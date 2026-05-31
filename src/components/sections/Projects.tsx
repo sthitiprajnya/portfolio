@@ -91,7 +91,7 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
         ease: [0.16, 1, 0.3, 1],
         delay: index * 0.1 // Cinematic stagger reveal based on index
       }}
-      className="h-full flex"
+      className="h-full flex" data-orb-target="project"
     >
       <GlassCard
         ref={ref}

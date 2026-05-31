@@ -175,7 +175,7 @@ export function Contact() {
                  <span className="font-mono text-xs uppercase tracking-widest text-text-muted group-hover:text-white">GitHub</span>
               </a>
 
-              <div className="group flex flex-col items-center justify-center p-6 rounded-lg bg-surface border border-border col-span-2 sm:col-span-1">
+              <div className="group flex flex-col items-center justify-center p-6 rounded-lg bg-surface border border-border col-span-2 sm:col-span-1" data-orb-target="contact">
                  <div className="w-12 h-12 rounded bg-surface border border-border flex items-center justify-center text-text-muted mb-4">
                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>

@@ -18,19 +18,31 @@ export function Preloader() {
     const sequence = async () => {
       // Stage 0: 0-300ms (Blinking cursor)
       await new Promise(r => setTimeout(r, 300));
-      setStage(1); // Type line 1
-
-      await new Promise(r => setTimeout(r, 600));
-      setStage(2); // Type line 2
+      setStage(1); // SYSTEM BOOT
 
       await new Promise(r => setTimeout(r, 400));
-      setStage(3); // Type line 3
+      setStage(2); // INITIALIZING
+
+      await new Promise(r => setTimeout(r, 600));
+      setStage(3); // LOADING SECURITY PROTOCOLS
+
+      await new Promise(r => setTimeout(r, 400));
+      setStage(4); // MOUNTING ROOT FILESYSTEM
+
+      await new Promise(r => setTimeout(r, 400));
+      setStage(5); // BYPASSING MAINFRAME FIREWALL
+
+      await new Promise(r => setTimeout(r, 400));
+      setStage(6); // DECRYPTING PORTFOLIO ASSETS
+
+      await new Promise(r => setTimeout(r, 400));
+      setStage(7); // ESTABLISHING ENCRYPTED CHANNEL
 
       await new Promise(r => setTimeout(r, 300));
-      setStage(4); // Start progress bar & hex scroll
+      setStage(8); // Start progress bar & hex scroll
 
       // Simulate progress bar and hex dump
-      const duration = 900;
+      const duration = 1200;
       const interval = 50;
       const steps = duration / interval;
       let step = 0;
@@ -48,15 +60,15 @@ export function Preloader() {
 
         if (step >= steps) {
           clearInterval(timer);
-          setStage(5); // ACCESS GRANTED
+          setStage(9); // ACCESS GRANTED
         }
       }, interval);
 
-      await new Promise(r => setTimeout(r, 1100)); // Wait for bar + 200ms
-      setStage(6); // Fade out text
+      await new Promise(r => setTimeout(r, 1400)); // Wait for bar + 200ms
+      setStage(10); // Fade out text
 
       await new Promise(r => setTimeout(r, 300));
-      setStage(7); // Trigger exit animation
+      setStage(11); // Trigger exit animation
 
       await new Promise(r => setTimeout(r, 500));
       sessionStorage.setItem('booted', 'true');
@@ -79,7 +91,7 @@ export function Preloader() {
       >
         <motion.div
           className="w-full max-w-3xl flex flex-col items-start space-y-4"
-          animate={{ opacity: stage >= 6 ? 0 : 1 }}
+          animate={{ opacity: stage >= 10 ? 0 : 1 }}
           transition={{ duration: 0.3 }}
         >
           {stage >= 0 && (
@@ -89,27 +101,55 @@ export function Preloader() {
           )}
 
           {stage >= 1 && (
-            <div className="flex text-sm md:text-base">
+            <div className="flex text-sm md:text-base text-cyan font-bold mb-4">
               <span className="mr-2">&gt;</span>
-              <Typewriter text="INITIALIZING STHITAPRAJNA_BISWAL.sh..." speed={40} />
+              <Typewriter text="SYSTEM BOOT SEQUENCE INITIATED..." speed={20} />
             </div>
           )}
 
           {stage >= 2 && (
             <div className="flex text-sm md:text-base">
               <span className="mr-2">&gt;</span>
-              <Typewriter text="LOADING SECURITY PROTOCOLS..." speed={40} />
+              <Typewriter text="INITIALIZING STHITIPRAJNYA_BISWAL.sh..." speed={30} />
             </div>
           )}
 
           {stage >= 3 && (
             <div className="flex text-sm md:text-base">
               <span className="mr-2">&gt;</span>
-              <Typewriter text="ESTABLISHING ENCRYPTED CHANNEL..." speed={40} />
+              <Typewriter text="LOADING SECURITY PROTOCOLS..." speed={20} />
             </div>
           )}
 
-          {stage >= 4 && stage < 5 && (
+          {stage >= 4 && (
+            <div className="flex text-sm md:text-base">
+              <span className="mr-2">&gt;</span>
+              <Typewriter text="MOUNTING ROOT FILESYSTEM..." speed={20} />
+            </div>
+          )}
+
+          {stage >= 5 && (
+            <div className="flex text-sm md:text-base text-yellow-500">
+              <span className="mr-2">&gt;</span>
+              <Typewriter text="BYPASSING MAINFRAME FIREWALL..." speed={30} />
+            </div>
+          )}
+
+          {stage >= 6 && (
+            <div className="flex text-sm md:text-base">
+              <span className="mr-2">&gt;</span>
+              <Typewriter text="DECRYPTING PORTFOLIO ASSETS..." speed={20} />
+            </div>
+          )}
+
+          {stage >= 7 && (
+            <div className="flex text-sm md:text-base">
+              <span className="mr-2">&gt;</span>
+              <Typewriter text="ESTABLISHING ENCRYPTED CHANNEL..." speed={20} />
+            </div>
+          )}
+
+          {stage >= 8 && stage < 9 && (
             <div className="w-full flex flex-col mt-8">
               <div className="h-24 overflow-hidden mb-4 opacity-50 text-xs">
                 {hexDump.map((line, i) => (
@@ -125,7 +165,7 @@ export function Preloader() {
             </div>
           )}
 
-          {stage >= 5 && (
+          {stage >= 9 && (
             <div className="text-green mt-8 text-xl font-bold shadow-[var(--glow-green-sm)]" style={{ textShadow: '0 0 10px var(--color-green)' }}>
               ACCESS GRANTED
             </div>
@@ -141,13 +181,21 @@ function Typewriter({ text, speed = 40 }: { text: string; speed?: number }) {
   const [displayedText, setDisplayedText] = useState('');
 
   useEffect(() => {
-    let index = 0;
-    const interval = setInterval(() => {
-      setDisplayedText(prev => prev + text.charAt(index));
-      index++;
-      if (index >= text.length) clearInterval(interval);
-    }, speed);
-    return () => clearInterval(interval);
+    setDisplayedText('');
+    let currentIndex = 0;
+    let timeoutId: NodeJS.Timeout;
+
+    const typeNextChar = () => {
+      if (currentIndex < text.length) {
+        setDisplayedText(text.slice(0, currentIndex + 1));
+        currentIndex++;
+        timeoutId = setTimeout(typeNextChar, speed);
+      }
+    };
+
+    timeoutId = setTimeout(typeNextChar, speed);
+
+    return () => clearTimeout(timeoutId);
   }, [text, speed]);
 
   return <span>{displayedText}</span>;

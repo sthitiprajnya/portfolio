@@ -3,9 +3,10 @@ import React, { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { SectionTitle }  from '@/components/ui/SectionTitle';
 import { GlassCard }     from '@/components/ui/GlassCard';
-import { ScrollReveal, fadeSlideUp, fadeSlideLeft, containerStagger } from '@/components/ui/ScrollReveal';
+import { ScrollReveal, fadeSlideUp, fadeSlideLeft } from '@/components/ui/ScrollReveal';
 import { useInView }     from 'react-intersection-observer';
 import { CTF_PROFILE }   from '@/data/portfolio';
+import { Radar } from 'react-chartjs-2';
 
 export function CTFStats() {
   return (
@@ -84,20 +85,82 @@ export function CTFStats() {
             </GlassCard>
           </ScrollReveal>
 
-          {/* ── Right: Attack category proficiency ── */}
-          <ScrollReveal variants={fadeSlideLeft} className="lg:col-span-8">
-            <GlassCard className="p-6 h-full">
+          {/* ── Right: Attack category proficiency & Recent Activity ── */}
+          <ScrollReveal variants={fadeSlideLeft} className="lg:col-span-8 space-y-6">
+            <GlassCard className="p-6">
               <h3 className="font-mono text-sm text-white mb-6 border-b border-border pb-3">
                 // ATTACK_CATEGORY_PROFICIENCY
               </h3>
 
-              <ScrollReveal variants={containerStagger} className="space-y-5">
-                {CTF_PROFILE.attackCategories.map((cat) => (
-                  <ScrollReveal key={cat.label} variants={fadeSlideUp}>
-                    <SkillBar label={cat.label} level={cat.level} />
-                  </ScrollReveal>
-                ))}
-              </ScrollReveal>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                 <div className="space-y-4">
+                  {CTF_PROFILE.attackCategories.slice(0, 4).map((cat) => (
+                    <SkillBar key={cat.label} label={cat.label} level={cat.level} />
+                  ))}
+                  <div className="pt-2">
+                     <p className="font-mono text-[0.65rem] text-text-muted leading-relaxed">Proficiency measured across HTB matrices and real-world VAPT engagements.</p>
+                  </div>
+                 </div>
+
+                 {/* Hexagonal Radar Chart mapped from same data */}
+                 <div className="h-[240px] relative flex justify-center items-center">
+                   <Radar
+                     data={{
+                       labels: CTF_PROFILE.attackCategories.map(c => c.label.split(' ')[0]),
+                       datasets: [{
+                         label: 'Proficiency',
+                         data: CTF_PROFILE.attackCategories.map(c => c.level),
+                         backgroundColor: 'rgba(57, 255, 20, 0.2)',
+                         borderColor: 'rgba(57, 255, 20, 0.8)',
+                         pointBackgroundColor: 'rgba(57, 255, 20, 1)',
+                         pointBorderColor: '#fff',
+                       }]
+                     }}
+                     options={{
+                       scales: {
+                         r: {
+                           angleLines: { color: 'rgba(255,255,255,0.1)' },
+                           grid: { color: 'rgba(255,255,255,0.1)' },
+                           pointLabels: { color: '#7FA8C4', font: { family: 'JetBrains Mono', size: 9 } },
+                           ticks: { display: false },
+                           suggestedMin: 0,
+                           suggestedMax: 100
+                         }
+                       },
+                       plugins: { legend: { display: false } },
+                       maintainAspectRatio: false
+                     }}
+                   />
+                 </div>
+              </div>
+            </GlassCard>
+
+            <GlassCard className="p-6">
+               <h3 className="font-mono text-sm text-white mb-4 border-b border-border pb-3 flex justify-between items-end">
+                 <span>// RECENT_ACTIVITY</span>
+                 <span className="text-[0.6rem] text-text-muted">Live Feed (Mock)</span>
+               </h3>
+               <div className="space-y-3">
+                 {CTF_PROFILE.recentActivity.map((act, i) => (
+                    <div key={i} className="flex items-center justify-between p-3 rounded bg-black/40 border border-border hover:border-green/30 transition-colors">
+                      <div className="flex items-center gap-3">
+                         <span className={clsx("w-2 h-2 rounded-full", act.type === 'machine' ? 'bg-green shadow-[var(--glow-green-sm)]' : 'bg-amber shadow-[var(--glow-amber-sm)]')} />
+                         <div>
+                            <div className="font-heading font-bold text-sm text-white">{act.title}</div>
+                            <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest">{act.type}</div>
+                         </div>
+                      </div>
+                      <div className="text-right">
+                        <div className={clsx("font-mono text-[0.65rem] uppercase tracking-widest mb-1",
+                          act.difficulty === 'Easy' ? 'text-green' : act.difficulty === 'Medium' ? 'text-amber' : 'text-red-500'
+                        )}>
+                           {act.difficulty}
+                        </div>
+                        <div className="font-mono text-[0.6rem] text-text-secondary">{act.date}</div>
+                      </div>
+                    </div>
+                 ))}
+               </div>
             </GlassCard>
           </ScrollReveal>
         </div>

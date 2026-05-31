@@ -166,3 +166,51 @@ body {
   animation: scan-line 8s linear infinite;
   pointer-events: none;
 }
+
+/* ── Print Stylesheet ───────────────────────────────────────── */
+@media print {
+  body {
+    background-color: white !important;
+    color: black !important;
+    font-size: 12pt;
+  }
+
+  *, ::before, ::after {
+    background: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    border-color: #ccc !important;
+    animation: none !important;
+    transition: none !important;
+  }
+
+  nav, footer, .custom-cursor, .custom-cursor-dot, .scan-line-effect::after, iframe, video, .ticker-track {
+    display: none !important;
+  }
+
+  section {
+    page-break-inside: avoid;
+    padding: 2rem 0 !important;
+    border: none !important;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+    color: black !important;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+
+  a[href^="http"]:after {
+    content: " (" attr(href) ")";
+    font-size: 90%;
+  }
+
+  .redacted {
+    background: transparent !important;
+    color: black !important;
+  }
+}

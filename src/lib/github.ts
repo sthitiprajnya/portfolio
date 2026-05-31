@@ -45,8 +45,13 @@ export async function fetchGitHubStats(): Promise<GitHubStats> {
 
   const cached = localStorage.getItem(CACHE_KEY);
   if (cached) {
-    const parsed: GitHubStats = JSON.parse(cached);
-    if (Date.now() - parsed.fetchedAt < CACHE_TTL) return parsed;
+    try {
+      const parsed: GitHubStats = JSON.parse(cached);
+      if (Date.now() - parsed.fetchedAt < CACHE_TTL) return parsed;
+    } catch (e) {
+      console.warn('Failed to parse cached GitHub stats, clearing cache.', e);
+      localStorage.removeItem(CACHE_KEY);
+    }
   }
 
   const headers = { 'Accept': 'application/vnd.github.v3+json' };

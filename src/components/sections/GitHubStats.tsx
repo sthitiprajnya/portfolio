@@ -54,6 +54,8 @@ export function GitHubStats() {
                        alt={`${PERSONAL.name}'s GitHub Contribution Heatmap`}
                        className="w-full max-w-full drop-shadow-[0_0_8px_rgba(0,245,255,0.3)] filter brightness-110 contrast-125 invert-[1] hue-rotate-[180deg]"
                        style={{ opacity: 0.9 }}
+                       width={495}
+                       height={195}
                        loading="lazy"
                      />
                      <div className="mt-8 grid grid-cols-3 gap-6 w-full text-center border-t border-border/50 pt-6">

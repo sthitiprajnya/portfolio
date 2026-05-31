@@ -77,25 +77,33 @@ export async function fetchGitHubStats(): Promise<GitHubStats> {
     let top2: GitHubApiRepo | null = null;
     let top3: GitHubApiRepo | null = null;
 
+    let minTopStars = -1;
+
     for (let i = 0; i < repos.length; i++) {
       const r = repos[i];
+      const stars = r.stargazers_count;
+      const forks = r.forks_count;
+      const lang = r.language;
 
-      if (r.stargazers_count) totalStars += r.stargazers_count;
-      if (r.forks_count) totalForks += r.forks_count;
-      if (r.language) {
-        languages[r.language] = (languages[r.language] || 0) + 1;
+      totalStars += stars;
+      totalForks += forks;
+
+      if (lang) {
+        languages[lang] = (languages[lang] || 0) + 1;
       }
 
-      const stars = r.stargazers_count;
-      if (!top1 || stars > top1.stargazers_count) {
-          top3 = top2;
-          top2 = top1;
-          top1 = r;
-      } else if (!top2 || stars > top2.stargazers_count) {
-          top3 = top2;
-          top2 = r;
-      } else if (!top3 || stars > top3.stargazers_count) {
-          top3 = r;
+      if (stars > minTopStars) {
+          if (!top1 || stars > top1.stargazers_count) {
+              top3 = top2;
+              top2 = top1;
+              top1 = r;
+          } else if (!top2 || stars > top2.stargazers_count) {
+              top3 = top2;
+              top2 = r;
+          } else if (!top3 || stars > top3.stargazers_count) {
+              top3 = r;
+          }
+          if (top3) minTopStars = top3.stargazers_count;
       }
     }
 

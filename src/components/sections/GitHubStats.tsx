@@ -38,36 +38,40 @@ export function GitHubStats() {
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-              {/* Left Column - Third Party Embeds */}
-              <ScrollReveal variants={fadeSlideUp} className="lg:col-span-7 space-y-8">
-
-                <GlassCard className="p-1 border border-cyan/20">
-                  <div className="w-full overflow-hidden rounded">
-                    {/* Using github-readme-stats. Note: this requires user repo updates for live graphs */}
-                    <img
-                      src={`https://github-readme-stats.vercel.app/api/contribution?username=sthitiprajnya&theme=tokyonight`}
-                      alt={`${PERSONAL.name}'s GitHub Stats`}
-                      className="w-full h-auto object-cover"
-                      width={495}
-                      height={195}
-                      loading="lazy"
-                    />
+              {/* Left Column - Terminal Style Heatmap & Logs */}
+              <ScrollReveal variants={fadeSlideUp} className="lg:col-span-7">
+                <GlassCard className="h-full border border-cyan/20 p-0 flex flex-col overflow-hidden bg-[#0A0A0A]">
+                  <div className="flex items-center px-4 py-2 bg-black border-b border-border">
+                    <span className="w-3 h-3 rounded-full bg-red-500/80 mr-2"></span>
+                    <span className="w-3 h-3 rounded-full bg-amber-500/80 mr-2"></span>
+                    <span className="w-3 h-3 rounded-full bg-green-500/80 mr-4"></span>
+                    <span className="font-mono text-[0.65rem] text-text-muted tracking-widest">git_log.sh --author="sthitiprajnya"</span>
+                  </div>
+                  <div className="p-6 flex-grow flex flex-col justify-center items-center relative">
+                     <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PHBhdGggZD0iTTEwIDBMICAwIDBMMCAxMEwxMCAxMEwxMCAwWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEiLz48L3N2Zz4=')] opacity-[0.03] pointer-events-none"></div>
+                     <img
+                       src={`https://ghchart.rshah.org/00F5FF/sthitiprajnya`}
+                       alt={`${PERSONAL.name}'s GitHub Contribution Heatmap`}
+                       className="w-full max-w-full drop-shadow-[0_0_8px_rgba(0,245,255,0.3)] filter brightness-110 contrast-125 invert-[1] hue-rotate-[180deg]"
+                       style={{ opacity: 0.9 }}
+                       loading="lazy"
+                     />
+                     <div className="mt-8 grid grid-cols-3 gap-6 w-full text-center border-t border-border/50 pt-6">
+                       <div>
+                         <div className="font-mono text-xl text-cyan font-bold mb-1"><CountUp end={852} duration={2.5} /></div>
+                         <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest">Commits</div>
+                       </div>
+                       <div>
+                         <div className="font-mono text-xl text-green font-bold mb-1"><CountUp end={43} duration={2.5} /></div>
+                         <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest">Pull Requests</div>
+                       </div>
+                       <div>
+                         <div className="font-mono text-xl text-amber font-bold mb-1"><CountUp end={12} duration={2.5} /></div>
+                         <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest">Issues</div>
+                       </div>
+                     </div>
                   </div>
                 </GlassCard>
-
-                <GlassCard className="p-1 border border-border">
-                  <div className="w-full overflow-hidden rounded">
-                    <img
-                      src={`https://streak-stats.demolab.com/?user=sthitiprajnya&theme=highcontrast&hide_border=true`}
-                      alt="Top Languages"
-                      className="w-full h-auto object-cover"
-                      width={495}
-                      height={195}
-                      loading="lazy"
-                    />
-                  </div>
-                </GlassCard>
-
               </ScrollReveal>
 
               {/* Right Column - Top Repos */}

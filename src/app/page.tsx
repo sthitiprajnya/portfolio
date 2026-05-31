@@ -3,11 +3,14 @@
 import React from 'react';
 import { Preloader }            from '@/components/sections/Preloader';
 import { Navigation }           from '@/components/sections/Navigation';
+import { CommandPalette }       from '@/components/global/CommandPalette';
+import { ScrollProgress }       from '@/components/global/ScrollProgress';
 import { Hero }                 from '@/components/sections/Hero';
 import { About }                from '@/components/sections/About';
 import { Skills }               from '@/components/sections/Skills';
 import { Experience }           from '@/components/sections/Experience';
 import { Projects }             from '@/components/sections/Projects';
+import { WriteupsStub }         from '@/components/sections/WriteupsStub';
 import { Certifications }       from '@/components/sections/Certifications';
 import { CTFStats }             from '@/components/sections/CTFStats';
 import { GitHubStats }          from '@/components/sections/GitHubStats';
@@ -25,6 +28,8 @@ export default function Home() {
 
       <CursorProvider>
         <SmoothScrollProvider>
+          <ScrollProgress />
+          <CommandPalette />
           <Navigation />
 
           <main id="main-content" tabIndex={-1} className="outline-none">
@@ -33,6 +38,7 @@ export default function Home() {
             <Skills />
             <Experience />
             <Projects />
+            <WriteupsStub />
             <Certifications />
             {/* Section 06 — War Games: CTF / HackTheBox activity */}
             <CTFStats />

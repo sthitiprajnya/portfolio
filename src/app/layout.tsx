@@ -37,14 +37,37 @@ export const viewport: Viewport = {
   themeColor: '#00F5FF',
 };
 
+import { FaviconBlinkProvider } from '@/components/providers/FaviconBlinkProvider';
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: 'Sthitaprajna Biswal',
+    jobTitle: 'Information Security Engineer',
+    url: 'https://sthitiprajnya.github.io/portfolio/',
+    sameAs: [
+      'https://www.linkedin.com/in/sthitaprajna-biswal-0175b7171/',
+      'https://github.com/sthitiprajnya',
+      'https://profile.hackthebox.com/profile/019db8ae-9364-73ed-bb47-1336835663a7'
+    ],
+    worksFor: {
+      '@type': 'Organization',
+      name: 'iServeU Technology'
+    }
+  };
+
   return (
     <html lang="en">
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <meta
           http-equiv="Content-Security-Policy"
           content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://github-readme-stats.vercel.app https://streak-stats.demolab.com https://images.unsplash.com; font-src 'self' data:; connect-src 'self' https://api.github.com https://api.emailjs.com; form-action 'self' https://api.emailjs.com; object-src 'none'; base-uri 'self'; upgrade-insecure-requests; frame-ancestors 'none';"
@@ -57,7 +80,11 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <div id="root">{children}</div>
+        <div id="root">
+          <FaviconBlinkProvider>
+            {children}
+          </FaviconBlinkProvider>
+        </div>
       </body>
     </html>
   );

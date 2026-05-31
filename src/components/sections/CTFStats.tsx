@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import clsx from 'clsx';
 import { SectionTitle }  from '@/components/ui/SectionTitle';
 import { GlassCard }     from '@/components/ui/GlassCard';
@@ -7,6 +7,43 @@ import { ScrollReveal, fadeSlideUp, fadeSlideLeft } from '@/components/ui/Scroll
 import { useInView }     from 'react-intersection-observer';
 import { CTF_PROFILE }   from '@/data/portfolio';
 import { Radar } from 'react-chartjs-2';
+
+// BOLT: Hoist static configurations and data transformations to module level
+const HTB_STATS = [
+  { label: 'Points',        value: CTF_PROFILE.htbPoints.toLocaleString() },
+  { label: 'Top',           value: `${CTF_PROFILE.globalPercentile}%` },
+  { label: 'User Owns',     value: CTF_PROFILE.htbUserOwns },
+  { label: 'Root Owns',     value: CTF_PROFILE.htbRootOwns },
+  { label: 'Challenges',    value: CTF_PROFILE.htbChallengesSolved },
+  { label: 'Competitions',  value: CTF_PROFILE.competitions.length },
+];
+
+const RADAR_DATA = {
+  labels: CTF_PROFILE.attackCategories.map(c => c.label.split(' ')[0]),
+  datasets: [{
+    label: 'Proficiency',
+    data: CTF_PROFILE.attackCategories.map(c => c.level),
+    backgroundColor: 'rgba(57, 255, 20, 0.2)',
+    borderColor: 'rgba(57, 255, 20, 0.8)',
+    pointBackgroundColor: 'rgba(57, 255, 20, 1)',
+    pointBorderColor: '#fff',
+  }]
+};
+
+const RADAR_OPTIONS = {
+  scales: {
+    r: {
+      angleLines: { color: 'rgba(255,255,255,0.1)' },
+      grid: { color: 'rgba(255,255,255,0.1)' },
+      pointLabels: { color: '#7FA8C4', font: { family: 'JetBrains Mono', size: 9 } },
+      ticks: { display: false },
+      suggestedMin: 0,
+      suggestedMax: 100
+    }
+  },
+  plugins: { legend: { display: false } },
+  maintainAspectRatio: false
+};
 
 export function CTFStats() {
   return (
@@ -48,14 +85,7 @@ export function CTFStats() {
 
               {/* Stats grid */}
               <div className="grid grid-cols-2 gap-3 mb-6">
-                {[
-                  { label: 'Points',        value: CTF_PROFILE.htbPoints.toLocaleString() },
-                  { label: 'Top',           value: `${CTF_PROFILE.globalPercentile}%` },
-                  { label: 'User Owns',     value: CTF_PROFILE.htbUserOwns },
-                  { label: 'Root Owns',     value: CTF_PROFILE.htbRootOwns },
-                  { label: 'Challenges',    value: CTF_PROFILE.htbChallengesSolved },
-                  { label: 'Competitions',  value: CTF_PROFILE.competitions.length },
-                ].map(({ label, value }) => (
+                {HTB_STATS.map(({ label, value }) => (
                   <div key={label} className="p-3 rounded bg-black/40 border border-border">
                     <div className="font-display text-xl text-cyan font-bold">{value}</div>
                     <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest mt-0.5">
@@ -105,31 +135,8 @@ export function CTFStats() {
                  {/* Hexagonal Radar Chart mapped from same data */}
                  <div className="h-[240px] relative flex justify-center items-center">
                    <Radar
-                     data={{
-                       labels: CTF_PROFILE.attackCategories.map(c => c.label.split(' ')[0]),
-                       datasets: [{
-                         label: 'Proficiency',
-                         data: CTF_PROFILE.attackCategories.map(c => c.level),
-                         backgroundColor: 'rgba(57, 255, 20, 0.2)',
-                         borderColor: 'rgba(57, 255, 20, 0.8)',
-                         pointBackgroundColor: 'rgba(57, 255, 20, 1)',
-                         pointBorderColor: '#fff',
-                       }]
-                     }}
-                     options={{
-                       scales: {
-                         r: {
-                           angleLines: { color: 'rgba(255,255,255,0.1)' },
-                           grid: { color: 'rgba(255,255,255,0.1)' },
-                           pointLabels: { color: '#7FA8C4', font: { family: 'JetBrains Mono', size: 9 } },
-                           ticks: { display: false },
-                           suggestedMin: 0,
-                           suggestedMax: 100
-                         }
-                       },
-                       plugins: { legend: { display: false } },
-                       maintainAspectRatio: false
-                     }}
+                     data={RADAR_DATA}
+                     options={RADAR_OPTIONS}
                    />
                  </div>
               </div>
@@ -218,11 +225,6 @@ export function CTFStats() {
 
 function SkillBar({ label, level }: { label: string; level: number }) {
   const { ref, inView } = useInView({ threshold: 0.12, triggerOnce: true });
-  const [animated, setAnimated] = useState(false);
-
-  useEffect(() => {
-    if (inView && !animated) setAnimated(true);
-  }, [inView, animated]);
 
   const colorClass =
     level >= 85 ? 'bg-cyan shadow-[var(--glow-cyan-sm)]'  :
@@ -240,7 +242,7 @@ function SkillBar({ label, level }: { label: string; level: number }) {
       <div className="h-2 bg-border rounded-full overflow-hidden">
         <div
           className={clsx('h-full rounded-full transition-[width] duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)]', colorClass)}
-          style={{ width: animated ? `${level}%` : '0%' }}
+          style={{ width: inView ? `${level}%` : '0%' }}
         />
       </div>
     </div>
@@ -249,12 +251,7 @@ function SkillBar({ label, level }: { label: string; level: number }) {
 
 function OwnsBar({ label, value, max, color }: { label: string; value: number; max: number; color: 'cyan' | 'green' }) {
   const { ref, inView } = useInView({ threshold: 0.12, triggerOnce: true });
-  const [animated, setAnimated] = useState(false);
   const pct = Math.min(100, (value / max) * 100);
-
-  useEffect(() => {
-    if (inView && !animated) setAnimated(true);
-  }, [inView, animated]);
 
   const barClass = color === 'cyan'
     ? 'bg-cyan shadow-[var(--glow-cyan-sm)]'
@@ -271,7 +268,7 @@ function OwnsBar({ label, value, max, color }: { label: string; value: number; m
       <div className="h-1.5 bg-border rounded-full overflow-hidden">
         <div
           className={clsx('h-full rounded-full transition-[width] duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)]', barClass)}
-          style={{ width: animated ? `${pct}%` : '0%' }}
+          style={{ width: inView ? `${pct}%` : '0%' }}
         />
       </div>
     </div>

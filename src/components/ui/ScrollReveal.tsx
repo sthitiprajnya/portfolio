@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion, type Variants, type HTMLMotionProps } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
@@ -71,20 +71,21 @@ export function ScrollReveal({
   });
   const prefersReducedMotion = usePrefersReducedMotion();
 
-  let activeVariants = variants;
-
-  if (delay && activeVariants.visible && typeof activeVariants.visible === 'object' && 'transition' in activeVariants.visible) {
-    activeVariants = {
-      ...activeVariants,
-      visible: {
-        ...activeVariants.visible,
-        transition: {
-          ...activeVariants.visible.transition,
-          delay
+  const activeVariants = useMemo(() => {
+    if (delay && variants.visible && typeof variants.visible === 'object' && 'transition' in variants.visible) {
+      return {
+        ...variants,
+        visible: {
+          ...variants.visible,
+          transition: {
+            ...variants.visible.transition,
+            delay
+          }
         }
-      }
-    };
-  }
+      };
+    }
+    return variants;
+  }, [variants, delay]);
 
   if (prefersReducedMotion) {
     return <div className={className}>{children}</div>;

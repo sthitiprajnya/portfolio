@@ -11,7 +11,6 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://sthitiprajnya.github.io/portfolio/',
   },
-  referrer: 'strict-origin-when-cross-origin',
   openGraph: {
     type: 'website',
     url: 'https://sthitiprajnya.github.io/portfolio/',

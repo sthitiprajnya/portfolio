@@ -39,10 +39,7 @@ const MARQUEE_TAGS = [
 ];
 
 // BOLT: Pre-calculate doubled and reversed arrays to avoid O(n) work and mutation bugs during render
-const MARQUEE_ROW_1 = [...MARQUEE_TAGS, ...MARQUEE_TAGS];
 // Create reversed copy first to match original behavior (reversed sequence doubled for seamless loop)
-const REVERSED_TAGS = [...MARQUEE_TAGS].reverse();
-const MARQUEE_ROW_2 = [...REVERSED_TAGS, ...REVERSED_TAGS];
 
 export function Skills() {
   const [activeTab, setActiveTab] = useState<'ALL' | 'OFFENSIVE' | 'CLOUD' | 'AUTOMATION' | 'COMPLIANCE'>('ALL');

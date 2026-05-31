@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from 'react';
+import { toast } from 'react-hot-toast';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { GlassCard }    from '@/components/ui/GlassCard';
 import { CyberButton }  from '@/components/ui/CyberButton';

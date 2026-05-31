@@ -172,7 +172,7 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
 
         {/* Dynamic Tabs for Subsections */}
         <div className="mb-8">
-          <div className="flex flex-wrap gap-2 mb-4 border-b border-border pb-2">
+          <div className="flex flex-wrap gap-2 mb-4 border-b border-border pb-2" role="tablist" aria-label={`${experience.company} role details`}>
             {experience.subsections.map((sub) => {
               const isOpen = openSection === sub.id;
               const activeColorMap = {
@@ -185,6 +185,10 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
               return (
                 <button
                   key={sub.id}
+                  id={`tab-${experience.id}-${sub.id}`}
+                  role="tab"
+                  aria-selected={isOpen}
+                  aria-controls={`panel-${experience.id}-${sub.id}`}
                   onClick={() => setOpenSection(sub.id)}
                   className={clsx(
                     "px-4 py-2 font-mono text-[0.65rem] tracking-widest uppercase transition-all rounded-t-md border-b-2 outline-none focus-visible:ring-2",
@@ -213,6 +217,9 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
                 return (
                   <motion.div
                     key={sub.id}
+                    id={`panel-${experience.id}-${sub.id}`}
+                    role="tabpanel"
+                    aria-labelledby={`tab-${experience.id}-${sub.id}`}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}

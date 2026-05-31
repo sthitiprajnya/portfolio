@@ -68,7 +68,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <meta
-          http-equiv="Content-Security-Policy"
+          httpEquiv="Content-Security-Policy"
           content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://github-readme-stats.vercel.app https://streak-stats.demolab.com https://images.unsplash.com; font-src 'self' data:; connect-src 'self' https://api.github.com https://api.emailjs.com; form-action 'self' https://api.emailjs.com; object-src 'none'; base-uri 'self'; upgrade-insecure-requests; frame-ancestors 'none';"
         />
       </head>

@@ -111,6 +111,7 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
           <div
             role="img"
             aria-label="Decorative grid pattern"
+            aria-hidden="true"
             className="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PHBhdGggZD0iTTEwIDBMICAwIDBMMCAxMEwxMCAxMEwxMCAwWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEiLz48L3N2Zz4=')]"
           ></div>
 
@@ -202,7 +203,7 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
                   className="w-full flex items-center justify-between p-2.5 bg-surface hover:bg-white/5 transition-colors font-mono text-[0.65rem] text-text-secondary uppercase tracking-widest outline-none focus-visible:ring-2 focus-visible:ring-cyan"
                 >
                   <span>VIEW_METHODOLOGY</span>
-                  <motion.svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" animate={{ rotate: showMethodology ? 180 : 0 }}>
+                  <motion.svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" animate={{ rotate: showMethodology ? 180 : 0 }} aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                   </motion.svg>
                 </button>

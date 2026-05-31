@@ -23,3 +23,7 @@
 ## 2026-06-20 - [Interaction-Induced Layout Thrashing & Loop Symmetry]
 **Learning:** Calling `getBoundingClientRect()` inside a `mousemove` handler triggers forced synchronous layouts (layout thrashing) on every frame of user interaction, which is a major performance bottleneck. Furthermore, particle "connection" logic that checks distances between all points using a simple nested loop ($n^2$) often double-processes pairs (e.g., A to B and B to A) and includes redundant self-comparisons.
 **Action:** Always cache bounding boxes in `resize` or `scroll` handlers to keep interactive loops layout-free. Optimize symmetric interaction loops by starting the inner index at `i + 1`, reducing iterations from $O(n^2)$ to $O(n(n-1)/2)$.
+
+## 2026-06-25 - [Optimizing High-Frequency Hooks with useSyncExternalStore]
+**Learning:** React hooks that subscribe to browser-native state (like `window.matchMedia`) and are consumed by many components (27+ in this case) can cause significant overhead when implemented with `useState` + `useEffect`. Each instance incurs a second render on mount and multiple effect cycles. Transitioning to `useSyncExternalStore` allows for hoisting the subscription and snapshot logic to the module level, providing a single source of truth that is both SSR-safe and highly efficient.
+**Action:** Use `useSyncExternalStore` for all browser-native state subscriptions. Hoist `subscribe` and `getSnapshot` to module scope to ensure identity stability across all consuming components.

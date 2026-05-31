@@ -6,6 +6,7 @@ const nextConfig = {
 
   // Apply basePath since GitHub Pages serves the app at /portfolio
   basePath: '/portfolio',
+  assetPrefix: '/portfolio/',
 
   // GitHub Pages serves files with a trailing slash, so /about becomes /about/index.html
   trailingSlash: true,

@@ -43,44 +43,42 @@ const MARQUEE_TAGS = [
 const MARQUEE_ROW_1 = [...MARQUEE_TAGS, ...MARQUEE_TAGS];
 const MARQUEE_ROW_2 = [...MARQUEE_TAGS].reverse().concat([...MARQUEE_TAGS].reverse());
 
+// BOLT: Hoist static data and configurations to avoid redundant allocations on every render
+const RADAR_DATA = {
+  labels: ['Offensive', 'Cloud Security', 'Automation', 'Compliance', 'Network Analysis', 'Incident Response'],
+  datasets: [
+    {
+      label: 'Proficiency',
+      data: [90, 85, 88, 80, 85, 82], // Aggregated scores
+      backgroundColor: 'rgba(0, 245, 255, 0.2)',
+      borderColor: 'rgba(0, 245, 255, 1)',
+      borderWidth: 2,
+      pointBackgroundColor: 'rgba(0, 245, 255, 1)',
+      pointBorderColor: '#fff',
+      pointHoverBackgroundColor: '#fff',
+      pointHoverBorderColor: 'rgba(0, 245, 255, 1)',
+    },
+  ],
+};
+
+const RADAR_OPTIONS = {
+  scales: {
+    r: {
+      angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+      grid: { color: 'rgba(255, 255, 255, 0.1)' },
+      pointLabels: { color: '#7FA8C4', font: { family: 'JetBrains Mono', size: 10 } },
+      ticks: { display: false, min: 0, max: 100 },
+    },
+  },
+  plugins: { legend: { display: false } },
+  maintainAspectRatio: false,
+};
+
+const SKILLS_TABS: ('ALL' | 'OFFENSIVE' | 'CLOUD' | 'AUTOMATION' | 'COMPLIANCE')[] = ['ALL', 'OFFENSIVE', 'CLOUD', 'AUTOMATION', 'COMPLIANCE'];
+
 export function Skills() {
   const [activeTab, setActiveTab] = useState<'ALL' | 'OFFENSIVE' | 'CLOUD' | 'AUTOMATION' | 'COMPLIANCE'>('ALL');
   const { ref: chartRef, inView: chartInView } = useInView({ triggerOnce: true, threshold: 0.5 });
-
-  const tabs: ('ALL' | 'OFFENSIVE' | 'CLOUD' | 'AUTOMATION' | 'COMPLIANCE')[] = ['ALL', 'OFFENSIVE', 'CLOUD', 'AUTOMATION', 'COMPLIANCE'];
-
-  const radarData = {
-    labels: ['Offensive', 'Cloud Security', 'Automation', 'Compliance', 'Network Analysis', 'Incident Response'],
-    datasets: [
-      {
-        label: 'Proficiency',
-        data: [90, 85, 88, 80, 85, 82], // Aggregated scores
-        backgroundColor: 'rgba(0, 245, 255, 0.2)',
-        borderColor: 'rgba(0, 245, 255, 1)',
-        borderWidth: 2,
-        pointBackgroundColor: 'rgba(0, 245, 255, 1)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgba(0, 245, 255, 1)',
-      },
-    ],
-  };
-
-  const radarOptions = {
-    scales: {
-      r: {
-        angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
-        grid: { color: 'rgba(255, 255, 255, 0.1)' },
-        pointLabels: { color: '#7FA8C4', font: { family: 'JetBrains Mono', size: 10 } },
-        ticks: { display: false, min: 0, max: 100 },
-      },
-    },
-    plugins: { legend: { display: false } },
-    maintainAspectRatio: false,
-    animation: {
-      duration: chartInView ? 2000 : 0,
-    }
-  };
 
   return (
     <section id="skills" className="py-24 bg-black overflow-hidden relative">
@@ -91,7 +89,7 @@ export function Skills() {
         <div className="flex flex-col lg:flex-row justify-between items-start gap-12 mb-16">
           <div className="flex-1 w-full">
              <div className="flex flex-wrap gap-2 mb-8 border-b border-border pb-4">
-              {tabs.map((tab) => (
+              {SKILLS_TABS.map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -116,7 +114,15 @@ export function Skills() {
              <div className="absolute top-2 left-4 font-mono text-[0.6rem] text-cyan tracking-widest">
                [ DOMAIN_PROFICIENCY_RADAR ]
              </div>
-             {chartInView && <Radar data={radarData} options={radarOptions} />}
+             {chartInView && (
+               <Radar
+                 data={RADAR_DATA}
+                 options={{
+                   ...RADAR_OPTIONS,
+                   animation: { duration: 2000 }
+                 }}
+               />
+             )}
           </div>
         </div>
 

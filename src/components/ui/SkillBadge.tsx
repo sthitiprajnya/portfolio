@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
@@ -20,17 +20,10 @@ export function SkillBadge({ name, icon, proficiency, color, delay = 0, descript
     triggerOnce: true,
   });
   const prefersReducedMotion = usePrefersReducedMotion();
-  const [hasAnimated, setHasAnimated] = useState(false);
 
   const radius = 28;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (proficiency / 100) * circumference;
-
-  useEffect(() => {
-    if (inView && !hasAnimated) {
-      setHasAnimated(true);
-    }
-  }, [inView, hasAnimated]);
 
   const colorMap = {
     cyan:   'var(--color-cyan)',
@@ -71,7 +64,7 @@ export function SkillBadge({ name, icon, proficiency, color, delay = 0, descript
             strokeDasharray={circumference}
             initial={{ strokeDashoffset: circumference }}
             animate={
-              (hasAnimated || prefersReducedMotion)
+              (inView || prefersReducedMotion)
                 ? { strokeDashoffset }
                 : { strokeDashoffset: circumference }
             }

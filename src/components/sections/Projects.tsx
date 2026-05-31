@@ -96,7 +96,7 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
       <GlassCard
         ref={ref}
         withTilt={!prefersReducedMotion}
-        className="w-full flex flex-col group cursor-pointer"
+        className="w-full flex flex-col group"
         style={prefersReducedMotion ? {} : { rotateX, rotateY, transformStyle: 'preserve-3d' }}
       >
         {/* Image Container */}
@@ -200,9 +200,11 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
               <div className="border border-border rounded-md overflow-hidden">
                 <button
                   onClick={(e) => { e.stopPropagation(); setShowMethodology(!showMethodology); }}
+                  aria-expanded={showMethodology}
+                  aria-controls={`methodology-${project.id}`}
                   className="w-full flex items-center justify-between p-2.5 bg-surface hover:bg-white/5 transition-colors font-mono text-[0.65rem] text-text-secondary uppercase tracking-widest outline-none focus-visible:ring-2 focus-visible:ring-cyan"
                 >
-                  <span>VIEW_METHODOLOGY</span>
+                  <span>{showMethodology ? 'HIDE_METHODOLOGY' : 'VIEW_METHODOLOGY'}</span>
                   <motion.svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" animate={{ rotate: showMethodology ? 180 : 0 }} aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                   </motion.svg>
@@ -210,6 +212,7 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
                 <AnimatePresence>
                   {showMethodology && (
                     <motion.div
+                      id={`methodology-${project.id}`}
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}

@@ -58,6 +58,18 @@ const config: Config = {
     },
   },
   plugins: [],
+  // Performance optimization: purge unused CSS
+  safelist: [
+    // Keep animations
+    'animate-pulse',
+    // Keep text colors used dynamically
+    'text-cyan',
+    'text-green',
+    'text-yellow-500',
+    'text-text-primary',
+    'text-text-secondary',
+    'text-text-muted',
+  ],
 };
 
 export default config;

@@ -25,7 +25,7 @@ export function Preloader() {
 
       await new Promise(r => setTimeout(r, 400));
       setStage(2); // INITIALIZING
-      speak("Initializing Sthitaprajna Biswal dot sh.");
+      speak("Initializing Master Sthitapragyaan dot sh.");
 
       await new Promise(r => setTimeout(r, 600));
       setStage(3); // LOADING SECURITY PROTOCOLS
@@ -70,7 +70,7 @@ export function Preloader() {
         if (step >= steps) {
           clearInterval(timer);
           setStage(9); // ACCESS GRANTED
-          speak("Access granted.");
+          speak("Access granted. Portfolio loading complete.");
         }
       }, interval);
 

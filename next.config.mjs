@@ -15,6 +15,26 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+
+  // React strict mode for development
+  reactStrictMode: true,
+
+  // Compression
+  compress: true,
+
+  // Optimization settings
+  poweredByHeader: false,
+
+  // Experimental optimizations
+  experimental: {
+    optimizePackageImports: [
+      'framer-motion',
+      'gsap',
+      'three',
+      '@react-three/fiber',
+      '@react-three/drei',
+    ],
+  },
 };
 
 export default nextConfig;

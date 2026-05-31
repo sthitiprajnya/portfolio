@@ -4,63 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAudio } from '@/components/providers/AudioProvider';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
-
-// Simulated AI responses
-const RESPONSES = {
-  skills: [
-    "I process threats via Burp Suite, Metasploit, and custom scripts.",
-    "The operator specializes in GCP and AWS cloud security architectures.",
-    "My database indicates high proficiency in VAPT, AppSec, and DevSecOps."
-  ],
-  experience: [
-    "Over 50 successful penetration tests executed across Indian FinTech and banking sectors.",
-    "The operator secured systems for NPCI, UIDAI, Axis Bank, and Kotak Mahindra.",
-    "Current engagement: Information Security Engineer at iServeU Technology."
-  ],
-  projects: [
-    "Classified projects involve automated vulnerability scanning and cloud posture management.",
-    "I have records of deep security assessments on microservices architectures.",
-    "The operator frequently develops custom exploits and security automation tools."
-  ],
-  certifications: [
-    "Credentials verified. Multiple industry-recognized certifications acquired.",
-    "The operator continually upgrades their defensive and offensive capabilities.",
-    "Security clearance level: High. Certifications active."
-  ],
-  ctf: [
-    "War games are a frequent training ground. HackTheBox metrics are impressive.",
-    "The operator hones their skills through continuous CTF challenges.",
-    "I have recorded numerous successful root compromises in simulated environments."
-  ],
-  hiring: [
-    "The operator is currently active. Transmit a message via the contact channel for inquiries.",
-    "Ready for new missions. Are you looking to bolster your security posture?",
-    "Available for contract or permanent assignments. Initiate contact sequence."
-  ],
-  greetings: [
-    "Sentinel online. State your query.",
-    "I am the guardian of this sector. How can I assist?",
-    "Awaiting input. What intel do you seek?"
-  ],
-  unknown: [
-    "That intel is classified. Ask me about the operator.",
-    "Query outside my operational parameters. Stick to the operator's background.",
-    "I cannot disclose that. Ask me about skills, experience, or projects."
-  ]
-};
-
-// Keyword mapping
-const matchIntent = (query: string) => {
-  const q = query.toLowerCase();
-  if (/(skill|tool|tech|stack|use|know|language|framework)/.test(q)) return 'skills';
-  if (/(experience|work|job|history|company|iserveu|role)/.test(q)) return 'experience';
-  if (/(project|build|made|create|portfolio)/.test(q)) return 'projects';
-  if (/(cert|certificate|credential|degree|education)/.test(q)) return 'certifications';
-  if (/(ctf|hackthebox|htb|game|challenge|play)/.test(q)) return 'ctf';
-  if (/(hire|job|available|work|contact|reach|email)/.test(q)) return 'hiring';
-  if (/(hi|hello|hey|greet|who are you|what are you)/.test(q)) return 'greetings';
-  return 'unknown';
-};
+import { generateResponse } from '@/lib/sentinelSpeech';
 
 export function Sentinel() {
   const { audioEnabled, setAudioEnabled, isSpeaking, speak } = useAudio();
@@ -124,14 +68,14 @@ export function Sentinel() {
   // Orb settings based on section
   const getOrbState = () => {
     switch (activeSection) {
-      case 'hero': return { color: '#00F5FF', speed: 1, particles: 6, state: 'IDLE' }; // cyan
-      case 'skills': return { color: '#00F5FF', speed: 2.5, particles: 8, state: 'POWERING_UP' }; // fast cyan
-      case 'experience': return { color: '#FFB300', speed: 1.5, particles: 6, state: 'BATTLE_MODE' }; // amber
+      case 'hero': return { color: '#00F5FF', speed: 1, particles: 6, state: 'DOUBLE_HELIX' }; // cyan
+      case 'skills': return { color: '#00F5FF', speed: 2.5, particles: 8, state: 'DOUBLE_HELIX' }; // fast cyan
+      case 'experience': return { color: '#FFB300', speed: 1.5, particles: 6, state: 'DOUBLE_HELIX' }; // amber
       case 'projects': return { color: '#00F5FF', speed: 1.5, particles: 6, state: 'DOUBLE_HELIX' }; // cyan
-      case 'certifications': return { color: '#FFFFFF', speed: 1, particles: 6, state: 'VERIFIED' }; // white
-      case 'ctf': return { color: '#FF0000', speed: 3, particles: 10, state: 'THREAT_MODE' }; // red
-      case 'contact': return { color: '#00FF00', speed: 0.5, particles: 4, state: 'RECEIVING' }; // green
-      default: return { color: '#00F5FF', speed: 1, particles: 6, state: 'ACTIVE' }; // cyan
+      case 'certifications': return { color: '#FFFFFF', speed: 1, particles: 6, state: 'DOUBLE_HELIX' }; // white
+      case 'ctf': return { color: '#FF0000', speed: 3, particles: 10, state: 'DOUBLE_HELIX' }; // red
+      case 'contact': return { color: '#00FF00', speed: 0.5, particles: 4, state: 'DOUBLE_HELIX' }; // green
+      default: return { color: '#00F5FF', speed: 1, particles: 6, state: 'DOUBLE_HELIX' }; // cyan
     }
   };
 
@@ -181,10 +125,8 @@ export function Sentinel() {
     setInputValue('');
     setChatHistory(prev => [...prev, { role: 'user', text: query }]);
 
-    // Determine intent and select random response
-    const intent = matchIntent(query) as keyof typeof RESPONSES;
-    const options = RESPONSES[intent];
-    const response = options[Math.floor(Math.random() * options.length)];
+    // Determine intent and generate intelligent dynamic response
+    const response = generateResponse(query);
 
     // Small delay to simulate "processing"
     setTimeout(() => {
@@ -338,7 +280,7 @@ export function Sentinel() {
               initial={{ opacity: 0, y: 20, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.9 }}
-              className="absolute bottom-full mb-4 w-[300px] md:w-[350px] bg-black/80 backdrop-blur-md border border-cyan/30 rounded-lg shadow-[0_0_30px_rgba(0,245,255,0.15)] overflow-hidden flex flex-col pointer-events-auto origin-bottom"
+              className="sentinel-chat-bubble absolute bottom-full mb-4 w-[300px] md:w-[350px] bg-black/80 backdrop-blur-md border border-cyan/30 rounded-lg shadow-[0_0_30px_rgba(0,245,255,0.15)] overflow-hidden flex flex-col pointer-events-auto origin-bottom"
               style={{ maxHeight: '400px', height: '60vh', borderColor: `${orbColorStr}4D`, boxShadow: `0 0 30px ${orbColorStr}33` }}
             >
               {/* Header */}

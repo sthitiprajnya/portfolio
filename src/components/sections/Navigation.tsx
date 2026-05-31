@@ -6,15 +6,16 @@ import { CyberButton } from '@/components/ui/CyberButton';
 import { PERSONAL }    from '@/data/portfolio';
 
 export const NAV_LINKS = [
-  { label: 'About',    id: 'about'    },
-  { label: 'Skills',   id: 'skills'   },
-  { label: 'XP',       id: 'experience'},
-  { label: 'Projects', id: 'projects' },
-  { label: 'Certs',    id: 'certifications' },
-  { label: 'War Games',id: 'ctf'      },
-  { label: 'GitHub',   id: 'github'   },
-  { label: 'Resume',   id: 'resume'   },
-  { label: 'Contact',  id: 'contact'  },
+  { label: 'About',       id: 'about'    },
+  { label: 'Skills',      id: 'skills'   },
+  { label: 'XP',          id: 'experience'},
+  { label: 'Projects',    id: 'projects' },
+  { label: 'Write-ups',   id: 'writeups' },
+  { label: 'Certs',       id: 'certifications' },
+  { label: 'War Games',   id: 'ctf'      },
+  { label: 'GitHub',      id: 'github'   },
+  { label: 'Resume',      id: 'resume'   },
+  { label: 'Contact',     id: 'contact'  },
 ];
 
 export function Navigation() {

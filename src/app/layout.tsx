@@ -30,6 +30,7 @@ export const metadata: Metadata = {
     description: '50+ pen tests · 230+ vulnerabilities · NPCI · UIDAI · Axis Bank · Kotak Mahindra',
     images: ['https://sthitiprajnya.github.io/portfolio/og-image.png'],
   },
+  referrer: 'strict-origin-when-cross-origin',
 };
 
 export const viewport: Viewport = {
@@ -70,7 +71,7 @@ export default function RootLayout({
         />
         <meta
           httpEquiv="Content-Security-Policy"
-          content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://github-readme-stats.vercel.app https://streak-stats.demolab.com https://images.unsplash.com; font-src 'self' data:; connect-src 'self' https://api.github.com https://api.emailjs.com; form-action 'self' https://api.emailjs.com; object-src 'none'; base-uri 'self'; upgrade-insecure-requests; frame-ancestors 'none';"
+          content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://github-readme-stats.vercel.app https://streak-stats.demolab.com https://images.unsplash.com https://ghchart.rshah.org; font-src 'self' data:; connect-src 'self' https://api.github.com https://api.emailjs.com; form-action 'self' https://api.emailjs.com; object-src 'none'; base-uri 'self'; upgrade-insecure-requests; frame-ancestors 'none';"
         />
       </head>
       <body>

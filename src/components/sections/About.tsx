@@ -4,10 +4,15 @@ import CountUp from 'react-countup';
 import { AsciiAvatar }   from '@/components/ui/AsciiAvatar';
 import { TerminalWindow } from '@/components/ui/TerminalWindow';
 import { SectionTitle }  from '@/components/ui/SectionTitle';
-import { ScrollReveal, fadeSlideUp, fadeSlideLeft, containerStagger } from '@/components/ui/ScrollReveal';
-import { ABOUT_BIO, ABOUT_STATS, TERMINAL_LINES } from '@/data/portfolio';
+import { ScrollReveal, fadeSlideUp, containerStagger } from '@/components/ui/ScrollReveal';
+import { ABOUT_BIO, ABOUT_STATS, PERSONAL } from '@/data/portfolio';
+import { useInView } from 'react-intersection-observer';
+import { CyberButton } from '@/components/ui/CyberButton';
+import { TypewriterText } from '@/components/ui/TypewriterText';
 
 export function About() {
+  const { ref: bioRef, inView: bioInView } = useInView({ triggerOnce: true, threshold: 0.2 });
+
   return (
     <section id="about" className="py-24 bg-deep relative border-t border-border">
 
@@ -43,18 +48,30 @@ export function About() {
 
           {/* ── Right column: bio + terminal + stats ── */}
           <div className="order-1 lg:order-2 space-y-8">
-            <ScrollReveal variants={containerStagger} className="space-y-6">
-              {ABOUT_BIO.map((paragraph, i) => (
-                <ScrollReveal key={i} variants={fadeSlideLeft}>
-                  <p className="font-body text-text-secondary leading-relaxed">
-                    {paragraph}
-                  </p>
-                </ScrollReveal>
+            <div ref={bioRef} className="space-y-6">
+              {bioInView && ABOUT_BIO.map((paragraph, i) => (
+                <p key={i} className="font-body text-text-secondary leading-relaxed">
+                  <TypewriterText sequence={[paragraph]} speed={10} cursor={i === ABOUT_BIO.length - 1} />
+                </p>
               ))}
+            </div>
+
+            <ScrollReveal variants={fadeSlideUp} delay={0.2} className="flex gap-4">
+              <CyberButton as="a" href={PERSONAL.resumeUrl} download color="cyan">
+                DOWNLOAD_CV
+              </CyberButton>
             </ScrollReveal>
 
-            <ScrollReveal variants={fadeSlideUp} delay={0.2}>
-              <TerminalWindow lines={TERMINAL_LINES} />
+            <ScrollReveal variants={fadeSlideUp} delay={0.3}>
+              <TerminalWindow lines={[
+                { prompt: 'sthitaprajna@kali:~$', command: 'whoami' },
+                { prompt: '', output: 'infosec-engineer' },
+                { prompt: 'sthitaprajna@kali:~$', command: 'cat highlights.txt' },
+                { prompt: '', output: '> 50+ Full-scope pen tests executed' },
+                { prompt: '', output: '> 230+ Unique vulnerabilities documented' },
+                { prompt: '', output: '> Specialised in Cloud Security & AppSec' },
+                { prompt: 'sthitaprajna@kali:~$', command: '', cursor: true }
+              ]} />
             </ScrollReveal>
 
             {/* Animated stat counters */}

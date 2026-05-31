@@ -6,6 +6,15 @@ const MatrixRain = lazy(() => import('@/components/canvas/MatrixRain'));
 
 export function Footer() {
   const year = new Date().getFullYear();
+  // Using a mock session logged value or random number generator between 1000 and 5000 for aesthetics
+  const [visitorCount, setVisitorCount] = React.useState(0);
+
+  React.useEffect(() => {
+    // Generate a stable-ish random number based on today's date so it doesn't jump crazily on every refresh, but grows slowly
+    const today = new Date();
+    const base = 4280 + (today.getMonth() * 120) + today.getDate() * 15;
+    setVisitorCount(base + Math.floor(Math.random() * 5));
+  }, []);
 
   return (
     <footer className="relative bg-black h-[120px] flex flex-col items-center justify-center border-t-2 border-transparent">
@@ -47,8 +56,13 @@ export function Footer() {
         </div>
 
         {/* Fixed: was "React + Vite" — this project is Next.js */}
-        <div className="font-mono text-[0.75rem] text-text-muted text-center">
-          Built with Next.js · Deployed on GitHub Pages · © {year} {PERSONAL.name}
+        <div className="font-mono text-[0.75rem] text-text-muted text-center flex flex-col md:flex-row items-center justify-center gap-2">
+          <span>Built with Next.js · Deployed on GitHub Pages · © {year} {PERSONAL.name}</span>
+          <span className="hidden md:inline">|</span>
+          <span className="flex items-center gap-2 px-2 py-0.5 bg-green/5 border border-green/20 rounded font-bold text-green shadow-[var(--glow-green-sm)]">
+            <span className="w-1.5 h-1.5 rounded-full bg-green animate-pulse"></span>
+            SESSIONS_LOGGED: {visitorCount.toString().padStart(4, '0')}
+          </span>
         </div>
       </div>
     </footer>

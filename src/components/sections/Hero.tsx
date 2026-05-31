@@ -5,6 +5,9 @@ import { GlitchText }    from '@/components/ui/GlitchText';
 import { TypewriterText } from '@/components/ui/TypewriterText';
 import { CyberButton }   from '@/components/ui/CyberButton';
 import { PERSONAL, HERO_ROLES, HERO_STATS, HERO_TICKER } from '@/data/portfolio';
+import CountUp from 'react-countup';
+import { useInView } from 'react-intersection-observer';
+import { AnimatePresence } from 'framer-motion';
 
 const ParticleField = lazy(() => import('@/components/canvas/ParticleField'));
 const MatrixRain    = lazy(() => import('@/components/canvas/MatrixRain'));
@@ -16,6 +19,9 @@ const NAME_CHARS = PERSONAL.nameShort.split('');
 const TYPEWRITER_SEQUENCE = HERO_ROLES.flatMap(role => [role, 2000]);
 
 export function Hero() {
+  const { ref: statsRef, inView: statsInView } = useInView({ triggerOnce: true, threshold: 0.5 });
+  const [activeIntel, setActiveIntel] = React.useState<string | null>(null);
+
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -35,15 +41,26 @@ export function Hero() {
       {/* ── Main content ── */}
       <div className="relative z-10 w-full max-w-[900px] px-6 flex flex-col items-center text-center flex-1 justify-center">
 
-        {/* Role badge */}
-        <motion.div
-          initial={{ opacity: 0, x: -80, filter: 'blur(6px)' }}
-          animate={{ opacity: 1, x: 0,  filter: 'blur(0px)' }}
-          transition={{ duration: 0.7, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-8 px-5 py-1.5 rounded-full border border-cyan/30 bg-cyan-ghost text-cyan font-mono text-[0.7rem] uppercase tracking-wider"
-        >
-          // {PRIMARY_ROLE}
-        </motion.div>
+        {/* Role & Availability badge */}
+        <div className="flex flex-col sm:flex-row items-center gap-4 mb-8">
+          <motion.div
+            initial={{ opacity: 0, x: -80, filter: 'blur(6px)' }}
+            animate={{ opacity: 1, x: 0,  filter: 'blur(0px)' }}
+            transition={{ duration: 0.7, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            className="px-5 py-1.5 rounded-full border border-cyan/30 bg-cyan-ghost text-cyan font-mono text-[0.7rem] uppercase tracking-wider"
+          >
+            // {PRIMARY_ROLE}
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: 80, filter: 'blur(6px)' }}
+            animate={{ opacity: 1, x: 0,  filter: 'blur(0px)' }}
+            transition={{ duration: 0.7, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-green/30 bg-green-ghost text-green font-mono text-[0.7rem] uppercase tracking-wider shadow-[var(--glow-green-sm)]"
+          >
+            <span className="w-2 h-2 rounded-full bg-green animate-pulse" />
+            AVAILABLE_FOR_HIRE
+          </motion.div>
+        </div>
 
         {/* Name with per-character cinematic reveal */}
         <div className="mb-4 overflow-hidden w-full text-center">
@@ -97,21 +114,30 @@ export function Hero() {
 
         {/* Stats row */}
         <motion.div
+          ref={statsRef}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 2.0 }}
           className="flex flex-wrap justify-center gap-x-8 gap-y-4 mb-12"
         >
-          {HERO_STATS.map((stat, i) => (
-            <div key={i} className="flex flex-col items-center">
-              <span className="font-display text-2xl text-cyan mb-1">
-                {stat.value}{stat.suffix}
-              </span>
-              <span className="font-mono text-[0.6rem] uppercase tracking-widest text-text-muted">
-                {stat.label}
-              </span>
-            </div>
-          ))}
+          {HERO_STATS.map((stat, i) => {
+            const numericValue = parseInt(stat.value.toString().replace(/[^0-9]/g, ''), 10);
+            return (
+              <div key={i} className="flex flex-col items-center">
+                <span className="font-display text-2xl text-cyan mb-1 flex items-center">
+                  {statsInView ? (
+                    <CountUp end={numericValue} duration={2.5} separator="," />
+                  ) : (
+                    '0'
+                  )}
+                  {stat.suffix}
+                </span>
+                <span className="font-mono text-[0.6rem] uppercase tracking-widest text-text-muted">
+                  {stat.label}
+                </span>
+              </div>
+            );
+          })}
         </motion.div>
 
         {/* CTAs */}
@@ -161,13 +187,57 @@ export function Hero() {
         <div className="pl-20 flex whitespace-nowrap overflow-hidden">
           <div className="ticker-track flex gap-12">
             {TICKER_CONTENT.map((msg, i) => (
-              <span key={i} className="font-mono text-[0.65rem] text-text-secondary tracking-wide">
+              <button
+                key={i}
+                onClick={() => setActiveIntel(msg)}
+                className="font-mono text-[0.65rem] text-text-secondary tracking-wide hover:text-cyan hover:underline cursor-pointer outline-none focus-visible:text-cyan focus-visible:underline"
+              >
                 {msg}
-              </span>
+              </button>
             ))}
           </div>
         </div>
       </motion.div>
+
+      {/* Intel Modal */}
+      <AnimatePresence>
+        {activeIntel && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            onClick={() => setActiveIntel(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 20 }}
+              className="bg-surface border border-cyan/30 rounded-lg p-6 max-w-md w-full shadow-[var(--glow-cyan-md)]"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-4 pb-2 border-b border-border">
+                <span className="font-mono text-cyan text-sm font-bold tracking-widest flex items-center gap-2">
+                  <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                  INTEL_EXPANDED
+                </span>
+                <button
+                  onClick={() => setActiveIntel(null)}
+                  className="text-text-secondary hover:text-white"
+                >
+                  [X]
+                </button>
+              </div>
+              <p className="font-mono text-sm text-text-primary leading-relaxed">
+                {activeIntel}
+              </p>
+              <div className="mt-6 flex justify-end">
+                <span className="text-xs text-text-muted font-mono">STATUS: CLASSIFIED</span>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Scroll indicator */}
       <motion.button

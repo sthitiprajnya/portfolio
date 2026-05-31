@@ -5,7 +5,6 @@ import { GlassCard }    from '@/components/ui/GlassCard';
 import { CyberButton }  from '@/components/ui/CyberButton';
 import { ScrollReveal, fadeSlideUp, fadeSlideLeft, containerStagger } from '@/components/ui/ScrollReveal';
 import { PERSONAL, RESUME_HIGHLIGHTS } from '@/data/portfolio';
-import { toast } from 'react-hot-toast';
 
 // The resume section is styled like a "classified document viewer" inside a terminal.
 // Redacted sections reveal on hover — a small UX easter egg that reinforces the
@@ -87,8 +86,8 @@ export function ResumePanel() {
               </div>
 
               {/* Footer stamp */}
-              <div className="px-6 py-4 border-t border-border flex justify-between items-center bg-black/60">
-                <span className="text-[0.6rem] text-text-muted font-mono">
+              <div className="px-6 py-4 border-t border-border flex flex-col md:flex-row justify-between items-center bg-black/60 gap-4">
+                <span className="text-[0.6rem] text-text-muted font-mono text-center md:text-left">
                   DOC_ID: <span
                     className="redacted"
                     tabIndex={0}
@@ -102,23 +101,30 @@ export function ResumePanel() {
                         handleCopy('SB-RESUME-2025-v3', 'Document ID');
                       }
                     }}
-                  >SB-RESUME-2025-v3</span> · SHA256: <span
-                    className="redacted"
+                  >SB-RESUME-2025-v3</span><br className="md:hidden" />
+                  <span className="hidden md:inline"> · </span>SHA256: <span
+                    className="redacted group/hash"
                     tabIndex={0}
                     role="button"
                     aria-label="Reveal and copy SHA256 hash"
                     title="Reveal and copy SHA256 hash"
-                    onClick={() => handleCopy('8f2a…d91c', 'SHA256 hash')}
+                    onClick={() => handleCopy('e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'SHA256 hash')}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
-                        handleCopy('8f2a…d91c', 'SHA256 hash');
+                        handleCopy('e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'SHA256 hash');
                       }
                     }}
-                  >8f2a…d91c</span>
+                  >
+                    e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+                    <span className="absolute -top-6 left-1/2 -translate-x-1/2 bg-black border border-amber text-amber px-2 py-0.5 rounded opacity-0 invisible group-focus/hash:opacity-100 group-focus/hash:visible group-hover/hash:opacity-100 group-hover/hash:visible transition-all text-[0.5rem] w-max z-50 pointer-events-none">
+                      Click to copy
+                    </span>
+                  </span>
                 </span>
-                <span className="text-[0.6rem] text-green font-bold font-mono uppercase tracking-widest">
-                  ● INTEGRITY OK
+                <span className="text-[0.6rem] text-green font-bold font-mono uppercase tracking-widest flex items-center gap-1.5 shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green animate-pulse" />
+                  INTEGRITY OK
                 </span>
               </div>
             </GlassCard>
@@ -186,9 +192,22 @@ export function ResumePanel() {
                   </span>
                 </CyberButton>
 
+                <button
+                  onClick={() => handleCopy(window.location.origin + window.location.pathname + '#resume', 'Resume Link')}
+                  className="w-full mt-3 flex items-center justify-center space-x-2 py-2 border border-cyan/30 text-cyan font-mono text-xs uppercase tracking-widest rounded-sm hover:bg-cyan/10 transition-all outline-none focus-visible:ring-2 focus-visible:ring-cyan"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                  </svg>
+                  <span>COPY_DIRECT_LINK</span>
+                </button>
+
                 {/* Audit trail label */}
-                <div className="mt-3 text-center font-mono text-[0.6rem] text-text-muted">
-                  Last updated · 2025 · PDF · &lt;2MB
+                <div className="mt-4 text-center font-mono text-[0.6rem] text-text-muted flex items-center justify-center gap-2">
+                  <span className="opacity-60">Last updated:</span>
+                  <span className="text-white">June 2025</span>
+                  <span className="opacity-40">|</span>
+                  <span className="opacity-60">PDF (&lt;2MB)</span>
                 </div>
               </GlassCard>
             </ScrollReveal>

@@ -120,10 +120,6 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
   const [openSection, setOpenSection] = useState<string | null>(experience.subsections[0]?.id || null);
   const prefersReducedMotion = usePrefersReducedMotion();
 
-  const toggleSection = (id: string) => {
-    setOpenSection(prev => prev === id ? null : id);
-  };
-
   const cardContent = (
     <div className="relative pl-8 md:pl-12">
       {/* Timeline Node */}
@@ -163,86 +159,87 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
 
         {/* Awards */}
         {experience.awards && experience.awards.length > 0 && (
-          <div className="flex flex-wrap gap-3 mb-8">
+          <div className="flex flex-col sm:flex-row gap-4 mb-8">
             {experience.awards.map((award, i) => (
-              <div key={i} className="flex items-center space-x-2 text-amber text-sm font-body bg-[rgba(255,179,0,0.1)] px-3 py-1.5 rounded-sm border border-[rgba(255,179,0,0.3)]">
-                <span>🏆</span>
-                <span className="font-semibold text-xs tracking-wide">{award}</span>
+              <div key={i} className="relative overflow-hidden group/award flex-1 flex flex-col items-center justify-center p-4 bg-surface border border-amber/30 rounded-lg shadow-[0_4px_20px_rgba(255,179,0,0.05)] hover:shadow-[0_4px_20px_rgba(255,179,0,0.15)] hover:border-amber/60 transition-all duration-300">
+                <div className="absolute inset-0 bg-gradient-to-br from-amber/10 to-transparent opacity-0 group-hover/award:opacity-100 transition-opacity duration-300" />
+                <span className="text-3xl mb-2 drop-shadow-[0_0_8px_rgba(255,179,0,0.5)] transform group-hover/award:scale-110 transition-transform duration-300">🏆</span>
+                <span className="font-heading font-bold text-amber text-sm tracking-wide text-center uppercase">{award}</span>
               </div>
             ))}
           </div>
         )}
 
-        {/* Expandable Subsections */}
-        <div className="space-y-4 mb-8">
-          {experience.subsections.map((sub) => {
-            const isOpen = openSection === sub.id;
+        {/* Dynamic Tabs for Subsections */}
+        <div className="mb-8">
+          <div className="flex flex-wrap gap-2 mb-4 border-b border-border pb-2">
+            {experience.subsections.map((sub) => {
+              const isOpen = openSection === sub.id;
+              const activeColorMap = {
+                cyan: 'bg-cyan/10 text-cyan border-cyan',
+                amber: 'bg-amber/10 text-amber border-amber',
+                violet: 'bg-violet/10 text-violet border-violet',
+                green: 'bg-green/10 text-green border-green'
+              };
 
-            const colorMap = {
-              cyan: 'text-cyan border-cyan/30 bg-cyan-ghost hover:border-cyan',
-              amber: 'text-amber border-amber/30 bg-[rgba(255,179,0,0.1)] hover:border-amber',
-              violet: 'text-violet border-violet/30 bg-[rgba(191,0,255,0.1)] hover:border-violet',
-              green: 'text-green border-green/30 bg-[rgba(57,255,20,0.1)] hover:border-green'
-            };
-
-            return (
-              <div key={sub.id} className="border border-border rounded-md overflow-hidden bg-black/40">
+              return (
                 <button
-                  onClick={() => toggleSection(sub.id)}
+                  key={sub.id}
+                  onClick={() => setOpenSection(sub.id)}
                   className={clsx(
-                    "w-full flex items-center justify-between p-4 font-mono text-xs tracking-widest uppercase transition-colors",
-                    colorMap[sub.color],
-                    isOpen ? "border-b" : "border-b-0"
+                    "px-4 py-2 font-mono text-[0.65rem] tracking-widest uppercase transition-all rounded-t-md border-b-2 outline-none focus-visible:ring-2",
+                    isOpen
+                      ? activeColorMap[sub.color]
+                      : "border-transparent text-text-secondary hover:text-white hover:bg-surface"
                   )}
-                  aria-expanded={isOpen}
-                  aria-controls={`content-${sub.id}`}
-                  aria-label={`${isOpen ? 'Collapse' : 'Expand'} ${sub.label} section`}
                 >
-                  <span>{sub.label}</span>
-                  <motion.svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                    animate={{ rotate: isOpen ? 180 : 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                  </motion.svg>
+                  {sub.label}
                 </button>
+              );
+            })}
+          </div>
 
-                <AnimatePresence initial={false}>
-                  {isOpen && (
-                    <motion.div
-                      id={`content-${sub.id}`}
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3, ease: "easeInOut" }}
-                    >
-                      <ul className="p-5 space-y-4">
-                        {sub.bullets.map((bullet, i) => (
-                          <li key={i} className="flex items-start text-sm text-text-secondary leading-relaxed">
-                            <span className="mr-3 mt-1.5 w-1.5 h-1.5 rounded-full bg-border flex-shrink-0" />
-                            <span>
-                              {/* Highlight specific numbers/percentages for impact */}
-                              {bullet.split(/(\d+%|\d+\+? hours|55%|100%|80%|35%|zero)/gi).map((part, pIdx) => {
-                                if (part.match(/(\d+%|\d+\+? hours|55%|100%|80%|35%|zero)/i)) {
-                                  return <strong key={pIdx} className="text-white font-bold">{part}</strong>;
-                                }
-                                return part;
-                              })}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            );
-          })}
+          <div className="relative min-h-[150px]">
+            <AnimatePresence mode="wait">
+              {experience.subsections.map((sub) => {
+                if (openSection !== sub.id) return null;
+
+                const getSeverityBadge = (text: string) => {
+                  if (/SQL Injection|RCE|critical/i.test(text)) return <span className="inline-flex items-center ml-2 px-1.5 py-0.5 rounded bg-red-500/20 text-red-500 border border-red-500/50 font-mono text-[0.55rem] uppercase font-bold">CRITICAL</span>;
+                  if (/privilege escalation|high/i.test(text)) return <span className="inline-flex items-center ml-2 px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-500 border border-amber-500/50 font-mono text-[0.55rem] uppercase font-bold">HIGH</span>;
+                  return null;
+                };
+
+                return (
+                  <motion.div
+                    key={sub.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute inset-0"
+                  >
+                    <ul className="space-y-4">
+                      {sub.bullets.map((bullet, i) => (
+                        <li key={i} className="flex items-start text-sm text-text-secondary leading-relaxed group/bullet">
+                          <span className="mr-3 mt-1.5 text-cyan opacity-50 group-hover/bullet:opacity-100 transition-opacity">▹</span>
+                          <span>
+                            {bullet.split(/(\d+%|\d+\+? hours|55%|100%|80%|35%|zero)/gi).map((part, pIdx) => {
+                              if (part.match(/(\d+%|\d+\+? hours|55%|100%|80%|35%|zero)/i)) {
+                                return <strong key={pIdx} className="text-white font-bold">{part}</strong>;
+                              }
+                              return part;
+                            })}
+                            {getSeverityBadge(bullet)}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          </div>
         </div>
 
         {/* Tech Tags Footer */}

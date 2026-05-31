@@ -4,6 +4,28 @@ import { SectionTitle } from '@/components/ui/SectionTitle';
 import { SkillBadge } from '@/components/ui/SkillBadge';
 import { ScrollReveal, fadeSlideUp, containerStagger } from '@/components/ui/ScrollReveal';
 import { SKILLS } from '@/data/portfolio';
+import { useState } from 'react';
+import clsx from 'clsx';
+import { Radar } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { useInView } from 'react-intersection-observer';
+
+ChartJS.register(
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend
+);
 
 // BOLT: Move static data outside component to avoid redundant allocations on every render
 const MARQUEE_TAGS = [
@@ -20,34 +42,112 @@ const MARQUEE_TAGS = [
 // Create reversed copy first to match original behavior (reversed sequence doubled for seamless loop)
 
 export function Skills() {
+  const [activeTab, setActiveTab] = useState<'ALL' | 'OFFENSIVE' | 'CLOUD' | 'AUTOMATION' | 'COMPLIANCE'>('ALL');
+  const { ref: chartRef, inView: chartInView } = useInView({ triggerOnce: true, threshold: 0.5 });
+
+  const tabs: ('ALL' | 'OFFENSIVE' | 'CLOUD' | 'AUTOMATION' | 'COMPLIANCE')[] = ['ALL', 'OFFENSIVE', 'CLOUD', 'AUTOMATION', 'COMPLIANCE'];
+
+  const radarData = {
+    labels: ['Offensive', 'Cloud Security', 'Automation', 'Compliance', 'Network Analysis', 'Incident Response'],
+    datasets: [
+      {
+        label: 'Proficiency',
+        data: [90, 85, 88, 80, 85, 82], // Aggregated scores
+        backgroundColor: 'rgba(0, 245, 255, 0.2)',
+        borderColor: 'rgba(0, 245, 255, 1)',
+        borderWidth: 2,
+        pointBackgroundColor: 'rgba(0, 245, 255, 1)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgba(0, 245, 255, 1)',
+      },
+    ],
+  };
+
+  const radarOptions = {
+    scales: {
+      r: {
+        angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+        pointLabels: { color: '#7FA8C4', font: { family: 'JetBrains Mono', size: 10 } },
+        ticks: { display: false, min: 0, max: 100 },
+      },
+    },
+    plugins: { legend: { display: false } },
+    maintainAspectRatio: false,
+    animation: {
+      duration: chartInView ? 2000 : 0,
+    }
+  };
+
   return (
     <section id="skills" className="py-24 bg-black overflow-hidden relative">
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <SectionTitle number="02" title="Tech Arsenal." />
 
+        {/* Filter Tabs & Radar Chart Row */}
+        <div className="flex flex-col lg:flex-row justify-between items-start gap-12 mb-16">
+          <div className="flex-1 w-full">
+             <div className="flex flex-wrap gap-2 mb-8 border-b border-border pb-4">
+              {tabs.map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={clsx(
+                    'px-4 py-2 font-mono text-[0.7rem] uppercase tracking-widest transition-all rounded-sm border outline-none focus-visible:ring-2 focus-visible:ring-cyan',
+                    activeTab === tab
+                      ? 'border-cyan bg-cyan/10 text-cyan shadow-[var(--glow-cyan-sm)]'
+                      : 'border-border text-text-secondary hover:border-cyan/50 hover:text-white'
+                  )}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
+            <p className="font-mono text-sm text-text-secondary leading-relaxed max-w-2xl">
+              Explore my technical capabilities across various domains. Hover over individual tools for detailed proficiency and professional context.
+            </p>
+          </div>
+
+          <div ref={chartRef} className="w-full lg:w-[400px] h-[300px] bg-surface/50 border border-border rounded-lg p-4 flex items-center justify-center relative group">
+            <div className="absolute inset-0 bg-cyan/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg pointer-events-none" />
+             <div className="absolute top-2 left-4 font-mono text-[0.6rem] text-cyan tracking-widest">
+               [ DOMAIN_PROFICIENCY_RADAR ]
+             </div>
+             {chartInView && <Radar data={radarData} options={radarOptions} />}
+          </div>
+        </div>
+
         {/* Skill Rings Grid */}
         <div className="space-y-16 mb-24">
-          {SKILLS.map((category, catIdx) => (
-            <ScrollReveal key={catIdx} variants={containerStagger} className="space-y-6">
-              <h3 className="font-mono text-sm text-white border-b border-border pb-2 inline-block">
-                {category.category}
-              </h3>
+          {SKILLS.map((category, catIdx) => {
+            const filteredSkills = category.skills.filter(s => activeTab === 'ALL' || s.domain === activeTab);
+            if (filteredSkills.length === 0) return null;
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-y-8 gap-x-4">
-                {category.skills.map((skill, skillIdx) => (
-                  <ScrollReveal key={skillIdx} variants={fadeSlideUp}>
-                    <SkillBadge
-                      name={skill.name}
-                      icon={skill.icon}
-                      proficiency={skill.proficiency}
-                      color={category.color}
-                      delay={skillIdx * 0.1}
-                    />
-                  </ScrollReveal>
-                ))}
-              </div>
-            </ScrollReveal>
-          ))}
+            return (
+              <ScrollReveal key={catIdx} variants={containerStagger} className="space-y-6">
+                <h3 className="font-mono text-sm text-white border-b border-border pb-2 inline-block">
+                  {category.category}
+                </h3>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-y-8 gap-x-4">
+                  {filteredSkills.map((skill, skillIdx) => (
+                    <ScrollReveal key={skillIdx} variants={fadeSlideUp}>
+                      <SkillBadge
+                        name={skill.name}
+                        icon={skill.icon}
+                        proficiency={skill.proficiency}
+                        color={category.color}
+                        delay={skillIdx * 0.1}
+                        description={skill.description}
+                        experience={skill.experience}
+                      />
+                    </ScrollReveal>
+                  ))}
+                </div>
+              </ScrollReveal>
+            );
+          })}
         </div>
       </div>
 
@@ -69,7 +169,7 @@ export function Skills() {
           role="region"
           aria-label="Skills marquee row 1"
         >
-          {[...MARQUEE_TAGS, ...MARQUEE_TAGS].map((tag, i) => (
+          {MARQUEE_ROW_1.map((tag, i) => (
             <div
               key={`row1-${i}`}
               className="mx-3 px-4 py-1.5 rounded-sm bg-surface border border-border font-mono text-[0.75rem] text-text-secondary whitespace-nowrap"
@@ -86,7 +186,7 @@ export function Skills() {
           role="region"
           aria-label="Skills marquee row 2"
         >
-          {[...MARQUEE_TAGS].reverse().concat(MARQUEE_TAGS).map((tag, i) => (
+          {MARQUEE_ROW_2.map((tag, i) => (
             <div
               key={`row2-${i}`}
               className="mx-3 px-4 py-1.5 rounded-sm bg-surface border border-border font-mono text-[0.75rem] text-text-secondary whitespace-nowrap"

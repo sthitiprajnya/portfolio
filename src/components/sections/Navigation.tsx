@@ -5,7 +5,7 @@ import clsx from 'clsx';
 import { CyberButton } from '@/components/ui/CyberButton';
 import { PERSONAL }    from '@/data/portfolio';
 
-const NAV_LINKS = [
+export const NAV_LINKS = [
   { label: 'About',    id: 'about'    },
   { label: 'Skills',   id: 'skills'   },
   { label: 'XP',       id: 'experience'},
@@ -22,6 +22,17 @@ export function Navigation() {
   const [activeSection,  setActiveSection]  = useState('hero');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && mobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [mobileMenuOpen]);
 
   useEffect(() => {
     // BOLT: Use IntersectionObserver instead of scroll listeners and getBoundingClientRect
@@ -81,7 +92,11 @@ export function Navigation() {
         <div className="w-full max-w-7xl mx-auto flex items-center justify-between">
 
           {/* Logo */}
-          <button onClick={() => scrollTo('hero')} className="flex items-center space-x-2 group" aria-label="Scroll to top">
+          <button
+            onClick={() => scrollTo('hero')}
+            className="flex items-center space-x-2 group outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-sm"
+            aria-label="Scroll to top"
+          >
             <span className="text-cyan font-mono font-bold">{'>_'}</span>
             <span className="font-display font-bold text-white tracking-widest text-sm md:text-base group-hover:text-cyan transition-colors">
               {PERSONAL.nameShort}
@@ -98,10 +113,11 @@ export function Navigation() {
                     <button
                       onClick={() => scrollTo(link.id)}
                       className={clsx(
-                        'relative font-mono text-[0.72rem] uppercase tracking-widest py-2 transition-colors group',
+                        'relative font-mono text-[0.72rem] uppercase tracking-widest py-2 transition-colors group outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-sm',
                         isActive ? 'text-cyan' : 'text-text-secondary hover:text-cyan'
                       )}
                       aria-label={`Scroll to ${link.label} section`}
+                      aria-current={isActive ? 'page' : undefined}
                     >
                       {link.label}
                       <span className={clsx(
@@ -127,7 +143,7 @@ export function Navigation() {
 
           {/* Mobile hamburger */}
           <button
-            className="lg:hidden text-cyan p-2"
+            className="lg:hidden text-cyan p-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-md"
             onClick={() => setMobileMenuOpen(true)}
             aria-expanded={mobileMenuOpen}
             aria-controls="mobile-menu"
@@ -155,30 +171,35 @@ export function Navigation() {
           >
             <div className="flex justify-between items-center mb-10">
               <span className="font-display font-bold text-white tracking-widest text-sm">SYSTEM_MENU</span>
-              <button onClick={() => setMobileMenuOpen(false)} className="text-cyan p-2" aria-label="Close menu">
+              <button onClick={() => setMobileMenuOpen(false)} className="text-cyan p-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-md" aria-label="Close menu">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
               </button>
             </div>
 
-            <ul className="flex flex-col space-y-5">
-              {NAV_LINKS.map((link, i) => (
-                <motion.li key={link.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.05 + i * 0.07 }}>
-                  <button
-                    onClick={() => scrollTo(link.id)}
-                    className={clsx(
-                      'font-mono text-xl uppercase tracking-widest text-left w-full',
-                      activeSection === link.id ? 'text-cyan' : 'text-text-secondary'
-                    )}
-                    aria-label={`Scroll to ${link.label} section`}
-                  >
-                    <span className="opacity-40 mr-4 text-xs">// 0{i + 1}</span>
-                    {link.label}
-                  </button>
-                </motion.li>
-              ))}
-            </ul>
+            <div className="flex-1 overflow-y-auto">
+              <ul className="flex flex-col space-y-2">
+                {NAV_LINKS.map((link, i) => (
+                  <motion.li key={link.id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 + i * 0.05 }}>
+                    <button
+                      onClick={() => scrollTo(link.id)}
+                      className={clsx(
+                        'group flex items-center w-full p-4 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black font-mono transition-all',
+                        activeSection === link.id ? 'bg-cyan/10 text-cyan border border-cyan/20' : 'hover:bg-white/5 text-text-secondary hover:text-white border border-transparent'
+                      )}
+                      aria-label={`Scroll to ${link.label} section`}
+                      aria-current={activeSection === link.id ? 'page' : undefined}
+                    >
+                      <span className="opacity-40 mr-4 text-xs w-8 group-hover:text-cyan transition-colors">
+                        {activeSection === link.id ? '>>' : `$`}
+                      </span>
+                      <span className="text-lg uppercase tracking-widest">{link.label}</span>
+                    </button>
+                  </motion.li>
+                ))}
+              </ul>
+            </div>
 
             <motion.div className="mt-auto pt-8" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
               <CyberButton as="a" href={PERSONAL.resumeUrl} download color="green" className="w-full">

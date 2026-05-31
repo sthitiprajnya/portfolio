@@ -26,6 +26,9 @@ export interface Skill {
   name: string;
   icon: string;
   proficiency: number;
+  description?: string;
+  experience?: string;
+  domain?: 'OFFENSIVE' | 'CLOUD' | 'AUTOMATION' | 'COMPLIANCE';
 }
 
 export interface SkillCategory {
@@ -66,6 +69,8 @@ export interface Project {
   featured: boolean;
   year: number;
   impact: string;
+  methodology?: string;
+  terminalOutput?: { command: string, output: string[] }[];
 }
 
 export interface Certification {
@@ -74,8 +79,9 @@ export interface Certification {
   issuer: string;
   year: number;
   color: 'cyan' | 'amber' | 'green' | 'violet';
-  status: 'active' | 'expired';
+  status: 'active' | 'expired' | 'in-progress';
   verifyUrl: string;
+  expiry?: string;
 }
 
 export interface Education {
@@ -105,4 +111,5 @@ export interface CTFProfile {
   globalPercentile: number; // e.g. top 10 = 10
   competitions: CTFCompetition[];
   attackCategories: { label: string; level: number }[]; // level 0-100
+  recentActivity: { title: string; type: 'machine' | 'challenge'; difficulty: string; date: string }[];
 }

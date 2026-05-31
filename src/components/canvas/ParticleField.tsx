@@ -19,11 +19,15 @@ export default function ParticleField() {
     let particlesArray: Particle[] = [];
     const mouse = { x: null as number | null, y: null as number | null };
 
+    // BOLT: Cache bounding rect to avoid layout thrashing in mousemove handler
+    let canvasRect = canvas.getBoundingClientRect();
+
     // Resize canvas to fill window
     function resizeCanvas() {
       if (!canvas) return;
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+      canvasRect = canvas.getBoundingClientRect(); // BOLT: Update cached rect
       init();
     }
 
@@ -35,9 +39,8 @@ export default function ParticleField() {
 
     // Mouse interaction
     const handleMouseMove = (event: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      mouse.x = event.clientX - rect.left;
-      mouse.y = event.clientY - rect.top;
+      mouse.x = event.clientX - canvasRect.left;
+      mouse.y = event.clientY - canvasRect.top;
     };
 
     const handleMouseOut = () => {
@@ -108,39 +111,55 @@ export default function ParticleField() {
       }
     }
 
+    // BOLT: Hoist connection distance and squared comparison to avoid redundant math
+    const MAX_DISTANCE = 150;
+    const CONNECTION_DISTANCE_SQ = MAX_DISTANCE * MAX_DISTANCE;
+
     // Draw connecting lines
     function connect() {
       if (!ctx || !canvas) return;
-      let opacityValue = 1;
-      const connectionDistance = 150 * 150; // 150px squared for distance check
 
-      for (let a = 0; a < particlesArray.length; a++) {
-        for (let b = a; b < particlesArray.length; b++) {
-          const distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x))
-                       + ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
+      const particleCount = particlesArray.length;
+      const mX = mouse.x;
+      const mY = mouse.y;
+      const hasMouse = mX !== null && mY !== null;
 
-          if (distance < connectionDistance) {
-            opacityValue = 1 - (distance / connectionDistance);
-            ctx.strokeStyle = 'rgba(255, 255, 255,' + opacityValue * 0.5 + ')'; // Slightly lower opacity for lines
+      for (let a = 0; a < particleCount; a++) {
+        const pA = particlesArray[a];
+        const pAx = pA.x;
+        const pAy = pA.y;
+
+        // BOLT: Start inner loop at a + 1 to avoid self-comparison and drawing redundant lines
+        for (let b = a + 1; b < particleCount; b++) {
+          const pB = particlesArray[b];
+          const dx = pAx - pB.x;
+          const dy = pAy - pB.y;
+          const distanceSq = dx * dx + dy * dy;
+
+          if (distanceSq < CONNECTION_DISTANCE_SQ) {
+            const opacity = 1 - (distanceSq / CONNECTION_DISTANCE_SQ);
+            ctx.strokeStyle = `rgba(255, 255, 255, ${opacity * 0.5})`;
             ctx.lineWidth = 1;
             ctx.beginPath();
-            ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
-            ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+            ctx.moveTo(pAx, pAy);
+            ctx.lineTo(pB.x, pB.y);
             ctx.stroke();
           }
         }
 
         // Connect to mouse
-        if (mouse.x !== null && mouse.y !== null) {
-          const mouseDistance = ((particlesArray[a].x - mouse.x) * (particlesArray[a].x - mouse.x))
-                            + ((particlesArray[a].y - mouse.y) * (particlesArray[a].y - mouse.y));
-          if (mouseDistance < connectionDistance) {
-            opacityValue = 1 - (mouseDistance / connectionDistance);
-            ctx.strokeStyle = 'rgba(255, 255, 255,' + opacityValue * 0.8 + ')';
+        if (hasMouse) {
+          const dx = pAx - mX;
+          const dy = pAy - mY;
+          const mouseDistSq = dx * dx + dy * dy;
+
+          if (mouseDistSq < CONNECTION_DISTANCE_SQ) {
+            const opacity = 1 - (mouseDistSq / CONNECTION_DISTANCE_SQ);
+            ctx.strokeStyle = `rgba(255, 255, 255, ${opacity * 0.8})`;
             ctx.lineWidth = 1;
             ctx.beginPath();
-            ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
-            ctx.lineTo(mouse.x, mouse.y);
+            ctx.moveTo(pAx, pAy);
+            ctx.lineTo(mX, mY);
             ctx.stroke();
           }
         }

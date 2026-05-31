@@ -21,10 +21,17 @@ import { SmoothScrollProvider } from '@/components/providers/SmoothScrollProvide
 import { CursorProvider }       from '@/components/providers/CursorProvider';
 import { Toaster }              from 'react-hot-toast';
 
+import { useState } from 'react';
+import { AudioPrompt } from '@/components/sections/AudioPrompt';
+import { Sentinel } from '@/components/global/Sentinel';
+
 export default function Home() {
+  const [bootReady, setBootReady] = useState(false);
+
   return (
     <>
-      <Preloader />
+      {!bootReady && <AudioPrompt onComplete={() => setBootReady(true)} />}
+      {bootReady && <Preloader />}
 
       <CursorProvider>
         <SmoothScrollProvider>
@@ -49,6 +56,7 @@ export default function Home() {
           </main>
 
           <Footer />
+          <Sentinel />
         </SmoothScrollProvider>
       </CursorProvider>
 

@@ -37,6 +37,7 @@ export const viewport: Viewport = {
 };
 
 import { FaviconBlinkProvider } from '@/components/providers/FaviconBlinkProvider';
+import { AudioProvider } from '@/components/providers/AudioProvider';
 
 export default function RootLayout({
   children,
@@ -80,9 +81,11 @@ export default function RootLayout({
           Skip to content
         </a>
         <div id="root">
-          <FaviconBlinkProvider>
-            {children}
-          </FaviconBlinkProvider>
+          <AudioProvider>
+            <FaviconBlinkProvider>
+              {children}
+            </FaviconBlinkProvider>
+          </AudioProvider>
         </div>
       </body>
     </html>

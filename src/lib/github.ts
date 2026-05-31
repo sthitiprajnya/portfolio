@@ -68,26 +68,45 @@ export async function fetchGitHubStats(): Promise<GitHubStats> {
     let totalForks = 0;
     const languages: Record<string, number> = {};
 
+    let top1: GitHubApiRepo | null = null;
+    let top2: GitHubApiRepo | null = null;
+    let top3: GitHubApiRepo | null = null;
+
     for (let i = 0; i < repos.length; i++) {
       const r = repos[i];
+
       if (r.stargazers_count) totalStars += r.stargazers_count;
       if (r.forks_count) totalForks += r.forks_count;
       if (r.language) {
         languages[r.language] = (languages[r.language] || 0) + 1;
       }
+
+      const stars = r.stargazers_count;
+      if (!top1 || stars > top1.stargazers_count) {
+          top3 = top2;
+          top2 = top1;
+          top1 = r;
+      } else if (!top2 || stars > top2.stargazers_count) {
+          top3 = top2;
+          top2 = r;
+      } else if (!top3 || stars > top3.stargazers_count) {
+          top3 = r;
+      }
     }
 
-    const topRepos = [...repos]
-      .sort((a, b) => b.stargazers_count - a.stargazers_count)
-      .slice(0, 3)
-      .map(r => ({
+    const topReposArr = [];
+    if (top1) topReposArr.push(top1);
+    if (top2) topReposArr.push(top2);
+    if (top3) topReposArr.push(top3);
+
+    const topRepos = topReposArr.map(r => ({
         name:        r.name,
         description: r.description,
         stars:       r.stargazers_count,
         forks:       r.forks_count,
         language:    r.language,
         url:         r.html_url,
-      }));
+    }));
 
     const stats: GitHubStats = {
       followers: user.followers,

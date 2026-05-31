@@ -190,9 +190,13 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
                 <button
                   onClick={() => toggleSection(sub.id)}
                   className={clsx(
-                    "w-full flex items-center justify-between p-4 font-mono text-xs tracking-widest uppercase transition-colors",
+                    "w-full flex items-center justify-between p-4 font-mono text-xs tracking-widest uppercase transition-colors outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black",
                     colorMap[sub.color],
-                    isOpen ? "border-b" : "border-b-0"
+                    isOpen ? "border-b" : "border-b-0",
+                    sub.color === 'cyan' && "focus-visible:ring-cyan",
+                    sub.color === 'amber' && "focus-visible:ring-amber",
+                    sub.color === 'violet' && "focus-visible:ring-violet",
+                    sub.color === 'green' && "focus-visible:ring-green"
                   )}
                   aria-expanded={isOpen}
                   aria-controls={`content-${sub.id}`}

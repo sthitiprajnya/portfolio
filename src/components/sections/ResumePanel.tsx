@@ -6,7 +6,6 @@ import { GlassCard }    from '@/components/ui/GlassCard';
 import { CyberButton }  from '@/components/ui/CyberButton';
 import { ScrollReveal, fadeSlideUp, fadeSlideLeft, containerStagger } from '@/components/ui/ScrollReveal';
 import { PERSONAL, RESUME_HIGHLIGHTS } from '@/data/portfolio';
-import { toast } from 'react-hot-toast';
 
 // The resume section is styled like a "classified document viewer" inside a terminal.
 // Redacted sections reveal on hover — a small UX easter egg that reinforces the

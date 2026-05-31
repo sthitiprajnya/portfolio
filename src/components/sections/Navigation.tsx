@@ -24,6 +24,17 @@ export function Navigation() {
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && mobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [mobileMenuOpen]);
+
+  useEffect(() => {
     // BOLT: Use IntersectionObserver instead of scroll listeners and getBoundingClientRect
     // for much better performance (avoids main-thread layout thrashing)
     const sections = ['hero', ...NAV_LINKS.map(l => l.id)];
@@ -81,7 +92,11 @@ export function Navigation() {
         <div className="w-full max-w-7xl mx-auto flex items-center justify-between">
 
           {/* Logo */}
-          <button onClick={() => scrollTo('hero')} className="flex items-center space-x-2 group" aria-label="Scroll to top">
+          <button
+            onClick={() => scrollTo('hero')}
+            className="flex items-center space-x-2 group outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-sm"
+            aria-label="Scroll to top"
+          >
             <span className="text-cyan font-mono font-bold">{'>_'}</span>
             <span className="font-display font-bold text-white tracking-widest text-sm md:text-base group-hover:text-cyan transition-colors">
               {PERSONAL.nameShort}
@@ -98,10 +113,11 @@ export function Navigation() {
                     <button
                       onClick={() => scrollTo(link.id)}
                       className={clsx(
-                        'relative font-mono text-[0.72rem] uppercase tracking-widest py-2 transition-colors group',
+                        'relative font-mono text-[0.72rem] uppercase tracking-widest py-2 transition-colors group outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-sm',
                         isActive ? 'text-cyan' : 'text-text-secondary hover:text-cyan'
                       )}
                       aria-label={`Scroll to ${link.label} section`}
+                      aria-current={isActive ? 'page' : undefined}
                     >
                       {link.label}
                       <span className={clsx(
@@ -127,7 +143,7 @@ export function Navigation() {
 
           {/* Mobile hamburger */}
           <button
-            className="lg:hidden text-cyan p-2"
+            className="lg:hidden text-cyan p-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-md"
             onClick={() => setMobileMenuOpen(true)}
             aria-expanded={mobileMenuOpen}
             aria-controls="mobile-menu"
@@ -155,7 +171,7 @@ export function Navigation() {
           >
             <div className="flex justify-between items-center mb-10">
               <span className="font-display font-bold text-white tracking-widest text-sm">SYSTEM_MENU</span>
-              <button onClick={() => setMobileMenuOpen(false)} className="text-cyan p-2" aria-label="Close menu">
+              <button onClick={() => setMobileMenuOpen(false)} className="text-cyan p-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-md" aria-label="Close menu">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
@@ -168,10 +184,11 @@ export function Navigation() {
                   <button
                     onClick={() => scrollTo(link.id)}
                     className={clsx(
-                      'font-mono text-xl uppercase tracking-widest text-left w-full',
+                      'font-mono text-xl uppercase tracking-widest text-left w-full outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-sm',
                       activeSection === link.id ? 'text-cyan' : 'text-text-secondary'
                     )}
                     aria-label={`Scroll to ${link.label} section`}
+                    aria-current={activeSection === link.id ? 'page' : undefined}
                   >
                     <span className="opacity-40 mr-4 text-xs">// 0{i + 1}</span>
                     {link.label}

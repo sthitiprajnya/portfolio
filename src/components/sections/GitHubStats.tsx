@@ -84,7 +84,7 @@ export function GitHubStats() {
                         href={repo.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group block p-4 rounded bg-black/40 border border-border hover:border-cyan/50 hover:bg-black/60 transition-colors"
+                        className="group block p-4 rounded bg-black/40 border border-border hover:border-cyan/50 hover:bg-black/60 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black"
                       >
                         <div className="flex justify-between items-start mb-2">
                           <h4 className="font-heading font-bold text-cyan text-sm group-hover:underline">

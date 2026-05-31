@@ -44,7 +44,7 @@ export function Projects() {
                 key={filter.id}
                 onClick={() => setActiveFilter(filter.id)}
                 className={clsx(
-                  "font-mono text-xs uppercase tracking-widest px-5 py-2 transition-all duration-300 rounded-sm border",
+                  "font-mono text-xs uppercase tracking-widest px-5 py-2 transition-all duration-300 rounded-sm border outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black",
                   isActive
                     ? "bg-cyan border-cyan text-black shadow-[var(--glow-cyan-sm)] font-bold"
                     : "bg-transparent border-border text-text-secondary hover:text-cyan hover:border-cyan/50"

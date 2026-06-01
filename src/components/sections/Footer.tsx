@@ -1,6 +1,7 @@
 "use client";
 import React, { lazy, Suspense } from 'react';
 import { PERSONAL } from '@/data/portfolio';
+import { LogoBadge } from '@/components/ui/LogoBadge';
 
 const MatrixRain = lazy(() => import('@/components/canvas/MatrixRain'));
 
@@ -56,8 +57,14 @@ export function Footer() {
         </div>
 
         {/* Fixed: was "React + Vite" — this project is Next.js */}
-        <div className="font-mono text-[0.75rem] text-text-muted text-center flex flex-col md:flex-row items-center justify-center gap-2">
-          <span>Built with Next.js · Deployed on GitHub Pages · © {year} {PERSONAL.name}</span>
+        <div className="font-mono text-[0.75rem] text-text-muted text-center flex flex-col md:flex-row items-center justify-center gap-4">
+          <span className="flex items-center gap-2">
+            Built with
+            <LogoBadge src="/portfolio/logos/footer/nextjs.svg" alt="Next.js" width={16} height={16} className="invert dark:invert-0 opacity-80" />
+            · Deployed on
+            <LogoBadge src="/portfolio/logos/footer/githubpages.svg" alt="GitHub Pages" width={16} height={16} className="invert dark:invert-0 opacity-80" />
+            · © {year} {PERSONAL.name}
+          </span>
           <span className="hidden md:inline">|</span>
           <span className="flex items-center gap-2 px-2 py-0.5 bg-green/5 border border-green/20 rounded font-bold text-green shadow-[var(--glow-green-sm)]">
             <span className="w-1.5 h-1.5 rounded-full bg-green animate-pulse"></span>

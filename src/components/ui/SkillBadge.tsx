@@ -3,6 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { LogoBadge } from '@/components/ui/LogoBadge';
 
 interface SkillBadgeProps {
   name: string;
@@ -79,12 +80,49 @@ export function SkillBadge({ name, icon, proficiency, color, delay = 0, descript
           />
         </svg>
 
-        {/* Icon placeholder - in real app, map icon string to actual SVG components */}
-        <div
-          className="relative z-10 w-6 h-6 rounded-sm flex items-center justify-center text-[0.6rem] font-bold"
-          style={{ color: COLOR_MAP[color] }}
-        >
-          {icon.substring(0, 2).toUpperCase()}
+        {/* Icon / Monogram */}
+        <div className="relative z-10 flex items-center justify-center pointer-events-none">
+          {['burpsuite', 'nessus', 'kali', 'metasploit', 'nmap', 'nuclei', 'wireshark', 'frida', 'zap', 'postman', 'gcp', 'aws', 'kubernetes', 'docker', 'python', 'bash', 'powershell', 'owasp', 'mitre', 'pcidss', 'nist', 'wazuh', 'zabbix'].includes(icon) ? (
+            <LogoBadge
+              src={`/portfolio/logos/${
+                icon === 'burpsuite' ? 'tools/burp-suite.svg' :
+                icon === 'nessus' ? 'tools/nessus.svg' :
+                icon === 'kali' ? 'tools/kalilinux.svg' :
+                icon === 'metasploit' ? 'tools/metasploit.svg' :
+                icon === 'nmap' ? 'tools/nmap.png' :
+                icon === 'nuclei' ? 'tools/nuclei.svg' :
+                icon === 'wireshark' ? 'tools/wireshark.svg' :
+                icon === 'frida' ? 'tools/frida.png' :
+                icon === 'zap' ? 'tools/owasp.svg' :
+                icon === 'postman' ? 'tools/postman.svg' :
+                icon === 'gcp' ? 'cloud/gcp.svg' :
+                icon === 'aws' ? 'cloud/aws.svg' :
+                icon === 'kubernetes' ? 'cloud/kubernetes.svg' :
+                icon === 'docker' ? 'cloud/docker.svg' :
+                icon === 'python' ? 'scripting/python.svg' :
+                icon === 'bash' ? 'scripting/bash.svg' :
+                icon === 'powershell' ? 'scripting/powershell.svg' :
+                icon === 'owasp' ? 'tools/owasp.svg' :
+                icon === 'mitre' ? 'frameworks/mitre.png' :
+                icon === 'pcidss' ? 'frameworks/pcidss.jpg' :
+                icon === 'nist' ? 'frameworks/nist.png' :
+                icon === 'wazuh' ? 'siem/wazuh.svg' :
+                icon === 'zabbix' ? 'siem/zabbix.png' :
+                ''
+              }`}
+              alt={name}
+              width={20}
+              height={20}
+              className={`invert dark:invert-0 drop-shadow-lg ${['nmap', 'frida', 'mitre', 'pcidss', 'nist', 'zabbix'].includes(icon) ? 'invert dark:invert-0' : 'fill-current opacity-90'} `}
+            />
+          ) : (
+            <div
+              className="w-6 h-6 rounded flex items-center justify-center text-[0.65rem] font-bold tracking-widest bg-black/40 border border-border backdrop-blur-sm"
+              style={{ color: COLOR_MAP[color], borderColor: `${COLOR_MAP[color]}40` }}
+            >
+              {icon.substring(0, 2).toUpperCase()}
+            </div>
+          )}
         </div>
       </div>
 

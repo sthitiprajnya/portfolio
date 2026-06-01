@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { ScrollReveal, fadeSlideUp, containerStagger } from '@/components/ui/ScrollReveal';
 import { CERTIFICATIONS, UPCOMING_CERTIFICATIONS } from '@/data/portfolio';
+import { LogoBadge } from '@/components/ui/LogoBadge';
 
 // BOLT: Hoist static configurations to module level to avoid redundant allocations on every render
 const CERT_COLOR_MAP = {
@@ -72,15 +73,27 @@ function CertCard({ cert }: { cert: typeof CERTIFICATIONS[0] }) {
       <div className={clsx("absolute inset-0 opacity-20 group-hover:opacity-100 transition-opacity duration-500", style.bg)} />
       <div className="relative h-full bg-surface border border-border rounded-xl p-5 flex flex-col z-10 hover-glow-card" style={{ clipPath: 'polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%)' }}>
 
-        {/* Hexagonal Shield Icon */}
-        <div className="flex justify-between items-start mb-6">
-          <div className="relative w-12 h-14 flex items-center justify-center">
-            <svg className={clsx("absolute inset-0 w-full h-full drop-shadow-md", style.text)} viewBox="0 0 24 24" fill="currentColor" fillOpacity="0.1" stroke="currentColor" strokeWidth="1">
-              <polygon points="12 2 22 7 22 17 12 22 2 17 2 7" />
-            </svg>
-            <span className={clsx("font-display font-bold text-lg relative z-10", style.text)}>
-              {cert.name.charAt(0)}
-            </span>
+        {/* Logo and Status */}
+        <div className="flex justify-between items-start mb-6 h-14">
+          <div className="relative h-full flex items-center justify-center">
+            <LogoBadge
+              src={`/portfolio/logos/${
+                cert.issuer === 'Cisco Systems' || cert.issuer === 'Cisco' ? 'certs/cisco.svg' :
+                cert.issuer === 'eLearnSecurity' || cert.issuer === 'INE Security' ? 'certs/cisco.svg' /* Re-use cisco temporarily since no ine svg downloaded, fallback to initials */ :
+                cert.issuer === 'TCM Security' ? 'certs/tcm.png' :
+                cert.issuer === 'EC-Council' ? 'certs/eccouncil.svg' :
+                cert.issuer === 'OpenEDG Python Institute' ? 'certs/openedg.png' :
+                cert.issuer === 'CRAW Security' ? 'certs/craw.png' :
+                cert.issuer === 'ISC2' ? 'certs/isc2.png' :
+                cert.issuer === 'KodeKloud' ? 'cloud/docker.svg' :
+                ''
+              }`}
+              alt={cert.issuer}
+              width={80}
+              height={28}
+              monogram={cert.issuer.substring(0, 2).toUpperCase()}
+              className={`${['certs/tcm.png', 'certs/openedg.png', 'certs/craw.png', 'certs/isc2.png'].includes(cert.issuer) ? '' : 'invert dark:invert-0'} object-left w-auto h-full max-w-[100px]`}
+            />
           </div>
 
           {cert.status === 'active' && (

@@ -21,6 +21,7 @@ const TYPEWRITER_SEQUENCE = HERO_ROLES.flatMap(role => [role, 2000]);
 export function Hero() {
   const { ref: statsRef, inView: statsInView } = useInView({ triggerOnce: true, threshold: 0.5 });
   const [activeIntel, setActiveIntel] = React.useState<string | null>(null);
+  const [showMethodology, setShowMethodology] = React.useState(false);
 
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
@@ -148,6 +149,7 @@ export function Hero() {
           className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6"
         >
           <CyberButton onClick={() => scrollTo('projects')}>VIEW_PROJECTS</CyberButton>
+          <CyberButton color="amber" onClick={() => setShowMethodology(true)}>VIEW_METHODOLOGY</CyberButton>
           <CyberButton color="green" onClick={() => scrollTo('contact')}>CONTACT_ME</CyberButton>
 
           <div className="flex space-x-4 pt-4 sm:pt-0 sm:ml-4">
@@ -198,6 +200,88 @@ export function Hero() {
           </div>
         </div>
       </motion.div>
+
+      {/* Methodology Modal */}
+      <AnimatePresence>
+        {showMethodology && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
+            onClick={() => setShowMethodology(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 20 }}
+              className="bg-surface border border-amber/30 rounded-lg p-6 max-w-4xl w-full shadow-[var(--glow-amber-md)] max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-border"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
+                <span className="font-mono text-amber text-lg font-bold tracking-widest flex items-center gap-3">
+                  <svg className="w-5 h-5 text-amber" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                  PENTEST_METHODOLOGY // LIFECYCLE
+                </span>
+                <button
+                  onClick={() => setShowMethodology(false)}
+                  className="text-text-secondary hover:text-white transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+              </div>
+
+              <div className="space-y-4 font-mono">
+                {/* Pipeline visual */}
+                <div className="hidden md:flex items-center justify-between px-2 mb-8 text-[0.6rem] text-text-muted">
+                  <span>RECON</span><span className="text-border">→</span>
+                  <span>SCAN</span><span className="text-border">→</span>
+                  <span>EXPLOIT</span><span className="text-border">→</span>
+                  <span>POC CHAIN</span><span className="text-border">→</span>
+                  <span>REPORT</span><span className="text-border">→</span>
+                  <span className="text-amber">CLOSURE</span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 border border-border bg-black/40 rounded">
+                    <h4 className="text-amber font-bold mb-2 flex items-center gap-2"><span className="text-xs">01</span> RECONNAISSANCE</h4>
+                    <p className="text-xs text-text-secondary leading-relaxed">OSINT gathering, subdomain enumeration, and attack surface mapping using tools like SpiderFoot, Subfinder, and Nmap.</p>
+                  </div>
+                  <div className="p-4 border border-border bg-black/40 rounded">
+                    <h4 className="text-amber font-bold mb-2 flex items-center gap-2"><span className="text-xs">02</span> SCANNING & ENUMERATION</h4>
+                    <p className="text-xs text-text-secondary leading-relaxed">Automated and manual discovery of misconfigurations and known CVEs using Burp Suite Pro, Nessus, and custom Nuclei templates.</p>
+                  </div>
+                  <div className="p-4 border border-border bg-black/40 rounded">
+                    <h4 className="text-amber font-bold mb-2 flex items-center gap-2"><span className="text-xs">03</span> EXPLOITATION</h4>
+                    <p className="text-xs text-text-secondary leading-relaxed">Active exploitation of identified flaws (SQLi, IDOR, SSRF, etc.) to assess real-world business impact and data risk.</p>
+                  </div>
+                  <div className="p-4 border border-border bg-black/40 rounded">
+                    <h4 className="text-amber font-bold mb-2 flex items-center gap-2"><span className="text-xs">04</span> POC CHAINING</h4>
+                    <p className="text-xs text-text-secondary leading-relaxed">Linking multiple low-severity vulnerabilities to demonstrate critical impact, creating reliable and reproducible Proof of Concepts.</p>
+                  </div>
+                  <div className="p-4 border border-border bg-black/40 rounded">
+                    <h4 className="text-amber font-bold mb-2 flex items-center gap-2"><span className="text-xs">05</span> REPORTING</h4>
+                    <p className="text-xs text-text-secondary leading-relaxed">Delivering comprehensive reports mapped to OWASP/MITRE frameworks, including executive summaries and technical remediation steps.</p>
+                  </div>
+                  <div className="p-4 border border-amber/30 bg-amber/5 rounded">
+                    <h4 className="text-amber font-bold mb-2 flex items-center gap-2"><span className="text-xs">06</span> REMEDIATION TRACKING</h4>
+                    <p className="text-xs text-text-secondary leading-relaxed">Collaborating directly with engineering teams, automating JIRA tracking, and validating patches to achieve 100% closure.</p>
+                  </div>
+                </div>
+
+                <div className="mt-8 pt-6 border-t border-border">
+                  <p className="text-xs text-text-muted mb-4 uppercase tracking-widest">See it in practice ↴</p>
+                  <div className="flex flex-wrap gap-3">
+                    <button onClick={() => { setShowMethodology(false); scrollTo('projects'); }} className="px-3 py-1.5 border border-cyan/30 text-cyan text-xs rounded hover:bg-cyan/10 transition-colors">DLP Pipeline</button>
+                    <button onClick={() => { setShowMethodology(false); scrollTo('projects'); }} className="px-3 py-1.5 border border-cyan/30 text-cyan text-xs rounded hover:bg-cyan/10 transition-colors">GCP Hardening</button>
+                    <button onClick={() => { setShowMethodology(false); scrollTo('projects'); }} className="px-3 py-1.5 border border-cyan/30 text-cyan text-xs rounded hover:bg-cyan/10 transition-colors">MQTT Attack Chain</button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Intel Modal */}
       <AnimatePresence>

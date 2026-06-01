@@ -2,7 +2,7 @@
 import React from 'react';
 import CountUp from 'react-countup';
 import { AsciiAvatar }   from '@/components/ui/AsciiAvatar';
-import { TerminalWindow } from '@/components/ui/TerminalWindow';
+import { InteractiveTerminal } from '@/components/ui/InteractiveTerminal';
 import { SectionTitle }  from '@/components/ui/SectionTitle';
 import { ScrollReveal, fadeSlideUp, containerStagger } from '@/components/ui/ScrollReveal';
 import { ABOUT_BIO, ABOUT_STATS, PERSONAL } from '@/data/portfolio';
@@ -63,15 +63,7 @@ export function About() {
             </ScrollReveal>
 
             <ScrollReveal variants={fadeSlideUp} delay={0.3}>
-              <TerminalWindow lines={[
-                { prompt: 'sthitaprajna@kali:~$', command: 'whoami' },
-                { prompt: '', output: 'infosec-engineer' },
-                { prompt: 'sthitaprajna@kali:~$', command: 'cat highlights.txt' },
-                { prompt: '', output: '> 50+ Full-scope pen tests executed' },
-                { prompt: '', output: '> 230+ Unique vulnerabilities documented' },
-                { prompt: '', output: '> Specialised in Cloud Security & AppSec' },
-                { prompt: 'sthitaprajna@kali:~$', command: '', cursor: true }
-              ]} />
+              <InteractiveTerminal />
             </ScrollReveal>
 
             {/* Animated stat counters */}

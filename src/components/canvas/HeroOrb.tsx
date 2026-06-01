@@ -15,7 +15,23 @@ interface OrbState {
   mouseX: number;
   mouseY: number;
   mouseActive: boolean;
+  // BOLT: Cache viewport-dependent dimensions to avoid recalculating in the 60fps loop
+  cx: number;
+  cy: number;
+  A: number;
+  B: number;
 }
+
+// BOLT: Hoist static animation constants to module level to avoid redundant allocations on every render
+const FREQ_X = 2;
+const FREQ_Y = 3;
+const DELTA = Math.PI / 4;
+const SPEED = 0.0008;
+const K_SPRING = 0.045;
+const DAMPING = 0.88;
+const MOUSE_FORCE = 0.025;
+const MOUSE_RANGE = 300;
+const MOUSE_RANGE_SQ = MOUSE_RANGE * MOUSE_RANGE;
 
 export default function HeroOrb() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -28,6 +44,10 @@ export default function HeroOrb() {
     mouseX:      0,
     mouseY:      0,
     mouseActive: false,
+    cx:          0,
+    cy:          0,
+    A:           0,
+    B:           0,
   });
   const rafRef = useRef<number>(0);
 
@@ -41,10 +61,17 @@ export default function HeroOrb() {
     const resize = () => {
       canvas.width  = window.innerWidth;
       canvas.height = window.innerHeight;
-      // Reset to centre on resize
+
       const o = orbRef.current;
-      o.x = canvas.width  / 2;
-      o.y = canvas.height / 2;
+      // BOLT: Cache center and Lissajous amplitudes during resize to eliminate per-frame work
+      o.cx = canvas.width / 2;
+      o.cy = canvas.height / 2;
+      o.A = canvas.width * 0.30;
+      o.B = canvas.height * 0.22;
+
+      // Reset to centre on resize
+      o.x = o.cx;
+      o.y = o.cy;
     };
     resize();
     window.addEventListener('resize', resize, { passive: true });
@@ -58,20 +85,6 @@ export default function HeroOrb() {
     const onMouseLeave = () => { orbRef.current.mouseActive = false; };
     window.addEventListener('mousemove', onMouseMove, { passive: true });
     window.addEventListener('mouseleave', onMouseLeave);
-
-    // ── Lissajous parameters ─────────────────────────────────────────
-    const A     = canvas.width  * 0.30;  // x amplitude (30% of viewport width)
-    const B     = canvas.height * 0.22;  // y amplitude (22% of viewport height)
-    const freqX = 2;                      // horizontal frequency
-    const freqY = 3;                      // vertical frequency (3:2 = classic figure-8 variant)
-    const delta = Math.PI / 4;            // phase offset — controls loop "tightness"
-    const speed = 0.0008;                 // radians per ms — full cycle ≈ 130s
-
-    // ── Spring constants ─────────────────────────────────────────────
-    const K_SPRING    = 0.045;   // restoring force toward Lissajous path
-    const DAMPING     = 0.88;    // velocity damping (0–1; lower = more damping)
-    const MOUSE_FORCE = 0.025;   // mouse attraction/repulsion multiplier
-    const MOUSE_RANGE = 300;     // px radius of mouse influence
 
     // ── Drawing helpers ──────────────────────────────────────────────
     function drawOrb(x: number, y: number, t: number) {
@@ -138,26 +151,28 @@ export default function HeroOrb() {
       lastTime  = now;
 
       const o  = orbRef.current;
-      const cx = canvas!.width  / 2;
-      const cy = canvas!.height / 2;
 
       // Advance Lissajous parameter
-      o.t += speed * dt;
+      o.t += SPEED * dt;
 
+      // BOLT: Use cached viewport dimensions to avoid lookups in the hot loop
       // Target position on Lissajous curve
-      const targetX = cx + A * Math.sin(freqX * o.t + delta);
-      const targetY = cy + B * Math.sin(freqY * o.t);
+      const targetX = o.cx + o.A * Math.sin(FREQ_X * o.t + DELTA);
+      const targetY = o.cy + o.B * Math.sin(FREQ_Y * o.t);
 
       // Spring force toward Lissajous path
       let fx = (targetX - o.x) * K_SPRING;
       let fy = (targetY - o.y) * K_SPRING;
 
+      // BOLT: Use squared distance for mouse interaction checks to eliminate expensive Math.sqrt() calls
       // Mouse magnetic influence (repulsion when close, attraction when far)
       if (o.mouseActive) {
         const dx   = o.mouseX - o.x;
         const dy   = o.mouseY - o.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < MOUSE_RANGE && dist > 1) {
+        const distSq = dx * dx + dy * dy;
+
+        if (distSq < MOUSE_RANGE_SQ && distSq > 1) {
+          const dist = Math.sqrt(distSq);
           // Inside range: gentle repulsion
           const strength = MOUSE_FORCE * (1 - dist / MOUSE_RANGE);
           fx -= (dx / dist) * strength * 80;

@@ -14,6 +14,21 @@ interface SkillBadgeProps {
   experience?: string;
 }
 
+// BOLT: Hoist static configurations to module level to avoid redundant allocations on every render
+const COLOR_MAP = {
+  cyan:   'var(--color-cyan)',
+  amber:  'var(--color-amber)',
+  green:  'var(--color-green)',
+  violet: 'var(--color-violet)',
+};
+
+const BG_MAP = {
+  cyan:   'var(--color-cyan-ghost)',
+  amber:  'rgba(255, 179, 0, 0.1)',
+  green:  'var(--color-green-ghost)',
+  violet: 'rgba(191, 0, 255, 0.1)',
+};
+
 export function SkillBadge({ name, icon, proficiency, color, delay = 0, description, experience }: SkillBadgeProps) {
   const { ref, inView } = useInView({
     threshold: 0.12,
@@ -25,22 +40,8 @@ export function SkillBadge({ name, icon, proficiency, color, delay = 0, descript
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (proficiency / 100) * circumference;
 
-  const colorMap = {
-    cyan:   'var(--color-cyan)',
-    amber:  'var(--color-amber)',
-    green:  'var(--color-green)',
-    violet: 'var(--color-violet)',
-  };
-
-  const bgMap = {
-    cyan:   'var(--color-cyan-ghost)',
-    amber:  'rgba(255, 179, 0, 0.1)',
-    green:  'var(--color-green-ghost)',
-    violet: 'rgba(191, 0, 255, 0.1)',
-  };
-
   return (
-    <div ref={ref} className="relative flex flex-col items-center justify-center p-2 group">
+    <div ref={ref} className="relative flex flex-col items-center justify-center p-2 group skill-tag" data-orb-target="skill">
       <div className="relative w-16 h-16 flex items-center justify-center mb-3">
         {/* Background track */}
         <svg className="absolute inset-0 w-full h-full transform -rotate-90" aria-hidden="true">
@@ -48,7 +49,7 @@ export function SkillBadge({ name, icon, proficiency, color, delay = 0, descript
             cx="32"
             cy="32"
             r={radius}
-            fill={bgMap[color]}
+            fill={BG_MAP[color]}
             stroke="var(--color-border)"
             strokeWidth="2"
           />
@@ -58,7 +59,7 @@ export function SkillBadge({ name, icon, proficiency, color, delay = 0, descript
             cy="32"
             r={radius}
             fill="none"
-            stroke={colorMap[color]}
+            stroke={COLOR_MAP[color]}
             strokeWidth="3"
             strokeLinecap="round"
             strokeDasharray={circumference}
@@ -74,14 +75,14 @@ export function SkillBadge({ name, icon, proficiency, color, delay = 0, descript
               ease: [0.16, 1, 0.3, 1]
             }}
             className="drop-shadow-md"
-            style={{ filter: `drop-shadow(0 0 4px ${colorMap[color]}66)` }}
+            style={{ filter: `drop-shadow(0 0 4px ${COLOR_MAP[color]}66)` }}
           />
         </svg>
 
         {/* Icon placeholder - in real app, map icon string to actual SVG components */}
         <div
           className="relative z-10 w-6 h-6 rounded-sm flex items-center justify-center text-[0.6rem] font-bold"
-          style={{ color: colorMap[color] }}
+          style={{ color: COLOR_MAP[color] }}
         >
           {icon.substring(0, 2).toUpperCase()}
         </div>
@@ -92,7 +93,7 @@ export function SkillBadge({ name, icon, proficiency, color, delay = 0, descript
       </span>
 
       {/* Tooltip */}
-      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-3 bg-surface border border-border rounded-md shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none translate-y-2 group-hover:translate-y-0">
+      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-3 bg-surface border border-border rounded-md shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-visible:opacity-100 group-focus-visible:visible transition-all duration-200 z-50 pointer-events-none translate-y-2 group-hover:translate-y-0 group-focus-visible:translate-y-0">
         <div className="font-mono text-[0.6rem] text-cyan font-bold mb-1 tracking-widest">{name}</div>
         <div className="flex justify-between items-center mb-2 font-mono text-[0.6rem]">
            <span className="text-text-secondary">EXP: <span className="text-white">{experience || 'N/A'}</span></span>

@@ -11,6 +11,19 @@ import { EXPERIENCE } from '@/data/portfolio';
 
 gsap.registerPlugin(ScrollTrigger);
 
+// BOLT: Hoist static configurations and regexes to module level to avoid redundant allocations on every render
+const ACTIVE_COLOR_MAP = {
+  cyan: 'bg-cyan/10 text-cyan border-cyan',
+  amber: 'bg-amber/10 text-amber border-amber',
+  violet: 'bg-violet/10 text-violet border-violet',
+  green: 'bg-green/10 text-green border-green'
+};
+
+const CRITICAL_REGEX = /SQL Injection|RCE|critical/i;
+const HIGH_REGEX = /privilege escalation|high/i;
+const METRIC_REGEX = /(\d+%|\d+\+? hours|55%|100%|80%|35%|zero)/gi;
+const METRIC_MATCH_REGEX = /(\d+%|\d+\+? hours|55%|100%|80%|35%|zero)/i;
+
 export function Experience() {
   const containerRef = useRef<HTMLDivElement>(null);
   const lineRef = useRef<HTMLDivElement>(null);
@@ -19,10 +32,12 @@ export function Experience() {
   useEffect(() => {
     if (prefersReducedMotion || !containerRef.current || !lineRef.current) return;
 
+    const container = containerRef.current;
+
     // Timeline self-drawing animation
     const tl = gsap.timeline({
       scrollTrigger: {
-        trigger: containerRef.current,
+        trigger: container,
         start: "top center",
         end: "bottom center",
         scrub: 1, // Smooth scrubbing
@@ -34,8 +49,9 @@ export function Experience() {
       ease: "none"
     });
 
+    // BOLT: Scope GSAP queries to the container to avoid scanning the entire document
     // Cinematic staggering for the experience cards using GSAP ScrollTrigger
-    const cards = document.querySelectorAll('.experience-card-wrapper');
+    const cards = container.querySelectorAll('.experience-card-wrapper');
     cards.forEach((card) => {
       gsap.fromTo(card,
         { opacity: 0, y: 100, rotateX: 5, scale: 0.95 },
@@ -56,7 +72,7 @@ export function Experience() {
     });
 
     // Animate nodes popping in when line reaches them
-    const nodes = document.querySelectorAll('.timeline-node');
+    const nodes = container.querySelectorAll('.timeline-node');
     nodes.forEach((node) => {
       gsap.fromTo(node,
         { scale: 0, opacity: 0 },
@@ -175,12 +191,6 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
           <div className="flex flex-wrap gap-2 mb-4 border-b border-border pb-2" role="tablist" aria-label={`${experience.company} role details`}>
             {experience.subsections.map((sub) => {
               const isOpen = openSection === sub.id;
-              const activeColorMap = {
-                cyan: 'bg-cyan/10 text-cyan border-cyan',
-                amber: 'bg-amber/10 text-amber border-amber',
-                violet: 'bg-violet/10 text-violet border-violet',
-                green: 'bg-green/10 text-green border-green'
-              };
 
               return (
                 <button
@@ -193,7 +203,7 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
                   className={clsx(
                     "px-4 py-2 font-mono text-[0.65rem] tracking-widest uppercase transition-all rounded-t-md border-b-2 outline-none focus-visible:ring-2",
                     isOpen
-                      ? activeColorMap[sub.color]
+                      ? ACTIVE_COLOR_MAP[sub.color]
                       : "border-transparent text-text-secondary hover:text-white hover:bg-surface"
                   )}
                 >
@@ -203,14 +213,14 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
             })}
           </div>
 
-          <div className="relative min-h-[150px]">
+          <div className="relative">
             <AnimatePresence mode="wait">
               {experience.subsections.map((sub) => {
                 if (openSection !== sub.id) return null;
 
                 const getSeverityBadge = (text: string) => {
-                  if (/SQL Injection|RCE|critical/i.test(text)) return <span className="inline-flex items-center ml-2 px-1.5 py-0.5 rounded bg-red-500/20 text-red-500 border border-red-500/50 font-mono text-[0.55rem] uppercase font-bold">CRITICAL</span>;
-                  if (/privilege escalation|high/i.test(text)) return <span className="inline-flex items-center ml-2 px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-500 border border-amber-500/50 font-mono text-[0.55rem] uppercase font-bold">HIGH</span>;
+                  if (CRITICAL_REGEX.test(text)) return <span className="inline-flex items-center ml-2 px-1.5 py-0.5 rounded bg-red-500/20 text-red-500 border border-red-500/50 font-mono text-[0.55rem] uppercase font-bold">CRITICAL</span>;
+                  if (HIGH_REGEX.test(text)) return <span className="inline-flex items-center ml-2 px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-500 border border-amber-500/50 font-mono text-[0.55rem] uppercase font-bold">HIGH</span>;
                   return null;
                 };
 
@@ -224,15 +234,15 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className=""
+                    className="relative"
                   >
                     <ul className="space-y-4">
                       {sub.bullets.map((bullet, i) => (
                         <li key={i} className="flex items-start text-sm text-text-secondary leading-relaxed group/bullet">
                           <span className="mr-3 mt-1.5 text-cyan opacity-50 group-hover/bullet:opacity-100 transition-opacity">▹</span>
                           <span>
-                            {bullet.split(/(\d+%|\d+\+? hours|55%|100%|80%|35%|zero)/gi).map((part, pIdx) => {
-                              if (part.match(/(\d+%|\d+\+? hours|55%|100%|80%|35%|zero)/i)) {
+                            {bullet.split(METRIC_REGEX).map((part, pIdx) => {
+                              if (METRIC_MATCH_REGEX.test(part)) {
                                 return <strong key={pIdx} className="text-white font-bold">{part}</strong>;
                               }
                               return part;
@@ -263,7 +273,7 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
   );
 
   return (
-    <div className={clsx("experience-card-wrapper", prefersReducedMotion ? "" : "opacity-0")}>
+    <div className={clsx("experience-card-wrapper", prefersReducedMotion ? "" : "opacity-0")} data-orb-target="experience">
       {cardContent}
     </div>
   );

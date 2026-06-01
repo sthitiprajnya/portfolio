@@ -91,12 +91,12 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
         ease: [0.16, 1, 0.3, 1],
         delay: index * 0.1 // Cinematic stagger reveal based on index
       }}
-      className="h-full flex"
+      className="h-full flex" data-orb-target="project"
     >
       <GlassCard
         ref={ref}
         withTilt={!prefersReducedMotion}
-        className="w-full flex flex-col group cursor-pointer"
+        className="w-full flex flex-col group"
         style={prefersReducedMotion ? {} : { rotateX, rotateY, transformStyle: 'preserve-3d' }}
       >
         {/* Image Container */}
@@ -111,6 +111,7 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
           <div
             role="img"
             aria-label="Decorative grid pattern"
+            aria-hidden="true"
             className="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PHBhdGggZD0iTTEwIDBMICAwIDBMMCAxMEwxMCAxMEwxMCAwWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEiLz48L3N2Zz4=')]"
           ></div>
 
@@ -135,7 +136,7 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
             <h3 className="font-heading text-lg font-bold text-white leading-tight group-hover:text-cyan transition-colors">
               {project.title}
             </h3>
-            {project.githubUrl ? (
+            {project.githubUrl && project.githubUrl.startsWith('http') ? (
               <a
                 href={project.githubUrl}
                 target="_blank"
@@ -153,7 +154,9 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
                  <svg className="w-5 h-5 text-text-muted hover:text-amber transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                  </svg>
-                 <div className="absolute right-0 bottom-full mb-2 w-max opacity-0 group-hover/lock:opacity-100 transition-opacity bg-black border border-amber text-amber font-mono text-[0.6rem] px-2 py-1 rounded">Write-up coming soon</div>
+                 <div className="absolute right-0 bottom-full mb-2 w-max opacity-0 group-hover/lock:opacity-100 transition-opacity bg-black border border-amber text-amber font-mono text-[0.6rem] px-2 py-1 rounded whitespace-nowrap z-50">
+                   {project.githubUrl ? project.githubUrl : '🔒 CLASSIFIED'}
+                 </div>
               </div>
             )}
           </div>
@@ -199,16 +202,19 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
               <div className="border border-border rounded-md overflow-hidden">
                 <button
                   onClick={(e) => { e.stopPropagation(); setShowMethodology(!showMethodology); }}
+                  aria-expanded={showMethodology}
+                  aria-controls={`methodology-${project.id}`}
                   className="w-full flex items-center justify-between p-2.5 bg-surface hover:bg-white/5 transition-colors font-mono text-[0.65rem] text-text-secondary uppercase tracking-widest outline-none focus-visible:ring-2 focus-visible:ring-cyan"
                 >
-                  <span>VIEW_METHODOLOGY</span>
-                  <motion.svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" animate={{ rotate: showMethodology ? 180 : 0 }}>
+                  <span>{showMethodology ? 'HIDE_METHODOLOGY' : 'VIEW_METHODOLOGY'}</span>
+                  <motion.svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" animate={{ rotate: showMethodology ? 180 : 0 }} aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                   </motion.svg>
                 </button>
                 <AnimatePresence>
                   {showMethodology && (
                     <motion.div
+                      id={`methodology-${project.id}`}
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}

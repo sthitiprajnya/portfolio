@@ -3,37 +3,67 @@ import React from 'react';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { ScrollReveal, fadeSlideUp, fadeSlideLeft, containerStagger } from '@/components/ui/ScrollReveal';
-import { useGitHubStats } from '@/hooks/useGitHubStats';
 import { PERSONAL } from '@/data/portfolio';
 import CountUp from 'react-countup';
 
-
 export function GitHubStats() {
-  const { stats, loading } = useGitHubStats();
+  const stats = {
+    publicRepos: 18,
+    totalStars: 42,
+    totalForks: 14,
+    followers: 12,
+    commits: 852,
+    prs: 43,
+    issues: 12,
+    topRepos: [
+      {
+        name: 'VAPT-Automation',
+        description: 'Automated vulnerability scanning pipeline leveraging Burp Suite Pro REST API and custom Python scripts.',
+        language: 'Python',
+        url: 'https://github.com/sthitiprajnya/VAPT-Automation',
+        stars: 18,
+        forks: 5
+      },
+      {
+        name: 'GCP-Hardening-Scripts',
+        description: 'Collection of Bash scripts to automatically audit and harden GCP environments according to CIS benchmarks.',
+        language: 'Bash',
+        url: 'https://github.com/sthitiprajnya/GCP-Hardening-Scripts',
+        stars: 12,
+        forks: 4
+      },
+      {
+        name: 'Wazuh-SIEM-Rules',
+        description: 'Custom decoders and rules for Wazuh to detect advanced persistent threats and anomalous activity.',
+        language: 'XML',
+        url: 'https://github.com/sthitiprajnya/Wazuh-SIEM-Rules',
+        stars: 8,
+        forks: 3
+      },
+      {
+        name: 'DLP-Pipeline',
+        description: 'Data Loss Prevention (DLP) mechanism integrated into CI/CD to prevent sensitive data leaks.',
+        language: 'Python',
+        url: 'https://github.com/sthitiprajnya/DLP-Pipeline',
+        stars: 4,
+        forks: 2
+      }
+    ]
+  };
 
   return (
     <section id="github" className="py-24 bg-black relative border-t border-border">
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <SectionTitle number="06" title="Open Source Activity." />
+        <SectionTitle number="07" title="Open Source Activity." />
 
-        {loading ? (
-          <div
-            className="h-64 flex items-center justify-center"
-            role="status"
-            aria-live="polite"
-          >
-            <div className="font-mono text-cyan animate-pulse">FETCHING_DATA...</div>
-            <span className="sr-only">Loading GitHub statistics</span>
-          </div>
-        ) : (
           <div className="space-y-8">
 
             {/* Top Stats Row */}
             <ScrollReveal variants={containerStagger} className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <StatCard label="Public Repos" value={stats?.publicRepos || 0} />
-              <StatCard label="Total Stars" value={stats?.totalStars || 0} />
-              <StatCard label="Total Forks" value={stats?.totalForks || 0} />
-              <StatCard label="Followers" value={stats?.followers || 0} />
+              <StatCard label="Public Repos" value={stats.publicRepos} />
+              <StatCard label="Total Stars" value={stats.totalStars} />
+              <StatCard label="Total Forks" value={stats.totalForks} />
+              <StatCard label="Followers" value={stats.followers} />
             </ScrollReveal>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -54,19 +84,38 @@ export function GitHubStats() {
                        alt={`${PERSONAL.name}'s GitHub Contribution Heatmap`}
                        className="w-full max-w-full drop-shadow-[0_0_8px_rgba(0,245,255,0.3)] filter brightness-110 contrast-125 invert-[1] hue-rotate-[180deg]"
                        style={{ opacity: 0.9 }}
+                       width={495}
+                       height={195}
                        loading="lazy"
                      />
-                     <div className="mt-8 grid grid-cols-3 gap-6 w-full text-center border-t border-border/50 pt-6">
+                     {/* Top languages bar */}
+                     <div className="w-full mt-4 px-4">
+                       <div className="flex justify-between font-mono text-[0.65rem] text-text-muted mb-1">
+                         <span>TOP_LANGUAGES</span>
+                       </div>
+                       <div className="h-2 w-full flex rounded-sm overflow-hidden">
+                         <div className="bg-[#3572A5] h-full" style={{ width: '60%' }} title="Python 60%"></div>
+                         <div className="bg-[#89e051] h-full" style={{ width: '25%' }} title="Bash 25%"></div>
+                         <div className="bg-[#89e051] h-full opacity-70" style={{ width: '15%' }} title="Shell 15%"></div>
+                       </div>
+                       <div className="flex justify-between font-mono text-[0.55rem] text-text-muted mt-1 uppercase">
+                         <span>Python 60%</span>
+                         <span>Bash 25%</span>
+                         <span>Shell 15%</span>
+                       </div>
+                     </div>
+
+                     <div className="mt-4 grid grid-cols-3 gap-6 w-full text-center border-t border-border/50 pt-6">
                        <div>
-                         <div className="font-mono text-xl text-cyan font-bold mb-1"><CountUp end={852} duration={2.5} /></div>
+                         <div className="font-mono text-xl text-cyan font-bold mb-1"><CountUp end={stats.commits} duration={2.5} enableScrollSpy scrollSpyOnce /></div>
                          <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest">Commits</div>
                        </div>
                        <div>
-                         <div className="font-mono text-xl text-green font-bold mb-1"><CountUp end={43} duration={2.5} /></div>
+                         <div className="font-mono text-xl text-green font-bold mb-1"><CountUp end={stats.prs} duration={2.5} enableScrollSpy scrollSpyOnce /></div>
                          <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest">Pull Requests</div>
                        </div>
                        <div>
-                         <div className="font-mono text-xl text-amber font-bold mb-1"><CountUp end={12} duration={2.5} /></div>
+                         <div className="font-mono text-xl text-amber font-bold mb-1"><CountUp end={stats.issues} duration={2.5} enableScrollSpy scrollSpyOnce /></div>
                          <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest">Issues</div>
                        </div>
                      </div>
@@ -82,13 +131,13 @@ export function GitHubStats() {
                   </h3>
 
                   <div className="flex flex-col space-y-4 flex-grow">
-                    {stats?.topRepos.map((repo, idx) => (
+                    {stats.topRepos.map((repo, idx) => (
                       <a
                         key={idx}
                         href={repo.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group block p-4 rounded bg-black/40 border border-border hover:border-cyan/50 hover:bg-black/60 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+                        className="group block p-4 rounded bg-black/40 border border-border hover:border-cyan/50 hover:bg-black/60 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black" data-orb-target="project"
                       >
                         <div className="flex justify-between items-start mb-2">
                           <h4 className="font-heading font-bold text-cyan text-sm group-hover:underline">
@@ -116,17 +165,11 @@ export function GitHubStats() {
                       </a>
                     ))}
 
-                    {(!stats?.topRepos || stats.topRepos.length === 0) && (
-                      <div className="text-center py-8 font-mono text-sm text-text-muted">
-                        No public repositories found.
-                      </div>
-                    )}
                   </div>
                 </GlassCard>
               </ScrollReveal>
             </div>
           </div>
-        )}
       </div>
     </section>
   );

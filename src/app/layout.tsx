@@ -18,6 +18,10 @@ export const metadata: Metadata = {
     description: 'Information Security Engineer with 2+ years in application VAPT, cloud security, and red team operations for major Indian FinTech and banking clients.',
     siteName: 'Sthitaprajna Biswal Portfolio',
     images: [{
+      url: 'https://sthitiprajnya.github.io/portfolio/og-image.webp',
+      width: 1200,
+      height: 630,
+    }, {
       url: 'https://sthitiprajnya.github.io/portfolio/og-image.png',
       width: 1200,
       height: 630,
@@ -28,8 +32,9 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Sthitaprajna Biswal — Cybersecurity Engineer',
     description: '50+ pen tests · 230+ vulnerabilities · NPCI · UIDAI · Axis Bank · Kotak Mahindra',
-    images: ['https://sthitiprajnya.github.io/portfolio/og-image.png'],
+    images: ['https://sthitiprajnya.github.io/portfolio/og-image.webp'],
   },
+  referrer: 'strict-origin-when-cross-origin',
 };
 
 export const viewport: Viewport = {
@@ -37,6 +42,7 @@ export const viewport: Viewport = {
 };
 
 import { FaviconBlinkProvider } from '@/components/providers/FaviconBlinkProvider';
+import { AudioProvider } from '@/components/providers/AudioProvider';
 
 export default function RootLayout({
   children,
@@ -57,7 +63,16 @@ export default function RootLayout({
     worksFor: {
       '@type': 'Organization',
       name: 'iServeU Technology'
-    }
+    },
+    knowsAbout: [
+      'Cybersecurity',
+      'Penetration Testing',
+      'Cloud Security',
+      'Application Security',
+      'GCP',
+      'AWS',
+      'VAPT'
+    ]
   };
 
   return (
@@ -68,9 +83,11 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <meta
-          http-equiv="Content-Security-Policy"
-          content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://github-readme-stats.vercel.app https://streak-stats.demolab.com https://images.unsplash.com; font-src 'self' data:; connect-src 'self' https://api.github.com https://api.emailjs.com; form-action 'self' https://api.emailjs.com; object-src 'none'; base-uri 'self'; upgrade-insecure-requests; frame-ancestors 'none';"
+          httpEquiv="Content-Security-Policy"
+          content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://github-readme-stats.vercel.app https://streak-stats.demolab.com https://images.unsplash.com https://ghchart.rshah.org; font-src 'self' data:; connect-src 'self' https://api.github.com https://api.emailjs.com; form-action 'self' https://api.emailjs.com; object-src 'none'; base-uri 'self'; upgrade-insecure-requests; frame-ancestors 'none';"
         />
+        <link rel="preload" href="/portfolio/fonts/JetBrainsMono-Regular.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/portfolio/og-image.webp" as="image" />
       </head>
       <body>
         <a
@@ -80,9 +97,11 @@ export default function RootLayout({
           Skip to content
         </a>
         <div id="root">
-          <FaviconBlinkProvider>
-            {children}
-          </FaviconBlinkProvider>
+          <AudioProvider>
+            <FaviconBlinkProvider>
+              {children}
+            </FaviconBlinkProvider>
+          </AudioProvider>
         </div>
       </body>
     </html>

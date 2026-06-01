@@ -7,7 +7,7 @@ export default ts.config(
   js.configs.recommended,
   ...ts.configs.recommended,
   {
-    ignores: ["dist", ".next", "out", "eslint.config.mjs"],
+    ignores: ["dist", ".next", "out", "eslint.config.mjs", "next.config.mjs"],
   },
   {
     files: ["**/*.ts", "**/*.tsx"],

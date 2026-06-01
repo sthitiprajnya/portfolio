@@ -1,12 +1,14 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAudio } from '@/components/providers/AudioProvider';
 
 export function Preloader() {
   const [isVisible, setIsVisible] = useState(true);
   const [stage, setStage] = useState(0);
   const [hexDump, setHexDump] = useState<string[]>([]);
   const [progress, setProgress] = useState(0);
+  const { speak } = useAudio();
 
   useEffect(() => {
     // Check if booted in this session
@@ -16,33 +18,40 @@ export function Preloader() {
     }
 
     const sequence = async () => {
-      // Stage 0: 0-300ms (Blinking cursor)
-      await new Promise(r => setTimeout(r, 300));
+      // Stage 0: 0-180ms (Blinking cursor)
+      await new Promise(r => setTimeout(r, 180));
       setStage(1); // SYSTEM BOOT
+      speak("System boot sequence initiated.");
 
-      await new Promise(r => setTimeout(r, 400));
+      await new Promise(r => setTimeout(r, 180));
       setStage(2); // INITIALIZING
+      speak("Initializing Sthitaprajna Biswal dot sh.");
 
-      await new Promise(r => setTimeout(r, 600));
+      await new Promise(r => setTimeout(r, 180));
       setStage(3); // LOADING SECURITY PROTOCOLS
+      speak("Loading security protocols.");
 
-      await new Promise(r => setTimeout(r, 400));
+      await new Promise(r => setTimeout(r, 180));
       setStage(4); // MOUNTING ROOT FILESYSTEM
+      speak("Mounting root filesystem.");
 
-      await new Promise(r => setTimeout(r, 400));
+      await new Promise(r => setTimeout(r, 180));
       setStage(5); // BYPASSING MAINFRAME FIREWALL
+      speak("Bypassing mainframe firewall.");
 
-      await new Promise(r => setTimeout(r, 400));
+      await new Promise(r => setTimeout(r, 180));
       setStage(6); // DECRYPTING PORTFOLIO ASSETS
+      speak("Decrypting portfolio assets.");
 
-      await new Promise(r => setTimeout(r, 400));
+      await new Promise(r => setTimeout(r, 180));
       setStage(7); // ESTABLISHING ENCRYPTED CHANNEL
+      speak("Establishing encrypted channel.");
 
-      await new Promise(r => setTimeout(r, 300));
+      await new Promise(r => setTimeout(r, 180));
       setStage(8); // Start progress bar & hex scroll
 
       // Simulate progress bar and hex dump
-      const duration = 1200;
+      const duration = 800;
       const interval = 50;
       const steps = duration / interval;
       let step = 0;
@@ -61,10 +70,11 @@ export function Preloader() {
         if (step >= steps) {
           clearInterval(timer);
           setStage(9); // ACCESS GRANTED
+          speak("Access granted.");
         }
       }, interval);
 
-      await new Promise(r => setTimeout(r, 1400)); // Wait for bar + 200ms
+      await new Promise(r => setTimeout(r, duration + 400)); // Wait for bar + 400ms display of ACCESS GRANTED
       setStage(10); // Fade out text
 
       await new Promise(r => setTimeout(r, 300));
@@ -76,7 +86,7 @@ export function Preloader() {
     };
 
     sequence();
-  }, []);
+  }, [speak]); // intentionally only run once
 
   if (!isVisible) return null;
 

@@ -80,10 +80,19 @@ export function Skills() {
   const [activeTab, setActiveTab] = useState<'ALL' | 'OFFENSIVE' | 'CLOUD' | 'AUTOMATION' | 'COMPLIANCE'>('ALL');
   const { ref: chartRef, inView: chartInView } = useInView({ triggerOnce: true, threshold: 0.5 });
 
+  const totalFilteredSkills = SKILLS.reduce((acc, cat) => {
+    return acc + cat.skills.filter(s => activeTab === 'ALL' || s.domain === activeTab).length;
+  }, 0);
+
   return (
     <section id="skills" className="py-24 bg-black overflow-hidden relative">
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <SectionTitle number="02" title="Tech Arsenal." />
+
+        {/* Accessibility: Announce number of filtered results */}
+        <div className="sr-only" aria-live="polite">
+          Showing {totalFilteredSkills} skills in {activeTab === 'ALL' ? 'all categories' : activeTab}
+        </div>
 
         {/* Filter Tabs & Radar Chart Row */}
         <div className="flex flex-col lg:flex-row justify-between items-start gap-12 mb-16">
@@ -99,6 +108,8 @@ export function Skills() {
                       ? 'border-cyan bg-cyan/10 text-cyan shadow-[var(--glow-cyan-sm)]'
                       : 'border-border text-text-secondary hover:border-cyan/50 hover:text-white'
                   )}
+                  aria-pressed={activeTab === tab}
+                  aria-label={`Filter by ${tab}`}
                 >
                   {tab}
                 </button>
@@ -109,7 +120,12 @@ export function Skills() {
             </p>
           </div>
 
-          <div ref={chartRef} className="w-full lg:w-[400px] h-[300px] bg-surface/50 border border-border rounded-lg p-4 flex items-center justify-center relative group">
+          <div
+            ref={chartRef}
+            className="w-full lg:w-[400px] h-[300px] bg-surface/50 border border-border rounded-lg p-4 flex items-center justify-center relative group"
+            role="img"
+            aria-label="Skill proficiency radar chart showing expertise in Offensive Security, Cloud Security, Automation, Compliance, Network Analysis, and Incident Response"
+          >
             <div className="absolute inset-0 bg-cyan/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg pointer-events-none" />
              <div className="absolute top-2 left-4 font-mono text-[0.6rem] text-cyan tracking-widest">
                [ DOMAIN_PROFICIENCY_RADAR ]

@@ -7,6 +7,8 @@ import { CyberButton }  from '@/components/ui/CyberButton';
 import { ScrollReveal, fadeSlideUp, fadeSlideLeft, containerStagger } from '@/components/ui/ScrollReveal';
 import { PERSONAL, RESUME_HIGHLIGHTS } from '@/data/portfolio';
 
+const RESUME_SHA256 = 'f4a9f24d314dd2a6869c505d896746a84561e97392e77d1a53c6b8adcbc06c91';
+
 // The resume section is styled like a "classified document viewer" inside a terminal.
 // Redacted sections reveal on hover — a small UX easter egg that reinforces the
 // security-engineer aesthetic and gets recruiters to interact with the page.
@@ -83,6 +85,7 @@ export function ResumePanel() {
                   src={PERSONAL.resumeUrl}
                   className="w-full h-[600px] border-none"
                   title="Resume PDF"
+                  sandbox="allow-scripts allow-same-origin"
                 />
               </div>
 
@@ -109,15 +112,15 @@ export function ResumePanel() {
                     role="button"
                     aria-label="Reveal and copy SHA256 hash"
                     title="Reveal and copy SHA256 hash"
-                    onClick={() => handleCopy('e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'SHA256 hash')}
+                    onClick={() => handleCopy(RESUME_SHA256, 'SHA256 hash')}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
-                        handleCopy('e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'SHA256 hash');
+                        handleCopy(RESUME_SHA256, 'SHA256 hash');
                       }
                     }}
                   >
-                    e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+                    {RESUME_SHA256}
                     <span className="absolute -top-6 left-1/2 -translate-x-1/2 bg-black border border-amber text-amber px-2 py-0.5 rounded opacity-0 invisible group-focus/hash:opacity-100 group-focus/hash:visible group-hover/hash:opacity-100 group-hover/hash:visible transition-all text-[0.5rem] w-max z-50 pointer-events-none">
                       Click to copy
                     </span>

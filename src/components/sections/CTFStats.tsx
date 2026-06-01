@@ -84,7 +84,7 @@ export function CTFStats() {
               </div>
 
               {/* Stats grid */}
-              <div className="grid grid-cols-2 gap-3 mb-6">
+              <div className="grid grid-cols-2 gap-3 mb-6" data-orb-target="ctf">
                 {HTB_STATS.map(({ label, value }) => (
                   <div key={label} className="p-3 rounded bg-black/40 border border-border">
                     <div className="font-display text-xl text-cyan font-bold">{value}</div>

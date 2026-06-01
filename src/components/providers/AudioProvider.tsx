@@ -19,11 +19,33 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 
   // Initialize audio preference and voices
   useEffect(() => {
-    // Check localStorage for audio preference
+
+    // Check localStorage for audio preference (defaulting to true now)
     const storedPreference = localStorage.getItem('audio_enabled');
-    if (storedPreference === 'true') {
+    if (storedPreference === 'false') {
+      setAudioEnabled(false);
+    } else {
       setAudioEnabled(true);
+      localStorage.setItem('audio_enabled', 'true');
     }
+
+    // Unlock Web Speech API on first user interaction to bypass autoplay policies
+    const unlockSpeech = () => {
+      if ('speechSynthesis' in window) {
+        const silentUtterance = new SpeechSynthesisUtterance('');
+        silentUtterance.volume = 0;
+        window.speechSynthesis.speak(silentUtterance);
+
+        window.removeEventListener('click', unlockSpeech);
+        window.removeEventListener('keydown', unlockSpeech);
+        window.removeEventListener('scroll', unlockSpeech);
+      }
+    };
+
+    window.addEventListener('click', unlockSpeech, { once: true });
+    window.addEventListener('keydown', unlockSpeech, { once: true });
+    window.addEventListener('scroll', unlockSpeech, { once: true });
+
 
     // Load voices
     const loadVoices = () => {

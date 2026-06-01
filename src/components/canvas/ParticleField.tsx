@@ -166,10 +166,15 @@ export default function ParticleField() {
       }
     }
 
+
     // Animation loop
     function animate() {
       if (!ctx || !canvas) return;
       animationFrameId = requestAnimationFrame(animate);
+
+      // BOLT: Only process and clear if in viewport to save CPU/GPU cycles
+      if (!inView) return;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       for (let i = 0; i < particlesArray.length; i++) {

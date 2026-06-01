@@ -9,3 +9,7 @@
 ## 2026-05-31 - [Keyboard-Accessible Tooltips and Filter Announcements]
 **Learning:** Interactive elements that only reveal information on hover (like skill badges with tooltips) are invisible to keyboard users and screen readers unless explicitly made focusable (`tabIndex={0}`) and coupled with CSS that responds to focus (`focus-visible`). Additionally, dynamic filtering requires `aria-live` regions to announce state changes to assistive technologies.
 **Action:** Always ensure hover-only information is reachable via keyboard focus and that dynamic UI updates (like filtering) are announced via `aria-live` regions.
+
+## 2026-06-01 - [Keyboard-Accessible Tooltips via ARIA Describedby]
+**Learning:** Making hover-only information (like tooltips) accessible to keyboard users requires more than just `tabIndex={0}`. To ensure screen readers announce the supplemental information, the interactive element should use `aria-describedby` to link to a container marked with `role="tooltip"`. Additionally, `role="button"` should be avoided if the element is purely informative and doesn't trigger a state change or navigation, as it creates false expectations for keyboard users (who would expect 'Enter' or 'Space' to perform an action).
+**Action:** Implement focusable informative elements with `aria-describedby` pointing to a `role="tooltip"` container to provide a semantic and predictable experience for assistive technology.

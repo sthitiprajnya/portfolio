@@ -36,13 +36,20 @@ export function SkillBadge({ name, icon, proficiency, color, delay = 0, descript
     triggerOnce: true,
   });
   const prefersReducedMotion = usePrefersReducedMotion();
+  const tooltipId = React.useId();
 
   const radius = 28;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (proficiency / 100) * circumference;
 
   return (
-    <div ref={ref} className="relative flex flex-col items-center justify-center p-2 group skill-tag" >
+    <div
+      ref={ref}
+      tabIndex={0}
+      aria-label={`Skill: ${name}`}
+      aria-describedby={tooltipId}
+      className="relative flex flex-col items-center justify-center p-2 group skill-tag outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-lg transition-all"
+    >
       <div className="relative w-16 h-16 flex items-center justify-center mb-3">
         {/* Background track */}
         <svg className="absolute inset-0 w-full h-full transform -rotate-90" aria-hidden="true">
@@ -131,7 +138,11 @@ export function SkillBadge({ name, icon, proficiency, color, delay = 0, descript
       </span>
 
       {/* Tooltip */}
-      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-3 glass rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-visible:opacity-100 group-focus-visible:visible transition-all duration-200 z-50 pointer-events-none translate-y-2 group-hover:translate-y-0 group-focus-visible:translate-y-0 relative overflow-hidden">
+      <div
+        id={tooltipId}
+        role="tooltip"
+        className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-3 glass rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-visible:opacity-100 group-focus-visible:visible transition-all duration-200 z-50 pointer-events-none translate-y-2 group-hover:translate-y-0 group-focus-visible:translate-y-0 relative overflow-hidden"
+      >
         <div className="font-mono text-[0.6rem] text-cyan font-bold mb-1 tracking-widest">{name}</div>
         <div className="flex justify-between items-center mb-2 font-mono text-[0.6rem]">
            <span className="text-text-secondary">EXP: <span className="text-white">{experience || 'N/A'}</span></span>

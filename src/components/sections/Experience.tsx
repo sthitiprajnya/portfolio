@@ -224,7 +224,7 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute inset-0"
+                    className=""
                   >
                     <ul className="space-y-4">
                       {sub.bullets.map((bullet, i) => (

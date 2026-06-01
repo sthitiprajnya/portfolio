@@ -193,7 +193,7 @@ export const PROJECTS: Project[] = [
     tags:        ['Python 3.10', 'Google DLP API', 'GCP', 'Data Classification', 'PCI/PII'],
     imageUrl:    'https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?auto=format&fit=crop&q=80&w=800',
     imageAlt:    'Google DLP Pipeline architecture diagram',
-    githubUrl:   'https://github.com/sthitiprajnya/dlp-pipeline-poc',
+    githubUrl:   '', // REPO: PRIVATE — ENTERPRISE
     featured:    false,
     year:        2024,
     impact:      '500+ daily transactions protected',
@@ -211,7 +211,7 @@ export const PROJECTS: Project[] = [
     tags:        ['Wazuh', 'Python', 'Log Analysis', 'Detection Engineering', 'Linux'],
     imageUrl:    'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800',
     imageAlt:    'Wazuh SIEM dashboard with custom detection rules',
-    githubUrl:   '', // Leave empty for "write-up coming soon"
+    githubUrl:   '', // REPO: PRIVATE — ENTERPRISE
     featured:    false,
     year:        2024,
     impact:      '45% false-positive reduction',
@@ -228,7 +228,7 @@ export const PROJECTS: Project[] = [
     tags:        ['GCP', 'IAM', 'CMEK', 'Cloud Storage', 'CIS Benchmarks', 'Python'],
     imageUrl:    'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800',
     imageAlt:    'GCP security hardening',
-    githubUrl:   'https://github.com/sthitiprajnya/gcp-bucket-auditor',
+    githubUrl:   '', // REPO: PRIVATE — ENTERPRISE
     featured:    true,
     year:        2024,
     impact:      '100% public exposure eliminated',
@@ -246,7 +246,7 @@ export const PROJECTS: Project[] = [
     tags:        ['MQTT', 'AWS', 'Python', 'IoT Security', 'Protocol Abuse', 'PoC Development'],
     imageUrl:    'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=800',
     imageAlt:    'MQTT attack chain proof of concept',
-    githubUrl:   '', // Write-up coming soon
+    githubUrl:   '', // REPO: RESTRICTED — ACTIVE CLIENT
     featured:    true,
     year:        2024,
     impact:      '4 payment microservices hardened',
@@ -264,7 +264,7 @@ export const PROJECTS: Project[] = [
     tags:        ['Python', 'Bash', 'Google Apps Script', 'JIRA REST API', 'Automation'],
     imageUrl:    'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&q=80&w=800',
     imageAlt:    'VAPT automation pipeline dashboard',
-    githubUrl:   'https://github.com/sthitiprajnya/vapt-jira-sync',
+    githubUrl:   '', // REPO: PRIVATE — ENTERPRISE
     featured:    false,
     year:        2024,
     impact:      '35% faster finding closure',
@@ -281,7 +281,7 @@ export const PROJECTS: Project[] = [
     tags:        ['GCP', 'Wazuh', 'Incident Response', 'Forensics', 'Linux', 'Detection Engineering'],
     imageUrl:    'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&q=80&w=800',
     imageAlt:    'Cryptojacking incident investigation timeline',
-    githubUrl:   '', // Write-up coming soon
+    githubUrl:   '', // REPO: RESTRICTED
     featured:    true,
     year:        2024,
     impact:      '80% faster future detection',
@@ -294,17 +294,17 @@ export const PROJECTS: Project[] = [
 ];
 
 export const CERTIFICATIONS: Certification[] = [
-  { id: 'ejpt',     name: 'eJPT v2',                            issuer: 'eLearnSecurity',          year: 2024, color: 'cyan',   status: 'active', verifyUrl: 'https://verify.elearnsecurity.com/placeholder1', expiry: '2027-05-10' },
-  { id: 'peh',      name: 'Practical Ethical Hacker (PEH)',     issuer: 'TCM Security',             year: 2024, color: 'green',  status: 'active', verifyUrl: 'https://verify.tcm-sec.com/placeholder2', expiry: 'No expiry' },
-  { id: 'icca',     name: 'INE Certified Cloud Associate',      issuer: 'INE Security',             year: 2024, color: 'amber',  status: 'active', verifyUrl: 'https://verify.ine.com/placeholder3', expiry: '2027-08-15' },
-  { id: 'cyberops', name: 'CyberOps Associate',                 issuer: 'Cisco Systems',            year: 2023, color: 'cyan',   status: 'active', verifyUrl: 'https://verify.cisco.com/placeholder4', expiry: '2026-11-20' },
-  { id: 'ccna',     name: 'CCNA v1.7',                          issuer: 'Cisco Systems',            year: 2023, color: 'cyan',   status: 'active', verifyUrl: 'https://verify.cisco.com/placeholder5', expiry: '2026-06-12' },
-  { id: 'ehe',      name: 'Ethical Hacking Essentials (EHE)',   issuer: 'EC-Council',               year: 2023, color: 'violet', status: 'active', verifyUrl: 'https://aspen.eccouncil.org/placeholder6', expiry: '2026-03-05' },
-  { id: 'nde',      name: 'Network Defence Essentials (NDE)',   issuer: 'EC-Council',               year: 2023, color: 'violet', status: 'active', verifyUrl: 'https://aspen.eccouncil.org/placeholder7', expiry: '2026-04-18' },
-  { id: 'dfe',      name: 'Digital Forensics Essentials (DFE)', issuer: 'EC-Council',               year: 2023, color: 'violet', status: 'active', verifyUrl: 'https://aspen.eccouncil.org/placeholder8', expiry: '2026-05-22' },
-  { id: 'cybersec', name: 'Cybersecurity Essentials',           issuer: 'Cisco',                    year: 2022, color: 'cyan',   status: 'active', verifyUrl: 'https://verify.cisco.com/placeholder9', expiry: 'No expiry' },
-  { id: 'pcap',     name: 'PCAP — Python Certified',            issuer: 'OpenEDG Python Institute', year: 2023, color: 'green',  status: 'active', verifyUrl: 'https://verify.pythoninstitute.org/placeholder10', expiry: 'No expiry' },
-  { id: 'kali',     name: 'Basic to Advanced Kali Linux',       issuer: 'CRAW Security',            year: 2023, color: 'green',  status: 'active', verifyUrl: 'https://verify.craw.in/placeholder11', expiry: 'No expiry' },
+  { id: 'ejpt',     name: 'eJPT v2',                            issuer: 'eLearnSecurity',          year: 2024, color: 'cyan',   status: 'active', verifyUrl: 'https://my.ine.com/certificate/', expiry: '2027-05-10' },
+  { id: 'peh',      name: 'Practical Ethical Hacker (PEH)',     issuer: 'TCM Security',             year: 2024, color: 'green',  status: 'active', verifyUrl: 'https://certifications.tcm-sec.com/', expiry: 'No expiry' },
+  { id: 'icca',     name: 'INE Certified Cloud Associate',      issuer: 'INE Security',             year: 2024, color: 'amber',  status: 'active', verifyUrl: '#', expiry: '2027-08-15' },
+  { id: 'cyberops', name: 'CyberOps Associate',                 issuer: 'Cisco Systems',            year: 2023, color: 'cyan',   status: 'active', verifyUrl: '#', expiry: '2026-11-20' },
+  { id: 'ccna',     name: 'CCNA v1.7',                          issuer: 'Cisco Systems',            year: 2023, color: 'cyan',   status: 'active', verifyUrl: '#', expiry: '2026-06-12' },
+  { id: 'ehe',      name: 'Ethical Hacking Essentials (EHE)',   issuer: 'EC-Council',               year: 2023, color: 'violet', status: 'active', verifyUrl: '#', expiry: '2026-03-05' },
+  { id: 'nde',      name: 'Network Defence Essentials (NDE)',   issuer: 'EC-Council',               year: 2023, color: 'violet', status: 'active', verifyUrl: '#', expiry: '2026-04-18' },
+  { id: 'dfe',      name: 'Digital Forensics Essentials (DFE)', issuer: 'EC-Council',               year: 2023, color: 'violet', status: 'active', verifyUrl: '#', expiry: '2026-05-22' },
+  { id: 'cybersec', name: 'Cybersecurity Essentials',           issuer: 'Cisco',                    year: 2022, color: 'cyan',   status: 'active', verifyUrl: '#', expiry: 'No expiry' },
+  { id: 'pcap',     name: 'PCAP — Python Certified',            issuer: 'OpenEDG Python Institute', year: 2023, color: 'green',  status: 'active', verifyUrl: '#', expiry: 'No expiry' },
+  { id: 'kali',     name: 'Basic to Advanced Kali Linux',       issuer: 'CRAW Security',            year: 2023, color: 'green',  status: 'active', verifyUrl: '#', expiry: 'No expiry' },
 ];
 
 export const UPCOMING_CERTIFICATIONS: Certification[] = [

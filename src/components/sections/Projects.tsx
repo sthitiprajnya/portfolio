@@ -136,7 +136,7 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
             <h3 className="font-heading text-lg font-bold text-white leading-tight group-hover:text-cyan transition-colors">
               {project.title}
             </h3>
-            {project.githubUrl ? (
+            {project.githubUrl && project.githubUrl.startsWith('http') ? (
               <a
                 href={project.githubUrl}
                 target="_blank"
@@ -154,7 +154,9 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
                  <svg className="w-5 h-5 text-text-muted hover:text-amber transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                  </svg>
-                 <div className="absolute right-0 bottom-full mb-2 w-max opacity-0 group-hover/lock:opacity-100 transition-opacity bg-black border border-amber text-amber font-mono text-[0.6rem] px-2 py-1 rounded">Write-up coming soon</div>
+                 <div className="absolute right-0 bottom-full mb-2 w-max opacity-0 group-hover/lock:opacity-100 transition-opacity bg-black border border-amber text-amber font-mono text-[0.6rem] px-2 py-1 rounded whitespace-nowrap z-50">
+                   {project.githubUrl ? project.githubUrl : '🔒 CLASSIFIED'}
+                 </div>
               </div>
             )}
           </div>

@@ -45,6 +45,15 @@ const RADAR_OPTIONS = {
   maintainAspectRatio: false
 };
 
+function RadarChartWrapper({ data, options }: { data: any, options: any }) {
+  const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
+  return (
+    <div ref={ref} className="w-full h-full flex justify-center items-center">
+      {inView && <Radar data={data} options={{...options, animation: {duration: 2000}}} />}
+    </div>
+  );
+}
+
 export function CTFStats() {
   return (
     <section id="ctf" className="py-24 bg-black relative border-t border-border overflow-hidden">
@@ -134,10 +143,7 @@ export function CTFStats() {
 
                  {/* Hexagonal Radar Chart mapped from same data */}
                  <div className="h-[240px] relative flex justify-center items-center">
-                   <Radar
-                     data={RADAR_DATA}
-                     options={RADAR_OPTIONS}
-                   />
+                   <RadarChartWrapper data={RADAR_DATA} options={RADAR_OPTIONS} />
                  </div>
               </div>
             </GlassCard>

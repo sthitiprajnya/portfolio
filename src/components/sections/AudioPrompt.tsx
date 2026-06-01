@@ -15,21 +15,14 @@ export function AudioPrompt({ onComplete }: AudioPromptProps) {
   useEffect(() => {
     // Only show if not booted
     if (sessionStorage.getItem('booted') !== 'true') {
-      // Check if we already have an audio preference
-      const storedPreference = localStorage.getItem('audio_enabled');
-      if (storedPreference === null) {
-         setIsVisible(true);
-      } else {
-         // Already chosen, skip directly to boot
-         onComplete();
-      }
+      setIsVisible(true);
     } else {
-        onComplete();
+      onComplete();
     }
   }, [onComplete]);
 
-  const handleChoice = (enableAudio: boolean) => {
-    setAudioEnabled(enableAudio);
+  const handleChoice = () => {
+    setAudioEnabled(true);
     setIsVisible(false);
 
     // Give a tiny delay for the exit animation before triggering completion
@@ -60,22 +53,12 @@ export function AudioPrompt({ onComplete }: AudioPromptProps) {
              SENTINEL ONLINE
           </div>
 
-          <p className="text-text-secondary text-sm mb-8 leading-relaxed relative z-10">
-            For the optimal immersive experience, the AI Sentinel requests audio permissions.
-          </p>
-
           <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
             <button
-              onClick={() => handleChoice(true)}
-              className="px-6 py-2 border border-cyan text-cyan hover:bg-cyan/10 transition-colors uppercase text-sm tracking-wider font-bold shadow-[var(--glow-cyan-sm)] outline-none focus-visible:ring-2 focus-visible:ring-cyan"
+              onClick={handleChoice}
+              className="px-6 py-2 border border-cyan text-cyan hover:bg-cyan/10 transition-colors uppercase text-sm tracking-wider font-bold shadow-[var(--glow-cyan-sm)] outline-none focus-visible:ring-2 focus-visible:ring-cyan w-full"
             >
-              [ENABLE AUDIO]
-            </button>
-            <button
-              onClick={() => handleChoice(false)}
-              className="px-6 py-2 border border-border text-text-muted hover:text-white hover:border-white/50 transition-colors uppercase text-sm tracking-wider outline-none focus-visible:ring-2 focus-visible:ring-cyan"
-            >
-              [SKIP]
+              [ CLICK ANYWHERE TO BOOT SYSTEM ]
             </button>
           </div>
         </motion.div>

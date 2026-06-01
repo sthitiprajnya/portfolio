@@ -8,9 +8,13 @@ import { PERSONAL, HERO_ROLES, HERO_STATS, HERO_TICKER } from '@/data/portfolio'
 import CountUp from 'react-countup';
 import { useInView } from 'react-intersection-observer';
 import { AnimatePresence } from 'framer-motion';
+import dynamic from 'next/dynamic';
 
-const ParticleField = lazy(() => import('@/components/canvas/ParticleField'));
-const MatrixRain    = lazy(() => import('@/components/canvas/MatrixRain'));
+const MatrixRain = lazy(() => import('@/components/canvas/MatrixRain'));
+const HeroOrb = dynamic(() => import('@/components/canvas/HeroOrb'), {
+  ssr: false,
+  loading: () => null,
+});
 
 // BOLT: Hoist static data transformations to module level to avoid redundant allocations on every render
 const TICKER_CONTENT = [...HERO_TICKER, ...HERO_TICKER];
@@ -32,10 +36,10 @@ export function Hero() {
       id="hero"
       className="relative min-h-screen flex flex-col items-center justify-center pt-16 bg-[var(--gradient-hero)] overflow-hidden"
     >
+      <HeroOrb />
       {/* Background effects */}
       <Suspense fallback={null}>
         <MatrixRain opacity={0.055} />
-        <ParticleField />
       </Suspense>
       <div className="absolute inset-0 scan-line-effect z-0" />
 
@@ -174,25 +178,32 @@ export function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 3.0, duration: 0.8 }}
-        className="relative z-10 w-full mt-auto border-t border-cyan/15 bg-black/40 backdrop-blur-sm py-3 overflow-hidden"
+        className="relative z-10 w-full mt-auto border-t border-[var(--glass-border)] py-3 overflow-hidden glass rounded-t-card"
+        role="marquee"
+        aria-label="Security intelligence ticker"
+        aria-live="off"
+        aria-atomic="false"
       >
+        {/* Top accent bar */}
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#00F5FF]/50 to-transparent z-30 pointer-events-none" />
+
         {/* Fade edges */}
         <div className="absolute top-0 left-0 bottom-0 w-20 bg-gradient-to-r from-black to-transparent z-10 pointer-events-none" />
         <div className="absolute top-0 right-0 bottom-0 w-20 bg-gradient-to-l from-black to-transparent z-10 pointer-events-none" />
 
         {/* ALERT label */}
-        <div className="absolute left-4 top-1/2 -translate-y-1/2 z-20 font-mono text-[0.6rem] text-black bg-cyan px-2 py-0.5 rounded-sm tracking-widest font-bold">
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 z-20 font-mono text-[0.6rem] text-black bg-cyan px-2 py-0.5 rounded-pill tracking-widest font-bold glass-pill">
           INTEL
         </div>
 
         {/* Scrolling messages */}
-        <div className="pl-20 flex whitespace-nowrap overflow-hidden">
+        <div className="pl-20 flex whitespace-nowrap overflow-hidden relative z-10">
           <div className="ticker-track flex gap-12">
             {TICKER_CONTENT.map((msg, i) => (
               <button
                 key={i}
                 onClick={() => setActiveIntel(msg)}
-                className="font-mono text-[0.65rem] text-text-secondary tracking-wide hover:text-cyan hover:underline cursor-pointer outline-none focus-visible:text-cyan focus-visible:underline"
+                className="font-mono text-[0.65rem] text-text-secondary tracking-wide hover:text-cyan hover:underline cursor-pointer outline-none focus-visible:text-cyan focus-visible:underline glass-pill px-3 py-1 border-[var(--glass-border)]"
               >
                 {msg}
               </button>

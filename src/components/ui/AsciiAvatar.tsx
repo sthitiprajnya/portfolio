@@ -72,14 +72,14 @@ export function AsciiAvatar({ className }: AsciiAvatarProps) {
   return (
     <div
       className={clsx(
-        'relative rounded-md border border-cyan/40 bg-black overflow-hidden',
+        'relative rounded-2xl border border-[var(--glass-border)] glass-heavy overflow-hidden',
         'shadow-[0_0_30px_rgba(0,245,255,0.12)]',
-        'group transition-all duration-500 hover:border-cyan hover:shadow-[var(--glow-cyan-md)]',
+        'group transition-all duration-500 hover:border-[rgba(0,245,255,0.4)] hover:shadow-[var(--glow-cyan-md)]',
         className
       )}
     >
       {/* ── Terminal title bar ───────────────────────────── */}
-      <div className="flex items-center space-x-2 px-3 py-2 bg-[#0a0a0a] border-b border-cyan/20">
+      <div className="flex items-center space-x-2 px-3 py-2 bg-[rgba(0,0,0,0.6)] border-b border-[var(--glass-border)] relative z-10">
         <span className="w-3 h-3 rounded-full bg-red-500/70" />
         <span className="w-3 h-3 rounded-full bg-amber-500/70" />
         <span className="w-3 h-3 rounded-full bg-green-500/70" />
@@ -89,22 +89,22 @@ export function AsciiAvatar({ className }: AsciiAvatarProps) {
         {/* Toggle Switch */}
         <button
           onClick={() => setIsHuman(!isHuman)}
-          className="ml-auto flex items-center bg-black/50 rounded-full border border-cyan/30 p-0.5 w-20 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-1 focus-visible:ring-offset-black"
+          className="ml-auto flex items-center bg-black/50 rounded-pill border border-cyan/30 p-0.5 w-20 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-1 focus-visible:ring-offset-black glass-pill"
           aria-label={isHuman ? "Switch to SCAN mode" : "Switch to HUMAN mode"}
         >
           <span className={clsx(
-            "w-1/2 text-center text-[0.55rem] font-mono tracking-wider py-0.5 rounded-full transition-all",
+            "w-1/2 text-center text-[0.55rem] font-mono tracking-wider py-0.5 rounded-pill transition-all",
             !isHuman ? "bg-cyan text-black font-bold" : "text-text-muted"
           )}>SCAN</span>
           <span className={clsx(
-            "w-1/2 text-center text-[0.55rem] font-mono tracking-wider py-0.5 rounded-full transition-all",
+            "w-1/2 text-center text-[0.55rem] font-mono tracking-wider py-0.5 rounded-pill transition-all",
             isHuman ? "bg-green text-black font-bold" : "text-text-muted"
           )}>HUMAN</span>
         </button>
       </div>
 
       {/* ── Image Area ─────────────────────────────────── */}
-      <div className="relative h-[240px] select-none flex items-center justify-center overflow-hidden bg-black" aria-hidden="true">
+      <div className="relative h-[240px] select-none flex items-center justify-center overflow-hidden bg-[rgba(0,0,0,0.4)] relative z-10" aria-hidden="true">
 
         {/* ASCII View */}
         <div className={clsx("absolute inset-0 pt-2 px-2 transition-opacity duration-500", !isHuman ? "opacity-100 z-10" : "opacity-0 z-0")}>
@@ -152,7 +152,7 @@ export function AsciiAvatar({ className }: AsciiAvatarProps) {
       </div>
 
       {/* ── Metadata panel ─────────────────────────────────── */}
-      <div className="border-t border-cyan/20 mt-2 px-3 pt-2 pb-3 space-y-[2px]">
+      <div className="border-t border-[var(--glass-border)] bg-[rgba(0,0,0,0.6)] px-3 pt-2 pb-3 space-y-[2px] relative z-10">
         {META_LINES.map((line, idx) => (
           <div
             key={idx}
@@ -169,10 +169,10 @@ export function AsciiAvatar({ className }: AsciiAvatarProps) {
       </div>
 
       {/* ── Corner targeting reticles (matching hero aesthetic) ── */}
-      <div className="absolute top-10 left-2 w-4 h-4 border-t-2 border-l-2 border-cyan/60 pointer-events-none" />
-      <div className="absolute top-10 right-2 w-4 h-4 border-t-2 border-r-2 border-cyan/60 pointer-events-none" />
-      <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-cyan/60 pointer-events-none" />
-      <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-cyan/60 pointer-events-none" />
+      <div className="absolute top-10 left-2 w-4 h-4 border-t-2 border-l-2 border-cyan/60 pointer-events-none z-20" />
+      <div className="absolute top-10 right-2 w-4 h-4 border-t-2 border-r-2 border-cyan/60 pointer-events-none z-20" />
+      <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-cyan/60 pointer-events-none z-20" />
+      <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-cyan/60 pointer-events-none z-20" />
 
       {/* Hover glitch flash */}
       <div

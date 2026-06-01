@@ -43,6 +43,8 @@ export const viewport: Viewport = {
 
 import { FaviconBlinkProvider } from '@/components/providers/FaviconBlinkProvider';
 import { AudioProvider } from '@/components/providers/AudioProvider';
+import { VisibilityOptimiserProvider } from '@/components/providers/VisibilityOptimiserProvider';
+import LivieBot from '@/components/livie/LivieBot';
 
 export default function RootLayout({
   children,
@@ -97,11 +99,14 @@ export default function RootLayout({
           Skip to content
         </a>
         <div id="root">
-          <AudioProvider>
-            <FaviconBlinkProvider>
-              {children}
-            </FaviconBlinkProvider>
-          </AudioProvider>
+          <VisibilityOptimiserProvider>
+            <AudioProvider>
+              <FaviconBlinkProvider>
+                {children}
+                <LivieBot />
+              </FaviconBlinkProvider>
+            </AudioProvider>
+          </VisibilityOptimiserProvider>
         </div>
       </body>
     </html>

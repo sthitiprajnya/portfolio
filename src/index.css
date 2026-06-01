@@ -12,12 +12,41 @@
 @font-face {
   font-family: 'JetBrains Mono';
   src: url('/portfolio/fonts/JetBrainsMono-Regular.woff2') format('woff2');
-  font-weight: 100 800;
+  font-weight: 400;
   font-display: swap;
 }
 
 /* ── Design tokens ──────────────────────────────────────────── */
 :root {
+  --animation-play-state: running;
+
+  /* ─────── GLASS TOKENS ─────── */
+  /* surface glass */
+  --glass-bg:             rgba(0, 245, 255, 0.04);
+  --glass-bg-hover:       rgba(0, 245, 255, 0.08);
+  --glass-bg-active:      rgba(0, 245, 255, 0.12);
+  --glass-border:         rgba(0, 245, 255, 0.15);
+  --glass-border-hover:   rgba(0, 245, 255, 0.30);
+  --glass-shadow:         0 8px 32px rgba(0, 0, 0, 0.40),
+                          0 0 0 1px rgba(0, 245, 255, 0.06),
+                          inset 0 1px 0 rgba(0, 245, 255, 0.08);
+  --glass-shadow-hover:   0 16px 48px rgba(0, 0, 0, 0.55),
+                          0 0 0 1px rgba(0, 245, 255, 0.20),
+                          inset 0 1px 0 rgba(0, 245, 255, 0.14);
+  --glass-blur:           blur(12px);
+  --glass-blur-heavy:     blur(20px);
+  --glass-blur-light:     blur(6px);
+
+  /* radius scale */
+  --r-xs:   4px;
+  --r-sm:   8px;
+  --r-md:   12px;
+  --r-lg:   16px;
+  --r-xl:   20px;
+  --r-2xl:  24px;
+  --r-card: 20px;
+  --r-pill: 9999px;
+
   --color-void:        #000000;
   --color-deep:        #020408;
   --color-surface:     #071018;
@@ -64,6 +93,55 @@
   --ease-spring:    cubic-bezier(0.68, -0.55, 0.27, 1.55);
 }
 
+/* ─────── REUSABLE GLASS UTILITY CLASSES ─────── */
+.glass {
+  background:    var(--glass-bg);
+  border:        1px solid var(--glass-border);
+  box-shadow:    var(--glass-shadow);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-radius: var(--r-card);
+  transition:    background 0.3s ease, border-color 0.3s ease,
+                 box-shadow 0.3s ease;
+}
+.glass:hover {
+  background:    var(--glass-bg-hover);
+  border-color:  var(--glass-border-hover);
+  box-shadow:    var(--glass-shadow-hover);
+}
+
+.glass-heavy {
+  background:    rgba(0, 0, 0, 0.55);
+  border:        1px solid var(--glass-border);
+  box-shadow:    var(--glass-shadow);
+  backdrop-filter: var(--glass-blur-heavy);
+  -webkit-backdrop-filter: var(--glass-blur-heavy);
+  border-radius: var(--r-card);
+}
+
+.glass-pill {
+  background:    var(--glass-bg);
+  border:        1px solid var(--glass-border);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border-radius: var(--r-pill);
+}
+
+/* Scanline shimmer on glass cards */
+.glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 245, 255, 0.04) 0%,
+    transparent 60%,
+    rgba(0, 245, 255, 0.02) 100%
+  );
+  pointer-events: none;
+}
+
 body {
   background-color: var(--color-void);
   color: var(--text-primary);
@@ -107,10 +185,22 @@ body {
 
 .ticker-track {
   animation: ticker-scroll 40s linear infinite;
+  animation-play-state: var(--animation-play-state, running);
+  will-change: transform;
 }
 
 .ticker-track:hover {
   animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px;
+  }
 }
 
 /* ── CTF skill bar fill ─────────────────────────────────────── */

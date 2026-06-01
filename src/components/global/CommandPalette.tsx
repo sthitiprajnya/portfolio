@@ -85,7 +85,7 @@ export function CommandPalette() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-md transition-opacity"
+            className="fixed inset-0 bg-[rgba(0,0,0,0.6)] backdrop-blur-md transition-opacity"
             onClick={() => setIsOpen(false)}
           />
 
@@ -94,9 +94,9 @@ export function CommandPalette() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -20 }}
             transition={{ duration: 0.2 }}
-            className="relative bg-surface border border-border rounded-lg shadow-[0_0_40px_rgba(0,245,255,0.1)] w-full max-w-lg overflow-hidden flex flex-col"
+            className="relative glass-heavy rounded-card shadow-[0_0_40px_rgba(0,245,255,0.1)] w-full max-w-lg overflow-hidden flex flex-col"
           >
-            <div className="flex items-center px-4 py-4 border-b border-border bg-black/40">
+            <div className="flex items-center px-4 py-4 border-b border-[var(--glass-border)] bg-[rgba(0,0,0,0.4)] relative z-10">
               <span className="text-cyan font-mono mr-3">{'>'}</span>
               <input
                 ref={inputRef}
@@ -112,7 +112,7 @@ export function CommandPalette() {
               <span className="text-text-secondary text-xs font-mono bg-black/50 px-2 py-1 rounded border border-border/50">ESC</span>
             </div>
 
-            <div className="max-h-80 overflow-y-auto py-2 px-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+            <div className="max-h-80 overflow-y-auto py-2 px-2 scrollbar-thin scrollbar-thumb-[var(--glass-border)] scrollbar-track-transparent relative z-10">
               {filteredLinks.length > 0 ? (
                 filteredLinks.map((link, i) => {
                   const isSelected = i === selectedIndex;
@@ -121,7 +121,7 @@ export function CommandPalette() {
                       key={link.id}
                       className={clsx(
                         'w-full text-left px-4 py-3 rounded-md flex items-center justify-between font-mono text-sm transition-colors',
-                        isSelected ? 'bg-cyan/10 text-cyan border border-cyan/20' : 'text-text-secondary hover:bg-white/5 hover:text-white border border-transparent'
+                        isSelected ? 'bg-cyan/10 text-cyan border border-cyan/20 glass-pill rounded-pill' : 'text-text-secondary hover:bg-white/5 hover:text-white border border-transparent rounded-pill'
                       )}
                       onClick={() => handleSelect(link.id, link.label)}
                       onMouseEnter={() => setSelectedIndex(i)}
@@ -141,7 +141,7 @@ export function CommandPalette() {
               )}
             </div>
 
-            <div className="px-4 py-3 border-t border-border bg-black/40 flex items-center justify-between text-xs text-text-secondary font-mono">
+            <div className="px-4 py-3 border-t border-[var(--glass-border)] bg-[rgba(0,0,0,0.4)] flex items-center justify-between text-xs text-text-secondary font-mono relative z-10">
               <div className="flex items-center gap-4">
                 <span className="flex items-center gap-1">
                   <kbd className="bg-white/10 px-1.5 py-0.5 rounded border border-white/20">↑</kbd>

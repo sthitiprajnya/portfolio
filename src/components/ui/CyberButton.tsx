@@ -18,7 +18,7 @@ export function CyberButton({
 }: CyberButtonProps) {
 
   const baseClasses = cn(
-    "cyber-button relative inline-flex items-center justify-center font-mono text-xs uppercase tracking-widest px-6 py-3 transition-all duration-300 overflow-hidden group border-2 bg-transparent active:scale-[0.97] outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black",
+    "cyber-button relative inline-flex items-center justify-center font-mono text-xs uppercase tracking-widest px-6 py-3 transition-all duration-300 overflow-hidden group border-2 rounded-pill bg-transparent active:scale-[0.97] outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black glass-pill",
     "disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 disabled:hover:bg-transparent disabled:hover:shadow-none disabled:hover:text-inherit",
     color === 'cyan' ? [
       "border-cyan text-cyan",

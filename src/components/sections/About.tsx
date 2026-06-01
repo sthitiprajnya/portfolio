@@ -69,11 +69,11 @@ export function About() {
             {/* Animated stat counters */}
             <ScrollReveal
               variants={containerStagger}
-              className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-8 border-t border-border"
+              className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-8 border-t border-[var(--glass-border)]"
             >
               {ABOUT_STATS.map((stat, i) => (
-                <ScrollReveal key={i} variants={fadeSlideUp} className="flex flex-col">
-                  <div className="font-display text-3xl md:text-4xl text-cyan mb-2">
+                <ScrollReveal key={i} variants={fadeSlideUp} className="flex flex-col glass rounded-xl px-4 py-3 relative overflow-hidden">
+                  <div className="font-display text-3xl md:text-4xl text-cyan mb-2 relative z-10">
                     <CountUp
                       end={stat.value}
                       duration={2.5}
@@ -83,7 +83,7 @@ export function About() {
                     />
                     {stat.suffix}
                   </div>
-                  <div className="font-mono text-[0.65rem] text-text-muted uppercase tracking-widest leading-snug">
+                  <div className="font-mono text-[0.65rem] text-text-muted uppercase tracking-widest leading-snug relative z-10">
                     {stat.label}
                   </div>
                 </ScrollReveal>

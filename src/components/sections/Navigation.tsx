@@ -106,9 +106,9 @@ export function Navigation() {
       <nav
         aria-label="Main navigation"
         className={clsx(
-          'fixed top-0 left-0 w-full h-16 z-50 transition-all duration-300 flex items-center px-4 md:px-8',
-          'bg-black/70 backdrop-blur-xl',
-          scrolled ? 'border-b border-[rgba(0,245,255,0.3)]' : 'border-b border-[rgba(0,245,255,0.08)]'
+          'fixed top-0 left-0 right-0 h-16 z-50 transition-all duration-300 flex items-center px-4 md:px-8',
+          'glass-heavy rounded-b-xl border-t-0 border-l-0 border-r-0 border-b',
+          scrolled ? 'bg-[rgba(0,0,0,0.75)] backdrop-blur-glass-heavy border-[rgba(0,245,255,0.25)]' : 'border-[var(--glass-border)]'
         )}
       >
         <div className="w-full max-w-7xl mx-auto flex items-center justify-between">
@@ -135,17 +135,13 @@ export function Navigation() {
                     <button
                       onClick={() => scrollTo(link.id)}
                       className={clsx(
-                        'relative font-mono text-[0.72rem] uppercase tracking-widest py-2 transition-colors group outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-sm',
-                        isActive ? 'text-cyan' : 'text-text-secondary hover:text-cyan'
+                        'relative font-mono text-[0.72rem] uppercase tracking-widest py-2 px-3 transition-colors group outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black',
+                        isActive ? 'text-cyan glass-pill rounded-pill' : 'text-text-secondary hover:text-cyan rounded-pill'
                       )}
                       aria-label={`Scroll to ${link.label} section`}
                       aria-current={isActive ? 'page' : undefined}
                     >
                       {link.label}
-                      <span className={clsx(
-                        'absolute bottom-0 left-0 h-[1px] bg-cyan transition-transform duration-300 origin-left w-full',
-                        isActive ? 'scale-x-100 shadow-[var(--glow-cyan-sm)]' : 'scale-x-0 group-hover:scale-x-100'
-                      )} />
                     </button>
                   </li>
                 );

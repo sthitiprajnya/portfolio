@@ -1,10 +1,9 @@
 "use client";
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { SkillBadge } from '@/components/ui/SkillBadge';
 import { ScrollReveal, fadeSlideUp, containerStagger } from '@/components/ui/ScrollReveal';
 import { SKILLS } from '@/data/portfolio';
-import { useState } from 'react';
 import clsx from 'clsx';
 import { Radar } from 'react-chartjs-2';
 import {
@@ -80,9 +79,18 @@ export function Skills() {
   const [activeTab, setActiveTab] = useState<'ALL' | 'OFFENSIVE' | 'CLOUD' | 'AUTOMATION' | 'COMPLIANCE'>('ALL');
   const { ref: chartRef, inView: chartInView } = useInView({ triggerOnce: true, threshold: 0.5 });
 
-  const totalFilteredSkills = SKILLS.reduce((acc, cat) => {
-    return acc + cat.skills.filter(s => activeTab === 'ALL' || s.domain === activeTab).length;
-  }, 0);
+  // BOLT: Memoize filtered skill data to avoid redundant O(n*m) filtering and reduction on every render cycle.
+  // This ensures these expensive array operations only execute when the activeTab actually changes.
+  const { filteredCategories, totalFilteredSkills } = useMemo(() => {
+    let count = 0;
+    const filtered = SKILLS.map(category => {
+      const filteredSkills = category.skills.filter(s => activeTab === 'ALL' || s.domain === activeTab);
+      count += filteredSkills.length;
+      return { ...category, filteredSkills };
+    }).filter(cat => cat.filteredSkills.length > 0);
+
+    return { filteredCategories: filtered, totalFilteredSkills: count };
+  }, [activeTab]);
 
   return (
     <section id="skills" className="py-24 bg-black overflow-hidden relative">
@@ -143,34 +151,29 @@ export function Skills() {
 
         {/* Skill Rings Grid */}
         <div className="space-y-16 mb-24">
-          {SKILLS.map((category, catIdx) => {
-            const filteredSkills = category.skills.filter(s => activeTab === 'ALL' || s.domain === activeTab);
-            if (filteredSkills.length === 0) return null;
+          {filteredCategories.map((category) => (
+            <ScrollReveal key={category.category} variants={containerStagger} className="space-y-6">
+              <h3 className="font-mono text-sm text-white border-b border-border pb-2 inline-block">
+                {category.category}
+              </h3>
 
-            return (
-              <ScrollReveal key={catIdx} variants={containerStagger} className="space-y-6">
-                <h3 className="font-mono text-sm text-white border-b border-border pb-2 inline-block">
-                  {category.category}
-                </h3>
-
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-y-8 gap-x-4">
-                  {filteredSkills.map((skill, skillIdx) => (
-                    <ScrollReveal key={skillIdx} variants={fadeSlideUp}>
-                      <SkillBadge
-                        name={skill.name}
-                        icon={skill.icon}
-                        proficiency={skill.proficiency}
-                        color={category.color}
-                        delay={skillIdx * 0.1}
-                        description={skill.description}
-                        experience={skill.experience}
-                      />
-                    </ScrollReveal>
-                  ))}
-                </div>
-              </ScrollReveal>
-            );
-          })}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-y-8 gap-x-4">
+                {category.filteredSkills.map((skill) => (
+                  <ScrollReveal key={skill.name} variants={fadeSlideUp}>
+                    <SkillBadge
+                      name={skill.name}
+                      icon={skill.icon}
+                      proficiency={skill.proficiency}
+                      color={category.color}
+                      delay={skillIdx * 0.1}
+                      description={skill.description}
+                      experience={skill.experience}
+                    />
+                  </ScrollReveal>
+                ))}
+              </div>
+            </ScrollReveal>
+          ))}
         </div>
       </div>
 

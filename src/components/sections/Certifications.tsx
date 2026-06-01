@@ -5,6 +5,14 @@ import { SectionTitle } from '@/components/ui/SectionTitle';
 import { ScrollReveal, fadeSlideUp, containerStagger } from '@/components/ui/ScrollReveal';
 import { CERTIFICATIONS, UPCOMING_CERTIFICATIONS } from '@/data/portfolio';
 
+// BOLT: Hoist static configurations to module level to avoid redundant allocations on every render
+const CERT_COLOR_MAP = {
+  cyan:   { bg: 'bg-cyan-ghost',   border: 'border-cyan/30',   text: 'text-cyan',   glow: 'hover:shadow-[var(--glow-cyan-sm)]' },
+  green:  { bg: 'bg-[rgba(57,255,20,0.1)]', border: 'border-green/30',  text: 'text-green',  glow: 'hover:shadow-[var(--glow-green-sm)]' },
+  amber:  { bg: 'bg-[rgba(255,179,0,0.1)]', border: 'border-amber/30',  text: 'text-amber',  glow: 'hover:shadow-[var(--glow-amber-sm)]' },
+  violet: { bg: 'bg-[rgba(191,0,255,0.1)]', border: 'border-violet/30', text: 'text-violet', glow: 'hover:shadow-[var(--glow-violet-sm)]' },
+};
+
 export function Certifications() {
   return (
     <section id="certifications" className="py-24 bg-deep relative border-t border-border">
@@ -57,14 +65,7 @@ export function Certifications() {
 }
 
 function CertCard({ cert }: { cert: typeof CERTIFICATIONS[0] }) {
-  const colorMap = {
-    cyan:   { bg: 'bg-cyan-ghost',   border: 'border-cyan/30',   text: 'text-cyan',   glow: 'hover:shadow-[var(--glow-cyan-sm)]' },
-    green:  { bg: 'bg-[rgba(57,255,20,0.1)]', border: 'border-green/30',  text: 'text-green',  glow: 'hover:shadow-[var(--glow-green-sm)]' },
-    amber:  { bg: 'bg-[rgba(255,179,0,0.1)]', border: 'border-amber/30',  text: 'text-amber',  glow: 'hover:shadow-[var(--glow-amber-sm)]' },
-    violet: { bg: 'bg-[rgba(191,0,255,0.1)]', border: 'border-violet/30', text: 'text-violet', glow: 'hover:shadow-[var(--glow-violet-sm)]' },
-  };
-
-  const style = colorMap[cert.color];
+  const style = CERT_COLOR_MAP[cert.color];
 
   return (
     <div className={clsx("relative p-[1px] rounded-xl overflow-hidden group h-full", style.glow)} data-orb-target="cert">

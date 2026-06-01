@@ -77,12 +77,16 @@ export default function RootLayout({
     ]
   };
 
+  // Security: Escape JSON-LD to prevent XSS via script tag breakout.
+  // Specifically, replacing '<' with '\u003c' prevents '</script>' from being parsed as a closing tag.
+  const jsonLdString = JSON.stringify(jsonLd).replace(/</g, '\\u003c');
+
   return (
     <html lang="en">
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdString }}
         />
         <meta
           httpEquiv="Content-Security-Policy"

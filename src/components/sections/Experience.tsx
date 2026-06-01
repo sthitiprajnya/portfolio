@@ -213,7 +213,7 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
             })}
           </div>
 
-          <div className="relative min-h-[150px]">
+          <div className="relative">
             <AnimatePresence mode="wait">
               {experience.subsections.map((sub) => {
                 if (openSection !== sub.id) return null;
@@ -234,7 +234,7 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute inset-0"
+                    className="relative"
                   >
                     <ul className="space-y-4">
                       {sub.bullets.map((bullet, i) => (

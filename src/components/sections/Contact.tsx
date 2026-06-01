@@ -8,7 +8,6 @@ import { PERSONAL } from '@/data/portfolio';
 
 type Status = 'idle' | 'transmitting' | 'sent' | 'error';
 
-import emailjs from '@emailjs/browser';
 import { useAudio } from '@/components/providers/AudioProvider';
 
 // This form uses EmailJS to send emails directly from the browser.
@@ -99,6 +98,9 @@ export function Contact() {
       }
 
       if (!formRef.current) return;
+
+      // BOLT: Lazy-load @emailjs/browser to reduce initial bundle size (~15KB gzipped deferred)
+      const emailjs = (await import('@emailjs/browser')).default;
 
       await emailjs.sendForm(
         serviceId,

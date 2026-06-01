@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { SectionTitle } from '@/components/ui/SectionTitle';
@@ -20,9 +20,10 @@ export function Projects() {
   const [activeFilter, setActiveFilter] = useState('all');
   const prefersReducedMotion = usePrefersReducedMotion();
 
-  const filteredProjects = PROJECTS.filter(p =>
-    activeFilter === 'all' ? true : p.category === activeFilter
-  );
+  // BOLT: Memoize filtered projects to avoid redundant array filtering on every render
+  const filteredProjects = useMemo(() =>
+    PROJECTS.filter(p => activeFilter === 'all' ? true : p.category === activeFilter),
+  [activeFilter]);
 
   return (
     <section id="projects" className="py-32 bg-black relative border-t border-border overflow-hidden">

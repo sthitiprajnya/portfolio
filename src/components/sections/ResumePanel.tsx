@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { SectionTitle } from '@/components/ui/SectionTitle';
-import { GlassCard }    from '@/components/ui/GlassCard';
 import { CyberButton }  from '@/components/ui/CyberButton';
 import { ScrollReveal, fadeSlideUp, fadeSlideLeft, containerStagger } from '@/components/ui/ScrollReveal';
 import { PERSONAL, RESUME_HIGHLIGHTS } from '@/data/portfolio';
@@ -49,10 +48,10 @@ export function ResumePanel() {
 
           {/* ── Left: Document viewer ── */}
           <ScrollReveal variants={fadeSlideUp} className="lg:col-span-7">
-            <GlassCard className="overflow-hidden border-amber/20 hover:shadow-[var(--glow-amber-sm)]">
+            <div className="overflow-hidden border border-[var(--glass-border)] hover:shadow-[var(--glow-amber-sm)] glass-heavy rounded-2xl relative">
 
               {/* Document title bar */}
-              <div className="flex items-center justify-between px-5 py-3 bg-black/60 border-b border-amber/20">
+              <div className="flex items-center justify-between px-5 py-3 bg-[rgba(0,0,0,0.6)] border-b border-[var(--glass-border)] relative z-10">
                 <div className="flex items-center space-x-3">
                   {/* Fake "PDF" icon indicator */}
                   <div className="w-8 h-10 border border-amber/40 rounded-sm relative flex items-center justify-center">
@@ -80,7 +79,7 @@ export function ResumePanel() {
               </div>
 
               {/* Document body / PDF viewer */}
-              <div className="w-full bg-black/40">
+              <div className="w-full bg-[rgba(0,0,0,0.4)] relative z-10">
                 <iframe
                   src={PERSONAL.resumeUrl}
                   className="w-full h-[600px] border-none"
@@ -90,7 +89,7 @@ export function ResumePanel() {
               </div>
 
               {/* Footer stamp */}
-              <div className="px-6 py-4 border-t border-border flex flex-col md:flex-row justify-between items-center bg-black/60 gap-4">
+              <div className="px-6 py-4 border-t border-[var(--glass-border)] flex flex-col md:flex-row justify-between items-center bg-[rgba(0,0,0,0.6)] gap-4 relative z-10">
                 <span className="text-[0.6rem] text-text-muted font-mono text-center md:text-left">
                   DOC_ID: <span
                     className="redacted"
@@ -131,7 +130,7 @@ export function ResumePanel() {
                   INTEGRITY OK
                 </span>
               </div>
-            </GlassCard>
+            </div>
           </ScrollReveal>
 
           {/* ── Right: Stats + download CTA ── */}
@@ -141,28 +140,28 @@ export function ResumePanel() {
             <ScrollReveal variants={containerStagger} className="grid grid-cols-2 gap-4">
               {RESUME_HIGHLIGHTS.map((item) => (
                 <ScrollReveal key={item.label} variants={fadeSlideUp}>
-                  <GlassCard className="p-4 text-center hover:shadow-[var(--glow-cyan-sm)]">
-                    <div className="font-display text-2xl text-cyan font-bold mb-1">
+                  <div className="p-4 text-center hover:shadow-[var(--glow-cyan-sm)] glass rounded-card relative overflow-hidden">
+                    <div className="font-display text-2xl text-cyan font-bold mb-1 relative z-10">
                       {item.value}
                     </div>
-                    <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest mb-1">
+                    <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest mb-1 relative z-10">
                       {item.label}
                     </div>
-                    <div className="font-body text-[0.7rem] text-text-secondary leading-snug">
+                    <div className="font-body text-[0.7rem] text-text-secondary leading-snug relative z-10">
                       {item.detail}
                     </div>
-                  </GlassCard>
+                  </div>
                 </ScrollReveal>
               ))}
             </ScrollReveal>
 
             {/* Download CTA */}
             <ScrollReveal variants={fadeSlideUp} delay={0.2}>
-              <GlassCard className="p-6 border-green/20 hover:shadow-[var(--glow-green-sm)]">
-                <div className="font-mono text-[0.65rem] text-text-muted uppercase tracking-widest mb-3">
+              <div className="p-6 border-green/20 hover:shadow-[var(--glow-green-sm)] glass rounded-card relative overflow-hidden">
+                <div className="font-mono text-[0.65rem] text-text-muted uppercase tracking-widest mb-3 relative z-10">
                   // AUTHORISED DOWNLOAD
                 </div>
-                <p className="font-body text-sm text-text-secondary leading-relaxed mb-6">
+                <p className="font-body text-sm text-text-secondary leading-relaxed mb-6 relative z-10">
                   Full resume with engagement details, methodology notes, and verified credentials.
                   PDF format — ready to forward to your hiring manager.
                 </p>
@@ -172,7 +171,7 @@ export function ResumePanel() {
                   href={PERSONAL.resumeUrl}
                   download
                   color="green"
-                  className="w-full justify-center"
+                  className="w-full justify-center rounded-pill glass"
                   onClick={handleDownload}
                 >
                   <span className="flex items-center space-x-2">
@@ -198,7 +197,7 @@ export function ResumePanel() {
 
                 <button
                   onClick={() => handleCopy(window.location.origin + window.location.pathname + '#resume', 'Resume Link')}
-                  className="w-full mt-3 flex items-center justify-center space-x-2 py-2 border border-cyan/30 text-cyan font-mono text-xs uppercase tracking-widest rounded-sm hover:bg-cyan/10 transition-all outline-none focus-visible:ring-2 focus-visible:ring-cyan"
+                  className="w-full mt-3 flex items-center justify-center space-x-2 py-2 border border-cyan/30 text-cyan font-mono text-xs uppercase tracking-widest rounded-pill glass hover:bg-cyan/10 transition-all outline-none focus-visible:ring-2 focus-visible:ring-cyan relative z-10"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
@@ -207,13 +206,13 @@ export function ResumePanel() {
                 </button>
 
                 {/* Audit trail label */}
-                <div className="mt-4 text-center font-mono text-[0.6rem] text-text-muted flex items-center justify-center gap-2">
+                <div className="mt-4 text-center font-mono text-[0.6rem] text-text-muted flex items-center justify-center gap-2 relative z-10">
                   <span className="opacity-60">Last updated:</span>
                   <span className="text-white">June 2025</span>
                   <span className="opacity-40">|</span>
                   <span className="opacity-60">PDF (&lt;2MB)</span>
                 </div>
-              </GlassCard>
+              </div>
             </ScrollReveal>
           </ScrollReveal>
         </div>

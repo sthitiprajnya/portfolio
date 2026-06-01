@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { SectionTitle } from '@/components/ui/SectionTitle';
-import { GlassCard } from '@/components/ui/GlassCard';
 import { ScrollReveal, fadeSlideUp } from '@/components/ui/ScrollReveal';
 import { useCardTilt } from '@/hooks/useCardTilt';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
@@ -91,20 +90,22 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
         ease: [0.16, 1, 0.3, 1],
         delay: index * 0.1 // Cinematic stagger reveal based on index
       }}
-      className="h-full flex" data-orb-target="project"
+      className="h-full flex"
     >
-      <GlassCard
-        ref={ref}
-        withTilt={!prefersReducedMotion}
-        className="w-full flex flex-col group"
-        style={prefersReducedMotion ? {} : { rotateX, rotateY, transformStyle: 'preserve-3d' }}
+      <div
+        ref={ref as unknown as React.RefObject<HTMLDivElement>}
+        className="w-full flex flex-col group glass rounded-card relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--glass-shadow-hover)] cursor-pointer"
+        style={prefersReducedMotion ? {} : { transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`, transformStyle: 'preserve-3d' }}
       >
+        {/* Top accent bar */}
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#00F5FF]/50 to-transparent rounded-t-card z-30" />
+
         {/* Image Container */}
-        <div className="relative h-48 w-full overflow-hidden bg-deep border-b border-border">
+        <div className="relative h-48 w-full overflow-hidden bg-deep border-b border-[var(--glass-border)]">
           {project.featured && (
-            <div className="absolute top-3 left-3 z-20 px-2 py-1 bg-cyan text-black font-mono text-[0.6rem] uppercase tracking-widest font-bold rounded-sm shadow-[var(--glow-cyan-sm)]">
+            <span className="absolute top-3 left-3 z-20 glass-pill rounded-pill text-xs px-3 py-1 text-[#00F5FF] border-[#00F5FF]/30 mb-3 inline-block">
               FEATURED
-            </div>
+            </span>
           )}
 
           {/* Fallback pattern */}
@@ -168,7 +169,7 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
           <div className="mt-auto space-y-4">
 
             {/* Impact Badge - Redesigned to be highly prominent */}
-            <div className="relative overflow-hidden rounded-md bg-gradient-to-r from-green/20 to-transparent border-l-2 border-green p-3 flex items-center justify-between">
+            <div className="relative overflow-hidden rounded-lg bg-gradient-to-r from-green/20 to-transparent border-l-2 border-green p-3 flex items-center justify-between glass-pill">
               <div className="flex items-center gap-2">
                 <span className="text-green animate-pulse">●</span>
                 <span className="font-mono text-[0.65rem] text-text-muted tracking-widest uppercase">IMPACT_METRIC</span>
@@ -180,11 +181,11 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
 
             {/* Simulated Terminal Output */}
             {project.terminalOutput && (
-              <div className="rounded-md overflow-hidden border border-border bg-[#0a0a0a] text-xs font-mono">
-                <div className="flex items-center px-2 py-1 bg-border/50 border-b border-border">
+              <div className="rounded-lg overflow-hidden border border-[var(--glass-border)] bg-[rgba(0,0,0,0.4)] text-xs font-mono glass">
+                <div className="flex items-center px-2 py-1 bg-[rgba(0,245,255,0.05)] border-b border-[var(--glass-border)]">
                   <span className="text-text-muted text-[0.55rem] tracking-widest">mock_terminal.sh</span>
                 </div>
-                <div className="p-3 space-y-2 h-24 overflow-y-auto scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+                <div className="p-3 space-y-2 h-24 overflow-y-auto scrollbar-thin scrollbar-thumb-[var(--glass-border)] scrollbar-track-transparent">
                   {project.terminalOutput.map((cmd, i) => (
                     <div key={i} className="space-y-1">
                       <div className="text-cyan"><span className="text-text-muted mr-2">$</span>{cmd.command}</div>
@@ -199,12 +200,12 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
 
             {/* Methodology Accordion */}
             {project.methodology && (
-              <div className="border border-border rounded-md overflow-hidden">
+              <div className="border border-[var(--glass-border)] rounded-lg overflow-hidden glass">
                 <button
                   onClick={(e) => { e.stopPropagation(); setShowMethodology(!showMethodology); }}
                   aria-expanded={showMethodology}
                   aria-controls={`methodology-${project.id}`}
-                  className="w-full flex items-center justify-between p-2.5 bg-surface hover:bg-white/5 transition-colors font-mono text-[0.65rem] text-text-secondary uppercase tracking-widest outline-none focus-visible:ring-2 focus-visible:ring-cyan"
+                  className="w-full flex items-center justify-between p-2.5 bg-[rgba(0,245,255,0.05)] hover:bg-[rgba(0,245,255,0.1)] transition-colors font-mono text-[0.65rem] text-text-secondary uppercase tracking-widest outline-none focus-visible:ring-2 focus-visible:ring-cyan"
                 >
                   <span>{showMethodology ? 'HIDE_METHODOLOGY' : 'VIEW_METHODOLOGY'}</span>
                   <motion.svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" animate={{ rotate: showMethodology ? 180 : 0 }} aria-hidden="true">
@@ -218,9 +219,9 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      className="bg-black/50 overflow-hidden"
+                      className="bg-[rgba(0,0,0,0.5)] overflow-hidden"
                     >
-                      <div className="p-3 font-mono text-[0.65rem] text-cyan/90 leading-relaxed border-t border-border">
+                      <div className="p-3 font-mono text-[0.65rem] text-cyan/90 leading-relaxed border-t border-[var(--glass-border)]">
                         {project.methodology.split('→').map((step, i, arr) => (
                           <div key={i} className="flex gap-2">
                             <span className="text-text-muted">{(i + 1).toString().padStart(2, '0')}.</span>
@@ -238,7 +239,7 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
             {/* Tags */}
             <div className="flex flex-wrap gap-2 pt-2">
               {project.tags.map((tag: string, i: number) => (
-                <span key={i} className="font-mono text-[0.55rem] text-text-muted bg-deep px-2 py-1 rounded border border-border">
+                <span key={i} className="font-mono text-[0.55rem] text-text-muted bg-[rgba(0,0,0,0.4)] px-2 py-1 rounded-pill border border-[var(--glass-border)] glass-pill">
                   {tag}
                 </span>
               ))}
@@ -246,7 +247,7 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
           </div>
 
         </div>
-      </GlassCard>
+      </div>
     </motion.div>
   );
 }

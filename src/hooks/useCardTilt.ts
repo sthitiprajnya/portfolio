@@ -73,7 +73,7 @@ export function useCardTilt() {
     el.addEventListener('mouseenter', handleMouseEnter);
     el.addEventListener('mousemove', handleMouseMove);
     el.addEventListener('mouseleave', handleMouseLeave);
-    window.addEventListener('resize', updateRect);
+    window.addEventListener('resize', updateRect, { passive: true });
     // Removed window.addEventListener('scroll', updateRect)
 
     return () => {

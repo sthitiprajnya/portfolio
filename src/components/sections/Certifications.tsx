@@ -32,20 +32,20 @@ export function Certifications() {
         </ScrollReveal>
 
         <ScrollReveal variants={fadeSlideUp} delay={0.4}>
-          <div className="mt-16 border-t border-border pt-12">
+          <div className="mt-16 border-t border-[var(--glass-border)] pt-12">
             <h3 className="font-mono text-sm text-white mb-6 flex items-center gap-3">
               <span className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
               CERTIFICATION_ROADMAP // IN_PROGRESS
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {UPCOMING_CERTIFICATIONS.map((cert) => (
-                <div key={cert.id} className="relative overflow-hidden p-5 border border-border bg-black/40 rounded-lg group">
+                <div key={cert.id} className="relative overflow-hidden p-5 border border-[var(--glass-border)] bg-[rgba(0,0,0,0.4)] glass rounded-xl group">
                    <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPjxyZWN0IHdpZHRoPSI4IiBoZWlnaHQ9IjgiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMiIvPjxwYXRoIGQ9Ik0wIDBMOCA4Wk04IDBMMCA4WiIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utb3BhY2l0eT0iMC4wNSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9zdmc+')] opacity-20 pointer-events-none" />
                    <div className="flex items-center gap-3 mb-3">
                      <svg className="w-5 h-5 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                      </svg>
-                     <span className="font-mono text-[0.6rem] uppercase tracking-widest text-text-muted bg-border/50 px-2 py-0.5 rounded">LOCKED</span>
+                     <span className="font-mono text-[0.6rem] uppercase tracking-widest text-text-muted bg-[rgba(0,245,255,0.05)] px-2 py-0.5 rounded-pill glass-pill">LOCKED</span>
                    </div>
                    <h4 className="font-heading font-bold text-text-secondary group-hover:text-white transition-colors">{cert.name}</h4>
                    <p className="font-mono text-[0.65rem] text-text-muted mt-2">Target: {cert.year}</p>
@@ -69,9 +69,12 @@ function CertCard({ cert }: { cert: typeof CERTIFICATIONS[0] }) {
   const style = CERT_COLOR_MAP[cert.color];
 
   return (
-    <div className={clsx("relative p-[1px] rounded-xl overflow-hidden group h-full", style.glow)} data-orb-target="cert">
-      <div className={clsx("absolute inset-0 opacity-20 group-hover:opacity-100 transition-opacity duration-500", style.bg)} />
-      <div className="relative h-full bg-surface border border-border rounded-xl p-5 flex flex-col z-10 hover-glow-card" style={{ clipPath: 'polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%)' }}>
+    <div className={clsx("relative rounded-xl overflow-hidden group h-full glass transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--glass-shadow-hover)]", style.glow)} >
+      <div className={clsx("absolute inset-0 opacity-20 group-hover:opacity-100 transition-opacity duration-500 z-0", style.bg)} />
+      <div className="relative h-full border border-[var(--glass-border)] rounded-xl p-5 flex flex-col z-10">
+
+        {/* Top accent bar */}
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#00F5FF]/50 to-transparent rounded-t-xl z-30" />
 
         {/* Logo and Status */}
         <div className="flex justify-between items-start mb-6 h-14">

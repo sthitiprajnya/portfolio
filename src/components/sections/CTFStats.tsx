@@ -2,7 +2,6 @@
 import React from 'react';
 import clsx from 'clsx';
 import { SectionTitle }  from '@/components/ui/SectionTitle';
-import { GlassCard }     from '@/components/ui/GlassCard';
 import { ScrollReveal, fadeSlideUp, fadeSlideLeft } from '@/components/ui/ScrollReveal';
 import { useInView }     from 'react-intersection-observer';
 import { CTF_PROFILE }   from '@/data/portfolio';
@@ -75,7 +74,7 @@ export function CTFStats() {
 
           {/* ── Left: HackTheBox profile card ── */}
           <ScrollReveal variants={fadeSlideUp} className="lg:col-span-4">
-            <GlassCard className="p-6 h-full border-cyan/20 hover:shadow-[var(--glow-cyan-sm)]">
+            <div className="p-6 h-full border-cyan/20 hover:shadow-[var(--glow-cyan-sm)] glass rounded-card relative overflow-hidden">
 
               {/* HTB logo row */}
               <div className="flex items-center justify-between mb-6">
@@ -96,15 +95,15 @@ export function CTFStats() {
                   </div>
                 </div>
                 {/* Rank badge */}
-                <div className="px-3 py-1.5 rounded bg-cyan-ghost border border-cyan/40 text-cyan font-mono text-xs font-bold uppercase tracking-wider shadow-[var(--glow-cyan-sm)]">
+                <div className="px-3 py-1.5 glass-pill rounded-pill text-cyan font-mono text-xs font-bold uppercase tracking-wider shadow-[var(--glow-cyan-sm)] border-cyan/40">
                   {CTF_PROFILE.htbRank}
                 </div>
               </div>
 
               {/* Stats grid */}
-              <div className="grid grid-cols-2 gap-3 mb-6" data-orb-target="ctf">
+              <div className="grid grid-cols-2 gap-3 mb-6" >
                 {HTB_STATS.map(({ label, value }) => (
-                  <div key={label} className="p-3 rounded bg-black/40 border border-border">
+                  <div key={label} className="p-3 glass rounded-lg bg-[rgba(0,0,0,0.4)]">
                     <div className="font-display text-xl text-cyan font-bold">{value}</div>
                     <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest mt-0.5">
                       {label}
@@ -125,18 +124,18 @@ export function CTFStats() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="View HackTheBox Profile in a new tab"
-                className="mt-6 flex items-center justify-center space-x-2 w-full py-2.5 border border-cyan/30 text-cyan font-mono text-xs uppercase tracking-widest rounded-sm hover:bg-cyan hover:text-black transition-all hover:shadow-[var(--glow-cyan-sm)]"
+                className="mt-6 flex items-center justify-center space-x-2 w-full py-2.5 border border-cyan/30 text-cyan font-mono text-xs uppercase tracking-widest rounded-pill hover:bg-cyan hover:text-black transition-all hover:shadow-[var(--glow-cyan-sm)]"
               >
                 <span>VIEW HTB PROFILE</span>
                 <span aria-hidden="true" className="text-[10px]">↗</span>
               </a>
-            </GlassCard>
+            </div>
           </ScrollReveal>
 
           {/* ── Right: Attack category proficiency & Recent Activity ── */}
           <ScrollReveal variants={fadeSlideLeft} className="lg:col-span-8 space-y-6">
-            <GlassCard className="p-6">
-              <h3 className="font-mono text-sm text-white mb-6 border-b border-border pb-3">
+            <div className="p-6 glass rounded-card">
+              <h3 className="font-mono text-sm text-white mb-6 border-b border-[var(--glass-border)] pb-3">
                 // ATTACK_CATEGORY_PROFICIENCY
               </h3>
 
@@ -155,16 +154,16 @@ export function CTFStats() {
                    <RadarChartWrapper data={RADAR_DATA} options={RADAR_OPTIONS} />
                  </div>
               </div>
-            </GlassCard>
+            </div>
 
-            <GlassCard className="p-6">
-               <h3 className="font-mono text-sm text-white mb-4 border-b border-border pb-3 flex justify-between items-end">
+            <div className="p-6 glass rounded-card">
+               <h3 className="font-mono text-sm text-white mb-4 border-b border-[var(--glass-border)] pb-3 flex justify-between items-end">
                  <span>// RECENT_ACTIVITY</span>
                  <span className="text-[0.6rem] text-text-muted">Live Feed (Mock)</span>
                </h3>
                <div className="space-y-3">
                  {CTF_PROFILE.recentActivity.map((act, i) => (
-                    <div key={i} className="flex items-center justify-between p-3 rounded bg-black/40 border border-border hover:border-green/30 transition-colors">
+                    <div key={i} className="flex items-center justify-between p-3 rounded-lg glass bg-[rgba(0,0,0,0.4)] hover:border-green/30 transition-colors">
                       <div className="flex items-center gap-3">
                          <span className={clsx("w-2 h-2 rounded-full", act.type === 'machine' ? 'bg-green shadow-[var(--glow-green-sm)]' : 'bg-amber shadow-[var(--glow-amber-sm)]')} />
                          <div>
@@ -183,14 +182,14 @@ export function CTFStats() {
                     </div>
                  ))}
                </div>
-            </GlassCard>
+            </div>
           </ScrollReveal>
         </div>
 
         {/* ── CTF competition history ── */}
         <ScrollReveal variants={fadeSlideUp} delay={0.3} className="mt-10">
-          <GlassCard className="p-6">
-            <h3 className="font-mono text-sm text-white mb-6 border-b border-border pb-3">
+          <div className="p-6 glass rounded-card">
+            <h3 className="font-mono text-sm text-white mb-6 border-b border-[var(--glass-border)] pb-3">
               // CTF_COMPETITION_HISTORY
             </h3>
 
@@ -198,13 +197,13 @@ export function CTFStats() {
               {CTF_PROFILE.competitions.map((comp, i) => (
                 <div
                   key={i}
-                  className="p-4 rounded bg-black/50 border border-border hover:border-cyan/40 transition-colors group"
+                  className="p-4 glass rounded-lg bg-[rgba(0,0,0,0.5)] hover:border-[rgba(0,245,255,0.4)] transition-colors group"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest">
                       {comp.year}
                     </div>
-                    <div className="px-2 py-0.5 rounded-sm bg-green-ghost border border-green/30 font-mono text-[0.6rem] text-green uppercase tracking-widest">
+                    <div className="px-2 py-0.5 rounded-pill glass-pill border border-green/30 font-mono text-[0.6rem] text-green uppercase tracking-widest">
                       {comp.placement}
                     </div>
                   </div>
@@ -221,7 +220,7 @@ export function CTFStats() {
 
                   <div className="flex flex-wrap gap-1.5 mt-3">
                     {comp.tags.map(tag => (
-                      <span key={tag} className="font-mono text-[0.55rem] text-text-muted px-2 py-0.5 rounded bg-surface border border-border uppercase tracking-wide">
+                      <span key={tag} className="font-mono text-[0.55rem] text-text-muted px-2 py-0.5 rounded-pill glass-pill border border-[var(--glass-border)] uppercase tracking-wide">
                         {tag}
                       </span>
                     ))}
@@ -229,7 +228,7 @@ export function CTFStats() {
                 </div>
               ))}
             </div>
-          </GlassCard>
+          </div>
         </ScrollReveal>
       </div>
     </section>

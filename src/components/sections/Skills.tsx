@@ -122,11 +122,10 @@ export function Skills() {
 
           <div
             ref={chartRef}
-            className="w-full lg:w-[400px] h-[300px] bg-surface/50 border border-border rounded-lg p-4 flex items-center justify-center relative group"
+            className="w-full lg:w-[400px] h-[300px] glass rounded-card p-4 flex items-center justify-center relative group"
             role="img"
             aria-label="Skill proficiency radar chart showing expertise in Offensive Security, Cloud Security, Automation, Compliance, Network Analysis, and Incident Response"
           >
-            <div className="absolute inset-0 bg-cyan/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg pointer-events-none" />
              <div className="absolute top-2 left-4 font-mono text-[0.6rem] text-cyan tracking-widest">
                [ DOMAIN_PROFICIENCY_RADAR ]
              </div>

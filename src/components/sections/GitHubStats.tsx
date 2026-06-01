@@ -1,17 +1,30 @@
 "use client";
 import React from 'react';
 import { SectionTitle } from '@/components/ui/SectionTitle';
-import { GlassCard } from '@/components/ui/GlassCard';
 import { ScrollReveal, fadeSlideUp, fadeSlideLeft, containerStagger } from '@/components/ui/ScrollReveal';
 import { PERSONAL } from '@/data/portfolio';
 import CountUp from 'react-countup';
+import useSWR from 'swr';
+import Image from 'next/image';
+
+const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 export function GitHubStats() {
+  const { data: githubData } = useSWR(
+    'https://api.github.com/users/sthitiprajnya',
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 3_600_000, // 1 hour
+      fallbackData: { public_repos: 18, followers: 12, following: 0 },
+    }
+  );
+
   const stats = {
-    publicRepos: 18,
-    totalStars: 42,
+    publicRepos: githubData?.public_repos || 18,
+    totalStars: 42, // Would require additional API calls to sum up properly
     totalForks: 14,
-    followers: 12,
+    followers: githubData?.followers || 12,
     commits: 852,
     prs: 43,
     issues: 12,
@@ -70,8 +83,8 @@ export function GitHubStats() {
 
               {/* Left Column - Terminal Style Heatmap & Logs */}
               <ScrollReveal variants={fadeSlideUp} className="lg:col-span-7">
-                <GlassCard className="h-full border border-cyan/20 p-0 flex flex-col overflow-hidden bg-[#0A0A0A]">
-                  <div className="flex items-center px-4 py-2 bg-black border-b border-border">
+                <div className="h-full p-0 flex flex-col overflow-hidden bg-[rgba(0,0,0,0.4)] glass rounded-card relative">
+                  <div className="flex items-center px-4 py-2 bg-[rgba(0,0,0,0.6)] border-b border-[var(--glass-border)] relative z-10">
                     <span className="w-3 h-3 rounded-full bg-red-500/80 mr-2"></span>
                     <span className="w-3 h-3 rounded-full bg-amber-500/80 mr-2"></span>
                     <span className="w-3 h-3 rounded-full bg-green-500/80 mr-4"></span>
@@ -79,14 +92,14 @@ export function GitHubStats() {
                   </div>
                   <div className="p-6 flex-grow flex flex-col justify-center items-center relative">
                      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PHBhdGggZD0iTTEwIDBMICAwIDBMMCAxMEwxMCAxMEwxMCAwWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEiLz48L3N2Zz4=')] opacity-[0.03] pointer-events-none"></div>
-                     <img
+                     <Image
                        src={`https://ghchart.rshah.org/00F5FF/sthitiprajnya`}
                        alt={`${PERSONAL.name}'s GitHub Contribution Heatmap`}
                        className="w-full max-w-full drop-shadow-[0_0_8px_rgba(0,245,255,0.3)] filter brightness-110 contrast-125 invert-[1] hue-rotate-[180deg]"
                        style={{ opacity: 0.9 }}
                        width={495}
                        height={195}
-                       loading="lazy"
+                       unoptimized
                      />
                      {/* Top languages bar */}
                      <div className="w-full mt-4 px-4">
@@ -105,7 +118,7 @@ export function GitHubStats() {
                        </div>
                      </div>
 
-                     <div className="mt-4 grid grid-cols-3 gap-6 w-full text-center border-t border-border/50 pt-6">
+                     <div className="mt-4 grid grid-cols-3 gap-6 w-full text-center border-t border-[var(--glass-border)] pt-6 relative z-10">
                        <div>
                          <div className="font-mono text-xl text-cyan font-bold mb-1"><CountUp end={stats.commits} duration={2.5} enableScrollSpy scrollSpyOnce /></div>
                          <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest">Commits</div>
@@ -120,24 +133,24 @@ export function GitHubStats() {
                        </div>
                      </div>
                   </div>
-                </GlassCard>
+                </div>
               </ScrollReveal>
 
               {/* Right Column - Top Repos */}
               <ScrollReveal variants={fadeSlideLeft} className="lg:col-span-5">
-                <GlassCard className="p-6 h-full flex flex-col">
-                  <h3 className="font-mono text-sm text-white mb-6 border-b border-border pb-2">
+                <div className="p-6 h-full flex flex-col glass rounded-card relative overflow-hidden">
+                  <h3 className="font-mono text-sm text-white mb-6 border-b border-[var(--glass-border)] pb-2 relative z-10">
                     // TOP_REPOSITORIES
                   </h3>
 
-                  <div className="flex flex-col space-y-4 flex-grow">
+                  <div className="flex flex-col space-y-4 flex-grow relative z-10">
                     {stats.topRepos.map((repo, idx) => (
                       <a
                         key={idx}
                         href={repo.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group block p-4 rounded bg-black/40 border border-border hover:border-cyan/50 hover:bg-black/60 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black" data-orb-target="project"
+                        className="group block p-4 rounded-card glass bg-[rgba(0,0,0,0.4)] hover:border-[rgba(0,245,255,0.4)] hover:bg-[rgba(0,0,0,0.6)] transition-colors outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black"
                       >
                         <div className="flex justify-between items-start mb-2">
                           <h4 className="font-heading font-bold text-cyan text-sm group-hover:underline">
@@ -158,7 +171,7 @@ export function GitHubStats() {
                           {repo.description || 'No description provided.'}
                         </p>
                         {repo.language && (
-                          <span className="inline-block px-2 py-0.5 rounded-sm bg-surface border border-border font-mono text-[0.6rem] text-text-muted">
+                          <span className="inline-block px-2 py-0.5 rounded-pill glass-pill bg-[rgba(0,0,0,0.4)] border border-[var(--glass-border)] font-mono text-[0.6rem] text-text-muted">
                             {repo.language}
                           </span>
                         )}
@@ -166,7 +179,7 @@ export function GitHubStats() {
                     ))}
 
                   </div>
-                </GlassCard>
+                </div>
               </ScrollReveal>
             </div>
           </div>
@@ -177,13 +190,13 @@ export function GitHubStats() {
 
 function StatCard({ label, value }: { label: string, value: number }) {
   return (
-    <GlassCard className="p-6 flex flex-col items-center justify-center text-center">
-      <div className="font-display text-3xl text-cyan mb-2">
+    <div className="p-6 flex flex-col items-center justify-center text-center glass rounded-card relative overflow-hidden">
+      <div className="font-display text-3xl text-cyan mb-2 relative z-10">
         <CountUp end={value} duration={2} enableScrollSpy scrollSpyOnce />
       </div>
-      <div className="font-mono text-[0.65rem] uppercase tracking-widest text-text-muted">
+      <div className="font-mono text-[0.65rem] uppercase tracking-widest text-text-muted relative z-10">
         {label}
       </div>
-    </GlassCard>
+    </div>
   );
 }

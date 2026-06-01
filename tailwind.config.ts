@@ -33,8 +33,8 @@ const config: Config = {
       },
       fontFamily: {
         display: ['Orbitron', 'monospace'],
-        heading: ['Syne', 'sans-serif'],
-        body:    ['DM Sans', 'sans-serif'],
+        heading: ['system-ui', '-apple-system', 'sans-serif'],
+        body:    ['system-ui', '-apple-system', 'sans-serif'],
         mono:    ['JetBrains Mono', 'monospace'],
       },
       fontSize: {
@@ -54,7 +54,28 @@ const config: Config = {
         'lg':  '1024px',
         'xl':  '1280px',
         '2xl': '1536px',
-      }
+      },
+      borderRadius: {
+        'xs':   '4px',
+        'sm':   '8px',
+        'md':   '12px',
+        'lg':   '16px',
+        'xl':   '20px',
+        '2xl':  '24px',
+        'card': '20px',
+        'pill': '9999px',
+      },
+      backdropBlur: {
+        'glass':       '12px',
+        'glass-heavy': '20px',
+        'glass-light': '6px',
+      },
+      boxShadow: {
+        'glass':       '0 8px 32px rgba(0,0,0,0.40), 0 0 0 1px rgba(0,245,255,0.06), inset 0 1px 0 rgba(0,245,255,0.08)',
+        'glass-hover': '0 16px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,245,255,0.20), inset 0 1px 0 rgba(0,245,255,0.14)',
+        'glow-cyan':   '0 0 24px rgba(0,245,255,0.25), 0 0 48px rgba(0,245,255,0.10)',
+        'glow-green':  '0 0 24px rgba(0,255,128,0.25)',
+      },
     },
   },
   plugins: [],

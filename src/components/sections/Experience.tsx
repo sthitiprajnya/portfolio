@@ -5,7 +5,6 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import clsx from 'clsx';
 import { SectionTitle } from '@/components/ui/SectionTitle';
-import { GlassCard } from '@/components/ui/GlassCard';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { LogoBadge } from '@/components/ui/LogoBadge';
 import { EXPERIENCE } from '@/data/portfolio';
@@ -152,10 +151,13 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
         {experience.period}
       </div>
 
-      <GlassCard className="p-6 md:p-8 w-full max-w-[800px]" withTilt={false}>
+      <div className="p-6 md:p-8 w-full max-w-[800px] glass rounded-card relative overflow-hidden transition-all duration-300 hover:shadow-[var(--glass-shadow-hover)]">
+
+        {/* Top accent bar */}
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#00F5FF]/50 to-transparent rounded-t-card z-30" />
 
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-6 gap-4">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-6 gap-4 relative z-10">
           <div className="flex items-start gap-4">
             {experience.id === 'iserveU' && (
               <div className="hidden sm:block mt-1">
@@ -190,9 +192,9 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
 
         {/* Awards */}
         {experience.awards && experience.awards.length > 0 && (
-          <div className="flex flex-col sm:flex-row gap-4 mb-8">
+          <div className="flex flex-col sm:flex-row gap-4 mb-8 relative z-10">
             {experience.awards.map((award, i) => (
-              <div key={i} className="relative overflow-hidden group/award flex-1 flex flex-col items-center justify-center p-4 bg-surface border border-amber/30 rounded-lg shadow-[0_4px_20px_rgba(255,179,0,0.05)] hover:shadow-[0_4px_20px_rgba(255,179,0,0.15)] hover:border-amber/60 transition-all duration-300">
+              <div key={i} className="relative overflow-hidden group/award flex-1 flex flex-col items-center justify-center p-4 glass rounded-lg border border-amber/30 hover:border-amber/60 transition-all duration-300">
                 <div className="absolute inset-0 bg-gradient-to-br from-amber/10 to-transparent opacity-0 group-hover/award:opacity-100 transition-opacity duration-300" />
                 <span className="text-3xl mb-2 drop-shadow-[0_0_8px_rgba(255,179,0,0.5)] transform group-hover/award:scale-110 transition-transform duration-300">🏆</span>
                 <span className="font-heading font-bold text-amber text-sm tracking-wide text-center uppercase">{award}</span>
@@ -202,8 +204,8 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
         )}
 
         {/* Dynamic Tabs for Subsections */}
-        <div className="mb-8">
-          <div className="flex flex-wrap gap-2 mb-4 border-b border-border pb-2" role="tablist" aria-label={`${experience.company} role details`}>
+        <div className="mb-8 relative z-10">
+          <div className="flex flex-wrap gap-2 mb-4 border-b border-[var(--glass-border)] pb-2" role="tablist" aria-label={`${experience.company} role details`}>
             {experience.subsections.map((sub) => {
               const isOpen = openSection === sub.id;
 
@@ -216,10 +218,10 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
                   aria-controls={`panel-${experience.id}-${sub.id}`}
                   onClick={() => setOpenSection(sub.id)}
                   className={clsx(
-                    "px-4 py-2 font-mono text-[0.65rem] tracking-widest uppercase transition-all rounded-t-md border-b-2 outline-none focus-visible:ring-2",
+                    "px-4 py-2 font-mono text-[0.65rem] tracking-widest uppercase transition-all rounded-t-lg border-b-2 outline-none focus-visible:ring-2",
                     isOpen
                       ? ACTIVE_COLOR_MAP[sub.color]
-                      : "border-transparent text-text-secondary hover:text-white hover:bg-surface"
+                      : "border-transparent text-text-secondary hover:text-white hover:bg-[rgba(255,255,255,0.05)]"
                   )}
                 >
                   {sub.label}
@@ -249,7 +251,7 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className="relative"
+                    className="relative z-10"
                   >
                     <ul className="space-y-4">
                       {sub.bullets.map((bullet, i) => (
@@ -275,20 +277,20 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
         </div>
 
         {/* Tech Tags Footer */}
-        <div className="pt-6 border-t border-border flex flex-wrap gap-2">
+        <div className="pt-6 border-t border-[var(--glass-border)] flex flex-wrap gap-2 relative z-10">
           {experience.tags.map((tag, i) => (
-            <span key={i} className="text-[0.65rem] font-mono text-text-muted px-2 py-1 bg-surface rounded border border-border">
+            <span key={i} className="text-[0.65rem] font-mono text-text-muted px-2 py-1 bg-[rgba(0,0,0,0.4)] rounded-pill border border-[var(--glass-border)] glass-pill">
               {tag}
             </span>
           ))}
         </div>
 
-      </GlassCard>
+      </div>
     </div>
   );
 
   return (
-    <div className={clsx("experience-card-wrapper", prefersReducedMotion ? "" : "opacity-0")} data-orb-target="experience">
+    <div className={clsx("experience-card-wrapper", prefersReducedMotion ? "" : "opacity-0")} >
       {cardContent}
     </div>
   );

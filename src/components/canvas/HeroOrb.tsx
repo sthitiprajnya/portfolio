@@ -1,6 +1,8 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { useInView } from 'react-intersection-observer';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 interface OrbState {
   // Lissajous base position
@@ -17,8 +19,22 @@ interface OrbState {
   mouseActive: boolean;
 }
 
+// BOLT: Hoist static animation constants to module level to reduce per-frame object property lookups
+// ── Lissajous parameters ─────────────────────────────────────────
+const FREQ_X = 2;                      // horizontal frequency
+const FREQ_Y = 3;                      // vertical frequency (3:2 = classic figure-8 variant)
+const PHASE_DELTA = Math.PI / 4;       // phase offset — controls loop "tightness"
+const ANIM_SPEED = 0.0008;             // radians per ms — full cycle ≈ 130s
+
+// ── Spring constants ─────────────────────────────────────────────
+const K_SPRING    = 0.045;   // restoring force toward Lissajous path
+const DAMPING     = 0.88;    // velocity damping (0–1; lower = more damping)
+const MOUSE_FORCE = 0.025;   // mouse attraction/repulsion multiplier
+const MOUSE_RANGE = 300;     // px radius of mouse influence
+const MOUSE_RANGE_SQ = MOUSE_RANGE * MOUSE_RANGE;
+
 export default function HeroOrb() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const orbRef    = useRef<OrbState>({
     t:           0,
     x:           0,
@@ -30,21 +46,41 @@ export default function HeroOrb() {
     mouseActive: false,
   });
   const rafRef = useRef<number>(0);
+  const { ref: inViewRef, inView } = useInView({ threshold: 0 });
+  const prefersReducedMotion = usePrefersReducedMotion();
+
+  // Combine refs for the canvas element
+  const setRefs = (node: HTMLCanvasElement | null) => {
+    canvasRef.current = node;
+    inViewRef(node);
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas || !inView || prefersReducedMotion) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    // BOLT: Cache viewport-dependent values in resize handler to avoid redundant lookups and arithmetic in 60fps loop
+    let A = 0;
+    let B = 0;
+    let cx = 0;
+    let cy = 0;
 
     // ── Resize ──────────────────────────────────────────────────────
     const resize = () => {
       canvas.width  = window.innerWidth;
       canvas.height = window.innerHeight;
+
+      cx = canvas.width / 2;
+      cy = canvas.height / 2;
+      A = canvas.width * 0.30;
+      B = canvas.height * 0.22;
+
       // Reset to centre on resize
       const o = orbRef.current;
-      o.x = canvas.width  / 2;
-      o.y = canvas.height / 2;
+      o.x = cx;
+      o.y = cy;
     };
     resize();
     window.addEventListener('resize', resize, { passive: true });
@@ -58,20 +94,6 @@ export default function HeroOrb() {
     const onMouseLeave = () => { orbRef.current.mouseActive = false; };
     window.addEventListener('mousemove', onMouseMove, { passive: true });
     window.addEventListener('mouseleave', onMouseLeave);
-
-    // ── Lissajous parameters ─────────────────────────────────────────
-    const A     = canvas.width  * 0.30;  // x amplitude (30% of viewport width)
-    const B     = canvas.height * 0.22;  // y amplitude (22% of viewport height)
-    const freqX = 2;                      // horizontal frequency
-    const freqY = 3;                      // vertical frequency (3:2 = classic figure-8 variant)
-    const delta = Math.PI / 4;            // phase offset — controls loop "tightness"
-    const speed = 0.0008;                 // radians per ms — full cycle ≈ 130s
-
-    // ── Spring constants ─────────────────────────────────────────────
-    const K_SPRING    = 0.045;   // restoring force toward Lissajous path
-    const DAMPING     = 0.88;    // velocity damping (0–1; lower = more damping)
-    const MOUSE_FORCE = 0.025;   // mouse attraction/repulsion multiplier
-    const MOUSE_RANGE = 300;     // px radius of mouse influence
 
     // ── Drawing helpers ──────────────────────────────────────────────
     function drawOrb(x: number, y: number, t: number) {
@@ -138,26 +160,25 @@ export default function HeroOrb() {
       lastTime  = now;
 
       const o  = orbRef.current;
-      const cx = canvas!.width  / 2;
-      const cy = canvas!.height / 2;
 
       // Advance Lissajous parameter
-      o.t += speed * dt;
+      o.t += ANIM_SPEED * dt;
 
       // Target position on Lissajous curve
-      const targetX = cx + A * Math.sin(freqX * o.t + delta);
-      const targetY = cy + B * Math.sin(freqY * o.t);
+      const targetX = cx + A * Math.sin(FREQ_X * o.t + PHASE_DELTA);
+      const targetY = cy + B * Math.sin(FREQ_Y * o.t);
 
       // Spring force toward Lissajous path
       let fx = (targetX - o.x) * K_SPRING;
       let fy = (targetY - o.y) * K_SPRING;
 
-      // Mouse magnetic influence (repulsion when close, attraction when far)
+      // BOLT: Optimize mouse interaction with squared distance check before executing Math.sqrt, saving CPU cycles
       if (o.mouseActive) {
         const dx   = o.mouseX - o.x;
         const dy   = o.mouseY - o.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < MOUSE_RANGE && dist > 1) {
+        const distSq = dx * dx + dy * dy;
+        if (distSq < MOUSE_RANGE_SQ && distSq > 1) {
+          const dist = Math.sqrt(distSq);
           // Inside range: gentle repulsion
           const strength = MOUSE_FORCE * (1 - dist / MOUSE_RANGE);
           fx -= (dx / dist) * strength * 80;
@@ -185,11 +206,11 @@ export default function HeroOrb() {
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseleave', onMouseLeave);
     };
-  }, []);
+  }, [inView, prefersReducedMotion]);
 
   return (
     <canvas
-      ref={canvasRef}
+      ref={setRefs}
       className="absolute inset-0 w-full h-full pointer-events-none will-change-transform z-0"
       style={{ willChange: 'transform' }}
       aria-hidden="true"

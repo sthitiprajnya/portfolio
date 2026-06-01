@@ -111,6 +111,7 @@ export default function ParticleField() {
       }
     }
 
+
     // BOLT: Hoist connection distance and squared comparison to avoid redundant math
     const MAX_DISTANCE = 150;
     const CONNECTION_DISTANCE_SQ = MAX_DISTANCE * MAX_DISTANCE;
@@ -129,7 +130,7 @@ export default function ParticleField() {
         const pAx = pA.x;
         const pAy = pA.y;
 
-        // BOLT: Start inner loop at a + 1 to avoid self-comparison and drawing redundant lines
+        // Connect particles to each other
         for (let b = a + 1; b < particleCount; b++) {
           const pB = particlesArray[b];
           const dx = pAx - pB.x;
@@ -138,7 +139,8 @@ export default function ParticleField() {
 
           if (distanceSq < CONNECTION_DISTANCE_SQ) {
             const opacity = 1 - (distanceSq / CONNECTION_DISTANCE_SQ);
-            ctx.strokeStyle = `rgba(255, 255, 255, ${opacity * 0.5})`;
+            // Increased visibility for the spider web effect
+            ctx.strokeStyle = `rgba(0, 245, 255, ${opacity * 0.35})`;
             ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.moveTo(pAx, pAy);
@@ -147,16 +149,16 @@ export default function ParticleField() {
           }
         }
 
-        // Connect to mouse
+        // Connect to mouse with a slightly larger radius to "pull" the web
         if (hasMouse) {
           const dx = pAx - mX;
           const dy = pAy - mY;
           const mouseDistSq = dx * dx + dy * dy;
 
-          if (mouseDistSq < CONNECTION_DISTANCE_SQ) {
-            const opacity = 1 - (mouseDistSq / CONNECTION_DISTANCE_SQ);
-            ctx.strokeStyle = `rgba(255, 255, 255, ${opacity * 0.8})`;
-            ctx.lineWidth = 1;
+          if (mouseDistSq < (CONNECTION_DISTANCE_SQ * 1.5)) {
+            const opacity = 1 - (mouseDistSq / (CONNECTION_DISTANCE_SQ * 1.5));
+            ctx.strokeStyle = `rgba(0, 245, 255, ${opacity * 0.8})`;
+            ctx.lineWidth = 1.5;
             ctx.beginPath();
             ctx.moveTo(pAx, pAy);
             ctx.lineTo(mX, mY);
@@ -165,6 +167,7 @@ export default function ParticleField() {
         }
       }
     }
+
 
 
     // Animation loop

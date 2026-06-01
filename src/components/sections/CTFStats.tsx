@@ -7,6 +7,7 @@ import { ScrollReveal, fadeSlideUp, fadeSlideLeft } from '@/components/ui/Scroll
 import { useInView }     from 'react-intersection-observer';
 import { CTF_PROFILE }   from '@/data/portfolio';
 import { Radar } from 'react-chartjs-2';
+import { LogoBadge } from '@/components/ui/LogoBadge';
 
 // BOLT: Hoist static configurations and data transformations to module level
 const HTB_STATS = [
@@ -78,12 +79,20 @@ export function CTFStats() {
 
               {/* HTB logo row */}
               <div className="flex items-center justify-between mb-6">
-                <div>
-                  <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest mb-1">
-                    Platform
-                  </div>
-                  <div className="font-display text-lg text-white font-bold tracking-widest">
-                    HackTheBox
+                <div className="flex items-center gap-3">
+                  <LogoBadge
+                    src="/portfolio/logos/wargames/hackthebox.svg"
+                    alt="HackTheBox"
+                    width={32}
+                    height={32}
+                  />
+                  <div>
+                    <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest mb-1">
+                      Platform
+                    </div>
+                    <div className="font-display text-lg text-white font-bold tracking-widest leading-none">
+                      HackTheBox
+                    </div>
                   </div>
                 </div>
                 {/* Rank badge */}

@@ -1,0 +1,2090 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>404</title>
+                                <link rel="stylesheet" href="/build/946.0c718d36.css" integrity="sha384-kSmaPX58dzP42zXup5C97tkruYIXoVsm1L13A2cyLvDQkhfiSu6dEVQHtvtUW5Hw"><link rel="stylesheet" href="/build/app.7b5e69a4.css" integrity="sha384-x7CPHMdG13vVDJ/MKmXu1/T62Vd5HFHoNXVH+Pb+dytAUR0V24GD3rKjH7uNEe8v">
+
+
+            <style>
+            @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bree+Serif&display=swap');
+
+::view-transition-old(root) {
+  animation-delay: 500ms;
+}
+
+::view-transition-new(root) {
+  animation: circle-in 500ms;
+/*   animation-timing-function: linear(0, 0.234 11.8%, 0.403 18.4%, 0.624 24.7%, 0.999 33.3%, 0.76 39.9%, 0.705 42.6%, 0.687 45.2%, 0.703 47.7%, 0.753 50.3%, 0.999 57.7%, 0.89 61.8%, 0.865 63.6%, 0.857 65.3%, 0.865 67%, 0.887 68.8%, 0.999 74.5%, 0.957 77.5%, 0.944 80.2%, 0.954 82.7%, 1 88.2%, 0.988 91.9%, 1); */
+}
+
+@keyframes move-in {
+  from { translate: 0 -100%; }
+  to { translate: 0  0; }
+}
+
+@keyframes circle-in {
+  from { clip-path: circle(0% at 50% 0%); }
+  to { clip-path: circle(120% at 50% 0%); }
+}
+
+@keyframes appear {
+    from {
+        opacity: 0;
+        scale: .9;
+        /* clip-path: inset(100% 100% 0 0); */
+    }
+    to {
+        opacity: 1;
+        scale: 1;
+        /* clip-path: inset(0 0 0 0); */
+    }
+}
+
+.block {
+    animation: appear linear;
+    animation-timeline: view();
+    animation-range: entry 0% cover 15%;
+}
+
+:root {
+  @media (prefers-color-scheme: light) {
+    --theme: ☀️;
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    --theme: 🌑;
+    color-scheme: dark;
+  }
+}
+
+html {
+    scrollbar-gutter: stable;
+}
+
+body {
+  color-scheme: light;
+
+    --clr-dodger-blue: #298af8;
+    --clr-science-blue: #0665d4;
+    --clr-denim: #1373e1;
+    --clr-mine-shaft: #333333;
+    --clr-red: #c83737;
+    --clr-green: #5aa02c;
+    --clr-gray: #525252;
+
+    --clr-primary: #0066ff;
+    --clr-white: #ffffff;
+    --clr-black: #000000;
+    --clr-background: #f9fbff;
+    --clr-text: #212529;
+    --clr-card-bg: linear-gradient(180deg, rgb(238 247 255) 0%, rgba(238, 250, 255, 0.1) 100%);
+    --clr-border: #0066ff2e;
+    --clr-boxshadow: #dbdbdb4a;
+    --clr-table-border: #dee2e6;
+    --clr-transparency: #ffffff9e;
+
+    --clr-code: #004ad4;
+    --clr-code-bg: #eff5ff;
+
+    --light-green: #fcffed;
+    --dark-green: #657211;
+
+    --light-gray: #eef3ff;
+    --dark-gray: #282828;
+
+    --light-blue: #f6f9ff;
+    --vibrant-blue: #0066ff;
+
+    --light-yellow: #fff5da;
+    --dark-yellow: #ffbc00;
+
+    --light-pink: #fcf2f3;
+    --dark-pink: #d2334b;
+
+    --light-purple: linear-gradient(145deg, rgba(88, 20, 252, 0.1) 0%, rgba(19, 233, 160, 0.1) 100%);
+    --dark-purple: #5814fc;
+
+    --light-teal: #ebffff;
+    --dark-teal: #008080;
+
+    --c-light-green: #f9fff5;
+    --c-dark-green: #73a950;
+
+    --c-light-blue: #d1e3ff;
+    --c-vibrant-blue: #2d81ff;
+
+    --light-orange: #fff2e9;
+    --dark-orange: #fd6824;
+
+  @container style(--theme: 🌑) {
+    color-scheme: dark;
+
+    --clr-dodger-blue: #298af8;
+    --clr-science-blue: #0665d4;
+    --clr-denim: #1373e1;
+    --clr-mine-shaft: #f9fbff;
+    --clr-red: #c83737;
+    --clr-green: #5aa02c;
+    --clr-gray: #a1a1a1;
+
+    --clr-primary: #0066ff;
+    --clr-white: #10171d;
+    --clr-black: #000000;
+    --clr-background: #111212;
+    --clr-text: #f9fbff;
+    --clr-card-bg: #13181d;
+    --clr-border: #0066ff2e;
+    --clr-boxshadow: #001e4b;
+    --clr-table-border: #0066ff2e;
+    --clr-transparency: #0000004a;
+
+    --clr-code: #b3ceff;
+    --clr-code-bg: #eff5ff38;
+
+    --light-green: #232320;
+    --dark-green: #657211;
+
+    --light-gray: #292c34;
+    --dark-gray: #282828;
+
+    --light-blue: #272d3a;
+    --vibrant-blue: #0066ff;
+
+    --light-yellow: #2a2821;
+    --dark-yellow: #ffbc00;
+
+    --light-pink: #322b2c;
+    --dark-pink: #d2334b;
+
+    --light-purple: linear-gradient(145deg, rgba(88, 20, 252, 0.1) 0%, rgba(19, 233, 160, 0.1) 100%);
+    --dark-purple: #5814fc;
+
+    --light-teal: #273333;
+    --dark-teal: #008080;
+
+    --c-light-green: #f9fff5;
+    --c-dark-green: #73a950;
+
+    --c-light-blue: #d1e3ff;
+    --c-vibrant-blue: #2d81ff;
+
+    --light-orange: #fff2e9;
+    --dark-orange: #fd6824;
+
+  }
+}
+
+body {
+    font-family: "Lexend", sans-serif;
+    font-weight: 300;
+    font-optical-sizing: auto;
+    overflow-x: hidden;
+    background: var(--clr-background) !important;
+    color: var(--clr-text);
+    cursor: url("https://pythoninstitute.org/assets/6a06ef381f8b0033997860.cur"), auto;
+}
+
+code {
+    color: var(--clr-code);
+    background-color: var(--clr-code-bg);
+    border-radius: 4px;
+    padding: .25rem;
+    border: 1px solid var(--clr-border);
+    filter: drop-shadow(0 0 0.75rem #00000009);
+}
+
+/*********************************** THEME SWITCHER ******************************/
+
+.dark-mode-logo {
+  display: none;
+}
+
+.switch {
+  font-size: 17px;
+  position: relative;
+  display: inline-block;
+  width: 4em;
+  height: 2.2em;
+  border-radius: 30px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  scale: .5;
+  transform: translate(-20px, -10px);
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #2a2a2a;
+  transition: 0.4s;
+  border-radius: 30px;
+  overflow: hidden;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 1.2em;
+  width: 1.2em;
+  border-radius: 20px;
+  left: 0.5em;
+  bottom: 0.5em;
+  transition: 0.4s;
+  transition-timing-function: cubic-bezier(0.81, -0.04, 0.38, 1.5);
+  box-shadow: inset 8px -4px 0px 0px #fff;
+}
+
+.switch input:checked + .slider {
+  background-color: #00a6ff;
+}
+
+.switch input:checked + .slider:before {
+  transform: translateX(1.8em);
+  box-shadow: inset 15px -4px 0px 15px #ffcf48;
+}
+
+.star {
+  background-color: #fff;
+  border-radius: 50%;
+  position: absolute;
+  width: 5px;
+  transition: all 0.4s;
+  height: 5px;
+}
+
+.star_1 {
+  left: 2.5em;
+  top: 0.5em;
+}
+
+.star_2 {
+  left: 2.2em;
+  top: 1.2em;
+}
+
+.star_3 {
+  left: 3em;
+  top: 0.9em;
+}
+
+.switch input:checked ~ .slider .star {
+  opacity: 0;
+}
+
+.cloud {
+  width: 3.5em;
+  position: absolute;
+  bottom: -1.4em;
+  left: -1.1em;
+  opacity: 0;
+  transition: all 0.4s;
+}
+
+.switch input:checked ~ .slider .cloud {
+  opacity: 1;
+}
+
+
+
+/*********************************************************************************/
+/******************** ACCORDION **************/
+
+
+.accordion {
+  background-color: var(--clr-white);
+  color: var(--clr-text);
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+  transition: 0.4s;
+  border-radius: 8px;
+  border: 1px solid var(--clr-border);
+}
+
+.acc-active, .accordion:hover {
+    background-color: var(--clr-background);
+    border: 1px solid var(--clr-primary);
+    color: #0066ff;
+}
+
+.panel {
+  padding: 0 1.5rem;
+  background-color: var(--clr-backround);
+  max-height: 0;
+  overflow: hidden;
+  border-radius: 8px;
+  filter: drop-shadow(0 0 0.75rem #00000009);
+  transition: max-height 0.2s ease-out;
+}
+
+.panel-inside {
+    margin-block: 1rem;
+}
+
+.accordion:after {
+  content: '+';
+  font-size: 1rem;
+  color: #777;
+  float: right;
+  margin-left: 5px;
+}
+
+.acc-active:after {
+  content: "–";
+  font-size: 1rem;
+}
+
+/**************************************************/
+.card {
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid var(--clr-border);
+    filter: drop-shadow(0 0 0.75rem #00000009);
+    background: #EEFAFF;
+    background: var(--clr-card-bg) !important;
+}
+
+.card-important {
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid var(--clr-border);
+    filter: drop-shadow(0 0 0.75rem #00000009);
+    background: var(--clr-card-bg);
+    overflow: hidden;
+}
+
+.card-important::before {
+    content: '';
+    position: absolute;
+    height: 100%;
+    width: 5px;
+    inset: 0;
+    background: var(--clr-primary);
+}
+
+
+.cookie-bar {
+    width: 500px;
+    bottom: 50px;
+    right: 70px;
+    padding: 2rem;
+    filter: drop-shadow(0 0 0.75rem #0066ff29);
+    border-radius: 16px;
+    background-color: #ffffffbf;
+    color: #000;
+    border: 1px solid var(--clr-border);
+    backdrop-filter: blur(7px);
+
+    h4 {
+        font-size: 1.5rem;
+        color: var(--clr-primary);
+    }
+
+    a {
+        color: var(--clr-primary) !important;
+    }
+
+    @media(width < 1000px) {
+      width: 100%;
+      right: 0;
+    }
+}
+
+.cookie-bar .cookie-bar-description {
+    font-size: .9rem;
+}
+
+h1, h2, h3, h4 {
+    font-family: "Bree Serif", serif;
+}
+
+.link {
+    text-decoration: none;
+    color: var(--clr-primary);
+    border-radius: 8px;
+    padding-block: .25rem;
+
+    transition: all 300ms ease;
+}
+
+.link:hover {
+    background-color: #eff5ff;
+    outline: 1px solid #0066ff50;
+    border-radius: 8px;
+}
+
+/******************* LAYOUT ***********************/
+
+.even-columns {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    margin-block: 1rem;
+    width: 100%;
+    position: relative;
+}
+
+.three-columns {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-block: 1rem;
+    width: 100%;
+    position: relative;
+}
+
+.two-to-one {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    margin-block: 1rem;
+    width: 100%;
+}
+
+.one-to-two {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+    margin-block: 1rem;
+    width: 100%;
+}
+
+.three-to-one {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    gap: 2rem;
+    margin-block: 1rem;
+    width: 100%;
+}
+
+.one-to-three {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    gap: 2rem;
+    margin-block: 1rem;
+    width: 100%;
+}
+
+/********************* MEDIA QUERIES *******************/
+
+@media(width < 1000px) {
+    .even-columns {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        justify-items: center;
+    }
+
+    .two-to-one,
+    .one-to-two,
+    .three-to-one,
+    .one-to-three,
+    .three-columns {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+
+/*********************************** NEW NAVIGATION **********************************************************/
+
+header {
+    position: relative;
+    z-index: 999999;
+    background: #0000;
+    /*    box-shadow: 0px 5px 5px #dbdbdb33; */
+}
+
+header hr {
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--clr-border) !important;
+}
+
+header ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  /* Color highlighting when pressed on mobile devices */
+  /*-webkit-tap-highlight-color: transparent;*/
+}
+
+header a {
+  text-decoration: none;
+}
+
+
+select {
+    word-wrap: normal;
+    font-size: 11px;
+    border-radius: 8px;
+    border: 1px solid var(--clr-border);
+}
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+    cursor: auto;
+}
+
+.nav {
+  display: flex;
+  height: 3.5rem;
+  background: #0000;
+}
+
+.nav__logo,
+.nav__burger,
+.nav__close {
+  color: var(--clr-white);
+}
+
+.nav__logo img {
+  width: 170px;
+}
+
+.nav__data {
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-inline: 1rem;
+  padding-block: 2rem;
+}
+
+.nav__toggle {
+  position: relative;
+  width: 32px;
+  height: 32px;
+}
+
+.nav__burger,
+.nav__close {
+  position: absolute;
+  width: max-content;
+  height: max-content;
+  inset: 0;
+  margin: auto;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: opacity .1s, transform .4s;
+  fill: #0066ff !important;
+}
+
+.nav__close {
+  opacity: 0;
+}
+
+/* Navigation for mobile devices */
+@media screen and (max-width: 1118px) {
+  .nav__menu {
+    position: absolute;
+    left: 0;
+    top: 10rem;
+    width: 100%;
+    height: calc(100vh - 3.5rem);
+    overflow: auto;
+    pointer-events: none;
+    opacity: 0;
+    transition: top .6s, opacity .5s;
+  }
+  .nav__menu::-webkit-scrollbar {
+    width: 0;
+  }
+  .nav__list {
+    background-color: var(--clr-white);
+    padding-top: 1rem;
+  }
+  .nav__data {
+    width: 100%;
+  }
+}
+
+.nav__link {
+  color: var(--clr-text);
+
+  font-weight: 650;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color .3s;
+}
+
+.nav__link:hover {
+  color: var(--clr-primary);
+}
+
+/* Show menu */
+.show-menu {
+  opacity: 1;
+  top: 3.5rem;
+  pointer-events: initial;
+}
+
+/* Show icon */
+.show-icon .nav__burger {
+  opacity: 0;
+  transform: rotate(90deg);
+}
+.show-icon .nav__close {
+  opacity: 1;
+  transform: rotate(90deg);
+}
+
+@media only screen and (max-width: 768px) {
+    #topNavi {
+        display: flex !important;
+    }
+
+    .top-navi .container-md {
+        align-items: center;
+        display: flex;
+        flex-wrap: inherit;
+        justify-content: flex-end !important;
+    }
+}
+
+.top-navi-bg {
+    position: relative;
+    z-index: 10000000000;
+}
+
+/*=============== DROPDOWN ===============*/
+.dropdown__item {
+  cursor: pointer;
+}
+
+.dropdown__arrow {
+  font-size: 1.25rem;
+  font-weight: initial;
+  transition: transform .4s;
+}
+
+.dropdown__link,
+.dropdown__sublink {
+  padding: .75rem;
+  color: var(--clr-text);
+  background-color: var(--clr-white);
+  display: flex;
+  align-items: center;
+  column-gap: .5rem;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: background-color .3s;
+}
+
+.dropdown__sublink {
+    font-weight: 300 !important;
+}
+
+.dropdown__link i,
+.dropdown__sublink i {
+  font-size: 1.25rem;
+  font-weight: initial;
+}
+
+.dropdown__link:hover,
+.dropdown__sublink:hover {
+  background-color: var(--clr-primary);
+  color: var(--clr-white);
+
+}
+
+.dropdown__sublink:hover .dropdown__submenu {
+    background: var(--clr-primary);
+}
+
+.dropdown__menu,
+.dropdown__submenu {
+  max-height: 0;
+  z-index: 1000;
+  overflow: hidden;
+  transition: max-height .6s ease-out;
+  box-shadow: 0px 0px 10px var(--clr-boxshadow);
+  border: 1px solid var(--clr-border);
+  /* border-top: none; */
+  border-radius: 8px;
+  background: var(--clr-background);
+}
+
+/* Show dropdown menu & submenu */
+.dropdown__item:hover .dropdown__menu,
+.dropdown__subitem:hover > .dropdown__submenu {
+  max-height: 1000px;
+  transition: max-height .6s ease-in;
+
+}
+
+/* Rotate dropdown icon */
+.dropdown__item:hover .dropdown__arrow {
+  transform: rotate(180deg);
+}
+
+/*=============== DROPDOWN SUBMENU ===============*/
+.dropdown__add {
+  margin-left: auto;
+}
+
+.dropdown__sublink {
+  background-color: var(--clr-white);
+}
+
+/*=============== BREAKPOINTS ===============*/
+/* For small devices */
+@media screen and (max-width: 340px) {
+  .container {
+    margin-inline: 1rem;
+  }
+
+  .nav__link {
+    padding-inline: 1rem;
+  }
+}
+
+/* For large devices */
+@media screen and (min-width: 1118px) {
+  .container {
+    margin-inline: auto;
+  }
+
+  .nav {
+    height: 5.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .nav__toggle {
+    display: none;
+  }
+
+  .nav__list {
+    height: 100%;
+    display: flex;
+    column-gap: 1.25rem;
+  }
+
+  .nav__link {
+    height: 100%;
+    padding-inline: 0;
+    padding-block: 1rem;
+    justify-content: initial;
+    column-gap: .25rem;
+  }
+  .nav__link:hover {
+    background-color: transparent;
+  }
+
+  .dropdown__item,
+  .dropdown__subitem {
+    position: relative;
+  }
+
+  .dropdown__menu,
+  .dropdown__submenu {
+    max-height: initial;
+    overflow: initial;
+    position: absolute;
+    left: 0;
+    top: 3rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .1s, top 0s;
+
+  }
+
+  .dropdown__link,
+  .dropdown__sublink {
+    padding-inline: 1rem;
+    font-size: .9rem;
+    width: 300px;
+    background: transparent;
+  }
+
+  .dropdown__subitem .dropdown__link {
+    padding-inline: 1rem;
+  }
+
+  .dropdown__submenu {
+    position: absolute;
+    left: 100%;
+    top: .5rem;
+  }
+
+  /* Show dropdown menu */
+  .dropdown__item:hover .dropdown__menu {
+    opacity: 1;
+    top: 4rem;
+    pointer-events: initial;
+    transition: top 0s;
+  }
+
+  /* Show dropdown submenu */
+  .dropdown__subitem:hover > .dropdown__submenu {
+    opacity: 1;
+    top: 0;
+    pointer-events: initial;
+    transition: top 0s;
+  }
+}
+
+
+
+/* === Submenu: JS-controlled (desktop only) === */
+@media (min-width: 1118px) {
+
+  /* Neutralize old hover rule */
+  .dropdown__subitem:hover > .dropdown__submenu {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  /* Baseline hidden state (always absolute so no jumping) */
+  .dropdown__submenu {
+    position: absolute;
+    left: 100%;
+    top: 0;                /* <-- lock at 0 to stop flicker */
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(0); /* stable baseline */
+    transition: opacity .18s ease, visibility 0s linear .18s;
+    will-change: opacity;
+  }
+
+  /* Show when JS adds .open */
+  .dropdown__subitem.open > .dropdown__submenu {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transition-delay: 0s !important;
+  }
+}
+
+
+
+
+.voucher-store-button {
+  position: relative;
+  padding-inline: .8rem;
+  padding-block: .4rem;
+  border-radius: 10vw;
+  corner-shape: squircle;
+  background-color: var(--clr-primary);
+  border: none;
+  z-index: 10000;
+  column-gap: .25rem;
+  margin-block: 1rem;
+  font-weight: bold;
+
+  transition: all 400ms ease;
+
+  @media(width < 1000px) {
+    margin-left: 1.25rem;
+  }
+}
+
+.voucher-store-button:hover {
+  background-color: #00317a;
+  border-radius: 100vw;
+}
+
+.voucher-store-button a {
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+  text-decoration: none;
+  color: #fff;
+}
+
+
+/*********************************** NEW NAVIGATION END **********************************************************/
+
+.hero {
+    background-color: blueviolet;
+    height: 100vh;
+    padding-inline: 10vw;
+}
+
+.visually-hidden {
+    display: none !important;
+}
+
+.visible {
+    display: block;
+}
+
+
+
+/*******************************************************************************************/
+
+
+.top-navi-bg {
+  background-color: #0000;
+}
+
+.top-navi .top-navi-item .top-navi-link {
+    color: var(--clr-mine-shaft);
+}
+
+.top-navi .top-navi-item .top-navi-link:hover {
+    color: var(--clr-science-blue);
+}
+
+.navbar {
+  background: var(--clr-white)!important;
+  color: var(--clr-mine-shaft);
+}
+
+.navbar-light .navbar-nav .nav-link {
+    color: var(--clr-mine-shaft);
+    font-weight: 500;
+    -webkit-transition: .4s;
+    -moz-transition: .4s;
+    -o-transition: .4s;
+    transition: .4s;
+}
+
+.logo-image-navigation {
+    height: 50px !important;
+    width: 204px !important;
+}
+
+
+
+/* .bgr-footer {
+    background-image: url('../assets/61ee9e2fe3f74388645138.jpg');
+    background-repeat: no-repeat;
+    background-position: right bottom;
+    background-size: 25%;
+} */
+
+.footer .footer-top {
+    background-color: var(--clr-background);
+}
+
+.footer {
+    border-top: 1px solid var(--clr-border);
+}
+
+.footer-address {
+    /*    color: var(--clr-white); */
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--clr-mine-shaft);
+}
+
+.footer-address .d-block:first-child {
+    /* color: var(--clr-white); */
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--clr-mine-shaft);
+}
+
+.footer-social a {
+    background: var(--clr-text);
+}
+
+.python-theme .footer .footer-top .footer-social a {
+    border: none;
+}
+
+.footer .footer-top .footer-section .footer-header {
+    font-size: 16px;
+    color: var(--clr-mine-shaft);
+}
+
+.footer .footer-top .footer-section ul li {
+    margin-bottom: 10px;
+}
+
+.footer .footer-top .footer-section ul li a {
+    font-size: 14px;
+    text-decoration: none;
+    color: var(--clr-mine-shaft);
+}
+
+.badge-item {
+    border: 6px solid #f3f3f3;
+    padding: 30px;
+}
+
+.exam-page .subheading-1 {
+    font-size: 24px;
+}
+
+.table {
+    color: var(--clr-text) !important;
+    border-color: var(--clr-table-border);
+}
+
+.exam-page .table th {
+    color: var(--clr-mine-shaft);
+}
+
+.exam-page .table>:not(:first-child) {
+    border-top: 2px solid #fdb934;
+}
+
+/* .exam-page .accordion-button:focus {
+    box-shadow: 0 0 0 0.25rem var(--clr-mine-shaft);
+}
+
+.exam-page .accordion-button:not(.collapsed) {
+    background-color: #fdb934;
+    color: #000;
+    font-weight: bold;
+}
+
+.exam-page .accordion-flush .accordion-item .accordion-button {
+    box-shadow: 0 0 0 0.25rem #000;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.exam-page .accordion-item:last-of-type .accordion-button.collapsed {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+} */
+
+@media only screen and (max-width: 768px) {
+    .badge-item img {
+        margin-top: 30px;
+    }
+}
+
+
+.footer .footer-bottom {
+    background-color: var(--clr-background);
+    /* border: solid #3d3d3d; */
+    border: 1px solid var(--clr-border);
+    padding: 40px 0;
+}
+
+.footer .footer-bottom .footer-copyright p {
+    color: var(--clr-mine-shaft);
+}
+
+#navbar .dropdown-menu {
+    font-size: 14px;
+}
+
+#navbar .dropdown-menu .dropdown-item {
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+
+#navbar .dropdown-menu hr {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.python-theme .footer .footer-top .footer-social a {
+    border: 1px solid var(--primary-color);
+    color: var(--clr-text);
+    background: var(--clr-background);
+}
+
+.python-theme {
+    --primary-color: var(--clr-denim)!important;
+}
+
+/***************************************************/
+
+
+/*************** SMALL ROADMAP ************/
+
+.roadmap-container__tiles {
+    display: grid;
+    grid-template-columns: 1fr 2fr 2fr 2fr 2fr;
+    gap: 2rem;
+
+    @media(width < 1000px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.prior-exp__container {
+    border-right: 1px solid var(--clr-border);
+    padding-right: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    p {
+        font-size: .7rem;
+        margin: 0;
+    }
+}
+
+.prior-exp__card {
+    background: var(--clr-card-bg);
+    border: 1px solid var(--clr-border);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+
+    p {
+        font-size: .7rem;
+        margin: 0;
+    }
+}
+
+.exam-tile {
+    border: 1px solid var(--light-gray);
+    background: var(--clr-white);
+    border-radius: 8px;
+    max-height: fit-content;
+    /* overflow: hidden; */
+}
+
+.exam-tile__header {
+    width: 100%;
+    text-align: center;
+    padding-block: .5rem;
+    color: var(--clr-gray);
+    background: var(--light-gray);
+
+    p {
+        font-size: .7rem;
+        margin: 0;
+    }
+}
+
+.arrow {
+    position: relative;
+}
+
+.arrow::after {
+    content: '';
+    display: block;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='rgba(100,116,147,1)'%3E%3Cpath d='M13.1717 12.0007L8.22192 7.05093L9.63614 5.63672L16.0001 12.0007L9.63614 18.3646L8.22192 16.9504L13.1717 12.0007Z'%3E%3C/path%3E%3C/svg%3E");
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    right: -30px;
+    top: 50%;
+
+    @media(width < 1000px) {
+        right: 48.5%;
+        top: 121px;
+        rotate: 90deg;
+    }
+}
+
+.current {
+    border: 2px solid var(--clr-primary);
+    background: var(--clr-card-bg);
+
+    .exam-tile__header {
+        background: var(--clr-primary);
+        color: white;
+    }
+}
+
+.exam-tile__content {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: .5rem;
+    padding: 1rem;
+
+    * {
+        margin: 0;
+    }
+
+    p {
+        font-size: .7rem;
+        color: var(--clr-gray);
+    }
+}
+
+
+
+
+
+
+
+.badge-item {
+    background: var(--clr-white) !important;
+}
+
+.table {
+    color: var(--clr-text) !important;
+}
+
+.accordion-item {
+    background-color: var(--clr-background) !important;
+    border: 1px solid var(--clr-border) !important;
+}
+
+.accordion-button {
+    font-weight: normal;
+    background-color: var(--clr-white) !important;
+    color: var(--clr-text) !important;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: var(--clr-background) !important;
+}
+
+.card .card-text {
+    color: var(--clr-text) !important;
+}
+
+.hero-container {
+    background-color: var(--clr-background) !important;
+}
+
+.partner-card__name {
+    a {
+        color: var(--clr-text) !important;
+        font-weight: normal;
+    }
+}
+
+.graph-card {
+    background: var(--clr-card-bg) !important;
+}
+        </style>
+
+                    <link rel="icon" type="image/png" href="https://pythoninstitute.org/assets/61ee7df904591742689724.png">
+
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-49926432-9"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'UA-49926432-9');
+        </script>
+    </head>
+
+    <body class="python-theme">
+                    <!--=============== REMIXICONS ===============-->
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
+
+<div id="topNavi" class="top-navi top-navi-bg">
+    <div class="container-md" id="start">
+        <ul class="ms-auto me-4 my-3 my-lg-0 list-unstyled">
+            <li class="top-navi-item">
+                <a href="https://pythoninstitute.org/terms-and-conditions" class="top-navi-link">Terms and Conditions</a>
+            </li>
+            <li class="top-navi-item">
+                <a href="https://pythoninstitute.org/exam-policies" class="top-navi-link">Exam Policies</a>
+            </li>
+            <li class="top-navi-item">
+                <a href="https://pythoninstitute.org/faq" class="top-navi-link">FAQ</a>
+            </li>
+            <li class="top-navi-item">
+                <a href="https://pythoninstitute.org/support" class="top-navi-link">Support</a>
+            </li>
+            <!--    <li class="top-navi-item">
+                <a href="https://pythoninstitute.org/search" class="top-navi-link"><i class="fa fa-search"></i> Search</a>
+            </li> -->
+
+            <li class="top-navi-item">
+                <label class="switch">
+                  <input id="themeToggle" type="checkbox" />
+                  <span class="slider">
+                    <div class="star star_1"></div>
+                    <div class="star star_2"></div>
+                    <div class="star star_3"></div>
+                    <svg viewBox="0 0 16 16" class="cloud_1 cloud">
+                      <path
+                        transform="matrix(.77976 0 0 .78395-299.99-418.63)"
+                        fill="#fff"
+                        d="m391.84 540.91c-.421-.329-.949-.524-1.523-.524-1.351 0-2.451 1.084-2.485 2.435-1.395.526-2.388 1.88-2.388 3.466 0 1.874 1.385 3.423 3.182 3.667v.034h12.73v-.006c1.775-.104 3.182-1.584 3.182-3.395 0-1.747-1.309-3.186-2.994-3.379.007-.106.011-.214.011-.322 0-2.707-2.271-4.901-5.072-4.901-2.073 0-3.856 1.202-4.643 2.925"
+                      ></path>
+                    </svg>
+                  </span>
+                </label>
+            </li>
+
+            <li class="top-navi-item">
+                <select id="lang-switcher" aria-label="Language selector">
+                    <option value="en">English</option>
+                    <option value="ja">日本語</option>
+                </select>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!------------------------------------------------------------------------------------------------------------------------->
+
+<!--=============== HEADER ===============-->
+      <header class="header">
+         <nav class="nav container">
+            <div class="nav__data">
+               <a href="https://pythoninstitute.org" class="nav__logo">
+                  <img class="light-mode-logo" src="https://pythoninstitute.org/assets/69205e5bc9a43768475655.svg">
+                  <img class="dark-mode-logo" src="https://pythoninstitute.org/assets/61e94ab03c704674847077.png">
+               </a>
+
+               <div class="nav__toggle" id="nav-toggle">
+                  <svg class="ri-menu-line nav__burger" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#383838" class="bi bi-list" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/></svg>
+                  <svg class="ri-close-line nav__close" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#383838" class="bi bi-x-lg" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg>
+               </div>
+            </div>
+
+            <!--=============== NAV MENU ===============-->
+            <div class="nav__menu" id="nav-menu">
+               <ul class="nav__list">
+
+                  <!--=============== DROPDOWN 1 ===============-->
+                  <li class="dropdown__item">
+                     <div class="nav__link noselect">
+                        About <i class="ri-arrow-down-s-line dropdown__arrow"></i>
+                     </div>
+
+                     <ul class="dropdown__menu">
+                        <li>
+                           <a href="https://pythoninstitute.org/about-pi" class="dropdown__link">
+                              Python Institute
+                           </a>
+                        </li>
+
+                        <li>
+                           <a href="https://pythoninstitute.org/leadership" class="dropdown__link">
+                              Leadership
+                           </a>
+                        </li>
+
+                        <li>
+                           <a href="https://pythoninstitute.org/about-python" class="dropdown__link">
+                              Python&reg;
+                           </a>
+                        </li>
+
+                        <li>
+                           <a href="https://pythoninstitute.org/contact" class="dropdown__link">
+                              Contact Us
+                           </a>
+                        </li>
+
+                     </ul>
+                  </li>
+
+                  <!--=============== DROPDOWN 2 ===============-->
+                  <li class="dropdown__item">
+                     <div class="nav__link noselect">
+                        Certifications <i class="ri-arrow-down-s-line dropdown__arrow"></i>
+                     </div>
+
+                     <ul class="dropdown__menu">
+
+                        <!--=============== DROPDOWN SUBMENU ===============-->
+                        <li class="dropdown__subitem">
+                           <div class="dropdown__link noselect">
+                              About Our Certifications <i class="ri-add-line dropdown__add"></i>
+                           </div>
+
+                           <ul class="dropdown__submenu">
+                              <li>
+                                 <a href="https://pythoninstitute.org/certification-tracks" class="dropdown__sublink">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-signpost-split" viewBox="0 0 16 16"><path d="M7 7V1.414a1 1 0 0 1 2 0V2h5a1 1 0 0 1 .8.4l.975 1.3a.5.5 0 0 1 0 .6L14.8 5.6a1 1 0 0 1-.8.4H9v10H7v-5H2a1 1 0 0 1-.8-.4L.225 9.3a.5.5 0 0 1 0-.6L1.2 7.4A1 1 0 0 1 2 7zm1 3V8H2l-.75 1L2 10zm0-5h6l.75-1L14 3H8z"/></svg> Certification Roadmap
+                                 </a>
+                              </li>
+
+                              <li>
+                                 <a href="https://pythoninstitute.org/exam-development" class="dropdown__sublink">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-braces-asterisk" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.114 8.063V7.9c1.005-.102 1.497-.615 1.497-1.6V4.503c0-1.094.39-1.538 1.354-1.538h.273V2h-.376C2.25 2 1.49 2.759 1.49 4.352v1.524c0 1.094-.376 1.456-1.49 1.456v1.299c1.114 0 1.49.362 1.49 1.456v1.524c0 1.593.759 2.352 2.372 2.352h.376v-.964h-.273c-.964 0-1.354-.444-1.354-1.538V9.663c0-.984-.492-1.497-1.497-1.6M14.886 7.9v.164c-1.005.103-1.497.616-1.497 1.6v1.798c0 1.094-.39 1.538-1.354 1.538h-.273v.964h.376c1.613 0 2.372-.759 2.372-2.352v-1.524c0-1.094.376-1.456 1.49-1.456v-1.3c-1.114 0-1.49-.362-1.49-1.456V4.352C14.51 2.759 13.75 2 12.138 2h-.376v.964h.273c.964 0 1.354.444 1.354 1.538V6.3c0 .984.492 1.497 1.497 1.6M7.5 11.5V9.207l-1.621 1.621-.707-.707L6.792 8.5H4.5v-1h2.293L5.172 5.879l.707-.707L7.5 6.792V4.5h1v2.293l1.621-1.621.707.707L9.208 7.5H11.5v1H9.207l1.621 1.621-.707.707L8.5 9.208V11.5z"/></svg> Exam Development
+                                 </a>
+                              </li>
+
+                              <li>
+                                 <a href="https://pythoninstitute.org/why-get-certified" class="dropdown__sublink">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-question-circle" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/><path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286m1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94"/></svg> Why Get Certified
+                                 </a>
+                              </li>
+
+                              <li>
+                                 <a href="https://pythoninstitute.org/test-now" class="dropdown__sublink">
+                                    <img style="width: 16px; height: 16px;" src="https://pythoninstitute.org/assets/68b94c5aafa18524878644.svg"> TestNow
+                                 </a>
+                              </li>
+
+                           </ul>
+                        </li>
+
+                        <li class="dropdown__subitem">
+                           <div class="dropdown__link noselect">
+                              General-Purpose Programming <i class="ri-add-line dropdown__add"></i>
+                           </div>
+
+                           <ul class="dropdown__submenu">
+                              <li>
+                                 <a href="https://pythoninstitute.org/pcep" class="dropdown__sublink">
+                                    <img src="https://pythoninstitute.org/assets/61f11fac8e6f4153315957.png" style="max-width:1rem";> PCEP™ (Entry)
+                                 </a>
+                              </li>
+
+                              <li>
+                                 <a href="https://pythoninstitute.org/pcap" class="dropdown__sublink">
+                                    <img src="https://pythoninstitute.org/assets/61f11f7719dd3800707549.png" style="max-width:1rem";> PCAP™ (Associate)
+                                 </a>
+                              </li>
+
+                              <li>
+                                 <a href="https://pythoninstitute.org/pcpp1" class="dropdown__sublink">
+                                    <img src="https://pythoninstitute.org/assets/61f11fe399557778655862.png" style="max-width:1rem";> PCPP1™ (Professional 1)
+                                 </a>
+                              </li>
+
+                              <li>
+                                 <a href="https://pythoninstitute.org/pcpp2" class="dropdown__sublink">
+                                    <img src="https://pythoninstitute.org/assets/61f1200322b6a507247364.png" style="max-width:1rem";> PCPP2™ (Professional 2)
+                                 </a>
+                              </li>
+
+                           </ul>
+                        </li>
+
+                        <li class="dropdown__subitem">
+                           <div class="dropdown__link noselect">
+                              Data Science <i class="ri-add-line dropdown__add"></i>
+                           </div>
+
+                           <ul class="dropdown__submenu">
+                              <li>
+                                 <a href="https://pythoninstitute.org/pced" class="dropdown__sublink">
+                                    <img src="https://pythoninstitute.org/assets/65081bd3c7227190233755.png" style="max-width:1rem";> PCED™ (Entry)
+                                 </a>
+                              </li>
+
+                              <li>
+                                 <a href="https://pythoninstitute.org/pcad" class="dropdown__sublink">
+                                    <img src="https://pythoninstitute.org/assets/625041de17032730407848.png" style="max-width:1rem";> PCAD™ (Associate)
+                                 </a>
+                              </li>
+
+                           </ul>
+                        </li>
+
+                        <li class="dropdown__subitem">
+                           <div class="dropdown__link noselect">
+                              Testing <i class="ri-add-line dropdown__add"></i>
+                           </div>
+
+                           <ul class="dropdown__submenu">
+                              <li>
+                                 <a href="https://pythoninstitute.org/pcet" class="dropdown__sublink">
+                                    <img src="https://openedg.org/assets/67585f3892d0f138855645.png" style="max-width:1rem";> PCET™ (Entry)
+                                 </a>
+                              </li>
+
+                              <li>
+                                 <a href="https://pythoninstitute.org/pcat" class="dropdown__sublink">
+                                    <img src="https://pythoninstitute.org/assets/6262726f13cf0918743627.png" style="max-width:1rem";> PCAT™ (Associate)
+                                 </a>
+                              </li>
+
+                           </ul>
+                        </li>
+
+                        <li class="dropdown__subitem">
+                           <div class="dropdown__link noselect">
+                              Security <i class="ri-add-line dropdown__add"></i>
+                           </div>
+
+                           <ul class="dropdown__submenu">
+                              <li>
+                                 <a href="https://pythoninstitute.org/pces" class="dropdown__sublink">
+                                    <img src="https://pythoninstitute.org/assets/670d10f9e43ca282095463.png" style="max-width:1rem";> PCES™ (Entry)
+                                 </a>
+                              </li>
+
+                              <!-- <li>
+                                 <a href="https://pythoninstitute.org/pcas" class="dropdown__sublink">
+                                    PCAS™ (Associate)
+                                 </a>
+                              </li> -->
+                           </ul>
+                        </li>
+
+                        <li class="dropdown__subitem">
+                           <div class="dropdown__link noselect">
+                              Automation <i class="ri-add-line dropdown__add"></i>
+                           </div>
+
+                           <ul class="dropdown__submenu">
+                              <li>
+                                 <a href="https://pythoninstitute.org/pcea" class="dropdown__sublink">
+                                    <img src="https://openedg.org/assets/670d11d1e6c27312056501.png" style="max-width:1rem";> PCEA™ (Entry)
+                                 </a>
+                              </li>
+
+                              <!-- <li>
+                                 <a href="https://pythoninstitute.org/pcaa" class="dropdown__sublink">
+                                    PCAA™ (Associate)
+                                 </a>
+                              </li> -->
+                           </ul>
+                        </li>
+
+                        <li class="dropdown__subitem">
+                           <div class="dropdown__link noselect">
+                              Artificial Intelligence <i class="ri-add-line dropdown__add"></i>
+                           </div>
+
+                           <ul class="dropdown__submenu">
+                              <li>
+                                 <a href="https://pythoninstitute.org/pcei" class="dropdown__sublink">
+                                    <img src="https://pythoninstitute.org/assets/68efa48140128044320072.png" style="max-width:1rem";> PCEI™ (Entry)
+                                 </a>
+                              </li>
+
+                           </ul>
+                        </li>
+
+                        <hr>
+
+                        <li class="dropdown__subitem">
+                           <div class="dropdown__link noselect">
+                              Credentials Verification <i class="ri-add-line dropdown__add"></i>
+                           </div>
+
+                           <ul class="dropdown__submenu">
+                              <li>
+                                 <a href="https://pythoninstitute.org/credential-verification" class="dropdown__sublink">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/><path d="m10.97 4.97-.02.022-3.473 4.425-2.093-2.094a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05"/></svg> Verify Credentials
+                                 </a>
+                              </li>
+
+                              <li>
+                                 <a href="https://pythoninstitute.org/digital-badging" class="dropdown__sublink">
+                                    <svg width="24" height="24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"> <path d="M 23.781012,13.152595 C 23.748914,13.13908 23.713436,13.130633 23.679648,13.125564 A 0.33956985,0.33956985 0 0 0 23.346836,13.30802 C 23.262366,13.438104 23.199858,13.578324 23.127213,13.710098 A 3.6592452,3.6592452 0 0 1 22.74203,14.221986 C 22.610256,14.377411 22.4599,14.514253 22.319679,14.666299 A 0.08953832,0.08953832 0 0 1 22.216626,14.695019 0.08953832,0.08953832 0 0 1 22.182838,14.605481 C 22.223383,14.227055 22.255482,13.846939 22.306164,13.470202 L 22.370361,12.960003 22.454831,12.228492 22.691348,10.403937 C 22.714999,10.277232 22.721757,10.032269 22.556196,9.8886697 A 0.44431278,0.44431278 0 0 0 22.319679,9.7771692 0.44431278,0.44431278 0 0 0 22.067958,9.8362983 C 21.846647,9.9984809 21.768934,10.341429 21.708116,10.596529 21.564516,11.197956 21.52735,11.833172 21.238462,12.390674 21.181022,12.502175 21.113446,12.608607 21.035734,12.708282 20.985051,12.777547 20.922544,12.838366 20.849899,12.887359 20.778944,12.936351 20.691095,12.954935 20.604936,12.94142 A 0.35477447,0.35477447 0 0 1 20.36842,12.731934 0.87848915,0.87848915 0 0 1 20.307601,12.410947 C 20.290707,11.870338 20.370109,11.331419 20.544118,10.81953 20.591421,10.696204 20.625209,10.569499 20.645482,10.439415 20.674201,10.280611 20.674201,10.059299 20.533981,9.9224578 A 0.52540409,0.52540409 0 0 0 20.032229,9.7940632 0.65210926,0.65210926 0 0 0 19.658871,10.187694 C 19.459521,10.648901 19.40546,11.135449 19.342953,11.632133 A 2.40233,2.40233 0 0 1 18.675639,13.061367 C 18.604684,13.13908 18.528661,13.210034 18.44588,13.275921 A 0.45275979,0.45275979 0 0 1 18.113068,13.385732 0.3801155,0.3801155 0 0 1 17.832627,13.177936 0.88186796,0.88186796 0 0 1 17.73971,12.863707 C 17.707611,12.660979 17.695785,12.45825 17.704232,12.253833 17.699164,12.034211 17.714369,11.812899 17.746467,11.594966 17.82418,11.206403 18.425607,9.6639792 18.55738,9.2635909 A 11.866361,11.866361 0 0 0 18.908776,8.0168121 C 18.993246,7.6417648 19.030413,7.2565811 19.020277,6.869708 19.01014,6.5994036 18.951011,6.3003794 18.733078,6.1398862 A 0.63183643,0.63183643 0 0 0 18.128272,6.0892042 0.98323209,0.98323209 0 0 0 17.672134,6.5149335 C 17.572459,6.7007678 17.498125,6.9001172 17.450822,7.1062243 A 12.817495,12.817495 0 0 0 17.182207,8.3969276 L 16.977789,9.6606004 C 16.92035,10.015375 16.773372,11.27229 16.715932,11.535837 16.650045,11.80952 16.550371,12.074756 16.416908,12.323098 16.281756,12.586645 16.158429,12.85526 16.009762,13.113739 15.965837,13.198209 15.908398,13.274232 15.834064,13.33505 A 0.26861495,0.26861495 0 0 1 15.56376,13.373906 0.36660028,0.36660028 0 0 1 15.39482,13.086708 C 15.315418,12.654221 15.384683,12.213287 15.467464,11.785868 15.548555,11.360139 15.911777,9.3919855 15.9878,8.9392257 16.085785,8.4121322 16.229384,7.8917963 16.271619,7.352877 16.303718,6.9643145 16.362847,6.4811455 16.073959,6.1702955 A 0.48992664,0.48992664 0 0 0 15.629646,6.0351433 0.67576089,0.67576089 0 0 0 15.242773,6.3274099 C 15.132962,6.4693197 15.046803,6.6264341 14.984295,6.7953743 A 6.5548806,6.5548806 0 0 0 14.725816,7.7059621 L 14.697096,7.836046 C 14.612626,8.2178509 14.550118,8.6030347 14.507883,8.9932866 14.484232,9.201083 14.465648,9.4105689 14.448754,9.6217442 14.440307,9.7231083 14.430171,9.8261619 14.426792,9.9292154 14.43355,10.010307 14.423413,10.093087 14.396383,10.1708 14.384557,10.19783 14.367663,10.221482 14.345701,10.238376 14.252784,10.295816 14.142972,10.317778 14.034851,10.297505 13.479037,10.280611 12.987421,10.59484 12.67995,11.049289 A 3.5021308,3.5021308 0 0 0 12.294766,11.882164 C 12.277872,11.932846 12.2576,11.981839 12.235637,12.032521 12.174819,12.20653 12.100485,12.377159 12.014326,12.542721 11.921409,12.703214 11.816666,12.856949 11.698407,13.000549 11.583528,13.150905 11.455134,13.287747 11.309845,13.409384 11.166246,13.539468 10.992237,13.629006 10.803024,13.667862 A 0.63014703,0.63014703 0 0 1 10.257347,13.466824 0.93930763,0.93930763 0 0 1 10.047862,12.929594 C 10.037725,12.873843 10.047862,12.814714 10.078271,12.765722 A 0.28888778,0.28888778 0 0 1 10.299582,12.688009 1.6184473,1.6184473 0 0 0 11.674756,11.674368 C 11.809908,11.344934 11.853832,10.985092 11.798082,10.633696 A 1.184271,1.184271 0 0 0 11.612248,10.152216 C 11.510884,10.010307 11.375732,9.8988062 11.215238,9.8295407 A 1.3042185,1.3042185 0 0 0 10.203287,9.8362983 C 9.6305788,10.066057 9.2572209,10.574567 9.0713866,11.390548 L 9.0494244,11.476708 C 8.9396133,11.966634 8.8196657,12.476834 8.46827,12.82654 A 0.42235055,0.42235055 0 0 1 8.1016698,12.970139 0.16218261,0.16218261 0 0 1 7.9918586,12.890737 C 7.8989415,12.733623 7.9986162,12.360265 8.1439048,11.890611 8.1827611,11.772353 8.2165491,11.649027 8.2418901,11.5257 A 0.92241361,0.92241361 0 0 0 8.132079,11.030706 0.82780709,0.82780709 0 0 0 7.7654787,10.709719 1.1318995,1.1318995 0 0 0 7.2992037,10.652279 H 7.2485216 C 7.1978396,10.653969 7.1471575,10.648901 7.0981648,10.635385 A 0.19766006,0.19766006 0 0 1 6.9545657,10.506991 C 6.9410504,10.430968 6.9461186,10.351566 6.9697703,10.277232 L 6.9900431,10.206277 A 0.37673669,0.37673669 0 0 0 6.8261711,9.797442 0.51357827,0.51357827 0 0 0 6.3598961,9.7619646 0.80077665,0.80077665 0 0 0 5.9949852,10.106603 0.77712502,0.77712502 0 0 0 5.8936211,10.588082 C 5.9409243,10.740128 5.9561289,10.902311 5.9375455,11.061115 5.8784164,11.339866 5.7145444,11.567935 5.548983,11.799384 5.5118162,11.850066 5.4763387,11.910884 5.4374825,11.956498 A 4.8992664,4.8992664 0 0 1 4.7346911,12.782616 2.7537256,2.7537256 0 0 1 3.5014275,13.44824 C 2.7564011,13.612112 1.9944807,13.389111 1.592403,12.71504 A 2.8702944,2.8702944 0 0 1 1.2426968,11.447988 5.3672308,5.3672308 0 0 1 1.6802519,8.9426045 C 2.0063066,8.1840629 2.491165,7.4238319 3.3916164,7.3292254 3.7413226,7.2937479 4.1434004,7.4136955 4.3005148,7.7296137 4.4103259,7.9593724 4.3748485,8.2364344 4.3005148,8.4830871 4.2244917,8.7297398 4.1248169,8.9730137 4.1197487,9.2298029 4.1146805,9.4849026 4.2447645,9.7704116 4.4897278,9.8447453 4.7346911,9.919079 4.9864121,9.763654 5.1249431,9.5575469 5.2617846,9.3497504 5.3107773,9.0963401 5.3699064,8.8547556 A 6.0886056,6.0886056 0 0 1 6.0304626,7.2261718 C 6.1689936,6.9930343 6.3294868,6.7379346 6.2821836,6.4710091 A 0.54060871,0.54060871 0 0 0 5.9138939,6.0537267 0.54060871,0.54060871 0 0 0 5.376664,6.1990153 C 5.2415118,6.3409251 5.1739357,6.5656156 4.9881015,6.6298129 4.8039566,6.6923207 4.641774,6.575752 4.4829702,6.4895925 3.8883006,6.1702955 3.1500319,6.1821213 2.5232636,6.4389104 A 3.4751004,3.4751004 0 0 0 1.0078699,7.7397501 5.7946496,5.7946496 0 0 0 0.02294838,11.520632 C 0.04828941,11.926089 0.1192443,12.329856 0.23581306,12.720108 0.35407121,13.11036 0.53990545,13.480339 0.78148997,13.809772 A 2.3111022,2.3111022 0 0 0 1.722487,14.556488 C 2.0992237,14.708534 2.5046802,14.7778 2.9118261,14.764284 A 3.0916061,3.0916061 0 0 0 4.0893395,14.477086 4.2572936,4.2572936 0 0 0 5.1148066,13.801325 5.2776925,5.2776925 0 0 0 6.577829,11.828103 0.42403996,0.42403996 0 0 1 6.7788678,11.564557 0.18245544,0.18245544 0 0 1 6.9782173,11.579761 C 7.0390358,11.606792 7.0880284,11.655784 7.1150589,11.714913 7.1488469,11.824725 7.1488469,11.942983 7.1083013,12.049415 V 12.06462 C 7.0795814,12.164294 7.0508616,12.263969 7.0153841,12.365333 6.8785426,12.787684 6.7788678,13.176246 6.8582697,13.556362 A 1.1099373,1.1099373 0 0 0 7.1083013,14.080077 0.84470111,0.84470111 0 0 0 7.6100537,14.345313 1.2957715,1.2957715 0 0 0 8.3364967,14.213539 1.6657506,1.6657506 0 0 0 8.9058252,13.769227 C 8.9531285,13.710098 8.9970529,13.620559 9.0882807,13.627317 A 0.1520462,0.1520462 0 0 1 9.1980918,13.691514 C 9.2217434,13.725302 9.2420163,13.764158 9.2572209,13.803015 A 1.4579541,1.4579541 0 0 0 10.58847,14.642648 H 10.661115 A 1.7400843,1.7400843 0 0 0 11.446687,14.421336 C 11.703476,14.26929 11.939992,14.083455 12.151167,13.870591 12.168061,13.852007 12.191713,13.836803 12.217054,13.828356 A 0.11150055,0.11150055 0 0 1 12.315039,13.870591 C 12.337002,13.902689 12.353896,13.936477 12.365721,13.971955 A 1.1031796,1.1031796 0 0 0 13.18846,14.627443 1.0998008,1.0998008 0 0 0 14.17845,14.272668 C 14.225753,14.208471 14.279814,14.149342 14.340633,14.096971 A 0.23651631,0.23651631 0 0 1 14.563634,14.049667 C 14.664998,14.091902 14.698786,14.218608 14.7444,14.319972 A 0.66731388,0.66731388 0 0 0 15.354274,14.69333 1.1487935,1.1487935 0 0 0 16.119573,14.35207 5.3317534,5.3317534 0 0 0 16.63822,13.743886 C 16.66525,13.70334 16.700727,13.669552 16.739584,13.644211 A 0.13177337,0.13177337 0 0 1 16.876425,13.644211 C 16.903456,13.669552 16.923729,13.70334 16.933865,13.738817 A 1.0812174,1.0812174 0 0 0 17.947506,14.384169 1.6556142,1.6556142 0 0 0 19.045618,13.870591 0.60142719,0.60142719 0 0 1 19.366604,13.657726 C 19.505135,13.640832 19.571022,13.769227 19.620014,13.880727 19.670697,14.012501 19.756856,14.129069 19.870046,14.213539 A 0.64704105,0.64704105 0 0 0 20.417412,14.314904 0.92072421,0.92072421 0 0 0 20.890445,13.997296 C 20.9614,13.909447 21.001946,13.796257 21.079658,13.715166 21.15906,13.634074 21.206363,13.742196 21.21481,13.811462 21.226636,13.92972 21.228325,14.047978 21.221568,14.166236 21.209742,14.401063 21.170886,14.632511 21.140476,14.865649 21.138787,14.933225 21.116825,15.000801 21.076279,15.054862 A 0.28381957,0.28381957 0 0 1 20.822869,15.119059 C 20.709679,15.102165 20.611694,15.093718 20.501882,15.08865 L 20.36673,15.073445 C 20.165691,15.05993 19.964653,15.039657 19.756856,15.03121 H 19.571022 A 2.9395599,2.9395599 0 0 0 18.543865,15.190014 1.6978492,1.6978492 0 0 0 17.543739,16.207034 1.2383318,1.2383318 0 0 0 17.773498,17.426783 1.6167579,1.6167579 0 0 0 18.922291,17.97246 C 19.366604,17.989354 19.807538,17.899815 20.212995,17.715671 A 2.9294234,2.9294234 0 0 0 21.914223,15.744138 0.05068207,0.05068207 0 0 1 21.936185,15.727244 2.9986889,2.9986889 0 0 0 22.747098,15.304894 3.4886156,3.4886156 0 0 0 23.649239,14.291252 C 23.725262,14.166236 23.784391,14.034463 23.855346,13.907758 23.916164,13.811462 23.960089,13.705029 23.987119,13.595218 A 0.42910816,0.42910816 0 0 0 23.933058,13.260717 C 23.894202,13.210034 23.841831,13.171178 23.781012,13.150905 M 10.122195,11.5257 C 10.139089,11.453056 10.161051,11.382101 10.181324,11.317904 10.240453,11.137138 10.328302,10.966508 10.439803,10.814462 10.47697,10.760401 10.524273,10.713098 10.574955,10.675931 10.630705,10.638764 10.696592,10.62187 10.760789,10.630317 A 0.27537256,0.27537256 0 0 1 10.961828,10.865144 1.0491188,1.0491188 0 0 1 10.850328,11.420958 1.0981114,1.0981114 0 0 1 10.539478,11.83655 C 10.483727,11.878786 10.422909,11.915952 10.360401,11.946362 10.324923,11.961566 10.287757,11.970013 10.2489,11.975081 H 10.233696 A 0.12501576,0.12501576 0 0 1 10.105301,11.890611 C 10.088407,11.767285 10.098544,11.642269 10.130642,11.522322 M 14.438618,11.336487 C 14.43186,11.41251 14.413277,11.488534 14.408209,11.559488 14.40314,11.655784 14.398072,11.75208 14.396383,11.848376 14.396383,12.012248 14.396383,12.17612 14.409898,12.339992 14.421724,12.503864 14.455512,12.637327 14.396383,12.784305 A 1.0896644,1.0896644 0 0 1 13.828744,13.42121 C 13.75441,13.460066 13.66994,13.478649 13.58547,13.480339 13.563508,13.480339 13.549992,13.473581 13.52803,13.473581 A 0.32605463,0.32605463 0 0 1 13.262794,13.292815 C 13.213801,13.208345 13.178324,13.117117 13.16143,13.020821 13.085407,12.649153 13.110748,12.26059 13.234074,11.900748 A 1.503568,1.503568 0 0 1 13.615879,11.306078 0.86666334,0.86666334 0 0 1 14.180139,11.069562 0.27368316,0.27368316 0 0 1 14.382868,11.13207 C 14.421724,11.177684 14.443686,11.235123 14.440307,11.295942 V 11.334798 M 20.861725,15.975586 C 20.843142,16.026268 20.816111,16.073572 20.784013,16.115807 20.736709,16.200277 20.682648,16.277989 20.618451,16.348944 20.522155,16.458755 20.415723,16.560119 20.302533,16.653037 A 2.4090876,2.4090876 0 0 1 19.525408,17.03991 C 19.366604,17.082145 19.204422,17.105796 19.03886,17.110865 H 19.003383 A 0.81091306,0.81091306 0 0 1 18.486426,16.931788 C 18.407024,16.867591 18.351273,16.779742 18.329311,16.678378 18.314107,16.577013 18.33269,16.470581 18.379993,16.377664 18.456016,16.208724 18.591169,16.070193 18.760109,15.989101 19.081095,15.853949 19.430801,15.799888 19.778818,15.833676 L 20.180896,15.855639 C 20.290707,15.860707 20.393761,15.869154 20.501882,15.877601 20.559322,15.877601 20.613383,15.877601 20.674201,15.887737 20.719815,15.887737 20.76374,15.889427 20.809354,15.894495 20.860036,15.90801 20.870172,15.940109 20.860036,15.975586"/></svg> Digital Badging
+                                 </a>
+                              </li>
+                           </ul>
+                        </li>
+
+                     </ul>
+                  </li>
+
+                  <!--=============== DROPDOWN 3 ===============-->
+                  <li class="dropdown__item">
+                     <div class="nav__link noselect">
+                        Study Resources <i class="ri-arrow-down-s-line dropdown__arrow"></i>
+                     </div>
+
+                     <ul class="dropdown__menu">
+
+                        <!--=============== DROPDOWN SUBMENU ===============-->
+                        <li class="dropdown__subitem">
+                           <div class="dropdown__link noselect">
+                              About Our Courses <i class="ri-add-line dropdown__add"></i>
+                           </div>
+
+                           <ul class="dropdown__submenu">
+                              <li>
+                                 <a href="https://pythoninstitute.org/study-resources" class="dropdown__sublink">
+                                    <i class="ri-file-list-line"></i> Why learn Python?
+                                 </a>
+                              </li>
+                           </ul>
+                        </li>
+
+                        <li class="dropdown__subitem">
+                           <div class="dropdown__link noselect">
+                              General-Purpose Programming <i class="ri-add-line dropdown__add"></i>
+                           </div>
+
+                           <ul class="dropdown__submenu">
+                              <li>
+                                 <a href="https://pythoninstitute.org/python-essentials-1" class="dropdown__sublink">
+                                    Python Essentials 1 (Beginner)</span>
+                                 </a>
+                              </li>
+
+                              <li>
+                                 <a href="https://pythoninstitute.org/python-essentials-2" class="dropdown__sublink">
+                                    Python Essentials 2 (Intermediate)
+                                 </a>
+                              </li>
+
+                              <li>
+                                 <a href="https://pythoninstitute.org/python-professional-1" class="dropdown__sublink">
+                                    Python Professional (Advanced)
+                                 </a>
+                              </li>
+                           </ul>
+                        </li>
+
+                        <li class="dropdown__subitem">
+                           <div class="dropdown__link noselect">
+                              Data Science <i class="ri-add-line dropdown__add"></i>
+                           </div>
+
+                           <ul class="dropdown__submenu">
+                              <li>
+                                 <a href="https://pythoninstitute.org/python-for-data-analytics-101" class="dropdown__sublink" style="max-width: 20ch;">
+                                    Python for Data Analytics 101 (PD101) (Beginner)
+                                 </a>
+                              </li>
+                           </ul>
+                        </li>
+
+                        <li class="dropdown__subitem">
+                           <div class="dropdown__link noselect">
+                              Testing <i class="ri-add-line dropdown__add"></i>
+                           </div>
+
+                           <ul class="dropdown__submenu">
+                              <li>
+                                 <a href="https://pythoninstitute.org/python-for-testing-101" class="dropdown__sublink">
+                                    Python for Testing 101 (PT101) (Beginner)
+                                 </a>
+                              </li>
+
+                              <li>
+                                 <a href="https://pythoninstitute.org/python-for-testing-102" class="dropdown__sublink">
+                                    Python for Testing 102 (PT102) (Intermediate)
+                                 </a>
+                              </li>
+
+                           </ul>
+                        </li>
+
+                        <li class="dropdown__subitem">
+                           <div class="dropdown__link noselect">
+                              Python for Teens <i class="ri-add-line dropdown__add"></i>
+                           </div>
+
+                           <ul class="dropdown__submenu">
+                              <li>
+                                 <a href="https://pythoninstitute.org/pycrafters" class="dropdown__sublink">
+                                    <i class="ri-hammer-line"></i>PyCrafters™ (Early Beginner)
+                                </a>
+                              </li>
+                           </ul>
+                        </li>
+
+                        <hr>
+
+                        <li class="dropdown__subitem">
+                           <div class="dropdown__link noselect">
+                              Collaborative Projects <i class="ri-add-line dropdown__add"></i>
+                           </div>
+
+                           <ul class="dropdown__submenu">
+                              <li>
+                                 <a href="https://pythoninstitute.org/netacad" class="dropdown__sublink">
+                                    <svg width="24px" height="24px" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"> <path id="path2" /><path id="Rectangle_5120" d="M 6.261378,5.6350706 A 0.52219588,0.52219588 0 0 0 5.7387888,6.1569674 V 11.703333 A 0.52224301,0.52224301 0 0 0 6.7832748,11.703333 V 6.1569674 A 0.52219588,0.52219588 0 0 0 6.261378,5.6350706 Z M 17.74034,5.6689869 A 0.52201868,0.52201868 0 0 0 17.219828,6.1576595 V 11.703333 A 0.52201868,0.52201868 0 1 0 18.261545,11.703333 V 6.1576595 A 0.52201868,0.52201868 0 0 0 17.74034,5.6689869 Z M 3.3937138,7.6001438 A 0.52219588,0.52219588 0 0 0 2.871817,8.1220406 V 10.654694 A 0.52224295,0.52224295 0 0 0 3.9163029,10.654694 V 8.1220406 A 0.52219588,0.52219588 0 0 0 3.3937138,7.6001438 Z M 9.1318106,7.6001438 A 0.52219588,0.52219588 0 0 0 8.6099139,8.1220406 V 10.654694 A 0.52219588,0.52219588 0 1 0 9.6537074,10.654694 V 8.1220406 A 0.52219588,0.52219588 0 0 0 9.1318106,7.6001438 Z M 20.547785,7.6319838 A 0.52414503,0.52414503 0 0 0 20.085415,8.1220406 V 10.654694 A 0.52414503,0.52414503 0 0 0 21.131977,10.654694 V 8.1220406 A 0.52414503,0.52414503 0 0 0 20.547785,7.6319838 Z M 14.80069,7.6368287 A 0.52201868,0.52201868 0 0 0 14.340397,8.1220406 V 10.654694 A 0.52201868,0.52201868 0 1 0 15.382114,10.654694 V 8.1220406 A 0.52201868,0.52201868 0 0 0 14.80069,7.6368287 Z M 11.999475,9.0052508 A 0.52201868,0.52201868 0 0 0 11.47827,9.5603718 V 10.654694 A 0.52201868,0.52201868 0 1 0 12.519987,10.654694 V 9.5603718 A 0.52201868,0.52201868 0 0 0 11.999475,9.0052508 Z M 23.477745,9.0052508 A 0.52201868,0.52201868 0 0 0 22.95654,9.5603718 V 10.654694 A 0.52201868,0.52201868 0 1 0 23.998949,10.654694 V 9.5603718 A 0.52201868,0.52201868 0 0 0 23.477745,9.0052508 Z M 0.47690574,9.0689304 A 0.52414503,0.52414503 0 0 0 0,9.5603718 V 10.654694 A 0.52414503,0.52414503 0 0 0 1.0465623,10.654694 V 9.5603718 A 0.52414503,0.52414503 0 0 0 0.47690574,9.0689304 Z M 19.634812,13.958426 A 2.203252,2.203252 0 1 0 21.837992,16.12492 2.1405247,2.1405247 0 0 0 19.634812,13.958426 Z M 4.3807496,13.962579 A 2.167104,2.167104 0 1 0 4.3807496,18.29626 3.2497701,3.2497701 0 0 0 5.3400983,18.146752 V 17.028896 A 1.8587834,1.8587834 0 0 1 4.4561963,17.245545 1.1134981,1.1134981 0 1 1 4.4561963,15.020216 1.8265338,1.8265338 0 0 1 5.3400983,15.236865 V 14.11278 A 3.2281522,3.2281522 0 0 0 4.3807496,13.962579 Z M 15.36481,13.962579 A 2.167104,2.167104 0 1 0 15.36481,18.29626 3.2845004,3.2845004 0 0 0 16.324158,18.146752 V 17.028896 A 1.8804013,1.8804013 0 0 1 15.43818,17.245545 1.1134981,1.1134981 0 1 1 15.43818,15.020216 1.850278,1.850278 0 0 1 16.324158,15.236865 V 14.11278 A 3.2497701,3.2497701 0 0 0 15.36481,13.962579 Z M 10.798558,13.9695 C 9.8303606,13.9695 9.2453268,14.489736 9.2453268,15.269397 9.2453268,15.960461 9.7434737,16.305411 10.328574,16.489694 L 10.545224,16.563065 C 10.796487,16.645638 11.013131,16.738832 11.013131,16.976983 11.013131,17.215134 10.772377,17.366675 10.250359,17.366675 A 4.0666425,4.0666425 0 0 1 9.2557094,17.213013 V 18.172362 A 6.5948714,6.5948714 0 0 0 10.390177,18.285186 C 11.202088,18.285186 12.123373,17.934261 12.123373,16.885616 A 1.2566723,1.2566723 0 0 0 11.128724,15.692314 L 10.838704,15.600947 C 10.665407,15.546725 10.357645,15.457723 10.357645,15.204333 10.357645,15.003748 10.574173,14.861708 11.007594,14.861708 A 3.6573203,3.6573203 0 0 1 11.831277,14.98976 L 11.826432,14.103781 A 4.4564731,4.4564731 0 0 0 10.798558,13.9695 Z M 6.7874279,14.040794 V 18.211124 H 7.8381434 V 14.040794 Z M 19.634812,15.029214 A 1.0833748,1.0833748 0 0 1 20.718752,16.12492 1.0986137,1.0986137 0 1 1 19.634812,15.029214 Z" style="stroke-width:0" /></svg>
+ Cisco Networking Academy
+                                 </a>
+                              </li>
+
+                           </ul>
+                        </li>
+
+                        <hr>
+
+                        <li class="dropdown__subitem">
+                           <div class="dropdown__link noselect">
+                              Resource Partner Content <i class="ri-add-line dropdown__add"></i>
+                           </div>
+
+                           <ul class="dropdown__submenu">
+                              <li>
+                                 <a href="https://pythoninstitute.org/publishing-partners" class="dropdown__sublink">
+                                    Publishing Partners (Paid)
+                                 </a>
+                              </li>
+                           </ul>
+                        </li>
+
+
+                     </ul>
+                  </li>
+
+                  <!--=============== DROPDOWN 4 ===============-->
+                  <li class="dropdown__item">
+                     <div class="nav__link noselect">
+                        Community <i class="ri-arrow-down-s-line dropdown__arrow"></i>
+                     </div>
+
+                     <ul class="dropdown__menu">
+
+
+                        <!--=============== DROPDOWN SUBMENU ===============-->
+                        <li class="dropdown__subitem">
+                           <div class="dropdown__link noselect">
+                              <b>Community</b>
+                           </div>
+                                 <a href="https://pythoninstitute.org/community" class="dropdown__sublink">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;Join the community
+                                 </a>
+                        </li>
+
+                        <hr>
+
+                        <li class="dropdown__subitem">
+                           <div class="dropdown__link noselect">
+                              <b>Partners</b>
+                           </div>
+                                <a href="https://pythoninstitute.org/partners" class="dropdown__sublink">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart-handshake-icon lucide-heart-handshake"><path d="M19.414 14.414C21 12.828 22 11.5 22 9.5a5.5 5.5 0 0 0-9.591-3.676.6.6 0 0 1-.818.001A5.5 5.5 0 0 0 2 9.5c0 2.3 1.5 4 3 5.5l5.535 5.362a2 2 0 0 0 2.879.052 2.12 2.12 0 0 0-.004-3 2.124 2.124 0 1 0 3-3 2.124 2.124 0 0 0 3.004 0 2 2 0 0 0 0-2.828l-1.881-1.882a2.41 2.41 0 0 0-3.409 0l-1.71 1.71a2 2 0 0 1-2.828 0 2 2 0 0 1 0-2.828l2.823-2.762"/></svg> Become a Partner
+                                 </a>
+                                <a href="https://pythoninstitute.org/our-partners" class="dropdown__sublink">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;Our Partners
+                                 </a>
+                                 <!-- <a href="https://pythoninstitute.org/partners" class="dropdown__sublink">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;Partner Programs
+                                 </a>
+                                 <a href="https://pythoninstitute.org/education-partner-program" class="dropdown__sublink">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;Education Partners
+                                 </a>
+                                 <a href="https://pythoninstitute.org/testing-service-partner-program" class="dropdown__sublink">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;Testing Service Partners
+                                 </a>
+                                 <a href="https://pythoninstitute.org/publishing-partner-program" class="dropdown__sublink">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;Publishing Partners
+                                 </a>
+                                 <a href="https://pythoninstitute.org/channel-partner-program" class="dropdown__sublink">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;Channel Partners
+                                 </a>
+                                 <a href="https://pythoninstitute.org/strategic-partners" class="dropdown__sublink">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;Strategic Partners
+                                 </a> -->
+                        </li>
+
+
+                     </ul>
+                  </li>
+
+                  <li><button class="voucher-store-button"><a href="https://ums.edube.org/store">Voucher Store <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-basket-icon lucide-shopping-basket"><path d="m15 11-1 9"/><path d="m19 11-4-7"/><path d="M2 11h20"/><path d="m3.5 11 1.6 7.4a2 2 0 0 0 2 1.6h9.8a2 2 0 0 0 2-1.6l1.7-7.4"/><path d="M4.5 15.5h15"/><path d="m5 11 4-7"/><path d="m9 11 1 9"/></svg></a></button></li>
+               </ul>
+            </div>
+         </nav>
+      </header>
+
+<!------------------------------------------------------------------------------------------------------------------------->
+
+    <div class="container padding-top-200 margin-bottom-100">
+        <div class="row">
+            <div class="col-md-12">
+                <h1 class="mb-4">Oops! 404 Not Found</h1>
+            </div>
+        </div>
+    </div>
+
+            <footer class="footer bgr-footer">
+    <div style="padding-bottom: 30px;" class="footer-top bgr-footer">
+        <div class="container">
+            <div class="row d-flex justify-content-between">
+                <div class="col-sm-8 col-md-5 col-lg-3 d-flex align-items-center">
+                    <div class="margin-bottom-50">
+                        <div class="footer-logo margin-bottom-30">
+                            <a href="https://pythoninstitute.org">
+                                <img class="light-mode-logo" width="65%" src="https://pythoninstitute.org/assets/69205e5bc9a43768475655.svg">
+                                <img class="dark-mode-logo" width="65%" src="https://pythoninstitute.org/assets/61e94ab03c704674847077.png">
+                            </a>
+                        </div>
+                        <div class="footer-social">
+                            <a href="https://www.facebook.com/pythoninstitute.org"><i class="fab fa-facebook-f"></i></a>
+                            <!-- <a href="https://discord.gg/eJ2sW8SYgJ" target="_blank"><i class="fab fa-discord"></i></a> -->
+                            <!-- <a href="https://www.twitter.com/pythoninstitute"><i class="fab fa-twitter"></i></a> -->
+                            <a href="https://www.linkedin.com/company/pythoninstitute/"><i class="fab fa-linkedin"></i></a>
+                            <a href="https://www.youtube.com/channel/UC2IRXg1rRD2yiig1Sqbf6iQ/featured"><i class="fab fa-youtube"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-5 col-md-3 col-lg-2">
+                    <div class="footer-section margin-bottom-50">
+                        <h5 class="footer-header">Terms & Policies</h5>
+                        <ul>
+                            <li><a href="https://pythoninstitute.org/terms-and-conditions">Terms and Conditions</a></li>
+                            <li><a href="https://pythoninstitute.org/privacy-policy">Privacy Policy</a></li>
+                            <li><a href="https://pythoninstitute.org/cookie-policy">Cookie Policy</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-sm-7 col-md-4 col-lg-2">
+                    <div class="footer-section margin-bottom-50">
+                        <h5 class="footer-header">Links & Resources</h5>
+                        <ul>
+                            <li><a href="https://edube.org/">Edube Interactive &trade;</a></li>
+                            <li><a href="https://edube.org/sandbox">Sandbox</a></li>
+                            <li><a href="https://ums.edube.org/store">Voucher Store</a></li>
+                            <li><a href="https://pythoninstitute.org/brand-resources">Brand Resources</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-sm-5 col-md-4 col-lg-3 footer-address">
+                    <span class="d-block margin-bottom-10">
+                        OpenEDG | Open Education and Development Group, LLC
+                        </span>
+
+                    <span class="d-block"><b><u>North America</u></b>: 1013 Centre</span>
+                    <span class="d-block">Road, Suite 403-A, Wilmington, DE,</span>
+                    <span class="d-block">19805, United States</span>
+                    <span class="d-block">+1 (302) 498-90-37</span>
+                    <span class="d-block">info@openedg.org</span>
+
+                    <span class="d-block margin-top-10"><b><u>Europe</u></b>: Mickiewicza 47, West</span>
+                    <span class="d-block">Pomerania, Szczecin, 70-385,</span>
+                    <span class="d-block">Poland</span>
+                    <span class="d-block">+48 (0) 791 546 179</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <div class="container">
+            <div class="row d-flex align-items-center">
+                <div class="col-xl-12">
+                    <div class="footer-copyright text-center">
+                        <p>© Copyright Open Education and Development Group 2011-<script>document.write(new Date().getFullYear())</script>. All Rights Reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X4YHKJG426"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-X4YHKJG426');
+</script>
+                            <script src="/build/runtime.5e097f3e.js" defer integrity="sha384-e06kNfSMwrDbbsQd+ogx2TETpA6T9v60sgED7dTmJNbiYUlCnVHjY1af85WMeBYW"></script><script src="/build/755.5a8586e9.js" defer integrity="sha384-gr4pBhc/crsd3k0Y6LPY6EzskQ1errcIxrCcR3mXD0bY9Ud2y2N0jCEomRCZiY9G"></script><script src="/build/946.d8650c66.js" defer integrity="sha384-oBRh1Hur69Yp+HKhdcu6j3PWfhD5tFLPuNGh+v4/W77Xc9nsIySnA5riGuj3nO+2"></script><script src="/build/605.654fc373.js" defer integrity="sha384-JtdkfBlt/jixfu8iLPZ0ySq7Z1lFlOrUxpUX/8+7ifdlmJQ7Ln60tYFY08rQc2KD"></script><script src="/build/app.a856d18a.js" defer integrity="sha384-DxpCpqcD7UAr0ONANiCzEMPWX7fXRuVU4xaiOFvTVO/VMGndVyiaQPZt3jWM5rxe"></script>
+
+
+            <script>
+            /*=============== SHOW MENU ===============*/
+const showMenu = (toggleId, navId) =>{
+   const toggle = document.getElementById(toggleId),
+         nav = document.getElementById(navId)
+
+   toggle.addEventListener('click', () =>{
+       // Add show-menu class to nav menu
+       nav.classList.toggle('show-menu')
+
+       // Add show-icon to show and hide the menu icon
+       toggle.classList.toggle('show-icon')
+   })
+}
+
+showMenu('nav-toggle','nav-menu')
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const OPEN_DELAY = 320;   // ms before opening a submenu
+  const CLOSE_DELAY = 340;  // ms before closing after leaving
+  const desktopMQ = window.matchMedia('(min-width: 1118px)');
+
+  const subitems = Array.from(document.querySelectorAll('.dropdown__subitem'));
+  const timers = new Map(); // element -> { open: id, close: id }
+
+  function ensureTimer(el) {
+    if (!timers.has(el)) timers.set(el, { open: null, close: null });
+    return timers.get(el);
+  }
+
+  function openSubitem(el) {
+    // close sibling subitems in the same dropdown (so switching behaves nicely)
+    const menu = el.closest('.dropdown__menu');
+    if (menu) {
+      Array.from(menu.querySelectorAll('.dropdown__subitem.open'))
+        .forEach(s => { if (s !== el) s.classList.remove('open'); });
+    }
+    el.classList.add('open');
+  }
+
+  function closeSubitem(el) {
+    el.classList.remove('open');
+  }
+
+  subitems.forEach(si => {
+    const submenu = si.querySelector('.dropdown__submenu');
+
+    si.addEventListener('mouseenter', (e) => {
+      if (!desktopMQ.matches) return;
+      const tm = ensureTimer(si);
+      clearTimeout(tm.close);
+      tm.open = setTimeout(() => openSubitem(si), OPEN_DELAY);
+    });
+
+    si.addEventListener('mouseleave', (e) => {
+      if (!desktopMQ.matches) return;
+      const tm = ensureTimer(si);
+      clearTimeout(tm.open);
+      // if we're moving into a child, don't close
+      const to = e.relatedTarget;
+      if (to && si.contains(to)) return;
+      tm.close = setTimeout(() => closeSubitem(si), CLOSE_DELAY);
+    });
+
+    if (submenu) {
+      submenu.addEventListener('mouseenter', () => {
+        if (!desktopMQ.matches) return;
+        const tm = ensureTimer(si);
+        clearTimeout(tm.close);
+      });
+      submenu.addEventListener('mouseleave', (e) => {
+        if (!desktopMQ.matches) return;
+        const to = e.relatedTarget;
+        if (to && si.contains(to)) return;
+        const tm = ensureTimer(si);
+        tm.close = setTimeout(() => closeSubitem(si), CLOSE_DELAY);
+      });
+    }
+  });
+
+  // collapse any open submenus whenever we switch to mobile widths
+  function collapseAll() {
+    subitems.forEach(s => s.classList.remove('open'));
+  }
+  if (desktopMQ.addEventListener) {
+    desktopMQ.addEventListener('change', e => { if (!e.matches) collapseAll(); });
+  } else {
+    // older browsers
+    desktopMQ.addListener(mq => { if (!mq.matches) collapseAll(); });
+  }
+
+  // close on click/tap outside
+  document.addEventListener('click', (ev) => {
+    if (!desktopMQ.matches) return;
+    const insideAny = ev.target.closest('.dropdown__subitem, .dropdown__submenu');
+    if (!insideAny) collapseAll();
+  });
+});
+
+
+
+// ACCORDION
+var acc = document.getElementsByClassName("accordion");
+var i;
+
+for (i = 0; i < acc.length; i++) {
+  acc[i].addEventListener("click", function() {
+    this.classList.toggle("acc-active");
+    var panel = this.nextElementSibling;
+    if (panel.style.maxHeight) {
+      panel.style.maxHeight = null;
+    } else {
+      panel.style.maxHeight = panel.scrollHeight + "px";
+    }
+  });
+}
+
+
+
+//LANGUAGE SWITCHER
+
+  // Detect current language based on URL path
+  const currentPath = window.location.pathname;
+  const isJapanese = currentPath.startsWith('/ja');
+  const switcher = document.getElementById('lang-switcher');
+
+  // Set current language in dropdown
+  switcher.value = isJapanese ? 'ja' : 'en';
+
+  // Handle language change
+  switcher.addEventListener('change', () => {
+    const selected = switcher.value;
+    let newUrl;
+
+    if (selected === 'ja') {
+      // Add /ja prefix if not already there
+      newUrl = isJapanese ? window.location.href : window.location.origin + '/ja' + currentPath + window.location.search + window.location.hash;
+    } else {
+      // Remove /ja prefix if switching back to English
+      newUrl = isJapanese
+        ? window.location.origin + currentPath.replace(/^\/ja/, '') + window.location.search + window.location.hash
+        : window.location.href;
+    }
+
+    window.location.href = newUrl;
+  });
+
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+
+  const themeToggle = document.querySelector('#themeToggle');
+  const STORAGE_KEY = 'selectedTheme';
+
+  const lightLogos = document.querySelectorAll('.light-mode-logo');
+  const darkLogos = document.querySelectorAll('.dark-mode-logo');
+
+  function toggleLogos(showLight) {
+    lightLogos.forEach(logo => {
+      logo.style.display = showLight ? 'block' : 'none';
+    });
+
+    darkLogos.forEach(logo => {
+      logo.style.display = showLight ? 'none' : 'block';
+    });
+  }
+
+  function updateTheme(selectedTheme) {
+    document.documentElement.style.setProperty('--theme', selectedTheme);
+    toggleLogos(selectedTheme === '☀️');
+  }
+
+  // --- INITIAL LOAD ---
+  let savedTheme = localStorage.getItem(STORAGE_KEY);
+
+  if (!savedTheme) {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    savedTheme = prefersDark ? '🌑' : '☀️';
+    localStorage.setItem(STORAGE_KEY, savedTheme);
+  }
+
+  // ✔ Light = checked
+  themeToggle.checked = savedTheme === '☀️';
+
+  updateTheme(savedTheme);
+
+  // --- CHANGE HANDLER ---
+  themeToggle.addEventListener('change', () => {
+
+    const selectedTheme = themeToggle.checked ? '☀️' : '🌑';
+
+    localStorage.setItem(STORAGE_KEY, selectedTheme);
+
+    // no view transition — stable mode
+    updateTheme(selectedTheme);
+
+  });
+
+});
+        </script>
+        </body>
+</html>

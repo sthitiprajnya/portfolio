@@ -7,6 +7,7 @@ import clsx from 'clsx';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { LogoBadge } from '@/components/ui/LogoBadge';
 import { EXPERIENCE } from '@/data/portfolio';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -155,13 +156,27 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
 
         {/* Header */}
         <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-6 gap-4">
-          <div>
-            <h3 className="font-heading text-xl md:text-2xl font-bold text-white mb-1">
-              {experience.company}
-            </h3>
-            <p className="font-mono text-xs text-text-muted">
-              {experience.location} · {experience.type}
-            </p>
+          <div className="flex items-start gap-4">
+            {experience.id === 'iserveU' && (
+              <div className="hidden sm:block mt-1">
+                <LogoBadge
+                  src="/portfolio/logos/employer/iserveu.png"
+                  alt={experience.company}
+                  width={40}
+                  height={40}
+                  monogram="iU"
+                  className="rounded-lg bg-surface border border-border p-1"
+                />
+              </div>
+            )}
+            <div>
+              <h3 className="font-heading text-xl md:text-2xl font-bold text-white mb-1">
+                {experience.company}
+              </h3>
+              <p className="font-mono text-xs text-text-muted">
+                {experience.location} · {experience.type}
+              </p>
+            </div>
           </div>
 
           <div className="flex flex-wrap gap-2">

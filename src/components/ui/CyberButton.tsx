@@ -3,7 +3,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 
 interface CyberButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  color?: 'cyan' | 'green';
+  color?: 'cyan' | 'green' | 'amber';
   as?: 'button' | 'a';
   href?: string;
   download?: string | boolean;
@@ -26,12 +26,18 @@ export function CyberButton({
       "hover:shadow-[var(--glow-cyan-md)]",
       "disabled:hover:text-cyan",
       "focus-visible:ring-cyan"
-    ] : [
+    ] : color === 'green' ? [
       "border-green text-green",
       "hover:bg-green hover:text-black",
       "hover:shadow-[var(--glow-green-md)]",
       "disabled:hover:text-green",
       "focus-visible:ring-green"
+    ] : [
+      "border-amber text-amber",
+      "hover:bg-amber hover:text-black",
+      "hover:shadow-[var(--glow-amber-md)]",
+      "disabled:hover:text-amber",
+      "focus-visible:ring-amber"
     ],
     className
   );

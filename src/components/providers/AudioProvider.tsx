@@ -31,12 +31,17 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 
       const voices = window.speechSynthesis.getVoices();
       // Try to find a robotic/british voice
-      const preferredVoice = voices.find(v =>
-        v.name.includes('Google') ||
-        v.name.includes('Daniel') ||
-        v.name.includes('en-GB') ||
-        v.lang === 'en-GB'
-      );
+      // 1. Any voice with "Male" in name
+      // 2. Any voice with "Daniel" in name
+      // 3. Any voice with "Google UK English Male"
+      // 4. Any en-GB voice
+      // 5. Fallback to first available English voice
+      const preferredVoice =
+        voices.find(v => v.name.includes('Male')) ||
+        voices.find(v => v.name.includes('Daniel')) ||
+        voices.find(v => v.name.includes('Google UK English Male')) ||
+        voices.find(v => v.name.includes('en-GB') || v.lang === 'en-GB') ||
+        voices.find(v => v.lang.startsWith('en'));
 
       if (preferredVoice) {
         setVoice(preferredVoice);
@@ -78,8 +83,8 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     const utterance = new SpeechSynthesisUtterance(text);
 
     // Set pitch and rate to sound more robotic
-    utterance.rate = 0.85;
-    utterance.pitch = 0.7;
+    utterance.rate = 0.78;
+    utterance.pitch = 0.3;
 
     if (voice) {
       utterance.voice = voice;

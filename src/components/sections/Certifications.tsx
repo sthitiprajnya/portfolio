@@ -104,32 +104,39 @@ function CertCard({ cert }: { cert: typeof CERTIFICATIONS[0] }) {
           {cert.issuer}
         </p>
 
-        <div className="mt-auto flex items-center justify-between pt-4 border-t border-border/50">
-          <span className="font-mono text-[0.65rem] text-text-secondary">
-            {cert.year}
-          </span>
+        <div className="mt-auto flex flex-col justify-end pt-4 border-t border-border/50">
+          <div className="flex items-center justify-between mb-2">
+            <span className="font-mono text-[0.65rem] text-text-secondary">
+              {cert.year}
+            </span>
 
-          {cert.verifyUrl ? (
-            <a
-              href={cert.verifyUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`Verify ${cert.name} certification`}
-              className={clsx(
-                "font-mono text-[0.65rem] uppercase tracking-widest flex items-center transition-colors outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-sm px-3 py-1.5 border",
-                style.text, style.border,
-                "hover:bg-white/5",
-                cert.color === 'cyan' && "focus-visible:ring-cyan",
-                cert.color === 'green' && "focus-visible:ring-green",
-                cert.color === 'amber' && "focus-visible:ring-amber",
-                cert.color === 'violet' && "focus-visible:ring-violet"
-              )}
-            >
-              VERIFY <span aria-hidden="true" className="ml-1.5 text-[10px]">↗</span>
-            </a>
-          ) : (
-            <span className="font-mono text-[0.65rem] text-text-muted uppercase tracking-widest flex items-center px-3 py-1.5 border border-transparent">
-              VERIFY <span aria-hidden="true" className="ml-1.5 text-[10px]">↗</span>
+            {cert.verifyUrl && cert.verifyUrl !== '#' ? (
+              <a
+                href={cert.verifyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Verify ${cert.name} certification`}
+                className={clsx(
+                  "font-mono text-[0.65rem] uppercase tracking-widest flex items-center transition-colors outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-sm px-3 py-1.5 border",
+                  style.text, style.border,
+                  "hover:bg-white/5",
+                  cert.color === 'cyan' && "focus-visible:ring-cyan",
+                  cert.color === 'green' && "focus-visible:ring-green",
+                  cert.color === 'amber' && "focus-visible:ring-amber",
+                  cert.color === 'violet' && "focus-visible:ring-violet"
+                )}
+              >
+                VERIFY <span aria-hidden="true" className="ml-1.5 text-[10px]">↗</span>
+              </a>
+            ) : (
+              <span className="font-mono text-[0.65rem] text-text-muted uppercase tracking-widest flex items-center px-3 py-1.5 border border-transparent">
+                VERIFY <span aria-hidden="true" className="ml-1.5 text-[10px]">↗</span>
+              </span>
+            )}
+          </div>
+          {cert.verifyUrl === '#' && (
+            <span className="font-mono text-[0.55rem] text-amber text-right mt-1" data-verify-url="#">
+              [VERIFICATION URL — UPDATE BEFORE LAUNCH]
             </span>
           )}
         </div>

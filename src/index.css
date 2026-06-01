@@ -10,20 +10,6 @@
 }
 
 @font-face {
-  font-family: 'Syne';
-  src: url('/portfolio/fonts/Syne-VariableFont_wght.woff2') format('woff2');
-  font-weight: 100 900;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'DM Sans';
-  src: url('/portfolio/fonts/DMSans-VariableFont_opsz,wght.woff2') format('woff2');
-  font-weight: 100 900;
-  font-display: swap;
-}
-
-@font-face {
   font-family: 'JetBrains Mono';
   src: url('/portfolio/fonts/JetBrainsMono-Regular.woff2') format('woff2');
   font-weight: 100 800;
@@ -69,8 +55,8 @@
   --gradient-text:  linear-gradient(90deg, #00F5FF 0%, #39FF14 50%, #BF00FF 100%);
 
   --font-display: 'Orbitron', monospace;
-  --font-heading: 'Syne', sans-serif;
-  --font-body:    'DM Sans', sans-serif;
+  --font-heading: system-ui, -apple-system, sans-serif;
+  --font-body:    system-ui, -apple-system, sans-serif;
   --font-mono:    'JetBrains Mono', monospace;
 
   --ease-out-expo:  cubic-bezier(0.16, 1, 0.3, 1);

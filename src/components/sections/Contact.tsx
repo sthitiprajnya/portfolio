@@ -48,8 +48,21 @@ export function Contact() {
     }
   };
 
+  const isEmailJSConfigured =
+    process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID &&
+    process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID &&
+    process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
+
+  if (process.env.NODE_ENV !== 'production' && !isEmailJSConfigured) {
+    console.warn("EmailJS environment variables are missing. Form submissions will not work.");
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!isEmailJSConfigured) {
+      window.location.href = `mailto:${PERSONAL.email}`;
+      return;
+    }
     if (!validate()) return;
 
     // Security: Honeypot check
@@ -228,16 +241,23 @@ export function Contact() {
                   <FloatingTextarea id="message" name="message" label="Message" value={form.message} onChange={handleChange} error={errors.message} required maxLength={2000} />
 
                   <CyberButton
-                    type="submit"
+                    type={isEmailJSConfigured ? "submit" : "button"}
                     disabled={status === 'transmitting'}
                     color={status === 'error' ? 'cyan' : 'cyan'}
                     className={clsx(
                       'w-full mt-4',
                       status === 'error' && 'border-red text-red hover:bg-red'
                     )}
+                    onClick={(e) => {
+                       if (!isEmailJSConfigured) {
+                          e.preventDefault();
+                          window.location.href = `mailto:${PERSONAL.email}`;
+                       }
+                    }}
                   >
-                    {status === 'idle'         && 'TRANSMIT_MESSAGE'}
-                    {status === 'transmitting' && (
+                    {!isEmailJSConfigured && '[CONFIGURING — USE EMAIL DIRECT]'}
+                    {isEmailJSConfigured && status === 'idle' && 'TRANSMIT_MESSAGE'}
+                    {isEmailJSConfigured && status === 'transmitting' && (
                       <span className="flex items-center justify-center gap-2">
                         <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
@@ -246,7 +266,7 @@ export function Contact() {
                         PREPARING_TRANSMISSION...
                       </span>
                     )}
-                    {status === 'error'        && 'RETRY_TRANSMISSION'}
+                    {isEmailJSConfigured && status === 'error' && 'RETRY_TRANSMISSION'}
                   </CyberButton>
                 </>
               )}

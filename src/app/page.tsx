@@ -12,7 +12,6 @@ import { Experience }           from '@/components/sections/Experience';
 import { Projects }             from '@/components/sections/Projects';
 import { WriteupsStub }         from '@/components/sections/WriteupsStub';
 import { Certifications }       from '@/components/sections/Certifications';
-import { CTFStats }             from '@/components/sections/CTFStats';
 import { GitHubStats }          from '@/components/sections/GitHubStats';
 import { ResumePanel }          from '@/components/sections/ResumePanel';
 import { Contact }              from '@/components/sections/Contact';
@@ -23,7 +22,10 @@ import { Toaster }              from 'react-hot-toast';
 
 import { useState } from 'react';
 import { AudioPrompt } from '@/components/sections/AudioPrompt';
-import { Sentinel } from '@/components/global/Sentinel';
+import dynamic from 'next/dynamic';
+
+const CTFStats = dynamic(() => import('@/components/sections/CTFStats').then(mod => mod.CTFStats), { ssr: false });
+const Sentinel = dynamic(() => import('@/components/global/Sentinel').then(mod => mod.Sentinel), { ssr: false });
 
 export default function Home() {
   const [bootReady, setBootReady] = useState(false);

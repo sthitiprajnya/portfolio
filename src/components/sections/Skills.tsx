@@ -40,8 +40,8 @@ const MARQUEE_TAGS = [
 
 // BOLT: Pre-calculate doubled and reversed arrays to avoid O(n) work and mutation bugs during render
 // Create reversed copy first to match original behavior (reversed sequence doubled for seamless loop)
-const MARQUEE_ROW_1 = [...MARQUEE_TAGS, ...MARQUEE_TAGS];
-const MARQUEE_ROW_2 = [...MARQUEE_TAGS].reverse().concat([...MARQUEE_TAGS].reverse());
+const MARQUEE_ROW_1 = [...MARQUEE_TAGS];
+const MARQUEE_ROW_2 = [...MARQUEE_TAGS].reverse();
 
 // BOLT: Hoist static data and configurations to avoid redundant allocations on every render
 const RADAR_DATA = {
@@ -193,7 +193,7 @@ export function Skills() {
           role="region"
           aria-label="Skills marquee row 1"
         >
-          {MARQUEE_ROW_1.map((tag, i) => (
+          {[...MARQUEE_ROW_1, ...MARQUEE_ROW_1].map((tag, i) => (
             <div
               key={`row1-${i}`}
               className="mx-3 px-4 py-1.5 rounded-sm bg-surface border border-border font-mono text-[0.75rem] text-text-secondary whitespace-nowrap"
@@ -210,7 +210,7 @@ export function Skills() {
           role="region"
           aria-label="Skills marquee row 2"
         >
-          {MARQUEE_ROW_2.map((tag, i) => (
+          {[...MARQUEE_ROW_2, ...MARQUEE_ROW_2].map((tag, i) => (
             <div
               key={`row2-${i}`}
               className="mx-3 px-4 py-1.5 rounded-sm bg-surface border border-border font-mono text-[0.75rem] text-text-secondary whitespace-nowrap"

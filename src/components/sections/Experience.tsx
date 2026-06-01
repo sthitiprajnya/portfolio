@@ -263,7 +263,7 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
   );
 
   return (
-    <div className={clsx("experience-card-wrapper", prefersReducedMotion ? "" : "opacity-0")}>
+    <div className={clsx("experience-card-wrapper", prefersReducedMotion ? "" : "opacity-0")} data-orb-target="experience">
       {cardContent}
     </div>
   );

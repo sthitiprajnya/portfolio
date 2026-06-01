@@ -96,3 +96,26 @@
 .cinematic-reveal {
   animation: cinematic-mask-reveal 1.5s cubic-bezier(0.77, 0, 0.175, 1) forwards;
 }
+/* ── Orb Proximity Glow Effects ───────────────────────────── */
+.orb-glow-active {
+  box-shadow: 0 0 20px rgba(0, 245, 255, 0.4) !important;
+  border-color: rgba(0, 245, 255, 0.5) !important;
+  transition: box-shadow 0.2s ease-in, border-color 0.2s ease-in !important;
+}
+
+.orb-glow-active-leaving {
+  box-shadow: none;
+  border-color: var(--color-border);
+  transition: box-shadow 0.4s ease-out, border-color 0.4s ease-out !important;
+}
+
+@keyframes fast-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.orb-glow-active.skill-tag {
+  background: linear-gradient(90deg, rgba(0, 245, 255, 0.1) 25%, rgba(0, 245, 255, 0.4) 50%, rgba(0, 245, 255, 0.1) 75%);
+  background-size: 400% 100%;
+  animation: fast-shimmer 0.6s linear forwards;
+}

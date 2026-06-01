@@ -40,7 +40,7 @@ export function SkillBadge({ name, icon, proficiency, color, delay = 0, descript
   };
 
   return (
-    <div ref={ref} className="relative flex flex-col items-center justify-center p-2 group">
+    <div ref={ref} className="relative flex flex-col items-center justify-center p-2 group skill-tag" data-orb-target="skill">
       <div className="relative w-16 h-16 flex items-center justify-center mb-3">
         {/* Background track */}
         <svg className="absolute inset-0 w-full h-full transform -rotate-90" aria-hidden="true">

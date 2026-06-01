@@ -67,7 +67,7 @@ function CertCard({ cert }: { cert: typeof CERTIFICATIONS[0] }) {
   const style = colorMap[cert.color];
 
   return (
-    <div className={clsx("relative p-[1px] rounded-xl overflow-hidden group h-full", style.glow)}>
+    <div className={clsx("relative p-[1px] rounded-xl overflow-hidden group h-full", style.glow)} data-orb-target="cert">
       <div className={clsx("absolute inset-0 opacity-20 group-hover:opacity-100 transition-opacity duration-500", style.bg)} />
       <div className="relative h-full bg-surface border border-border rounded-xl p-5 flex flex-col z-10 hover-glow-card" style={{ clipPath: 'polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%)' }}>
 

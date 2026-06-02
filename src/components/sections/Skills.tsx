@@ -5,7 +5,7 @@ import { SkillBadge } from '@/components/ui/SkillBadge';
 import { ScrollReveal, fadeSlideUp, containerStagger } from '@/components/ui/ScrollReveal';
 import { SKILLS } from '@/data/portfolio';
 
-// BOLT: Move static data outside component to avoid redundant allocations on every render
+// Generate flat list of tags for marquee outside component to avoid redundant allocations on every render
 const MARQUEE_TAGS = [
   'Burp Suite Pro', 'Nessus', 'IDOR/BOLA', 'Auth Bypass', 'SSRF', 'XSS',
   'SQL Injection', 'XXE', 'Business Logic Flaws', 'API Pentesting', 'Android VAPT',
@@ -16,7 +16,7 @@ const MARQUEE_TAGS = [
   'Lateral Movement', 'MQTT Attack Chain', 'Cryptojacking Response', 'CVE Triage', 'PoC Writing'
 ];
 
-// BOLT: Pre-calculate doubled and reversed arrays to avoid O(n) work and mutation bugs during render
+// Pre-calculate doubled and reversed arrays to avoid O(n) work and mutation bugs during render
 const MARQUEE_ROW_1 = [...MARQUEE_TAGS, ...MARQUEE_TAGS];
 // Create reversed copy first to match original behavior (reversed sequence doubled for seamless loop)
 const REVERSED_TAGS = [...MARQUEE_TAGS].reverse();
@@ -72,7 +72,7 @@ export function Skills() {
           role="region"
           aria-label="Skills marquee row 1"
         >
-          {[...marqueeTags, ...marqueeTags].map((tag, i) => (
+          {MARQUEE_ROW_1.map((tag, i) => (
             <div
               key={`row1-${i}`}
               className="mx-3 px-4 py-1.5 rounded-sm bg-surface border border-border font-mono text-[0.75rem] text-text-secondary whitespace-nowrap"
@@ -89,7 +89,7 @@ export function Skills() {
           role="region"
           aria-label="Skills marquee row 2"
         >
-          {[...marqueeTags].reverse().concat(marqueeTags).map((tag, i) => (
+          {MARQUEE_ROW_2.map((tag, i) => (
             <div
               key={`row2-${i}`}
               className="mx-3 px-4 py-1.5 rounded-sm bg-surface border border-border font-mono text-[0.75rem] text-text-secondary whitespace-nowrap"

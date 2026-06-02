@@ -35,3 +35,7 @@
 ## 2025-05-18 - [Deferring Expensive Math with Squared Distance Comparisons]
 **Learning:** In 60fps animation loops, `Math.sqrt()` is a relatively expensive operation that often occurs unnecessarily when checking if an object (like the mouse) is within an influence radius. By comparing the squared distance (`dx*dx + dy*dy`) against a squared threshold (`radius*radius`), we can skip the square root calculation entirely for any frame where the target is outside the radius.
 **Action:** Always use squared distance comparisons for proximity checks in hot loops. Only compute the actual distance with `Math.sqrt()` if the squared check confirms the target is within the active range and the linear distance is strictly required for further math (like normalization).
+
+## 2026-07-01 - [Eliminating Layout Thrashing in Animation Loops]
+**Learning:** Performing DOM queries (`querySelectorAll`) and layout measurements (`getBoundingClientRect`) inside a `requestAnimationFrame` loop causes "Layout Thrashing", forcing the browser to recalculate styles and layout on every frame. This drastically increases CPU usage and can cause visual stuttering.
+**Action:** Refactor animation loops to be "layout-free". Use a `useRef` to cache document-relative positions and update that cache only during `resize` or `mount` events. Any proximity checks within the loop should then use the cached values.

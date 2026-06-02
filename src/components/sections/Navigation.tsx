@@ -33,27 +33,15 @@ export function Navigation() {
 
     if (mobileMenuOpen) {
       document.body.style.overflow = 'hidden';
-      window.addEventListener('keydown', handleKeyDown);
     } else {
       document.body.style.overflow = '';
     }
 
+    window.addEventListener('keydown', handleKeyDown);
     return () => {
       document.body.style.overflow = '';
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [mobileMenuOpen]);
-
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && mobileMenuOpen) {
-        setMobileMenuOpen(false);
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
   }, [mobileMenuOpen]);
 
   useEffect(() => {
@@ -99,6 +87,10 @@ export function Navigation() {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const openSearch = () => {
+    window.dispatchEvent(new CustomEvent('open-command-palette'));
+  };
+
   return (
     <>
       {/* BOLT: Sentinel element to detect scroll position without scroll event listeners */}
@@ -127,6 +119,19 @@ export function Navigation() {
 
           {/* Desktop nav */}
           <div className="hidden lg:flex items-center space-x-6 xl:space-x-8">
+            <button
+              onClick={openSearch}
+              className="flex items-center gap-3 px-3 py-1.5 rounded-card border border-border text-text-secondary hover:text-cyan hover:border-cyan hover:shadow-[var(--glow-cyan-sm)] transition-all outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black group"
+              aria-label="Search sections"
+              aria-keyshortcuts="/"
+            >
+              <svg className="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <span className="font-mono text-[0.65rem] uppercase tracking-widest opacity-60 group-hover:opacity-100 transition-opacity">Search</span>
+              <kbd className="font-mono text-[0.6rem] bg-black/50 px-1.5 py-0.5 rounded border border-border/50 opacity-40 group-hover:opacity-100 transition-opacity">[/]</kbd>
+            </button>
+
             <ul className="flex items-center space-x-4 xl:space-x-6">
               {NAV_LINKS.map(link => {
                 const isActive = activeSection === link.id;
@@ -159,18 +164,30 @@ export function Navigation() {
             </CyberButton>
           </div>
 
-          {/* Mobile hamburger */}
-          <button
-            className="lg:hidden text-cyan p-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card"
-            onClick={() => setMobileMenuOpen(true)}
-            aria-expanded={mobileMenuOpen}
-            aria-controls="mobile-menu"
-            aria-label="Open menu"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"/>
-            </svg>
-          </button>
+          {/* Mobile actions */}
+          <div className="flex items-center gap-2 lg:hidden">
+            <button
+              onClick={openSearch}
+              className="text-text-secondary p-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card"
+              aria-label="Search sections"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
+
+            <button
+              className="text-cyan p-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card"
+              onClick={() => setMobileMenuOpen(true)}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-menu"
+              aria-label="Open menu"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"/>
+              </svg>
+            </button>
+          </div>
         </div>
       </nav>
 

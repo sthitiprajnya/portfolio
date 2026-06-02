@@ -14,14 +14,25 @@ export function CommandPalette() {
   const { speak } = useAudio();
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Open palette on '?' or '/'
-      if ((e.key === '?' || e.key === '/') && !isOpen && e.target === document.body) {
-        e.preventDefault();
+    const handleOpen = () => {
+      if (!isOpen) {
         setIsOpen(true);
         setQuery('');
         setSelectedIndex(0);
         speak("Command terminal ready.");
+      }
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Open palette on '?' or '/'
+      const isInput =
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        (e.target as HTMLElement).isContentEditable;
+
+      if ((e.key === '?' || e.key === '/') && !isOpen && !isInput) {
+        e.preventDefault();
+        handleOpen();
       }
 
       // Close palette
@@ -31,7 +42,11 @@ export function CommandPalette() {
     };
 
     document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('open-command-palette', handleOpen);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('open-command-palette', handleOpen);
+    };
   }, [isOpen, speak]);
 
   useEffect(() => {
@@ -101,6 +116,13 @@ export function CommandPalette() {
               <input
                 ref={inputRef}
                 type="text"
+                role="combobox"
+                aria-expanded="true"
+                aria-haspopup="listbox"
+                aria-controls="command-palette-listbox"
+                aria-autocomplete="list"
+                aria-activedescendant={filteredLinks[selectedIndex] ? `option-${filteredLinks[selectedIndex].id}` : undefined}
+                aria-label="Search site sections"
                 className="flex-1 bg-transparent border-none outline-none text-white font-mono placeholder-text-secondary/50 focus:ring-0"
                 placeholder="Jump to section... (Type to filter)"
                 value={query}
@@ -110,16 +132,25 @@ export function CommandPalette() {
                 spellCheck="false"
                 maxLength={100}
               />
-              <span className="text-text-secondary text-xs font-mono bg-black/50 px-2 py-1 rounded-card border border-border/50">ESC</span>
+              <span className="text-text-secondary text-xs font-mono bg-black/50 px-2 py-1 rounded-card border border-border/50" aria-hidden="true">ESC</span>
             </div>
 
-            <div className="max-h-80 overflow-y-auto py-2 px-2 scrollbar-thin scrollbar-thumb-[var(--glass-border)] scrollbar-track-transparent relative z-10">
+            <div
+              id="command-palette-listbox"
+              role="listbox"
+              aria-label="Search results"
+              className="max-h-80 overflow-y-auto py-2 px-2 scrollbar-thin scrollbar-thumb-[var(--glass-border)] scrollbar-track-transparent relative z-10"
+            >
               {filteredLinks.length > 0 ? (
                 filteredLinks.map((link, i) => {
                   const isSelected = i === selectedIndex;
                   return (
                     <button
                       key={link.id}
+                      id={`option-${link.id}`}
+                      role="option"
+                      aria-selected={isSelected}
+                      tabIndex={-1}
                       className={clsx(
                         'w-full text-left px-4 py-3 rounded-card flex items-center justify-between font-mono text-sm transition-colors',
                         isSelected ? 'bg-cyan/10 text-cyan border border-cyan/20 glass-pill rounded-pill' : 'text-text-secondary hover:bg-white/5 hover:text-white border border-transparent rounded-pill'

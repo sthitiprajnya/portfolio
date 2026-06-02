@@ -1,6 +1,19 @@
 import type { Metadata, Viewport } from 'next';
+import { JetBrains_Mono, Orbitron } from 'next/font/google';
 import '@/index.css';
 import '@/animations.css';
+
+const jbm = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+  display: 'swap',
+});
+
+const orbitron = Orbitron({
+  subsets: ['latin'],
+  variable: '--font-display',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'Sthitaprajna Biswal — Cybersecurity & Cloud Security Engineer',
@@ -83,7 +96,7 @@ export default function RootLayout({
   const jsonLdString = JSON.stringify(jsonLd).replace(/</g, '\\u003c');
 
   return (
-    <html lang="en">
+    <html lang="en" className={`${jbm.variable} ${orbitron.variable}`}>
       <head>
         <script
           type="application/ld+json"
@@ -93,9 +106,6 @@ export default function RootLayout({
           httpEquiv="Content-Security-Policy"
           content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://github-readme-stats.vercel.app https://streak-stats.demolab.com https://images.unsplash.com https://ghchart.rshah.org; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://api.github.com https://api.emailjs.com; form-action 'self' https://api.emailjs.com; object-src 'none'; base-uri 'self'; upgrade-insecure-requests; frame-ancestors 'none';"
         />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:wght@400&family=Orbitron:wght@400..900&family=Syne:wght@400..800&display=swap" rel="stylesheet" />
         <link rel="preload" href="/portfolio/og-image.webp" as="image" />
       </head>
       <body>

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { SectionTitle } from '@/components/ui/SectionTitle';
@@ -8,6 +8,7 @@ import { useCardTilt } from '@/hooks/useCardTilt';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { PROJECTS } from '@/data/portfolio';
 import type { Project } from '@/types';
+import Image from 'next/image';
 
 const FILTERS = [
   { id: 'all', label: 'ALL' },
@@ -20,9 +21,9 @@ export function Projects() {
   const [activeFilter, setActiveFilter] = useState('all');
   const prefersReducedMotion = usePrefersReducedMotion();
 
-  const filteredProjects = PROJECTS.filter(p =>
+  const filteredProjects = useMemo(() => PROJECTS.filter(p =>
     activeFilter === 'all' ? true : p.category === activeFilter
-  );
+  ), [activeFilter]);
 
   return (
     <section id="projects" className="py-32 bg-black relative border-t border-border overflow-hidden">
@@ -117,15 +118,18 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
             className="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PHBhdGggZD0iTTEwIDBMICAwIDBMMCAxMEwxMCAxMEwxMCAwWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEiLz48L3N2Zz4=')]"
           ></div>
 
-          <div
-            role="img"
-            className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
-            style={{
-              backgroundImage: `url(${project.imageUrl})`,
-              filter: 'grayscale(30%) contrast(120%) brightness(80%)'
-            }}
-            aria-label={project.imageAlt}
-          />
+          <div className="absolute inset-0 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105">
+            <Image
+              src={project.imageUrl}
+              alt={project.imageAlt}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              style={{
+                filter: 'grayscale(30%) contrast(120%) brightness(80%)'
+              }}
+            />
+          </div>
 
           {/* Overlay to ensure text readability if needed */}
           <div className="absolute inset-0 bg-gradient-to-t from-surface to-transparent opacity-60" />

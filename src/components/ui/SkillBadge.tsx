@@ -42,13 +42,30 @@ export function SkillBadge({ name, icon, proficiency, color, delay = 0, descript
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (proficiency / 100) * circumference;
 
+  const getStyle = () => {
+    if (proficiency >= 80) {
+      return { boxShadow: '0 0 8px rgba(0,245,255,0.4)', borderColor: 'rgba(0,245,255,0.4)' };
+    }
+    if (proficiency < 50) {
+      return { opacity: 0.6 };
+    }
+    return {};
+  };
+
+  const getBadgeStyle = () => {
+    if (proficiency >= 80) return "border border-transparent";
+    return "";
+  }
+
   return (
     <div
       ref={ref}
       tabIndex={0}
       aria-label={`Skill: ${name}`}
       aria-describedby={tooltipId}
-      className="relative flex flex-col items-center justify-center p-2 group skill-tag outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card transition-all"
+      className={`relative flex flex-col items-center justify-center p-2 group skill-tag outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card transition-all ${getBadgeStyle()}`}
+      style={getStyle()}
+      data-orb-target="true"
     >
       <div className="relative w-16 h-16 flex items-center justify-center mb-3">
         {/* Background track */}
@@ -133,7 +150,7 @@ export function SkillBadge({ name, icon, proficiency, color, delay = 0, descript
         </div>
       </div>
 
-      <span className="text-center font-mono text-[0.65rem] uppercase tracking-wider text-text-secondary group-hover:text-white transition-colors">
+      <span className={`text-center font-mono text-[0.65rem] uppercase tracking-wider transition-colors ${proficiency < 50 ? 'text-text-muted group-hover:text-text-secondary' : 'text-text-secondary group-hover:text-white'}`}>
         {name}
       </span>
 

@@ -129,6 +129,16 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
                 filter: 'grayscale(30%) contrast(120%) brightness(80%)'
               }}
             />
+            {/* Scan-line reveal on hover */}
+            <div className="absolute inset-0 group-hover:[clip-path:inset(0_0%_0_0)] [clip-path:inset(0_100%_0_0)] transition-all duration-500 ease-in-out pointer-events-none before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-cyan/20 before:to-transparent before:animate-[scan-line_1.5s_linear_infinite]">
+              <Image
+                src={project.imageUrl}
+                alt={project.imageAlt}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              />
+            </div>
           </div>
 
           {/* Overlay to ensure text readability if needed */}

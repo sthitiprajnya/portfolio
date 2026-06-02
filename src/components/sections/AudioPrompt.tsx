@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAudio } from '@/components/providers/AudioProvider';
+import { NeonBorder } from '@/components/ui/NeonBorder';
+import { CyberButton } from '@/components/ui/CyberButton';
 
 interface AudioPromptProps {
   onComplete: () => void;
@@ -43,24 +45,27 @@ export function AudioPrompt({ onComplete }: AudioPromptProps) {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="max-w-md w-full border border-cyan/30 bg-surface/50 backdrop-blur-md p-8 rounded-card shadow-[0_0_30px_rgba(0,245,255,0.1)] text-center relative overflow-hidden"
+          className="max-w-md w-full text-center relative overflow-hidden z-10"
         >
-          {/* Decorative scanline */}
-          <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.25)_50%)] bg-[length:100%_4px] opacity-20" />
+          <NeonBorder color="cyan" className="bg-surface/50 backdrop-blur-md p-8 rounded-card">
+            {/* Decorative scanline */}
+            <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.25)_50%)] bg-[length:100%_4px] opacity-20 rounded-card" />
 
-          <div className="text-cyan font-bold text-xl mb-6 tracking-widest relative z-10 flex items-center justify-center gap-3">
-             <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-             SENTINEL ONLINE
-          </div>
+            <div className="text-cyan font-bold text-xl mb-6 tracking-widest relative z-10 flex items-center justify-center gap-3">
+               <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+               SENTINEL ONLINE
+            </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
-            <button
-              onClick={handleChoice}
-              className="px-6 py-2 border border-cyan text-cyan hover:bg-cyan/10 transition-colors uppercase text-sm tracking-wider font-bold shadow-[var(--glow-cyan-sm)] outline-none focus-visible:ring-2 focus-visible:ring-cyan w-full"
-            >
-              [ CLICK ANYWHERE TO BOOT SYSTEM ]
-            </button>
-          </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
+              <CyberButton
+                onClick={handleChoice}
+                color="cyan"
+                className="w-full"
+              >
+                [ CLICK ANYWHERE TO BOOT SYSTEM ]
+              </CyberButton>
+            </div>
+          </NeonBorder>
         </motion.div>
       </motion.div>
     </AnimatePresence>

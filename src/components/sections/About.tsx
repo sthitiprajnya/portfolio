@@ -31,7 +31,7 @@ export function About() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
 
           {/* ── Left column: terminal biometric avatar ── */}
-          <ScrollReveal variants={fadeSlideUp} className="order-2 lg:order-1">
+          <ScrollReveal variants={fadeSlideUp} className="order-2 lg:order-1" data-orb-target="true">
             <AsciiAvatar className="w-full max-w-sm mx-auto lg:mx-0" />
 
             {/* Availability badge beneath avatar */}

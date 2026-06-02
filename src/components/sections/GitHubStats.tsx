@@ -85,7 +85,7 @@ export function GitHubStats() {
 
               {/* Left Column - Terminal Style Heatmap & Logs */}
               <ScrollReveal variants={fadeSlideUp} className="lg:col-span-7">
-                <div className="h-full p-0 flex flex-col overflow-hidden bg-[rgba(0,0,0,0.4)] glass rounded-card relative">
+                <div className="h-full p-0 flex flex-col overflow-hidden bg-[rgba(0,0,0,0.4)] glass rounded-card relative" data-orb-target="true">
                   <div className="flex items-center px-4 py-2 bg-[rgba(0,0,0,0.6)] border-b border-[var(--glass-border)] relative z-10">
                     <span className="w-3 h-3 rounded-full bg-red-500/80 mr-2"></span>
                     <span className="w-3 h-3 rounded-full bg-amber-500/80 mr-2"></span>

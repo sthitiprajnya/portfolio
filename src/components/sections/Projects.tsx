@@ -8,6 +8,7 @@ import { useCardTilt } from '@/hooks/useCardTilt';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { PROJECTS } from '@/data/portfolio';
 import type { Project } from '@/types';
+import Image from 'next/image';
 
 const FILTERS = [
   { id: 'all', label: 'ALL' },
@@ -20,10 +21,9 @@ export function Projects() {
   const [activeFilter, setActiveFilter] = useState('all');
   const prefersReducedMotion = usePrefersReducedMotion();
 
-  // BOLT: Memoize filtered projects to avoid redundant array filtering on every render
-  const filteredProjects = useMemo(() =>
-    PROJECTS.filter(p => activeFilter === 'all' ? true : p.category === activeFilter),
-  [activeFilter]);
+  const filteredProjects = useMemo(() => PROJECTS.filter(p =>
+    activeFilter === 'all' ? true : p.category === activeFilter
+  ), [activeFilter]);
 
   return (
     <section id="projects" className="py-32 bg-black relative border-t border-border overflow-hidden">
@@ -44,7 +44,7 @@ export function Projects() {
                 key={filter.id}
                 onClick={() => setActiveFilter(filter.id)}
                 className={clsx(
-                  "font-mono text-xs uppercase tracking-widest px-5 py-2 transition-all duration-300 rounded-sm border outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black",
+                  "font-mono text-xs uppercase tracking-widest px-5 py-2 transition-all duration-300 rounded-card border outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black",
                   isActive
                     ? "bg-cyan border-cyan text-black shadow-[var(--glow-cyan-sm)] font-bold"
                     : "bg-transparent border-border text-text-secondary hover:text-cyan hover:border-cyan/50"
@@ -95,6 +95,7 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
     >
       <div
         ref={ref as unknown as React.RefObject<HTMLDivElement>}
+        data-orb-target="project"
         className="w-full flex flex-col group glass rounded-card relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--glass-shadow-hover)] cursor-pointer"
         style={prefersReducedMotion ? {} : { transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`, transformStyle: 'preserve-3d' }}
       >
@@ -117,15 +118,18 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
             className="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PHBhdGggZD0iTTEwIDBMICAwIDBMMCAxMEwxMCAxMEwxMCAwWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEiLz48L3N2Zz4=')]"
           ></div>
 
-          <div
-            role="img"
-            className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
-            style={{
-              backgroundImage: `url(${project.imageUrl})`,
-              filter: 'grayscale(30%) contrast(120%) brightness(80%)'
-            }}
-            aria-label={project.imageAlt}
-          />
+          <div className="absolute inset-0 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105">
+            <Image
+              src={project.imageUrl}
+              alt={project.imageAlt}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              style={{
+                filter: 'grayscale(30%) contrast(120%) brightness(80%)'
+              }}
+            />
+          </div>
 
           {/* Overlay to ensure text readability if needed */}
           <div className="absolute inset-0 bg-gradient-to-t from-surface to-transparent opacity-60" />
@@ -156,7 +160,7 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
                  <svg className="w-5 h-5 text-text-muted hover:text-amber transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                  </svg>
-                 <div className="absolute right-0 bottom-full mb-2 w-max opacity-0 group-hover/lock:opacity-100 transition-opacity bg-black border border-amber text-amber font-mono text-[0.6rem] px-2 py-1 rounded whitespace-nowrap z-50">
+                 <div className="absolute right-0 bottom-full mb-2 w-max opacity-0 group-hover/lock:opacity-100 transition-opacity bg-black border border-amber text-amber font-mono text-[0.6rem] px-2 py-1 rounded-card whitespace-nowrap z-50">
                    {project.githubUrl ? project.githubUrl : '🔒 CLASSIFIED'}
                  </div>
               </div>
@@ -170,7 +174,7 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
           <div className="mt-auto space-y-4">
 
             {/* Impact Badge - Redesigned to be highly prominent */}
-            <div className="relative overflow-hidden rounded-lg bg-gradient-to-r from-green/20 to-transparent border-l-2 border-green p-3 flex items-center justify-between glass-pill">
+            <div className="relative overflow-hidden rounded-card bg-gradient-to-r from-green/20 to-transparent border-l-2 border-green p-3 flex items-center justify-between glass-pill">
               <div className="flex items-center gap-2">
                 <span className="text-green animate-pulse">●</span>
                 <span className="font-mono text-[0.65rem] text-text-muted tracking-widest uppercase">IMPACT_METRIC</span>
@@ -182,7 +186,7 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
 
             {/* Simulated Terminal Output */}
             {project.terminalOutput && (
-              <div className="rounded-lg overflow-hidden border border-[var(--glass-border)] bg-[rgba(0,0,0,0.4)] text-xs font-mono glass">
+              <div className="rounded-card overflow-hidden border border-[var(--glass-border)] bg-[rgba(0,0,0,0.4)] text-xs font-mono glass">
                 <div className="flex items-center px-2 py-1 bg-[rgba(0,245,255,0.05)] border-b border-[var(--glass-border)]">
                   <span className="text-text-muted text-[0.55rem] tracking-widest">mock_terminal.sh</span>
                 </div>
@@ -201,7 +205,7 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
 
             {/* Methodology Accordion */}
             {project.methodology && (
-              <div className="border border-[var(--glass-border)] rounded-lg overflow-hidden glass">
+              <div className="border border-[var(--glass-border)] rounded-card overflow-hidden glass">
                 <button
                   onClick={(e) => { e.stopPropagation(); setShowMethodology(!showMethodology); }}
                   aria-expanded={showMethodology}

@@ -31,3 +31,7 @@
 ## 2026-06-27 - [Hoisting Component Constants & Scoped DOM Queries]
 **Learning:** Redundant object allocations (e.g., color maps) and regex re-compilation inside React render functions contribute to GC pressure and unnecessary CPU work, especially for list items or components that update frequently. Additionally, using global `document.querySelectorAll` in GSAP effects is inefficient and violates component encapsulation, potentially causing performance hits as the DOM grows.
 **Action:** Hoist all static object maps and Regular Expressions to the module level. Scope GSAP and other DOM-direct queries to the component's `ref` using `container.querySelectorAll` to minimize search space and prevent cross-component interference.
+
+## 2025-05-18 - [Deferring Expensive Math with Squared Distance Comparisons]
+**Learning:** In 60fps animation loops, `Math.sqrt()` is a relatively expensive operation that often occurs unnecessarily when checking if an object (like the mouse) is within an influence radius. By comparing the squared distance (`dx*dx + dy*dy`) against a squared threshold (`radius*radius`), we can skip the square root calculation entirely for any frame where the target is outside the radius.
+**Action:** Always use squared distance comparisons for proximity checks in hot loops. Only compute the actual distance with `Math.sqrt()` if the squared check confirms the target is within the active range and the linear distance is strictly required for further math (like normalization).

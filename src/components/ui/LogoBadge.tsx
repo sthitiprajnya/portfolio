@@ -27,7 +27,7 @@ export function LogoBadge({
   return (
     <span
       aria-label={alt}
-      className={`inline-flex items-center justify-center rounded font-mono text-xs font-bold
+      className={`inline-flex items-center justify-center rounded-card font-mono text-xs font-bold
         bg-cyan/10 border border-cyan/30 text-cyan ${className}`}
       style={{ width, height }}
     >

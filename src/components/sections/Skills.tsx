@@ -4,6 +4,7 @@ import { SectionTitle } from '@/components/ui/SectionTitle';
 import { SkillBadge } from '@/components/ui/SkillBadge';
 import { ScrollReveal, fadeSlideUp, containerStagger } from '@/components/ui/ScrollReveal';
 import { SKILLS } from '@/data/portfolio';
+import { useState, useMemo } from 'react';
 import clsx from 'clsx';
 import { Radar } from 'react-chartjs-2';
 import {
@@ -79,17 +80,15 @@ export function Skills() {
   const [activeTab, setActiveTab] = useState<'ALL' | 'OFFENSIVE' | 'CLOUD' | 'AUTOMATION' | 'COMPLIANCE'>('ALL');
   const { ref: chartRef, inView: chartInView } = useInView({ triggerOnce: true, threshold: 0.5 });
 
-  // BOLT: Memoize total filtered skill count and category-level filtering to avoid redundant array operations on every render
-  const categorizedSkills = useMemo(() => {
-    return SKILLS.map(category => ({
-      ...category,
-      filteredSkills: category.skills.filter(s => activeTab === 'ALL' || s.domain === activeTab)
-    })).filter(cat => cat.filteredSkills.length > 0);
+  const { totalFilteredSkills, filteredCategories } = useMemo(() => {
+    let count = 0;
+    const categories = SKILLS.map(category => {
+      const filteredSkills = category.skills.filter(s => activeTab === 'ALL' || s.domain === activeTab);
+      count += filteredSkills.length;
+      return { ...category, filteredSkills };
+    }).filter(cat => cat.filteredSkills.length > 0);
+    return { totalFilteredSkills: count, filteredCategories: categories };
   }, [activeTab]);
-
-  const totalFilteredSkills = useMemo(() => {
-    return categorizedSkills.reduce((acc, cat) => acc + cat.filteredSkills.length, 0);
-  }, [categorizedSkills]);
 
   return (
     <section id="skills" className="py-24 bg-black overflow-hidden relative">
@@ -110,7 +109,7 @@ export function Skills() {
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={clsx(
-                    'px-4 py-2 font-mono text-[0.7rem] uppercase tracking-widest transition-all rounded-sm border outline-none focus-visible:ring-2 focus-visible:ring-cyan',
+                    'px-4 py-2 font-mono text-[0.7rem] uppercase tracking-widest transition-all rounded-card border outline-none focus-visible:ring-2 focus-visible:ring-cyan',
                     activeTab === tab
                       ? 'border-cyan bg-cyan/10 text-cyan shadow-[var(--glow-cyan-sm)]'
                       : 'border-border text-text-secondary hover:border-cyan/50 hover:text-white'
@@ -150,29 +149,31 @@ export function Skills() {
 
         {/* Skill Rings Grid */}
         <div className="space-y-16 mb-24">
-          {categorizedSkills.map((category, catIdx) => (
-            <ScrollReveal key={catIdx} variants={containerStagger} className="space-y-6">
-              <h3 className="font-mono text-sm text-white border-b border-border pb-2 inline-block">
-                {category.category}
-              </h3>
+          {filteredCategories.map((category, catIdx) => {
+            return (
+              <ScrollReveal key={catIdx} variants={containerStagger} className="space-y-6">
+                <h3 className="font-mono text-sm text-white border-b border-border pb-2 inline-block">
+                  {category.category}
+                </h3>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-y-8 gap-x-4">
-                {category.filteredSkills.map((skill, skillIdx) => (
-                  <ScrollReveal key={skillIdx} variants={fadeSlideUp}>
-                    <SkillBadge
-                      name={skill.name}
-                      icon={skill.icon}
-                      proficiency={skill.proficiency}
-                      color={category.color}
-                      delay={skillIdx * 0.1}
-                      description={skill.description}
-                      experience={skill.experience}
-                    />
-                  </ScrollReveal>
-                ))}
-              </div>
-            </ScrollReveal>
-          ))}
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-y-8 gap-x-4">
+                  {category.filteredSkills.map((skill, skillIdx) => (
+                    <ScrollReveal key={skillIdx} variants={fadeSlideUp}>
+                      <SkillBadge
+                        name={skill.name}
+                        icon={skill.icon}
+                        proficiency={skill.proficiency}
+                        color={category.color}
+                        delay={skillIdx * 0.1}
+                        description={skill.description}
+                        experience={skill.experience}
+                      />
+                    </ScrollReveal>
+                  ))}
+                </div>
+              </ScrollReveal>
+            );
+          })}
         </div>
       </div>
 
@@ -197,7 +198,7 @@ export function Skills() {
           {[...MARQUEE_ROW_1, ...MARQUEE_ROW_1].map((tag, i) => (
             <div
               key={`row1-${i}`}
-              className="mx-3 px-4 py-1.5 rounded-sm bg-surface border border-border font-mono text-[0.75rem] text-text-secondary whitespace-nowrap"
+              className="mx-3 px-4 py-1.5 rounded-card bg-surface border border-border font-mono text-[0.75rem] text-text-secondary whitespace-nowrap"
             >
               {tag}
             </div>
@@ -214,7 +215,7 @@ export function Skills() {
           {[...MARQUEE_ROW_2, ...MARQUEE_ROW_2].map((tag, i) => (
             <div
               key={`row2-${i}`}
-              className="mx-3 px-4 py-1.5 rounded-sm bg-surface border border-border font-mono text-[0.75rem] text-text-secondary whitespace-nowrap"
+              className="mx-3 px-4 py-1.5 rounded-card bg-surface border border-border font-mono text-[0.75rem] text-text-secondary whitespace-nowrap"
             >
               {tag}
             </div>

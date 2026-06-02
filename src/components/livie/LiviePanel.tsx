@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect, KeyboardEvent } from 'react';
 import { motion } from 'framer-motion';
+import { useAudio } from '@/components/providers/AudioProvider';
+import { generateDynamicSpeech } from '@/lib/sentinelSpeech';
 
 interface Message {
   role:    'user' | 'assistant';
@@ -13,29 +15,13 @@ const GREETING: Message = {
   content: 'LIVIE_v1.0 ONLINE. I know everything about Sthita\'s background. Ask me about his experience, projects, certs, or anything you\'d ask a recruiter.',
 };
 
-function generateReply(input: string): string {
-  const q = input.toLowerCase();
-  if (q.includes('experience') || q.includes('years'))
-    return 'Sthitaprajna has 2+ years at iServeU Technology as an Information Security Engineer and Penetration Tester.';
-  if (q.includes('cert') || q.includes('certif'))
-    return '11 active certs including eJPT v2, PEH (TCM), INE Cloud Associate, CCNA, and several EC-Council credentials.';
-  if (q.includes('skill') || q.includes('tool'))
-    return 'Core tools: Burp Suite Pro, Nessus, Metasploit, Nmap, Nuclei, Frida/MobSF, Wazuh. Cloud: GCP & AWS. Scripting: Python, Bash.';
-  if (q.includes('contact') || q.includes('hire') || q.includes('email'))
-    return 'Reach out at sthitabiswal2002@gmail.com or LinkedIn: linkedin.com/in/sthitaprajna-biswal-0175b7171/';
-  if (q.includes('project'))
-    return 'Top projects: GCP 92-bucket hardening, Google DLP PCI/PII pipeline, Wazuh SIEM with custom rules, MQTT IoT attack chain PoC.';
-  if (q.includes('hackthebox') || q.includes('htb'))
-    return 'HTB rank: Hacker · 1,240 points · 15% Top · 24 User Owns · 18 Root Owns · 45 Challenges.';
-  return 'Interesting question. For detailed info, scroll to the relevant section or drop an email at sthitabiswal2002@gmail.com.';
-}
-
 export default function LiviePanel({ onClose }: { onClose: () => void }) {
   const [messages, setMessages]   = useState<Message[]>([GREETING]);
   const [input, setInput]         = useState('');
   const [loading, setLoading]     = useState(false);
   const bottomRef                 = useRef<HTMLDivElement>(null);
   const inputRef                  = useRef<HTMLInputElement>(null);
+  const { speak }                 = useAudio();
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -58,10 +44,13 @@ export default function LiviePanel({ onClose }: { onClose: () => void }) {
     try {
       // Simulate API call delay
       await new Promise(r => setTimeout(r, 900 + Math.random() * 600));
-      const reply = generateReply(text);
+      const reply = generateDynamicSpeech(text);
       setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
+      speak(reply);
     } catch {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'NETWORK_ERROR. Try again.' }]);
+      const errorReply = 'NETWORK_ERROR. Try again.';
+      setMessages(prev => [...prev, { role: 'assistant', content: errorReply }]);
+      speak(errorReply);
     } finally {
       setLoading(false);
     }
@@ -81,7 +70,7 @@ export default function LiviePanel({ onClose }: { onClose: () => void }) {
         fixed bottom-24 right-6 z-[9998]
         w-[340px] sm:w-[380px]
         h-[480px]
-        glass-heavy rounded-2xl
+        glass-heavy rounded-card
         border border-[#00F5FF]/20
         shadow-glass
         flex flex-col
@@ -120,11 +109,11 @@ export default function LiviePanel({ onClose }: { onClose: () => void }) {
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`
-              max-w-[85%] px-3 py-2 rounded-xl
+              max-w-[85%] px-3 py-2 rounded-card
               font-mono text-[12px] leading-relaxed
               ${msg.role === 'user'
-                ? 'bg-[#00F5FF]/15 border border-[#00F5FF]/20 text-[#00F5FF] rounded-tr-sm'
-                : 'bg-[rgba(0,0,0,0.4)] border border-[#00F5FF]/08 text-[#a0f0e8] rounded-tl-sm'}
+                ? 'bg-[#00F5FF]/15 border border-[#00F5FF]/20 text-[#00F5FF] rounded-card'
+                : 'bg-[rgba(0,0,0,0.4)] border border-[#00F5FF]/08 text-[#a0f0e8] rounded-card'}
             `}>
               {msg.role === 'assistant' && (
                 <span className="text-[#00F5FF]/50 text-[10px] block mb-1">LIVIE ▸</span>
@@ -137,7 +126,7 @@ export default function LiviePanel({ onClose }: { onClose: () => void }) {
         {/* Thinking dots */}
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-[rgba(0,0,0,0.4)] border border-[#00F5FF]/08 rounded-xl rounded-tl-sm px-4 py-3">
+            <div className="bg-[rgba(0,0,0,0.4)] border border-[#00F5FF]/08 rounded-card px-4 py-3">
               <div className="flex gap-1">
                 {[0, 1, 2].map(i => (
                   <motion.span
@@ -184,6 +173,7 @@ export default function LiviePanel({ onClose }: { onClose: () => void }) {
           onKeyDown={onKey}
           placeholder="Ask about Sthita..."
           disabled={loading}
+          maxLength={500}
           className="
             flex-1 bg-transparent
             font-mono text-[12px] text-[#a0f0e8]

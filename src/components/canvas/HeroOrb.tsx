@@ -17,6 +17,11 @@ interface OrbState {
   mouseX: number;
   mouseY: number;
   mouseActive: boolean;
+  // BOLT: Cache viewport-dependent dimensions to avoid recalculating in the 60fps loop
+  cx: number;
+  cy: number;
+  A: number;
+  B: number;
 }
 
 // BOLT: Hoist static animation constants to module level to reduce per-frame object property lookups
@@ -44,6 +49,10 @@ export default function HeroOrb() {
     mouseX:      0,
     mouseY:      0,
     mouseActive: false,
+    cx:          0,
+    cy:          0,
+    A:           0,
+    B:           0,
   });
   const rafRef = useRef<number>(0);
   const { ref: inViewRef, inView } = useInView({ threshold: 0 });
@@ -164,6 +173,7 @@ export default function HeroOrb() {
       // Advance Lissajous parameter
       o.t += ANIM_SPEED * dt;
 
+      // BOLT: Use cached viewport dimensions to avoid lookups in the hot loop
       // Target position on Lissajous curve
       const targetX = cx + A * Math.sin(FREQ_X * o.t + PHASE_DELTA);
       const targetY = cy + B * Math.sin(FREQ_Y * o.t);

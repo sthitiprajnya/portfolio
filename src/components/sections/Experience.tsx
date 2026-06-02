@@ -28,6 +28,7 @@ export function Experience() {
   const containerRef = useRef<HTMLDivElement>(null);
   const lineRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
+  const triggersRef = useRef<ScrollTrigger[]>([]);
 
   useEffect(() => {
     if (prefersReducedMotion || !containerRef.current || !lineRef.current) return;
@@ -35,19 +36,17 @@ export function Experience() {
     const container = containerRef.current;
 
     // Timeline self-drawing animation
-    const tl = gsap.timeline({
-      scrollTrigger: {
+    const st1 = ScrollTrigger.create({
         trigger: container,
         start: "top center",
         end: "bottom center",
         scrub: 1, // Smooth scrubbing
-      }
+        animation: gsap.fromTo(lineRef.current,
+          { scaleY: 0 },
+          { scaleY: 1, ease: "none" }
+        )
     });
-
-    tl.to(lineRef.current, {
-      scaleY: 1,
-      ease: "none"
-    });
+    triggersRef.current.push(st1);
 
     // BOLT: Scope GSAP queries to the container to avoid scanning the entire document
     // Cinematic staggering for the experience cards using GSAP ScrollTrigger
@@ -91,7 +90,8 @@ export function Experience() {
     });
 
     return () => {
-      ScrollTrigger.getAll().forEach(t => t.kill());
+      triggersRef.current.forEach(t => t.kill());
+      triggersRef.current = [];
     };
   }, [prefersReducedMotion]);
 
@@ -137,7 +137,7 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
   const prefersReducedMotion = usePrefersReducedMotion();
 
   const cardContent = (
-    <div className="relative pl-8 md:pl-12">
+    <div className="relative pl-8 md:pl-12" data-orb-target="experience">
       {/* Timeline Node */}
       <div
         className={clsx(
@@ -167,7 +167,7 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
                   width={40}
                   height={40}
                   monogram="iU"
-                  className="rounded-lg bg-surface border border-border p-1"
+                  className="rounded-card bg-surface border border-border p-1"
                 />
               </div>
             )}
@@ -194,7 +194,7 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
         {experience.awards && experience.awards.length > 0 && (
           <div className="flex flex-col sm:flex-row gap-4 mb-8 relative z-10">
             {experience.awards.map((award, i) => (
-              <div key={i} className="relative overflow-hidden group/award flex-1 flex flex-col items-center justify-center p-4 glass rounded-lg border border-amber/30 hover:border-amber/60 transition-all duration-300">
+              <div key={i} className="relative overflow-hidden group/award flex-1 flex flex-col items-center justify-center p-4 glass rounded-card border border-amber/30 hover:border-amber/60 transition-all duration-300">
                 <div className="absolute inset-0 bg-gradient-to-br from-amber/10 to-transparent opacity-0 group-hover/award:opacity-100 transition-opacity duration-300" />
                 <span className="text-3xl mb-2 drop-shadow-[0_0_8px_rgba(255,179,0,0.5)] transform group-hover/award:scale-110 transition-transform duration-300">🏆</span>
                 <span className="font-heading font-bold text-amber text-sm tracking-wide text-center uppercase">{award}</span>
@@ -218,7 +218,7 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
                   aria-controls={`panel-${experience.id}-${sub.id}`}
                   onClick={() => setOpenSection(sub.id)}
                   className={clsx(
-                    "px-4 py-2 font-mono text-[0.65rem] tracking-widest uppercase transition-all rounded-t-lg border-b-2 outline-none focus-visible:ring-2",
+                    "px-4 py-2 font-mono text-[0.65rem] tracking-widest uppercase transition-all rounded-card border-b-2 outline-none focus-visible:ring-2",
                     isOpen
                       ? ACTIVE_COLOR_MAP[sub.color]
                       : "border-transparent text-text-secondary hover:text-white hover:bg-[rgba(255,255,255,0.05)]"
@@ -236,8 +236,8 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
                 if (openSection !== sub.id) return null;
 
                 const getSeverityBadge = (text: string) => {
-                  if (CRITICAL_REGEX.test(text)) return <span className="inline-flex items-center ml-2 px-1.5 py-0.5 rounded bg-red-500/20 text-red-500 border border-red-500/50 font-mono text-[0.55rem] uppercase font-bold">CRITICAL</span>;
-                  if (HIGH_REGEX.test(text)) return <span className="inline-flex items-center ml-2 px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-500 border border-amber-500/50 font-mono text-[0.55rem] uppercase font-bold">HIGH</span>;
+                  if (CRITICAL_REGEX.test(text)) return <span className="inline-flex items-center ml-2 px-1.5 py-0.5 rounded-card bg-red-500/20 text-red-500 border border-red-500/50 font-mono text-[0.55rem] uppercase font-bold">CRITICAL</span>;
+                  if (HIGH_REGEX.test(text)) return <span className="inline-flex items-center ml-2 px-1.5 py-0.5 rounded-card bg-amber-500/20 text-amber-500 border border-amber-500/50 font-mono text-[0.55rem] uppercase font-bold">HIGH</span>;
                   return null;
                 };
 

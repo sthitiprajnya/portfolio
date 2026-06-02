@@ -4,7 +4,7 @@ import { SectionTitle } from '@/components/ui/SectionTitle';
 import { SkillBadge } from '@/components/ui/SkillBadge';
 import { ScrollReveal, fadeSlideUp, containerStagger } from '@/components/ui/ScrollReveal';
 import { SKILLS } from '@/data/portfolio';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import clsx from 'clsx';
 import { Radar } from 'react-chartjs-2';
 import {
@@ -80,9 +80,15 @@ export function Skills() {
   const [activeTab, setActiveTab] = useState<'ALL' | 'OFFENSIVE' | 'CLOUD' | 'AUTOMATION' | 'COMPLIANCE'>('ALL');
   const { ref: chartRef, inView: chartInView } = useInView({ triggerOnce: true, threshold: 0.5 });
 
-  const totalFilteredSkills = SKILLS.reduce((acc, cat) => {
-    return acc + cat.skills.filter(s => activeTab === 'ALL' || s.domain === activeTab).length;
-  }, 0);
+  const { totalFilteredSkills, filteredCategories } = useMemo(() => {
+    let count = 0;
+    const categories = SKILLS.map(category => {
+      const filteredSkills = category.skills.filter(s => activeTab === 'ALL' || s.domain === activeTab);
+      count += filteredSkills.length;
+      return { ...category, filteredSkills };
+    }).filter(cat => cat.filteredSkills.length > 0);
+    return { totalFilteredSkills: count, filteredCategories: categories };
+  }, [activeTab]);
 
   return (
     <section id="skills" className="py-24 bg-black overflow-hidden relative">
@@ -103,7 +109,7 @@ export function Skills() {
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={clsx(
-                    'px-4 py-2 font-mono text-[0.7rem] uppercase tracking-widest transition-all rounded-sm border outline-none focus-visible:ring-2 focus-visible:ring-cyan',
+                    'px-4 py-2 font-mono text-[0.7rem] uppercase tracking-widest transition-all rounded-card border outline-none focus-visible:ring-2 focus-visible:ring-cyan',
                     activeTab === tab
                       ? 'border-cyan bg-cyan/10 text-cyan shadow-[var(--glow-cyan-sm)]'
                       : 'border-border text-text-secondary hover:border-cyan/50 hover:text-white'
@@ -143,10 +149,7 @@ export function Skills() {
 
         {/* Skill Rings Grid */}
         <div className="space-y-16 mb-24">
-          {SKILLS.map((category, catIdx) => {
-            const filteredSkills = category.skills.filter(s => activeTab === 'ALL' || s.domain === activeTab);
-            if (filteredSkills.length === 0) return null;
-
+          {filteredCategories.map((category, catIdx) => {
             return (
               <ScrollReveal key={catIdx} variants={containerStagger} className="space-y-6">
                 <h3 className="font-mono text-sm text-white border-b border-border pb-2 inline-block">
@@ -154,7 +157,7 @@ export function Skills() {
                 </h3>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-y-8 gap-x-4">
-                  {filteredSkills.map((skill, skillIdx) => (
+                  {category.filteredSkills.map((skill, skillIdx) => (
                     <ScrollReveal key={skillIdx} variants={fadeSlideUp}>
                       <SkillBadge
                         name={skill.name}
@@ -195,7 +198,7 @@ export function Skills() {
           {[...MARQUEE_ROW_1, ...MARQUEE_ROW_1].map((tag, i) => (
             <div
               key={`row1-${i}`}
-              className="mx-3 px-4 py-1.5 rounded-sm bg-surface border border-border font-mono text-[0.75rem] text-text-secondary whitespace-nowrap"
+              className="mx-3 px-4 py-1.5 rounded-card bg-surface border border-border font-mono text-[0.75rem] text-text-secondary whitespace-nowrap"
             >
               {tag}
             </div>
@@ -212,7 +215,7 @@ export function Skills() {
           {[...MARQUEE_ROW_2, ...MARQUEE_ROW_2].map((tag, i) => (
             <div
               key={`row2-${i}`}
-              className="mx-3 px-4 py-1.5 rounded-sm bg-surface border border-border font-mono text-[0.75rem] text-text-secondary whitespace-nowrap"
+              className="mx-3 px-4 py-1.5 rounded-card bg-surface border border-border font-mono text-[0.75rem] text-text-secondary whitespace-nowrap"
             >
               {tag}
             </div>

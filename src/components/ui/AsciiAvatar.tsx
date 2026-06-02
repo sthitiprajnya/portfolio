@@ -72,7 +72,7 @@ export function AsciiAvatar({ className }: AsciiAvatarProps) {
   return (
     <div
       className={clsx(
-        'relative rounded-2xl border border-[var(--glass-border)] glass-heavy overflow-hidden',
+        'relative rounded-card border border-[var(--glass-border)] glass-heavy overflow-hidden',
         'shadow-[0_0_30px_rgba(0,245,255,0.12)]',
         'group transition-all duration-500 hover:border-[rgba(0,245,255,0.4)] hover:shadow-[var(--glow-cyan-md)]',
         className

@@ -72,7 +72,7 @@ export function About() {
               className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-8 border-t border-[var(--glass-border)]"
             >
               {ABOUT_STATS.map((stat, i) => (
-                <ScrollReveal key={i} variants={fadeSlideUp} className="flex flex-col glass rounded-xl px-4 py-3 relative overflow-hidden">
+                <ScrollReveal key={i} variants={fadeSlideUp} className="flex flex-col glass rounded-card px-4 py-3 relative overflow-hidden">
                   <div className="font-display text-3xl md:text-4xl text-cyan mb-2 relative z-10">
                     <CountUp
                       end={stat.value}

@@ -10,7 +10,7 @@ import { SmoothScrollProvider } from '@/components/providers/SmoothScrollProvide
 import { CursorProvider }       from '@/components/providers/CursorProvider';
 import { Toaster }              from 'react-hot-toast';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { AudioPrompt } from '@/components/sections/AudioPrompt';
 import dynamic from 'next/dynamic';
 
@@ -29,9 +29,13 @@ const Footer = dynamic(() => import('@/components/sections/Footer').then(mod => 
 export default function Home() {
   const [bootReady, setBootReady] = useState(false);
 
+  const handleBootComplete = useCallback(() => {
+    setBootReady(true);
+  }, []);
+
   return (
     <>
-      {!bootReady && <AudioPrompt onComplete={() => setBootReady(true)} />}
+      {!bootReady && <AudioPrompt onComplete={handleBootComplete} />}
       {bootReady && <Preloader />}
 
       <CursorProvider>

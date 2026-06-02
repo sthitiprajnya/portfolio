@@ -32,10 +32,10 @@ const config: Config = {
         'text-accent':    '#00F5FF',
       },
       fontFamily: {
-        display: ['Orbitron', 'monospace'],
+        display: ['var(--font-display)', 'Orbitron', 'monospace'],
         heading: ['system-ui', '-apple-system', 'sans-serif'],
         body:    ['system-ui', '-apple-system', 'sans-serif'],
-        mono:    ['JetBrains Mono', 'monospace'],
+        mono:    ['var(--font-mono)', 'JetBrains Mono', 'monospace'],
       },
       fontSize: {
         'hero':    ['clamp(2.1rem, 8vw, 6.5rem)', { lineHeight: '1.0', letterSpacing: '-0.03em', fontWeight: '900' }],

@@ -238,8 +238,8 @@ export function Hero() {
                 </span>
                 <button
                   onClick={() => setShowMethodology(false)}
-                  className="text-text-secondary hover:text-white transition-colors outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card"
-                  aria-label="Close methodology"
+                  className="text-text-secondary hover:text-white transition-colors outline-none focus-visible:ring-2 focus-visible:ring-amber focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card"
+                  aria-label="Close methodology modal"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
@@ -321,7 +321,7 @@ export function Hero() {
                 </span>
                 <button
                   onClick={() => setActiveIntel(null)}
-                  className="text-text-secondary hover:text-white outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card"
+                  className="text-text-secondary hover:text-white outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card p-1"
                   aria-label="Close intel details"
                 >
                   [X]

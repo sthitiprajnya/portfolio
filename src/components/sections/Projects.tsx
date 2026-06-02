@@ -156,11 +156,20 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
                 </svg>
               </a>
             ) : (
-              <div className="group/lock relative ml-4 flex-shrink-0 cursor-help" onClick={(e) => e.stopPropagation()}>
-                 <svg className="w-5 h-5 text-text-muted hover:text-amber transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div
+                className="group/lock relative ml-4 flex-shrink-0 cursor-help outline-none focus-visible:ring-2 focus-visible:ring-amber focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-sm"
+                onClick={(e) => e.stopPropagation()}
+                tabIndex={0}
+                aria-describedby={`lock-tooltip-${index}`}
+              >
+                 <svg aria-hidden="true" className="w-5 h-5 text-text-muted hover:text-amber transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                  </svg>
-                 <div className="absolute right-0 bottom-full mb-2 w-max opacity-0 group-hover/lock:opacity-100 transition-opacity bg-black border border-amber text-amber font-mono text-[0.6rem] px-2 py-1 rounded-card whitespace-nowrap z-50">
+                 <div
+                   id={`lock-tooltip-${index}`}
+                   role="tooltip"
+                   className="absolute right-0 bottom-full mb-2 w-max opacity-0 group-hover/lock:opacity-100 group-focus-visible/lock:opacity-100 transition-opacity bg-black border border-amber text-amber font-mono text-[0.6rem] px-2 py-1 rounded-card whitespace-nowrap z-50"
+                 >
                    {project.githubUrl ? project.githubUrl : '🔒 CLASSIFIED'}
                  </div>
               </div>

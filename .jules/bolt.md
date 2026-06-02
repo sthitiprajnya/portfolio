@@ -39,3 +39,7 @@
 ## 2026-07-01 - [Eliminating Layout Thrashing in Animation Loops]
 **Learning:** Performing DOM queries (`querySelectorAll`) and layout measurements (`getBoundingClientRect`) inside a `requestAnimationFrame` loop causes "Layout Thrashing", forcing the browser to recalculate styles and layout on every frame. This drastically increases CPU usage and can cause visual stuttering.
 **Action:** Refactor animation loops to be "layout-free". Use a `useRef` to cache document-relative positions and update that cache only during `resize` or `mount` events. Any proximity checks within the loop should then use the cached values.
+
+## 2026-07-05 - [Batching Canvas Paths and Eliminating String Allocations]
+**Learning:** In high-frequency (60fps) Canvas 2D loops, individual `fill()` calls for dozens of elements and per-frame RGBA string template literals (`rgba(...)`) cause significant CPU overhead and trigger frequent Garbage Collection (GC) pauses. Batching similar shapes into a single path and using `ctx.globalAlpha` for transparency allows the browser and GPU to process the frame much more efficiently.
+**Action:** Always batch primitive shapes (like `arc`) into a single path before calling `fill()` or `stroke()`. Avoid dynamic color string generation in hot loops; use a static color and control opacity via `globalAlpha`.

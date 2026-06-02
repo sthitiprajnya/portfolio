@@ -8,6 +8,19 @@ interface NetworkConnectorProps {
   className?: string;
 }
 
+interface Node {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+}
+
+// BOLT: Hoist static animation constants to module level to avoid redundant allocations and property lookups
+const NUM_NODES = 70;
+const MAX_DISTANCE = 150;
+const MAX_DISTANCE_SQ = MAX_DISTANCE * MAX_DISTANCE;
+const NODE_COLOR = 'rgba(0, 245, 255, 0.5)';
+
 export default function NetworkConnector({ className }: NetworkConnectorProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const { ref: inViewRef, inView } = useInView({ threshold: 0 });
@@ -30,20 +43,11 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
     let width: number;
     let height: number;
 
-    interface Node {
-      x: number;
-      y: number;
-      vx: number;
-      vy: number;
-    }
-
-    const numNodes = 70; // Adjust for density
     let nodes: Node[] = [];
-    const maxDistance = 150; // Distance to draw lines
 
     const initNodes = () => {
       nodes = [];
-      for (let i = 0; i < numNodes; i++) {
+      for (let i = 0; i < NUM_NODES; i++) {
         nodes.push({
           x: Math.random() * width,
           y: Math.random() * height,
@@ -65,9 +69,11 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
 
-      // Update and draw nodes
-      ctx.fillStyle = 'rgba(0, 245, 255, 0.5)';
-      nodes.forEach((node) => {
+      // BOLT: Replace forEach with for-loop and batch arc drawing into a single fill() call
+      ctx.fillStyle = NODE_COLOR;
+      ctx.beginPath();
+      for (let i = 0; i < NUM_NODES; i++) {
+        const node = nodes[i];
         node.x += node.vx;
         node.y += node.vy;
 
@@ -75,30 +81,35 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
         if (node.x < 0 || node.x > width) node.vx *= -1;
         if (node.y < 0 || node.y > height) node.vy *= -1;
 
-        ctx.beginPath();
+        ctx.moveTo(node.x + 2, node.y);
         ctx.arc(node.x, node.y, 2, 0, Math.PI * 2);
-        ctx.fill();
-      });
+      }
+      ctx.fill();
 
-      // Draw connections
+      // BOLT: Use globalAlpha for connection opacity and squared distance thresholding to avoid Math.sqrt() in the 60fps loop.
+      // String template allocations for colors are eliminated.
       ctx.lineWidth = 1;
-      for (let i = 0; i < numNodes; i++) {
-        for (let j = i + 1; j < numNodes; j++) {
-          const dx = nodes[i].x - nodes[j].x;
-          const dy = nodes[i].y - nodes[j].y;
+      ctx.strokeStyle = '#00F5FF';
+      for (let i = 0; i < NUM_NODES; i++) {
+        const nodeA = nodes[i];
+        for (let j = i + 1; j < NUM_NODES; j++) {
+          const nodeB = nodes[j];
+          const dx = nodeA.x - nodeB.x;
+          const dy = nodeA.y - nodeB.y;
           const distanceSq = dx * dx + dy * dy;
 
-          if (distanceSq < maxDistance * maxDistance) {
+          if (distanceSq < MAX_DISTANCE_SQ) {
             const distance = Math.sqrt(distanceSq);
-            const opacity = 1 - distance / maxDistance;
-            ctx.strokeStyle = `rgba(0, 245, 255, ${opacity * 0.3})`;
+            const opacity = (1 - distance / MAX_DISTANCE) * 0.3;
+            ctx.globalAlpha = opacity;
             ctx.beginPath();
-            ctx.moveTo(nodes[i].x, nodes[i].y);
-            ctx.lineTo(nodes[j].x, nodes[j].y);
+            ctx.moveTo(nodeA.x, nodeA.y);
+            ctx.lineTo(nodeB.x, nodeB.y);
             ctx.stroke();
           }
         }
       }
+      ctx.globalAlpha = 1.0;
 
       animationFrameId = requestAnimationFrame(draw);
     };

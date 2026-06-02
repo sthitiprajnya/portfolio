@@ -108,6 +108,7 @@ export function CommandPalette() {
                 onKeyDown={handleKeyDown}
                 autoComplete="off"
                 spellCheck="false"
+                maxLength={100}
               />
               <span className="text-text-secondary text-xs font-mono bg-black/50 px-2 py-1 rounded-card border border-border/50">ESC</span>
             </div>

@@ -214,6 +214,7 @@ export function InteractiveTerminal({ className }: { className?: string }) {
               autoComplete="off"
               spellCheck="false"
               autoFocus
+              maxLength={500}
             />
           </div>
         )}

@@ -173,6 +173,7 @@ export default function LiviePanel({ onClose }: { onClose: () => void }) {
           onKeyDown={onKey}
           placeholder="Ask about Sthita..."
           disabled={loading}
+          maxLength={500}
           className="
             flex-1 bg-transparent
             font-mono text-[12px] text-[#a0f0e8]

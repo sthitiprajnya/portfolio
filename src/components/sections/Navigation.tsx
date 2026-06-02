@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { CyberButton } from '@/components/ui/CyberButton';
 import { PERSONAL }    from '@/data/portfolio';
+import { useAudio }    from '@/components/providers/AudioProvider';
 
 export const NAV_LINKS = [
   { label: 'About',    id: 'about'    },
@@ -119,6 +120,8 @@ export function Navigation() {
 
           {/* Desktop nav */}
           <div className="hidden lg:flex items-center space-x-6 xl:space-x-8">
+            <AudioToggle />
+
             <button
               onClick={openSearch}
               className="flex items-center gap-3 px-3 py-1.5 rounded-card border border-border text-text-secondary hover:text-cyan hover:border-cyan hover:shadow-[var(--glow-cyan-sm)] transition-all outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black group"
@@ -166,6 +169,8 @@ export function Navigation() {
 
           {/* Mobile actions */}
           <div className="flex items-center gap-2 lg:hidden">
+            <AudioToggle mobile />
+
             <button
               onClick={openSearch}
               className="text-text-secondary p-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card"
@@ -245,5 +250,37 @@ export function Navigation() {
         )}
       </AnimatePresence>
     </>
+  );
+}
+
+function AudioToggle({ mobile = false }: { mobile?: boolean }) {
+  const { audioEnabled, setAudioEnabled, isSpeaking } = useAudio();
+
+  return (
+    <button
+      onClick={() => setAudioEnabled(!audioEnabled)}
+      className={clsx(
+        "relative flex items-center justify-center transition-all outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card",
+        mobile ? "p-2 text-text-secondary" : "p-2 border border-border text-text-secondary hover:text-cyan hover:border-cyan hover:shadow-[var(--glow-cyan-sm)]"
+      )}
+      aria-label={audioEnabled ? "Mute audio" : "Unmute audio"}
+    >
+      {isSpeaking && audioEnabled && (
+        <span className="absolute -top-1 -right-1 flex h-2 w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan"></span>
+        </span>
+      )}
+      {audioEnabled ? (
+        <svg className={mobile ? "w-6 h-6" : "w-4 h-4"} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+        </svg>
+      ) : (
+        <svg className={mobile ? "w-6 h-6" : "w-4 h-4"} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+        </svg>
+      )}
+    </button>
   );
 }

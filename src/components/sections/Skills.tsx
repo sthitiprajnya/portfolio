@@ -4,7 +4,6 @@ import { SectionTitle } from '@/components/ui/SectionTitle';
 import { SkillBadge } from '@/components/ui/SkillBadge';
 import { ScrollReveal, fadeSlideUp, containerStagger } from '@/components/ui/ScrollReveal';
 import { SKILLS } from '@/data/portfolio';
-import { useState, useMemo } from 'react';
 import clsx from 'clsx';
 import { Radar } from 'react-chartjs-2';
 import {

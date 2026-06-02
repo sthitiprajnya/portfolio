@@ -84,7 +84,8 @@ export function ResumePanel() {
                   src={PERSONAL.resumeUrl}
                   className="w-full h-[600px] border-none"
                   title="Resume PDF"
-                  sandbox="allow-scripts allow-same-origin"
+                  sandbox="allow-same-origin"
+                  allow="camera 'none'; microphone 'none'; geolocation 'none'; autoplay 'none'"
                 />
               </div>
 

@@ -42,13 +42,28 @@ export default function Sentinel() {
     let width = window.innerWidth;
     let height = window.innerHeight;
 
+    const targetsRef: { current: { y: number }[] } = { current: [] };
+
+    // BOLT: Cache target positions outside the 60fps loop to eliminate layout thrashing
+    const updateTargets = () => {
+      const elements = document.querySelectorAll('[data-orb-target]');
+      const scrollY = window.scrollY;
+      targetsRef.current = Array.from(elements).map((el) => {
+        const rect = el.getBoundingClientRect();
+        return {
+          y: rect.top + scrollY + rect.height / 2,
+        };
+      });
+    };
+
     const resize = () => {
       width = window.innerWidth;
       height = window.innerHeight;
       canvas.width = width;
       canvas.height = height;
+      updateTargets();
     };
-    window.addEventListener('resize', resize);
+    window.addEventListener('resize', resize, { passive: true });
     resize();
 
     const onScroll = () => {
@@ -58,28 +73,27 @@ export default function Sentinel() {
     onScroll(); // initial sync
 
     const checkProximity = (currentY: number) => {
-      // Find elements with data-orb-target
-      const targets = document.querySelectorAll('[data-orb-target]');
       let maxProximity = 0;
       const viewportCenterY = currentY + height / 2;
 
-      targets.forEach(target => {
-        const rect = target.getBoundingClientRect();
-        // Element's center relative to document
-        const elementCenterY = currentY + rect.top + rect.height / 2;
-
-        // Distance from viewport center
-        const dist = Math.abs(elementCenterY - viewportCenterY);
+      const targets = targetsRef.current;
+      const len = targets.length;
+      for (let i = 0; i < len; i++) {
+        // Distance from viewport center using cached document-relative positions
+        const dist = Math.abs(targets[i].y - viewportCenterY);
 
         // If within 300px, increase glow
         if (dist < 300) {
           const proximity = 1 - (dist / 300);
           if (proximity > maxProximity) maxProximity = proximity;
         }
-      });
+      }
 
       return maxProximity;
     };
+
+    // Initial targets update after a short delay to ensure elements are rendered
+    const timer = setTimeout(updateTargets, 1000);
 
     const draw = () => {
       if (!ctx) return;
@@ -128,6 +142,7 @@ export default function Sentinel() {
     return () => {
       window.removeEventListener('resize', resize);
       window.removeEventListener('scroll', onScroll);
+      clearTimeout(timer);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, [prefersReducedMotion]);

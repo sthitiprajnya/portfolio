@@ -1,3 +1,7 @@
 ## 2025-07-24 - [Accessible Tooltips for Decorative Icons]
 **Learning:** Decorative or informative icons that trigger tooltips on hover are often missed in keyboard navigation. Providing `tabIndex={0}` and linking content via `aria-describedby` is essential for WCAG compliance.
 **Action:** Always verify that informative tooltips are triggerable via `:focus-visible` and have appropriate ARIA roles and descriptions. Use the array index for unique IDs when rendering in loops to ensure stable ARIA links.
+
+## 2025-07-25 - [Command Palette Discoverability]
+**Learning:** "Power user" features like Command Palettes or keyboard-driven navigation are often underutilized if they lack a visible entry point. Providing a "Search" button in the main navigation with keyboard shortcut hints significantly increases engagement and accessibility for non-power users.
+**Action:** Always include a visible UI element (e.g., a search icon or button) to trigger hidden interactive features, and label them with their corresponding keyboard shortcuts (e.g., `[/]`) to bridge the gap between GUI and CLI patterns.

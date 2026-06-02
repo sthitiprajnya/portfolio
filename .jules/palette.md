@@ -13,3 +13,7 @@
 ## 2026-06-01 - [Keyboard-Accessible Tooltips via ARIA Describedby]
 **Learning:** Making hover-only information (like tooltips) accessible to keyboard users requires more than just `tabIndex={0}`. To ensure screen readers announce the supplemental information, the interactive element should use `aria-describedby` to link to a container marked with `role="tooltip"`. Additionally, `role="button"` should be avoided if the element is purely informative and doesn't trigger a state change or navigation, as it creates false expectations for keyboard users (who would expect 'Enter' or 'Space' to perform an action).
 **Action:** Implement focusable informative elements with `aria-describedby` pointing to a `role="tooltip"` container to provide a semantic and predictable experience for assistive technology.
+
+## 2026-06-02 - [Keyboard-Accessible Tabs for Experience Section]
+**Learning:** Implementing the WAI-ARIA Tabs pattern with keyboard navigation (Arrow keys, Home, End) and roving tabindex significantly improves the accessibility of multi-tabbed content like role descriptions. It allows users to navigate logical groupings of information without excessive tabbing.
+**Action:** Use roving tabindex (`tabIndex={isOpen ? 0 : -1}`) and manage focus programmatically via refs to ensure a seamless keyboard navigation experience for tab lists.

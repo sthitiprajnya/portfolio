@@ -135,6 +135,35 @@ export function Experience() {
 function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE[0], isFirst: boolean }) {
   const [openSection, setOpenSection] = useState<string | null>(experience.subsections[0]?.id || null);
   const prefersReducedMotion = usePrefersReducedMotion();
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
+    const tabs = experience.subsections;
+    let newIndex = -1;
+
+    switch (e.key) {
+      case 'ArrowRight':
+        newIndex = (index + 1) % tabs.length;
+        break;
+      case 'ArrowLeft':
+        newIndex = (index - 1 + tabs.length) % tabs.length;
+        break;
+      case 'Home':
+        newIndex = 0;
+        break;
+      case 'End':
+        newIndex = tabs.length - 1;
+        break;
+      default:
+        return;
+    }
+
+    if (newIndex !== -1) {
+      e.preventDefault();
+      setOpenSection(tabs[newIndex].id);
+      tabRefs.current[newIndex]?.focus();
+    }
+  };
 
   const cardContent = (
     <div className="relative pl-8 md:pl-12" data-orb-target="experience">
@@ -206,17 +235,20 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
         {/* Dynamic Tabs for Subsections */}
         <div className="mb-8 relative z-10">
           <div className="flex flex-wrap gap-2 mb-4 border-b border-[var(--glass-border)] pb-2" role="tablist" aria-label={`${experience.company} role details`}>
-            {experience.subsections.map((sub) => {
+            {experience.subsections.map((sub, idx) => {
               const isOpen = openSection === sub.id;
 
               return (
                 <button
                   key={sub.id}
+                  ref={(el) => { tabRefs.current[idx] = el; }}
                   id={`tab-${experience.id}-${sub.id}`}
                   role="tab"
                   aria-selected={isOpen}
                   aria-controls={`panel-${experience.id}-${sub.id}`}
+                  tabIndex={isOpen ? 0 : -1}
                   onClick={() => setOpenSection(sub.id)}
+                  onKeyDown={(e) => handleKeyDown(e, idx)}
                   className={clsx(
                     "px-4 py-2 font-mono text-[0.65rem] tracking-widest uppercase transition-all rounded-card border-b-2 outline-none focus-visible:ring-2",
                     isOpen

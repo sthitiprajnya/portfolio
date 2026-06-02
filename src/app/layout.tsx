@@ -1,11 +1,17 @@
 import type { Metadata, Viewport } from 'next';
-import { JetBrains_Mono, Orbitron } from 'next/font/google';
+import { JetBrains_Mono, Orbitron, Inter } from 'next/font/google';
 import '@/index.css';
 import '@/animations.css';
 
 const jbm = JetBrains_Mono({
   subsets: ['latin'],
-  variable: '--font-mono',
+  variable: '--font-mono-loaded',
+  display: 'swap',
+});
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-body-loaded',
   display: 'swap',
 });
 
@@ -96,7 +102,7 @@ export default function RootLayout({
   const jsonLdString = JSON.stringify(jsonLd).replace(/</g, '\\u003c');
 
   return (
-    <html lang="en" className={`${jbm.variable} ${orbitron.variable}`}>
+    <html lang="en" className={`${jbm.variable} ${inter.variable} ${orbitron.variable}`}>
       <head>
         <script
           type="application/ld+json"

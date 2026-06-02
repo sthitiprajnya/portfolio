@@ -5,6 +5,7 @@ const config: Config = {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -30,12 +31,29 @@ const config: Config = {
         'text-secondary': '#7FA8C4',
         'text-muted':     '#3D6680',
         'text-accent':    '#00F5FF',
+
+        'bg-primary': 'var(--color-bg-primary)',
+        'bg-secondary': 'var(--color-bg-secondary)',
+        'bg-tertiary': 'var(--color-bg-tertiary)',
+        'bg-card': 'var(--color-bg-card)',
+        'bg-card-hover': 'var(--color-bg-card-hover)',
+        accent: 'var(--color-accent)',
+        'accent-dim': 'var(--color-accent-dim)',
+        'accent-glow': 'var(--color-accent-glow)',
+        critical: 'var(--color-critical)',
+        'critical-glow': 'var(--color-critical-glow)',
+        high: 'var(--color-high)',
+        'high-glow': 'var(--color-high-glow)',
+        medium: 'var(--color-medium)',
+        low: 'var(--color-low)',
+        info: 'var(--color-info)',
+        compliance: 'var(--color-compliance)',
       },
       fontFamily: {
         display: ['var(--font-display)', 'Orbitron', 'monospace'],
         heading: ['system-ui', '-apple-system', 'sans-serif'],
-        body:    ['system-ui', '-apple-system', 'sans-serif'],
-        mono:    ['var(--font-mono)', 'JetBrains Mono', 'monospace'],
+        body: ['var(--font-body-loaded)', 'system-ui', '-apple-system', 'sans-serif'],
+        mono: ['var(--font-mono-loaded)', 'JetBrains Mono', 'Fira Code', 'monospace'],
       },
       fontSize: {
         'hero':    ['clamp(2.1rem, 8vw, 6.5rem)', { lineHeight: '1.0', letterSpacing: '-0.03em', fontWeight: '900' }],

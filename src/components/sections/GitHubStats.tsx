@@ -106,7 +106,7 @@ export function GitHubStats() {
                        <div className="flex justify-between font-mono text-[0.65rem] text-text-muted mb-1">
                          <span>TOP_LANGUAGES</span>
                        </div>
-                       <div className="h-2 w-full flex rounded-sm overflow-hidden">
+                       <div className="h-2 w-full flex rounded-card overflow-hidden">
                          <div className="bg-[#3572A5] h-full" style={{ width: '60%' }} title="Python 60%"></div>
                          <div className="bg-[#89e051] h-full" style={{ width: '25%' }} title="Bash 25%"></div>
                          <div className="bg-[#89e051] h-full opacity-70" style={{ width: '15%' }} title="Shell 15%"></div>

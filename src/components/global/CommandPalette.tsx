@@ -109,7 +109,7 @@ export function CommandPalette() {
                 autoComplete="off"
                 spellCheck="false"
               />
-              <span className="text-text-secondary text-xs font-mono bg-black/50 px-2 py-1 rounded border border-border/50">ESC</span>
+              <span className="text-text-secondary text-xs font-mono bg-black/50 px-2 py-1 rounded-card border border-border/50">ESC</span>
             </div>
 
             <div className="max-h-80 overflow-y-auto py-2 px-2 scrollbar-thin scrollbar-thumb-[var(--glass-border)] scrollbar-track-transparent relative z-10">
@@ -120,7 +120,7 @@ export function CommandPalette() {
                     <button
                       key={link.id}
                       className={clsx(
-                        'w-full text-left px-4 py-3 rounded-md flex items-center justify-between font-mono text-sm transition-colors',
+                        'w-full text-left px-4 py-3 rounded-card flex items-center justify-between font-mono text-sm transition-colors',
                         isSelected ? 'bg-cyan/10 text-cyan border border-cyan/20 glass-pill rounded-pill' : 'text-text-secondary hover:bg-white/5 hover:text-white border border-transparent rounded-pill'
                       )}
                       onClick={() => handleSelect(link.id, link.label)}
@@ -144,12 +144,12 @@ export function CommandPalette() {
             <div className="px-4 py-3 border-t border-[var(--glass-border)] bg-[rgba(0,0,0,0.4)] flex items-center justify-between text-xs text-text-secondary font-mono relative z-10">
               <div className="flex items-center gap-4">
                 <span className="flex items-center gap-1">
-                  <kbd className="bg-white/10 px-1.5 py-0.5 rounded border border-white/20">↑</kbd>
-                  <kbd className="bg-white/10 px-1.5 py-0.5 rounded border border-white/20">↓</kbd>
+                  <kbd className="bg-white/10 px-1.5 py-0.5 rounded-card border border-white/20">↑</kbd>
+                  <kbd className="bg-white/10 px-1.5 py-0.5 rounded-card border border-white/20">↓</kbd>
                   <span className="ml-1">Navigate</span>
                 </span>
                 <span className="flex items-center gap-1">
-                  <kbd className="bg-white/10 px-1.5 py-0.5 rounded border border-white/20">↵</kbd>
+                  <kbd className="bg-white/10 px-1.5 py-0.5 rounded-card border border-white/20">↵</kbd>
                   <span className="ml-1">Select</span>
                 </span>
               </div>

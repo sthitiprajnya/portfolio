@@ -238,7 +238,8 @@ export function Hero() {
                 </span>
                 <button
                   onClick={() => setShowMethodology(false)}
-                  className="text-text-secondary hover:text-white transition-colors"
+                  className="text-text-secondary hover:text-white transition-colors outline-none focus-visible:ring-2 focus-visible:ring-amber focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card"
+                  aria-label="Close methodology modal"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
@@ -285,9 +286,9 @@ export function Hero() {
                 <div className="mt-8 pt-6 border-t border-border">
                   <p className="text-xs text-text-muted mb-4 uppercase tracking-widest">See it in practice ↴</p>
                   <div className="flex flex-wrap gap-3">
-                    <button onClick={() => { setShowMethodology(false); scrollTo('projects'); }} className="px-3 py-1.5 border border-cyan/30 text-cyan text-xs rounded-card hover:bg-cyan/10 transition-colors">DLP Pipeline</button>
-                    <button onClick={() => { setShowMethodology(false); scrollTo('projects'); }} className="px-3 py-1.5 border border-cyan/30 text-cyan text-xs rounded-card hover:bg-cyan/10 transition-colors">GCP Hardening</button>
-                    <button onClick={() => { setShowMethodology(false); scrollTo('projects'); }} className="px-3 py-1.5 border border-cyan/30 text-cyan text-xs rounded-card hover:bg-cyan/10 transition-colors">MQTT Attack Chain</button>
+                    <button onClick={() => { setShowMethodology(false); scrollTo('projects'); }} className="px-3 py-1.5 border border-cyan/30 text-cyan text-xs rounded-card hover:bg-cyan/10 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black">DLP Pipeline</button>
+                    <button onClick={() => { setShowMethodology(false); scrollTo('projects'); }} className="px-3 py-1.5 border border-cyan/30 text-cyan text-xs rounded-card hover:bg-cyan/10 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black">GCP Hardening</button>
+                    <button onClick={() => { setShowMethodology(false); scrollTo('projects'); }} className="px-3 py-1.5 border border-cyan/30 text-cyan text-xs rounded-card hover:bg-cyan/10 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black">MQTT Attack Chain</button>
                   </div>
                 </div>
               </div>
@@ -320,7 +321,8 @@ export function Hero() {
                 </span>
                 <button
                   onClick={() => setActiveIntel(null)}
-                  className="text-text-secondary hover:text-white"
+                  className="text-text-secondary hover:text-white outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card p-1"
+                  aria-label="Close intel details"
                 >
                   [X]
                 </button>

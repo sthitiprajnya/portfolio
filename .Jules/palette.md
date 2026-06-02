@@ -9,3 +9,7 @@
 ## 2026-05-31 - SPA Navigation Accessibility and Keyboard Interactivity
 **Learning:** For Single Page Applications (SPAs) with smooth scrolling, `aria-current="page"` is a critical accessibility pattern to let screen readers know which nav link corresponds to the currently visible section. Additionally, whenever implementing a custom `role="dialog"` (like the mobile menu), an `Escape` key listener is mandatory for keyboard users to easily dismiss the menu.
 **Action:** Always verify that active navigation links convey their state to assistive tech via `aria-current`, and ensure custom modals/dialogs can be exited via the `Escape` key.
+
+## 2024-06-02 - Added ARIA labels and focus states to dynamically rendered Hero modals
+**Learning:** Modal close buttons (`[X]` or SVG icons) rendered dynamically within `AnimatePresence` often miss crucial screen reader and keyboard accessibility attributes (`aria-label` and `focus-visible`), breaking the semantic and navigable flow of the UI.
+**Action:** Always ensure that dynamically mounted interactive elements, especially those acting as structural UI components like modal closures, include descriptive `aria-label`s and visible focus states (e.g., `outline-none focus-visible:ring-2`) to support full keyboard and screen reader accessibility.

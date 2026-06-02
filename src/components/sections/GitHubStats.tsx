@@ -6,10 +6,12 @@ import { PERSONAL } from '@/data/portfolio';
 import CountUp from 'react-countup';
 import useSWR from 'swr';
 import Image from 'next/image';
+import { useState } from 'react';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 export function GitHubStats() {
+  const [heatmapError, setHeatmapError] = useState(false);
   const { data: githubData } = useSWR(
     'https://api.github.com/users/sthitiprajnya',
     fetcher,
@@ -92,15 +94,22 @@ export function GitHubStats() {
                   </div>
                   <div className="p-6 flex-grow flex flex-col justify-center items-center relative">
                      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PHBhdGggZD0iTTEwIDBMICAwIDBMMCAxMEwxMCAxMEwxMCAwWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEiLz48L3N2Zz4=')] opacity-[0.03] pointer-events-none"></div>
-                     <Image
-                       src={`https://ghchart.rshah.org/00F5FF/sthitiprajnya`}
-                       alt={`${PERSONAL.name}'s GitHub Contribution Heatmap`}
-                       className="w-full max-w-full drop-shadow-[0_0_8px_rgba(0,245,255,0.3)] filter brightness-110 contrast-125 invert-[1] hue-rotate-[180deg]"
-                       style={{ opacity: 0.9 }}
-                       width={495}
-                       height={195}
-                       unoptimized
-                     />
+                     {!heatmapError ? (
+                       <Image
+                         src={`https://ghchart.rshah.org/00F5FF/sthitiprajnya`}
+                         alt={`${PERSONAL.name}'s GitHub Contribution Heatmap`}
+                         className="w-full max-w-full drop-shadow-[0_0_8px_rgba(0,245,255,0.3)] filter brightness-110 contrast-125 invert-[1] hue-rotate-[180deg]"
+                         style={{ opacity: 0.9 }}
+                         width={495}
+                         height={195}
+                         unoptimized
+                         onError={() => setHeatmapError(true)}
+                       />
+                     ) : (
+                       <div className="w-full h-[195px] flex items-center justify-center border border-border/50 rounded bg-surface/50 text-text-muted font-mono text-[0.65rem] tracking-widest text-center px-4">
+                         [HEATMAP_API_UNAVAILABLE] <br /> Showing static representation
+                       </div>
+                     )}
                      {/* Top languages bar */}
                      <div className="w-full mt-4 px-4">
                        <div className="flex justify-between font-mono text-[0.65rem] text-text-muted mb-1">

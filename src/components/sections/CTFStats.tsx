@@ -197,6 +197,7 @@ export function CTFStats() {
               {CTF_PROFILE.competitions.map((comp, i) => (
                 <div
                   key={i}
+                  data-orb-target="ctf"
                   className="p-4 glass rounded-lg bg-[rgba(0,0,0,0.5)] hover:border-[rgba(0,245,255,0.4)] transition-colors group"
                 >
                   <div className="flex items-start justify-between mb-3">

@@ -69,7 +69,7 @@ function CertCard({ cert }: { cert: typeof CERTIFICATIONS[0] }) {
   const style = CERT_COLOR_MAP[cert.color];
 
   return (
-    <div className={clsx("relative rounded-xl overflow-hidden group h-full glass transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--glass-shadow-hover)]", style.glow)} >
+    <div data-orb-target="cert" className={clsx("relative rounded-xl overflow-hidden group h-full glass transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--glass-shadow-hover)]", style.glow)} >
       <div className={clsx("absolute inset-0 opacity-20 group-hover:opacity-100 transition-opacity duration-500 z-0", style.bg)} />
       <div className="relative h-full border border-[var(--glass-border)] rounded-xl p-5 flex flex-col z-10">
 

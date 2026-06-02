@@ -94,6 +94,7 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
     >
       <div
         ref={ref as unknown as React.RefObject<HTMLDivElement>}
+        data-orb-target="project"
         className="w-full flex flex-col group glass rounded-card relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--glass-shadow-hover)] cursor-pointer"
         style={prefersReducedMotion ? {} : { transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`, transformStyle: 'preserve-3d' }}
       >

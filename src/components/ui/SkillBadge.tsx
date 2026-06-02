@@ -48,6 +48,7 @@ export function SkillBadge({ name, icon, proficiency, color, delay = 0, descript
       tabIndex={0}
       aria-label={`Skill: ${name}`}
       aria-describedby={tooltipId}
+      data-orb-target="skill"
       className="relative flex flex-col items-center justify-center p-2 group skill-tag outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-lg transition-all"
     >
       <div className="relative w-16 h-16 flex items-center justify-center mb-3">

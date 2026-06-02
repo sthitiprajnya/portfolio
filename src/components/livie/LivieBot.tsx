@@ -6,17 +6,13 @@ import LiviePanel from './LiviePanel';
 
 export default function LivieBot() {
   const [open, setOpen] = useState(false);
-  const [unread, setUnread] = useState(1); // initial greeting
 
   useEffect(() => {
     // Keyboard shortcut (Ctrl+/)
     const handler = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === '/') {
         e.preventDefault();
-        setOpen(o => {
-          if (!o) setUnread(0);
-          return !o;
-        });
+        setOpen(o => !o);
       }
       if (e.key === 'Escape') setOpen(false);
     };
@@ -28,7 +24,7 @@ export default function LivieBot() {
     <>
       {/* ── Floating Toggle Button ─────────────────────────────── */}
       <motion.button
-        onClick={() => { setOpen(o => !o); setUnread(0); }}
+        onClick={() => setOpen(o => !o)}
         className="
           fixed bottom-6 right-6 z-[9999]
           w-14 h-14
@@ -58,18 +54,6 @@ export default function LivieBot() {
         <span className="text-[#00F5FF] font-mono text-sm font-bold select-none">
           {open ? '✕' : 'AI'}
         </span>
-
-        {/* Unread badge */}
-        {!open && unread > 0 && (
-          <span className="
-            absolute -top-1 -right-1
-            w-4 h-4 rounded-pill bg-[#00F5FF]
-            text-black text-[9px] font-bold
-            flex items-center justify-center
-          ">
-            {unread}
-          </span>
-        )}
       </motion.button>
 
       {/* ── Chat Panel ────────────────────────────────────────── */}

@@ -70,7 +70,7 @@ export default function LiviePanel({ onClose }: { onClose: () => void }) {
         fixed bottom-24 right-6 z-[9998]
         w-[340px] sm:w-[380px]
         h-[480px]
-        glass-heavy rounded-2xl
+        glass-heavy rounded-card
         border border-[#00F5FF]/20
         shadow-glass
         flex flex-col
@@ -109,11 +109,11 @@ export default function LiviePanel({ onClose }: { onClose: () => void }) {
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`
-              max-w-[85%] px-3 py-2 rounded-xl
+              max-w-[85%] px-3 py-2 rounded-card
               font-mono text-[12px] leading-relaxed
               ${msg.role === 'user'
-                ? 'bg-[#00F5FF]/15 border border-[#00F5FF]/20 text-[#00F5FF] rounded-tr-sm'
-                : 'bg-[rgba(0,0,0,0.4)] border border-[#00F5FF]/08 text-[#a0f0e8] rounded-tl-sm'}
+                ? 'bg-[#00F5FF]/15 border border-[#00F5FF]/20 text-[#00F5FF] rounded-card'
+                : 'bg-[rgba(0,0,0,0.4)] border border-[#00F5FF]/08 text-[#a0f0e8] rounded-card'}
             `}>
               {msg.role === 'assistant' && (
                 <span className="text-[#00F5FF]/50 text-[10px] block mb-1">LIVIE ▸</span>
@@ -126,7 +126,7 @@ export default function LiviePanel({ onClose }: { onClose: () => void }) {
         {/* Thinking dots */}
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-[rgba(0,0,0,0.4)] border border-[#00F5FF]/08 rounded-xl rounded-tl-sm px-4 py-3">
+            <div className="bg-[rgba(0,0,0,0.4)] border border-[#00F5FF]/08 rounded-card px-4 py-3">
               <div className="flex gap-1">
                 {[0, 1, 2].map(i => (
                   <motion.span

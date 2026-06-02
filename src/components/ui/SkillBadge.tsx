@@ -48,8 +48,7 @@ export function SkillBadge({ name, icon, proficiency, color, delay = 0, descript
       tabIndex={0}
       aria-label={`Skill: ${name}`}
       aria-describedby={tooltipId}
-      data-orb-target="skill"
-      className="relative flex flex-col items-center justify-center p-2 group skill-tag outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-lg transition-all"
+      className="relative flex flex-col items-center justify-center p-2 group skill-tag outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card transition-all"
     >
       <div className="relative w-16 h-16 flex items-center justify-center mb-3">
         {/* Background track */}
@@ -125,7 +124,7 @@ export function SkillBadge({ name, icon, proficiency, color, delay = 0, descript
             />
           ) : (
             <div
-              className="w-6 h-6 rounded flex items-center justify-center text-[0.65rem] font-bold tracking-widest bg-black/40 border border-border backdrop-blur-sm"
+              className="w-6 h-6 rounded-card flex items-center justify-center text-[0.65rem] font-bold tracking-widest bg-black/40 border border-border backdrop-blur-sm"
               style={{ color: COLOR_MAP[color], borderColor: `${COLOR_MAP[color]}40` }}
             >
               {icon.substring(0, 2).toUpperCase()}
@@ -142,7 +141,7 @@ export function SkillBadge({ name, icon, proficiency, color, delay = 0, descript
       <div
         id={tooltipId}
         role="tooltip"
-        className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-3 glass rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-visible:opacity-100 group-focus-visible:visible transition-all duration-200 z-50 pointer-events-none translate-y-2 group-hover:translate-y-0 group-focus-visible:translate-y-0 relative overflow-hidden"
+        className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-3 glass rounded-card opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-visible:opacity-100 group-focus-visible:visible transition-all duration-200 z-50 pointer-events-none translate-y-2 group-hover:translate-y-0 group-focus-visible:translate-y-0 relative overflow-hidden"
       >
         <div className="font-mono text-[0.6rem] text-cyan font-bold mb-1 tracking-widest">{name}</div>
         <div className="flex justify-between items-center mb-2 font-mono text-[0.6rem]">

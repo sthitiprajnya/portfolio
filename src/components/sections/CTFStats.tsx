@@ -103,7 +103,7 @@ export function CTFStats() {
               {/* Stats grid */}
               <div className="grid grid-cols-2 gap-3 mb-6" >
                 {HTB_STATS.map(({ label, value }) => (
-                  <div key={label} className="p-3 glass rounded-lg bg-[rgba(0,0,0,0.4)]">
+                  <div key={label} className="p-3 glass rounded-card bg-[rgba(0,0,0,0.4)]">
                     <div className="font-display text-xl text-cyan font-bold">{value}</div>
                     <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest mt-0.5">
                       {label}
@@ -163,7 +163,7 @@ export function CTFStats() {
                </h3>
                <div className="space-y-3">
                  {CTF_PROFILE.recentActivity.map((act, i) => (
-                    <div key={i} className="flex items-center justify-between p-3 rounded-lg glass bg-[rgba(0,0,0,0.4)] hover:border-green/30 transition-colors">
+                    <div key={i} className="flex items-center justify-between p-3 rounded-card glass bg-[rgba(0,0,0,0.4)] hover:border-green/30 transition-colors">
                       <div className="flex items-center gap-3">
                          <span className={clsx("w-2 h-2 rounded-full", act.type === 'machine' ? 'bg-green shadow-[var(--glow-green-sm)]' : 'bg-amber shadow-[var(--glow-amber-sm)]')} />
                          <div>
@@ -197,8 +197,7 @@ export function CTFStats() {
               {CTF_PROFILE.competitions.map((comp, i) => (
                 <div
                   key={i}
-                  data-orb-target="ctf"
-                  className="p-4 glass rounded-lg bg-[rgba(0,0,0,0.5)] hover:border-[rgba(0,245,255,0.4)] transition-colors group"
+                  className="p-4 glass rounded-card bg-[rgba(0,0,0,0.5)] hover:border-[rgba(0,245,255,0.4)] transition-colors group"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest">

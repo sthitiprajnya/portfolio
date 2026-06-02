@@ -180,7 +180,7 @@ export function InteractiveTerminal({ className }: { className?: string }) {
     <div
       ref={ref}
       className={clsx(
-        "rounded-md overflow-hidden bg-black border border-border font-mono text-mono-sm text-green relative shadow-[var(--glow-green-sm)] flex flex-col h-[300px]",
+        "rounded-card overflow-hidden bg-black border border-border font-mono text-mono-sm text-green relative shadow-[var(--glow-green-sm)] flex flex-col h-[300px]",
         className
       )}
       onClick={() => inputRef.current?.focus()}

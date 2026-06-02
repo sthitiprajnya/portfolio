@@ -136,7 +136,7 @@ export function Contact() {
               </p>
 
               {/* Availability indicator */}
-              <div className="flex items-center space-x-3 mt-8 p-4 rounded bg-green/5 border border-green/20 inline-flex w-full max-w-sm">
+              <div className="flex items-center space-x-3 mt-8 p-4 rounded-card bg-green/5 border border-green/20 inline-flex w-full max-w-sm">
                 <span className="relative flex h-3 w-3">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green opacity-75" />
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-green" />
@@ -219,7 +219,7 @@ export function Contact() {
 
               {/* Success Terminal Output */}
               {status === 'sent' ? (
-                <div className="rounded-md overflow-hidden border border-green/50 bg-[#0a0a0a] font-mono text-sm" role="alert" aria-live="assertive">
+                <div className="rounded-card overflow-hidden border border-green/50 bg-[#0a0a0a] font-mono text-sm" role="alert" aria-live="assertive">
                   <div className="flex items-center px-4 py-2 bg-green/10 border-b border-green/20 text-green">
                     <span className="w-2 h-2 rounded-full bg-green animate-pulse mr-2" />
                     <span>SECURE_CHANNEL_ESTABLISHED</span>
@@ -299,7 +299,7 @@ function FloatingInput({ id, name, type, label, value, onChange, error, required
         aria-describedby={error ? `${id}-error` : undefined}
         placeholder=" "
         className={clsx(
-          'w-full bg-[#020408] border rounded-md px-4 py-4 pt-6 text-text-primary outline-none transition-all peer',
+          'w-full bg-[#020408] border rounded-card px-4 py-4 pt-6 text-text-primary outline-none transition-all peer',
           error
             ? 'border-red shadow-[var(--glow-red-sm)]'
             : 'border-border focus:border-cyan focus:shadow-[var(--glow-cyan-sm)]'
@@ -349,7 +349,7 @@ function FloatingTextarea({ id, name, label, value, onChange, error, required, m
         )}
         placeholder=" "
         className={clsx(
-          'w-full bg-[#020408] border rounded-md px-4 py-4 pt-6 text-text-primary outline-none transition-all peer min-h-[140px] resize-y',
+          'w-full bg-[#020408] border rounded-card px-4 py-4 pt-6 text-text-primary outline-none transition-all peer min-h-[140px] resize-y',
           error
             ? 'border-red shadow-[var(--glow-red-sm)]'
             : 'border-border focus:border-cyan focus:shadow-[var(--glow-cyan-sm)]'

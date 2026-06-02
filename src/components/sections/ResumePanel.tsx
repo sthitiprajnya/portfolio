@@ -48,13 +48,13 @@ export function ResumePanel() {
 
           {/* ── Left: Document viewer ── */}
           <ScrollReveal variants={fadeSlideUp} className="lg:col-span-7">
-            <div className="overflow-hidden border border-[var(--glass-border)] hover:shadow-[var(--glow-amber-sm)] glass-heavy rounded-2xl relative">
+            <div className="overflow-hidden border border-[var(--glass-border)] hover:shadow-[var(--glow-amber-sm)] glass-heavy rounded-card relative">
 
               {/* Document title bar */}
               <div className="flex items-center justify-between px-5 py-3 bg-[rgba(0,0,0,0.6)] border-b border-[var(--glass-border)] relative z-10">
                 <div className="flex items-center space-x-3">
                   {/* Fake "PDF" icon indicator */}
-                  <div className="w-8 h-10 border border-amber/40 rounded-sm relative flex items-center justify-center">
+                  <div className="w-8 h-10 border border-amber/40 rounded-card relative flex items-center justify-center">
                     <span className="font-mono text-[0.5rem] text-amber font-bold">PDF</span>
                     <div className="absolute top-0 right-0 w-2 h-2 border-l border-b border-amber/40 bg-black" />
                   </div>
@@ -69,10 +69,10 @@ export function ResumePanel() {
                 </div>
                 {/* Stamps */}
                 <div className="hidden md:flex items-center space-x-2">
-                  <span className="px-2 py-0.5 border border-green/50 text-green font-mono text-[0.55rem] uppercase tracking-widest rounded-sm">
+                  <span className="px-2 py-0.5 border border-green/50 text-green font-mono text-[0.55rem] uppercase tracking-widest rounded-card">
                     VERIFIED
                   </span>
-                  <span className="px-2 py-0.5 border border-amber/50 text-amber font-mono text-[0.55rem] uppercase tracking-widest rounded-sm">
+                  <span className="px-2 py-0.5 border border-amber/50 text-amber font-mono text-[0.55rem] uppercase tracking-widest rounded-card">
                     2025
                   </span>
                 </div>
@@ -120,7 +120,7 @@ export function ResumePanel() {
                     }}
                   >
                     {RESUME_SHA256}
-                    <span className="absolute -top-6 left-1/2 -translate-x-1/2 bg-black border border-amber text-amber px-2 py-0.5 rounded opacity-0 invisible group-focus/hash:opacity-100 group-focus/hash:visible group-hover/hash:opacity-100 group-hover/hash:visible transition-all text-[0.5rem] w-max z-50 pointer-events-none">
+                    <span className="absolute -top-6 left-1/2 -translate-x-1/2 bg-black border border-amber text-amber px-2 py-0.5 rounded-card opacity-0 invisible group-focus/hash:opacity-100 group-focus/hash:visible group-hover/hash:opacity-100 group-hover/hash:visible transition-all text-[0.5rem] w-max z-50 pointer-events-none">
                       Click to copy
                     </span>
                   </span>

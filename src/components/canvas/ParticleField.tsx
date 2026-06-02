@@ -18,7 +18,31 @@ function Particles({ inView }: { inView: boolean }) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const particleCount = isMobile ? 500 : 1800;
+  // Use a programmatic circle texture to fix the pixelated (square) appearance of particles
+  const circleTexture = useMemo(() => {
+    if (typeof window === 'undefined') return null;
+    const canvas = document.createElement('canvas');
+    canvas.width = 64;
+    canvas.height = 64;
+    const context = canvas.getContext('2d');
+    if (!context) return null;
+
+    // Create a smooth radial gradient for the particle
+    const gradient = context.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+    gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.8)');
+    gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.2)');
+    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, 64, 64);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    return texture;
+  }, []);
+
+  // Increased particle count for denser field
+  const particleCount = isMobile ? 1500 : 4000;
   const radius = 180;
   const radiusSq = useMemo(() => radius * radius, [radius]);
 
@@ -113,12 +137,15 @@ function Particles({ inView }: { inView: boolean }) {
         />
       </bufferGeometry>
       <pointsMaterial
-        size={1.4}
+        size={isMobile ? 2.5 : 2.0} // Slightly larger to make the soft texture visible
         color="#00F5FF"
         transparent
-        opacity={0.6}
+        opacity={0.8}
         sizeAttenuation={true}
         blending={THREE.AdditiveBlending}
+        depthWrite={false} // Performance improvement and prevents particle occlusion
+        map={circleTexture} // Apply the smooth circular texture to fix pixelation
+        alphaTest={0.01} // Discard fully transparent pixels
       />
     </points>
   );
@@ -136,7 +163,10 @@ export default function ParticleField() {
 
   return (
     <div ref={ref} className="absolute inset-0 z-0 pointer-events-none fade-in" style={{ animation: 'fadeIn 1.2s ease-in-out forwards' }}>
-      <Canvas camera={{ position: [0, 0, 150], fov: 75 }}>
+      <Canvas
+        camera={{ position: [0, 0, 150], fov: 75 }}
+        dpr={typeof window !== 'undefined' ? [1, Math.min(2, window.devicePixelRatio)] : 1} // Ensure crisp rendering on high-DPI screens while capping at 2x for performance
+      >
         <Particles inView={inView} />
       </Canvas>
       <style>{`

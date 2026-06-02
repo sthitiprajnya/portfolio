@@ -43,7 +43,7 @@ export function AudioPrompt({ onComplete }: AudioPromptProps) {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="max-w-md w-full border border-cyan/30 bg-surface/50 backdrop-blur-md p-8 rounded-lg shadow-[0_0_30px_rgba(0,245,255,0.1)] text-center relative overflow-hidden"
+          className="max-w-md w-full border border-cyan/30 bg-surface/50 backdrop-blur-md p-8 rounded-card shadow-[0_0_30px_rgba(0,245,255,0.1)] text-center relative overflow-hidden"
         >
           {/* Decorative scanline */}
           <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.25)_50%)] bg-[length:100%_4px] opacity-20" />

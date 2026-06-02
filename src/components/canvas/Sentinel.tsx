@@ -96,7 +96,7 @@ export default function Sentinel() {
     };
 
     // Initial targets update after a short delay to ensure elements are rendered
-    const timer = setTimeout(updateTargets, 1000);
+    const timer = setTimeout(updateTargetCache, 1000);
 
     const draw = () => {
       if (!ctx) return;

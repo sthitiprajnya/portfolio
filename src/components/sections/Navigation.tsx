@@ -116,7 +116,7 @@ export function Navigation() {
           {/* Logo */}
           <button
             onClick={() => scrollTo('hero')}
-            className="flex items-center space-x-2 group outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-sm"
+            className="flex items-center space-x-2 group outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card"
             aria-label="Scroll to top"
           >
             <span className="text-cyan font-mono font-bold">{'>_'}</span>
@@ -161,7 +161,7 @@ export function Navigation() {
 
           {/* Mobile hamburger */}
           <button
-            className="lg:hidden text-cyan p-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-md"
+            className="lg:hidden text-cyan p-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card"
             onClick={() => setMobileMenuOpen(true)}
             aria-expanded={mobileMenuOpen}
             aria-controls="mobile-menu"
@@ -189,7 +189,7 @@ export function Navigation() {
           >
             <div className="flex justify-between items-center mb-10">
               <span className="font-display font-bold text-white tracking-widest text-sm">SYSTEM_MENU</span>
-              <button onClick={() => setMobileMenuOpen(false)} className="text-cyan p-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-md" aria-label="Close menu">
+              <button onClick={() => setMobileMenuOpen(false)} className="text-cyan p-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card" aria-label="Close menu">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
@@ -203,7 +203,7 @@ export function Navigation() {
                     <button
                       onClick={() => scrollTo(link.id)}
                       className={clsx(
-                        'group flex items-center w-full p-4 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black font-mono transition-all',
+                        'group flex items-center w-full p-4 rounded-card outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black font-mono transition-all',
                         activeSection === link.id ? 'bg-cyan/10 text-cyan border border-cyan/20' : 'hover:bg-white/5 text-text-secondary hover:text-white border border-transparent'
                       )}
                       aria-label={`Scroll to ${link.label} section`}

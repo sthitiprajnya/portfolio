@@ -109,7 +109,7 @@ export function Skills() {
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={clsx(
-                    'px-4 py-2 font-mono text-[0.7rem] uppercase tracking-widest transition-all rounded-sm border outline-none focus-visible:ring-2 focus-visible:ring-cyan',
+                    'px-4 py-2 font-mono text-[0.7rem] uppercase tracking-widest transition-all rounded-card border outline-none focus-visible:ring-2 focus-visible:ring-cyan',
                     activeTab === tab
                       ? 'border-cyan bg-cyan/10 text-cyan shadow-[var(--glow-cyan-sm)]'
                       : 'border-border text-text-secondary hover:border-cyan/50 hover:text-white'
@@ -198,7 +198,7 @@ export function Skills() {
           {[...MARQUEE_ROW_1, ...MARQUEE_ROW_1].map((tag, i) => (
             <div
               key={`row1-${i}`}
-              className="mx-3 px-4 py-1.5 rounded-sm bg-surface border border-border font-mono text-[0.75rem] text-text-secondary whitespace-nowrap"
+              className="mx-3 px-4 py-1.5 rounded-card bg-surface border border-border font-mono text-[0.75rem] text-text-secondary whitespace-nowrap"
             >
               {tag}
             </div>
@@ -215,7 +215,7 @@ export function Skills() {
           {[...MARQUEE_ROW_2, ...MARQUEE_ROW_2].map((tag, i) => (
             <div
               key={`row2-${i}`}
-              className="mx-3 px-4 py-1.5 rounded-sm bg-surface border border-border font-mono text-[0.75rem] text-text-secondary whitespace-nowrap"
+              className="mx-3 px-4 py-1.5 rounded-card bg-surface border border-border font-mono text-[0.75rem] text-text-secondary whitespace-nowrap"
             >
               {tag}
             </div>

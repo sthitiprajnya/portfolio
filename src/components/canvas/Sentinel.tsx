@@ -95,6 +95,9 @@ export default function Sentinel() {
       return maxProximity;
     };
 
+    // Initial targets update after a short delay to ensure elements are rendered
+    const timer = setTimeout(updateTargets, 1000);
+
     const draw = () => {
       if (!ctx) return;
       ctx.clearRect(0, 0, width, height);
@@ -142,6 +145,7 @@ export default function Sentinel() {
     return () => {
       window.removeEventListener('resize', resize);
       window.removeEventListener('scroll', onScroll);
+      clearTimeout(timer);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, [prefersReducedMotion]);

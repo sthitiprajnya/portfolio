@@ -5,8 +5,13 @@ import { SectionTitle }  from '@/components/ui/SectionTitle';
 import { ScrollReveal, fadeSlideUp, fadeSlideLeft } from '@/components/ui/ScrollReveal';
 import { useInView }     from 'react-intersection-observer';
 import { CTF_PROFILE }   from '@/data/portfolio';
-import { Radar } from 'react-chartjs-2';
+import dynamic from 'next/dynamic';
 import { LogoBadge } from '@/components/ui/LogoBadge';
+
+const Radar = dynamic(() => import('react-chartjs-2').then((mod) => mod.Radar), {
+  ssr: false,
+  loading: () => <div className="w-full h-full flex items-center justify-center font-mono text-[0.6rem] text-text-muted animate-pulse">LOADING_DATA_VIZ...</div>
+});
 
 // BOLT: Hoist static configurations and data transformations to module level
 const HTB_STATS = [

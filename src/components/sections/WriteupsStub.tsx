@@ -1,6 +1,7 @@
 "use client";
 import React from 'react';
 import { ScrollReveal, fadeSlideUp } from '@/components/ui/ScrollReveal';
+import { SectionTitle } from '@/components/ui/SectionTitle';
 
 const MOCK_WRITEUPS = [
   { title: "CVE-2024-XXXX: Exploiting Deserialization in Java Enterprise", type: "CVE Breakdown", date: "TBD" },
@@ -14,7 +15,7 @@ export function WriteupsStub() {
       <div className="absolute inset-0 pointer-events-none opacity-[0.02]" style={{ backgroundImage: 'repeating-linear-gradient(45deg, var(--color-amber) 0, var(--color-amber) 2px, transparent 2px, transparent 10px)' }} />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        {/* Intentionally omitting section title here so it doesn't break 01-09 numbering, as this is a stub section */}
+        <SectionTitle number="04.5" title="Writeups." />
 
         <ScrollReveal variants={fadeSlideUp} className="mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber/10 border border-amber/30 text-amber font-mono text-[0.6rem] uppercase tracking-widest rounded-card shadow-[var(--glow-amber-sm)]">

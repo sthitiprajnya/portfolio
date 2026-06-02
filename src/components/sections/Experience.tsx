@@ -28,6 +28,7 @@ export function Experience() {
   const containerRef = useRef<HTMLDivElement>(null);
   const lineRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
+  const triggersRef = useRef<ScrollTrigger[]>([]);
 
   useEffect(() => {
     if (prefersReducedMotion || !containerRef.current || !lineRef.current) return;
@@ -35,19 +36,17 @@ export function Experience() {
     const container = containerRef.current;
 
     // Timeline self-drawing animation
-    const tl = gsap.timeline({
-      scrollTrigger: {
+    const st1 = ScrollTrigger.create({
         trigger: container,
         start: "top center",
         end: "bottom center",
         scrub: 1, // Smooth scrubbing
-      }
+        animation: gsap.fromTo(lineRef.current,
+          { scaleY: 0 },
+          { scaleY: 1, ease: "none" }
+        )
     });
-
-    tl.to(lineRef.current, {
-      scaleY: 1,
-      ease: "none"
-    });
+    triggersRef.current.push(st1);
 
     // BOLT: Scope GSAP queries to the container to avoid scanning the entire document
     // Cinematic staggering for the experience cards using GSAP ScrollTrigger
@@ -91,7 +90,8 @@ export function Experience() {
     });
 
     return () => {
-      ScrollTrigger.getAll().forEach(t => t.kill());
+      triggersRef.current.forEach(t => t.kill());
+      triggersRef.current = [];
     };
   }, [prefersReducedMotion]);
 
@@ -137,7 +137,7 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
   const prefersReducedMotion = usePrefersReducedMotion();
 
   const cardContent = (
-    <div className="relative pl-8 md:pl-12">
+    <div className="relative pl-8 md:pl-12" data-orb-target="experience">
       {/* Timeline Node */}
       <div
         className={clsx(

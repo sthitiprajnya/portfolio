@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect, KeyboardEvent } from 'react';
 import { motion } from 'framer-motion';
+import { useAudio } from '@/components/providers/AudioProvider';
+import { generateDynamicSpeech } from '@/lib/sentinelSpeech';
 
 interface Message {
   role:    'user' | 'assistant';
@@ -13,29 +15,13 @@ const GREETING: Message = {
   content: 'LIVIE_v1.0 ONLINE. I know everything about Sthita\'s background. Ask me about his experience, projects, certs, or anything you\'d ask a recruiter.',
 };
 
-function generateReply(input: string): string {
-  const q = input.toLowerCase();
-  if (q.includes('experience') || q.includes('years'))
-    return 'Sthitaprajna has 2+ years at iServeU Technology as an Information Security Engineer and Penetration Tester.';
-  if (q.includes('cert') || q.includes('certif'))
-    return '11 active certs including eJPT v2, PEH (TCM), INE Cloud Associate, CCNA, and several EC-Council credentials.';
-  if (q.includes('skill') || q.includes('tool'))
-    return 'Core tools: Burp Suite Pro, Nessus, Metasploit, Nmap, Nuclei, Frida/MobSF, Wazuh. Cloud: GCP & AWS. Scripting: Python, Bash.';
-  if (q.includes('contact') || q.includes('hire') || q.includes('email'))
-    return 'Reach out at sthitabiswal2002@gmail.com or LinkedIn: linkedin.com/in/sthitaprajna-biswal-0175b7171/';
-  if (q.includes('project'))
-    return 'Top projects: GCP 92-bucket hardening, Google DLP PCI/PII pipeline, Wazuh SIEM with custom rules, MQTT IoT attack chain PoC.';
-  if (q.includes('hackthebox') || q.includes('htb'))
-    return 'HTB rank: Hacker · 1,240 points · 15% Top · 24 User Owns · 18 Root Owns · 45 Challenges.';
-  return 'Interesting question. For detailed info, scroll to the relevant section or drop an email at sthitabiswal2002@gmail.com.';
-}
-
 export default function LiviePanel({ onClose }: { onClose: () => void }) {
   const [messages, setMessages]   = useState<Message[]>([GREETING]);
   const [input, setInput]         = useState('');
   const [loading, setLoading]     = useState(false);
   const bottomRef                 = useRef<HTMLDivElement>(null);
   const inputRef                  = useRef<HTMLInputElement>(null);
+  const { speak }                 = useAudio();
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -58,10 +44,13 @@ export default function LiviePanel({ onClose }: { onClose: () => void }) {
     try {
       // Simulate API call delay
       await new Promise(r => setTimeout(r, 900 + Math.random() * 600));
-      const reply = generateReply(text);
+      const reply = generateDynamicSpeech(text);
       setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
+      speak(reply);
     } catch {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'NETWORK_ERROR. Try again.' }]);
+      const errorReply = 'NETWORK_ERROR. Try again.';
+      setMessages(prev => [...prev, { role: 'assistant', content: errorReply }]);
+      speak(errorReply);
     } finally {
       setLoading(false);
     }

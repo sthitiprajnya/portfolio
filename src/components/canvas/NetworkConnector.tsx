@@ -48,8 +48,11 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
     let numNodes = DEFAULT_NUM_NODES;
 
     let nodes: Node[] = [];
-    // BOLT: Reuse bucket arrays to minimize garbage collection (GC) during the 60fps animation loop
+    // BOLT: Pre-allocate bucket arrays and reuse them across frames to minimize garbage collection (GC) pressure.
     const buckets: number[][] = [[], [], [], [], [], []];
+    const clearBuckets = () => {
+      for (let i = 0; i < 6; i++) buckets[i].length = 0;
+    };
 
     const initNodes = () => {
       nodes = [];
@@ -86,11 +89,10 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
     window.addEventListener('mouseleave', onMouseLeave, { passive: true });
     resize();
 
-    // BOLT: Hoist bucket arrays to avoid re-allocation in the 60fps loop
-    const buckets: number[][] = [[], [], [], [], [], []];
-
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
+      // BOLT: Clear reused buckets at the start of every frame to prevent infinite accumulation and memory leaks.
+      clearBuckets();
 
       // BOLT: Replace forEach with for-loop and batch arc drawing into a single fill() call
       ctx.fillStyle = NODE_COLOR;

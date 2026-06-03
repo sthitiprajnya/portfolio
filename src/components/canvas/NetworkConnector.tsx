@@ -16,7 +16,8 @@ interface Node {
 }
 
 // BOLT: Hoist static animation constants to module level to avoid redundant allocations and property lookups
-const NUM_NODES = 70;
+const DEFAULT_NUM_NODES = 70;
+const MOBILE_NUM_NODES = 35;
 const MAX_DISTANCE = 150;
 const MAX_DISTANCE_SQ = MAX_DISTANCE * MAX_DISTANCE;
 const NODE_COLOR = 'rgba(0, 245, 255, 0.5)';
@@ -42,12 +43,13 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
     let animationFrameId: number;
     let width: number;
     let height: number;
+    let numNodes = DEFAULT_NUM_NODES;
 
     let nodes: Node[] = [];
 
     const initNodes = () => {
       nodes = [];
-      for (let i = 0; i < NUM_NODES; i++) {
+      for (let i = 0; i < numNodes; i++) {
         nodes.push({
           x: Math.random() * width,
           y: Math.random() * height,
@@ -60,6 +62,7 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
     const resize = () => {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
+      numNodes = window.innerWidth < 768 ? MOBILE_NUM_NODES : DEFAULT_NUM_NODES;
       initNodes();
     };
 
@@ -72,7 +75,7 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       // BOLT: Replace forEach with for-loop and batch arc drawing into a single fill() call
       ctx.fillStyle = NODE_COLOR;
       ctx.beginPath();
-      for (let i = 0; i < NUM_NODES; i++) {
+      for (let i = 0; i < numNodes; i++) {
         const node = nodes[i];
         node.x += node.vx;
         node.y += node.vy;
@@ -90,9 +93,9 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       // String template allocations for colors are eliminated.
       ctx.lineWidth = 1;
       ctx.strokeStyle = '#00F5FF';
-      for (let i = 0; i < NUM_NODES; i++) {
+      for (let i = 0; i < numNodes; i++) {
         const nodeA = nodes[i];
-        for (let j = i + 1; j < NUM_NODES; j++) {
+        for (let j = i + 1; j < numNodes; j++) {
           const nodeB = nodes[j];
           const dx = nodeA.x - nodeB.x;
           const dy = nodeA.y - nodeB.y;

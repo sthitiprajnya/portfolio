@@ -125,11 +125,17 @@ export default function HeroOrb() {
       const pulse = 1 + 0.06 * Math.sin(t * 4);    // slow breathing scale
       const r     = 200 * pulse;                      // outer glow radius
 
+      // Day 5: Slow color shift between cyan and violet over 20s
+      const shiftFactor = (Math.sin(t * 0.05) + 1) / 2; // Maps to 0-1
+      const r_core = 0 + (191 - 0) * shiftFactor;
+      const g_core = 245 + (0 - 245) * shiftFactor;
+      const b_core = 255 + (255 - 255) * shiftFactor; // Remains 255
+
       // ── Outer halo (wide, very faint) ────────────────────────────
       const halo = ctx.createRadialGradient(x, y, r * 0.6, x, y, r * 1.6);
-      halo.addColorStop(0,   'rgba(0, 245, 255, 0.06)');
-      halo.addColorStop(0.5, 'rgba(0, 180, 255, 0.03)');
-      halo.addColorStop(1,   'rgba(0, 245, 255, 0)');
+      halo.addColorStop(0,   `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0.06)`);
+      halo.addColorStop(0.5, `rgba(${Math.round(r_core)}, ${Math.round(g_core*0.75)}, ${Math.round(b_core)}, 0.03)`);
+      halo.addColorStop(1,   `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0)`);
       ctx.fillStyle = halo;
       ctx.beginPath();
       ctx.arc(x, y, r * 1.6, 0, Math.PI * 2);
@@ -137,10 +143,10 @@ export default function HeroOrb() {
 
       // ── Mid glow ─────────────────────────────────────────────────
       const mid = ctx.createRadialGradient(x, y, 0, x, y, r);
-      mid.addColorStop(0,   'rgba(0, 245, 255, 0.18)');
-      mid.addColorStop(0.35,'rgba(0, 200, 255, 0.12)');
-      mid.addColorStop(0.7, 'rgba(0, 150, 255, 0.05)');
-      mid.addColorStop(1,   'rgba(0, 245, 255, 0)');
+      mid.addColorStop(0,   `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0.18)`);
+      mid.addColorStop(0.35,`rgba(${Math.round(r_core)}, ${Math.round(g_core*0.8)}, ${Math.round(b_core)}, 0.12)`);
+      mid.addColorStop(0.7, `rgba(${Math.round(r_core)}, ${Math.round(g_core*0.6)}, ${Math.round(b_core)}, 0.05)`);
+      mid.addColorStop(1,   `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0)`);
       ctx.fillStyle = mid;
       ctx.beginPath();
       ctx.arc(x, y, r, 0, Math.PI * 2);
@@ -151,11 +157,11 @@ export default function HeroOrb() {
         x - r * 0.08, y - r * 0.08, 0,
         x, y, r * 0.28
       );
-      core.addColorStop(0,   'rgba(180, 255, 255, 0.80)');
-      core.addColorStop(0.2, 'rgba(180, 255, 255, 0.65)');
-      core.addColorStop(0.5, 'rgba(0,  245, 255, 0.45)');
-      core.addColorStop(0.8, 'rgba(0,  160, 255, 0.20)');
-      core.addColorStop(1,   'rgba(0,  80,  200, 0)');
+      core.addColorStop(0,   `rgba(180, 255, 255, 0.80)`);
+      core.addColorStop(0.2, `rgba(180, 255, 255, 0.65)`);
+      core.addColorStop(0.5, `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0.45)`);
+      core.addColorStop(0.8, `rgba(${Math.round(r_core)}, ${Math.round(g_core*0.65)}, ${Math.round(b_core*0.8)}, 0.20)`);
+      core.addColorStop(1,   `rgba(${Math.round(r_core)}, ${Math.round(g_core*0.3)}, ${Math.round(b_core*0.8)}, 0)`);
       ctx.fillStyle = core;
       ctx.beginPath();
       ctx.arc(x, y, r * 0.28, 0, Math.PI * 2);

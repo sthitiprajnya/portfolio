@@ -9,6 +9,8 @@ interface OrbState {
   xOffset: number; // Sinusoidal offset
   glow: number; // Glow multiplier based on proximity
   phase: number; // Sinusoidal phase
+  trail: { x: number; y: number }[]; // Circular buffer for trail positions
+  trailIndex: number; // Index for circular buffer
 }
 
 interface TargetCache {
@@ -69,6 +71,8 @@ export default function Sentinel() {
     xOffset: 0,
     glow: BASE_GLOW,
     phase: 0,
+    trail: Array(8).fill({ x: 0, y: 0 }),
+    trailIndex: 0,
   });
 
   const targetThemeRef = useRef(DEFAULT_THEME);
@@ -178,6 +182,10 @@ export default function Sentinel() {
       const cx = width / 2 + s.xOffset;
       const cy = height / 2;
 
+      // Update trail buffer
+      s.trail[s.trailIndex] = { x: cx, y: cy + s.y - stateRef.current.targetY }; // Adjusted for visual motion
+      s.trailIndex = (s.trailIndex + 1) % 8;
+
       // Parse target colors
       const tCore = parseRgba(targetThemeRef.current.core);
       const tMid = parseRgba(targetThemeRef.current.mid);
@@ -215,6 +223,27 @@ export default function Sentinel() {
 
       const pulse = 1 + 0.08 * Math.sin(Date.now() * 0.002);
       const r = (s.glow + pulse * 10) * 2; // Making it significantly larger as requested
+
+      // 0. Trail effect
+      const trailLen = s.trail.length;
+      for (let i = 0; i < trailLen; i++) {
+        // Read buffer from newest to oldest
+        const idx = (s.trailIndex - 1 - i + trailLen) % trailLen;
+        const pt = s.trail[idx];
+
+        // Skip uninitialized points
+        if (pt.x === 0 && pt.y === 0) continue;
+
+        const opacity = 0.3 * (1 - i / trailLen);
+        if (opacity <= 0) continue;
+
+        ctx.fillStyle = `rgba(0, 245, 255, ${opacity})`;
+        ctx.beginPath();
+        // The trail is offset slightly based on the current orb movement to visually drag behind
+        const trailY = cy - (s.targetY - s.y) * 0.5 * (i + 1);
+        ctx.arc(pt.x, trailY, r * 0.15 * (1 - i / trailLen), 0, Math.PI * 2);
+        ctx.fill();
+      }
 
       // 1. Outer halo
       const halo = ctx.createRadialGradient(cx, cy, r * 0.6, cx, cy, r * 1.8);

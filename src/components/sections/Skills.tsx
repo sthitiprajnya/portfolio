@@ -44,9 +44,8 @@ const MARQUEE_TAGS = [
 ];
 
 // BOLT: Pre-calculate doubled and reversed arrays to avoid O(n) work and mutation bugs during render
-// Create reversed copy first to match original behavior (reversed sequence doubled for seamless loop)
-const MARQUEE_ROW_1 = [...MARQUEE_TAGS];
-const MARQUEE_ROW_2 = [...MARQUEE_TAGS].reverse();
+const DOUBLED_MARQUEE_ROW_1 = [...MARQUEE_TAGS, ...MARQUEE_TAGS];
+const DOUBLED_MARQUEE_ROW_2 = [...MARQUEE_TAGS].reverse().concat([...MARQUEE_TAGS].reverse());
 
 // BOLT: Hoist static data and configurations to avoid redundant allocations on every render
 const RADAR_DATA = {
@@ -77,6 +76,7 @@ const RADAR_OPTIONS = {
   },
   plugins: { legend: { display: false } },
   maintainAspectRatio: false,
+  animation: { duration: 2000 }
 };
 
 const SKILLS_TABS: ('ALL' | 'OFFENSIVE' | 'CLOUD' | 'AUTOMATION' | 'COMPLIANCE')[] = ['ALL', 'OFFENSIVE', 'CLOUD', 'AUTOMATION', 'COMPLIANCE'];
@@ -143,10 +143,7 @@ export function Skills() {
              {chartInView && (
                <Radar
                  data={RADAR_DATA}
-                 options={{
-                   ...RADAR_OPTIONS,
-                   animation: { duration: 2000 }
-                 }}
+                 options={RADAR_OPTIONS}
                />
              )}
           </div>
@@ -154,16 +151,16 @@ export function Skills() {
 
         {/* Skill Rings Grid */}
         <div className="space-y-16 mb-24">
-          {filteredCategories.map((category, catIdx) => {
+          {filteredCategories.map((category) => {
             return (
-              <ScrollReveal key={catIdx} variants={containerStagger} className="space-y-6">
+              <ScrollReveal key={category.category} variants={containerStagger} className="space-y-6">
                 <h3 className="font-mono text-sm text-white border-b border-border pb-2 inline-block">
                   {category.category}
                 </h3>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-y-8 gap-x-4">
                   {category.filteredSkills.map((skill, skillIdx) => (
-                    <ScrollReveal key={skillIdx} variants={fadeSlideUp}>
+                    <ScrollReveal key={skill.name} variants={fadeSlideUp}>
                       <SkillBadge
                         name={skill.name}
                         icon={skill.icon}
@@ -200,9 +197,9 @@ export function Skills() {
           role="region"
           aria-label="Skills marquee row 1"
         >
-          {[...MARQUEE_ROW_1, ...MARQUEE_ROW_1].map((tag, i) => (
+          {DOUBLED_MARQUEE_ROW_1.map((tag, i) => (
             <div
-              key={`row1-${i}`}
+              key={`row1-${i}-${tag}`}
               className="mx-3 px-4 py-1.5 rounded-card bg-surface border border-border font-mono text-[0.75rem] text-text-secondary whitespace-nowrap"
             >
               {tag}
@@ -217,9 +214,9 @@ export function Skills() {
           role="region"
           aria-label="Skills marquee row 2"
         >
-          {[...MARQUEE_ROW_2, ...MARQUEE_ROW_2].map((tag, i) => (
+          {DOUBLED_MARQUEE_ROW_2.map((tag, i) => (
             <div
-              key={`row2-${i}`}
+              key={`row2-${i}-${tag}`}
               className="mx-3 px-4 py-1.5 rounded-card bg-surface border border-border font-mono text-[0.75rem] text-text-secondary whitespace-nowrap"
             >
               {tag}

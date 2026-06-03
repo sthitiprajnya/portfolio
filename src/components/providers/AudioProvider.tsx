@@ -41,10 +41,11 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       // 4. Any en-GB voice
       // 5. Fallback to first available English voice
       const preferredVoice =
-        voices.find(v => v.name.includes('Male')) ||
-        voices.find(v => v.name.includes('Daniel')) ||
         voices.find(v => v.name.includes('Google UK English Male')) ||
-        voices.find(v => v.name.includes('en-GB') || v.lang === 'en-GB') ||
+        voices.find(v => v.name.includes('Daniel')) ||
+        voices.find(v => v.name.includes('Male') && v.lang.startsWith('en')) ||
+        voices.find(v => (v.name.includes('Robotic') || v.name.includes('Synthesis')) && v.lang.startsWith('en')) ||
+        voices.find(v => v.lang === 'en-GB') ||
         voices.find(v => v.lang.startsWith('en'));
 
       if (preferredVoice) {
@@ -114,10 +115,11 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     if (!('speechSynthesis' in window)) return;
 
     const interval = setInterval(() => {
-      if (window.speechSynthesis.speaking !== isSpeaking) {
-        setIsSpeaking(window.speechSynthesis.speaking);
+      const currentlySpeaking = window.speechSynthesis.speaking;
+      if (currentlySpeaking !== isSpeaking) {
+        setIsSpeaking(currentlySpeaking);
       }
-    }, 200);
+    }, 100);
 
     return () => clearInterval(interval);
   }, [isSpeaking]);

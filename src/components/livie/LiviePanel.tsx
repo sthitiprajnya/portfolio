@@ -100,7 +100,7 @@ export default function LiviePanel({ onClose }: { onClose: () => void }) {
         <button
           onClick={onClose}
           className="text-[#00F5FF]/40 hover:text-[#00F5FF] transition-colors text-sm"
-          aria-label="Close"
+          aria-label="Close Livie assistant"
         >✕</button>
       </div>
 
@@ -172,6 +172,7 @@ export default function LiviePanel({ onClose }: { onClose: () => void }) {
           onChange={e => setInput(e.target.value)}
           onKeyDown={onKey}
           placeholder="Ask about Sthita..."
+          aria-label="Chat with Livie assistant"
           disabled={loading}
           maxLength={500}
           className="

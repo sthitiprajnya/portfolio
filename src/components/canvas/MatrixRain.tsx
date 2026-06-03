@@ -89,15 +89,35 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
       const charCount = MATRIX_CHAR_LEN;
 
       for (let i = 0; i < dropsLen; i++) {
-        // Day 6: Check for glitch column
-        const isGlitchedCol = isGlitching && glitchedColumns.includes(i);
-        ctx.fillStyle = isGlitchedCol ? '#FF0055' : '#00F5FF';
-
         // BOLT: Cache calculations and hoist length lookups to optimize 60fps loop
         const x = xCoords[i];
         const y = drops[i] * fontSize;
 
-        // Draw character
+        // Day 6: Check for glitch column
+        const isGlitchedCol = isGlitching && glitchedColumns.includes(i);
+
+        // Day 10: Second pass over trailing characters
+        const trailLength = 12;
+        for (let j = 1; j <= trailLength; j++) {
+          const trailY = y - j * fontSize;
+          if (trailY < 0) continue;
+
+          const ratio = j / trailLength;
+          // Fade from cyan (0, 245, 255) to dark green (0, 85, 51)
+          const g = Math.round(245 - ratio * (245 - 85));
+          const b = Math.round(255 - ratio * (255 - 51));
+          const opacity = 1 - ratio;
+
+          ctx.fillStyle = isGlitchedCol
+            ? `rgba(255, 0, 85, ${opacity})`
+            : `rgba(0, ${g}, ${b}, ${opacity})`;
+
+          const trailText = MATRIX_CHARS[Math.floor(fastRand() * charCount)];
+          ctx.fillText(trailText, x, trailY);
+        }
+
+        // Draw lead character in bright white
+        ctx.fillStyle = '#FFFFFF';
         const text = MATRIX_CHARS[Math.floor(fastRand() * charCount)];
         ctx.fillText(text, x, y);
 

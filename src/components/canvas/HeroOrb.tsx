@@ -76,6 +76,26 @@ export default function HeroOrb() {
     let cx = 0;
     let cy = 0;
 
+    // Day 9: Setup OffscreenCanvas
+    let offscreenCanvas: OffscreenCanvas | HTMLCanvasElement;
+    let offscreenCtx: OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D | null = null;
+
+    try {
+      if (typeof OffscreenCanvas !== 'undefined') {
+        offscreenCanvas = new OffscreenCanvas(canvas.width, canvas.height);
+        offscreenCtx = offscreenCanvas.getContext('2d') as OffscreenCanvasRenderingContext2D;
+      } else {
+        offscreenCanvas = document.createElement('canvas');
+        offscreenCanvas.width = canvas.width;
+        offscreenCanvas.height = canvas.height;
+        offscreenCtx = offscreenCanvas.getContext('2d');
+      }
+    } catch (e) {
+      console.warn("OffscreenCanvas not supported or failed to initialize, falling back.", e);
+      offscreenCanvas = canvas;
+      offscreenCtx = ctx;
+    }
+
     // ── Resize ──────────────────────────────────────────────────────
     const resize = () => {
       canvas.width  = window.innerWidth;
@@ -85,6 +105,12 @@ export default function HeroOrb() {
       cy = canvas.height / 2;
       A = canvas.width * 0.30;
       B = canvas.height * 0.22;
+
+      // Day 9 Fix: Update OffscreenCanvas dimensions on resize
+      if (offscreenCanvas && offscreenCanvas !== canvas) {
+        offscreenCanvas.width = canvas.width;
+        offscreenCanvas.height = canvas.height;
+      }
 
       // Reset to centre on resize
       const o = orbRef.current;
@@ -120,7 +146,11 @@ export default function HeroOrb() {
     // ── Drawing helpers ──────────────────────────────────────────────
     function drawOrb(x: number, y: number, t: number) {
       if (!ctx || !canvas) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const targetCtx = offscreenCtx || ctx;
+      const targetCanvas = offscreenCanvas || canvas;
+
+      targetCtx.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
 
       const pulse = 1 + 0.06 * Math.sin(t * 4);    // slow breathing scale
       const r     = 200 * pulse;                      // outer glow radius
@@ -132,28 +162,28 @@ export default function HeroOrb() {
       const b_core = 255 + (255 - 255) * shiftFactor; // Remains 255
 
       // ── Outer halo (wide, very faint) ────────────────────────────
-      const halo = ctx.createRadialGradient(x, y, r * 0.6, x, y, r * 1.6);
+      const halo = targetCtx.createRadialGradient(x, y, r * 0.6, x, y, r * 1.6);
       halo.addColorStop(0,   `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0.06)`);
       halo.addColorStop(0.5, `rgba(${Math.round(r_core)}, ${Math.round(g_core*0.75)}, ${Math.round(b_core)}, 0.03)`);
       halo.addColorStop(1,   `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0)`);
-      ctx.fillStyle = halo;
-      ctx.beginPath();
-      ctx.arc(x, y, r * 1.6, 0, Math.PI * 2);
-      ctx.fill();
+      targetCtx.fillStyle = halo;
+      targetCtx.beginPath();
+      targetCtx.arc(x, y, r * 1.6, 0, Math.PI * 2);
+      targetCtx.fill();
 
       // ── Mid glow ─────────────────────────────────────────────────
-      const mid = ctx.createRadialGradient(x, y, 0, x, y, r);
+      const mid = targetCtx.createRadialGradient(x, y, 0, x, y, r);
       mid.addColorStop(0,   `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0.18)`);
       mid.addColorStop(0.35,`rgba(${Math.round(r_core)}, ${Math.round(g_core*0.8)}, ${Math.round(b_core)}, 0.12)`);
       mid.addColorStop(0.7, `rgba(${Math.round(r_core)}, ${Math.round(g_core*0.6)}, ${Math.round(b_core)}, 0.05)`);
       mid.addColorStop(1,   `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0)`);
-      ctx.fillStyle = mid;
-      ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
-      ctx.fill();
+      targetCtx.fillStyle = mid;
+      targetCtx.beginPath();
+      targetCtx.arc(x, y, r, 0, Math.PI * 2);
+      targetCtx.fill();
 
       // ── Core sphere ──────────────────────────────────────────────
-      const core = ctx.createRadialGradient(
+      const core = targetCtx.createRadialGradient(
         x - r * 0.08, y - r * 0.08, 0,
         x, y, r * 0.28
       );
@@ -162,22 +192,28 @@ export default function HeroOrb() {
       core.addColorStop(0.5, `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0.45)`);
       core.addColorStop(0.8, `rgba(${Math.round(r_core)}, ${Math.round(g_core*0.65)}, ${Math.round(b_core*0.8)}, 0.20)`);
       core.addColorStop(1,   `rgba(${Math.round(r_core)}, ${Math.round(g_core*0.3)}, ${Math.round(b_core*0.8)}, 0)`);
-      ctx.fillStyle = core;
-      ctx.beginPath();
-      ctx.arc(x, y, r * 0.28, 0, Math.PI * 2);
-      ctx.fill();
+      targetCtx.fillStyle = core;
+      targetCtx.beginPath();
+      targetCtx.arc(x, y, r * 0.28, 0, Math.PI * 2);
+      targetCtx.fill();
 
       // ── Specular highlight ────────────────────────────────────────
       const specX = x - r * 0.06;
       const specY = y - r * 0.09;
-      const spec = ctx.createRadialGradient(specX, specY, 0, specX, specY, r * 0.10);
+      const spec = targetCtx.createRadialGradient(specX, specY, 0, specX, specY, r * 0.10);
       spec.addColorStop(0,   'rgba(255, 255, 255, 0.70)');
       spec.addColorStop(0.5, 'rgba(255, 255, 255, 0.20)');
       spec.addColorStop(1,   'rgba(255, 255, 255, 0)');
-      ctx.fillStyle = spec;
-      ctx.beginPath();
-      ctx.arc(specX, specY, r * 0.10, 0, Math.PI * 2);
-      ctx.fill();
+      targetCtx.fillStyle = spec;
+      targetCtx.beginPath();
+      targetCtx.arc(specX, specY, r * 0.10, 0, Math.PI * 2);
+      targetCtx.fill();
+
+      // Blit to main canvas if using offscreen
+      if (offscreenCtx && offscreenCanvas && targetCtx !== ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(offscreenCanvas, 0, 0);
+      }
     }
 
     // ── Animation loop ───────────────────────────────────────────────

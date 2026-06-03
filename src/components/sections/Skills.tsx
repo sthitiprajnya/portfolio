@@ -5,7 +5,13 @@ import { SkillBadge } from '@/components/ui/SkillBadge';
 import { ScrollReveal, fadeSlideUp, containerStagger } from '@/components/ui/ScrollReveal';
 import { SKILLS } from '@/data/portfolio';
 import clsx from 'clsx';
-import { Radar } from 'react-chartjs-2';
+import dynamic from 'next/dynamic';
+
+const Radar = dynamic(() => import('react-chartjs-2').then((mod) => mod.Radar), {
+  ssr: false,
+  loading: () => <div className="w-full h-full flex items-center justify-center font-mono text-[0.6rem] text-text-muted animate-pulse">LOADING_DATA_VIZ...</div>
+});
+
 import {
   Chart as ChartJS,
   RadialLinearScale,

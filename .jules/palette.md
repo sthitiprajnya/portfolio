@@ -1,15 +1,7 @@
-## 2026-05-31 - [ARIA Tabs Pattern for Experience Section]
-**Learning:** Implementing the WAI-ARIA Tabs pattern (role="tablist", role="tab", role="tabpanel") significantly improves the discoverability and usability of nested information for screen reader users, especially in complex components like professional experience logs.
-**Action:** Always verify that interactive tab-like elements use semantic ARIA roles and proper ID cross-linking (aria-controls/aria-labelledby) to maintain a high accessibility standard.
+## 2025-07-24 - [Accessible Tooltips for Decorative Icons]
+**Learning:** Decorative or informative icons that trigger tooltips on hover are often missed in keyboard navigation. Providing `tabIndex={0}` and linking content via `aria-describedby` is essential for WCAG compliance.
+**Action:** Always verify that informative tooltips are triggerable via `:focus-visible` and have appropriate ARIA roles and descriptions. Use the array index for unique IDs when rendering in loops to ensure stable ARIA links.
 
-## 2026-05-31 - [Dynamic Labels and Disclosure Pattern for Accordions]
-**Learning:** Disclosure components (like project methodology accordions) require dynamic text labels (e.g., 'VIEW' vs 'HIDE') and proper ARIA attributes (`aria-expanded`, `aria-controls`) to provide clear feedback to both sighted and screen reader users about the current state of the content.
-**Action:** Implement the W3C disclosure pattern for all toggleable content areas, ensuring button labels update dynamically and are correctly associated with their content via unique IDs.
-
-## 2026-05-31 - [Keyboard-Accessible Tooltips and Filter Announcements]
-**Learning:** Interactive elements that only reveal information on hover (like skill badges with tooltips) are invisible to keyboard users and screen readers unless explicitly made focusable (`tabIndex={0}`) and coupled with CSS that responds to focus (`focus-visible`). Additionally, dynamic filtering requires `aria-live` regions to announce state changes to assistive technologies.
-**Action:** Always ensure hover-only information is reachable via keyboard focus and that dynamic UI updates (like filtering) are announced via `aria-live` regions.
-
-## 2026-06-01 - [Keyboard-Accessible Tooltips via ARIA Describedby]
-**Learning:** Making hover-only information (like tooltips) accessible to keyboard users requires more than just `tabIndex={0}`. To ensure screen readers announce the supplemental information, the interactive element should use `aria-describedby` to link to a container marked with `role="tooltip"`. Additionally, `role="button"` should be avoided if the element is purely informative and doesn't trigger a state change or navigation, as it creates false expectations for keyboard users (who would expect 'Enter' or 'Space' to perform an action).
-**Action:** Implement focusable informative elements with `aria-describedby` pointing to a `role="tooltip"` container to provide a semantic and predictable experience for assistive technology.
+## 2025-07-25 - [Command Palette Discoverability]
+**Learning:** "Power user" features like Command Palettes or keyboard-driven navigation are often underutilized if they lack a visible entry point. Providing a "Search" button in the main navigation with keyboard shortcut hints significantly increases engagement and accessibility for non-power users.
+**Action:** Always include a visible UI element (e.g., a search icon or button) to trigger hidden interactive features, and label them with their corresponding keyboard shortcuts (e.g., `[/]`) to bridge the gap between GUI and CLI patterns.

@@ -11,6 +11,11 @@ interface OrbState {
   phase: number; // Sinusoidal phase
 }
 
+interface TargetCache {
+  centerY: number; // Document-relative center Y
+}
+
+const ORB_RADIUS = 12;
 const BASE_GLOW = 20;
 const MAX_GLOW = 60;
 
@@ -56,6 +61,8 @@ export default function Sentinel() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number>();
   const prefersReducedMotion = usePrefersReducedMotion();
+  // BOLT: Cache target positions to avoid layout thrashing (getBoundingClientRect) in the 60fps loop
+  const targetCacheRef = useRef<TargetCache[]>([]);
 
   const stateRef = useRef<OrbState>({
     y: 0,
@@ -85,13 +92,26 @@ export default function Sentinel() {
     let width = window.innerWidth;
     let height = window.innerHeight;
 
+    // BOLT: Centralized cache update to keep the animation loop layout-free
+    const updateTargetCache = () => {
+      const targets = document.querySelectorAll('[data-orb-target]');
+      const scrollY = window.scrollY;
+      targetCacheRef.current = Array.from(targets).map(target => {
+        const rect = target.getBoundingClientRect();
+        return {
+          centerY: rect.top + scrollY + rect.height / 2
+        };
+      });
+    };
+
     const resize = () => {
       width = window.innerWidth;
       height = window.innerHeight;
       canvas.width = width;
       canvas.height = height;
+      updateTargetCache();
     };
-    window.addEventListener('resize', resize);
+    window.addEventListener('resize', resize, { passive: true });
     resize();
 
     const onScroll = () => {
@@ -116,28 +136,26 @@ export default function Sentinel() {
     });
 
     const checkProximity = (currentY: number) => {
-      // Find elements with data-orb-target
-      const targets = document.querySelectorAll('[data-orb-target]');
       let maxProximity = 0;
       const viewportCenterY = currentY + height / 2;
 
-      targets.forEach(target => {
-        const rect = target.getBoundingClientRect();
-        // Element's center relative to document
-        const elementCenterY = currentY + rect.top + rect.height / 2;
-
-        // Distance from viewport center
-        const dist = Math.abs(elementCenterY - viewportCenterY);
+      // BOLT: Iterate over cached positions instead of querying the DOM every frame
+      const cache = targetCacheRef.current;
+      for (let i = 0; i < cache.length; i++) {
+        const dist = Math.abs(cache[i].centerY - viewportCenterY);
 
         // If within 300px, increase glow
         if (dist < 300) {
           const proximity = 1 - (dist / 300);
           if (proximity > maxProximity) maxProximity = proximity;
         }
-      });
+      }
 
       return maxProximity;
     };
+
+    // Initial targets update after a short delay to ensure elements are rendered
+    const timer = setTimeout(updateTargetCache, 1000);
 
     const draw = () => {
       if (!ctx) return;
@@ -253,6 +271,7 @@ export default function Sentinel() {
     return () => {
       window.removeEventListener('resize', resize);
       window.removeEventListener('scroll', onScroll);
+      clearTimeout(timer);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, [prefersReducedMotion]);

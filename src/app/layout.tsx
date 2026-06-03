@@ -98,19 +98,21 @@ export default function RootLayout({
   };
 
   // Security: Escape JSON-LD to prevent XSS via script tag breakout.
-  // Specifically, replacing '<' with '\u003c' prevents '</script>' from being parsed as a closing tag.
-  const jsonLdString = JSON.stringify(jsonLd).replace(/</g, '\\u003c');
+  // Specifically, replacing '<' and '>' prevents script tag breakout and provides defense-in-depth.
+  const jsonLdString = JSON.stringify(jsonLd)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e');
 
   return (
     <html lang="en" className={`${jbm.variable} ${inter.variable} ${orbitron.variable}`}>
       <head>
+        <meta
+          httpEquiv="Content-Security-Policy"
+          content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://images.unsplash.com https://ghchart.rshah.org; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://api.github.com https://api.emailjs.com; form-action 'self' https://api.emailjs.com; object-src 'none'; base-uri 'none'; manifest-src 'self'; worker-src 'none'; upgrade-insecure-requests; frame-ancestors 'none';"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLdString }}
-        />
-        <meta
-          httpEquiv="Content-Security-Policy"
-          content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://github-readme-stats.vercel.app https://streak-stats.demolab.com https://images.unsplash.com https://ghchart.rshah.org; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://api.github.com https://api.emailjs.com; form-action 'self' https://api.emailjs.com; object-src 'none'; base-uri 'self'; upgrade-insecure-requests; frame-ancestors 'none';"
         />
         <link rel="preload" href="/portfolio/og-image.webp" as="image" />
       </head>

@@ -96,8 +96,8 @@ export function Contact() {
     const lastSubmission = localStorage.getItem(LAST_SUBMISSION_KEY);
     const now = Date.now();
 
-    if (lastSubmission && now - parseInt(lastSubmission) < COOLDOWN_MS) {
-      const remaining = Math.ceil((COOLDOWN_MS - (now - parseInt(lastSubmission))) / 1000);
+    if (lastSubmission && now - parseInt(lastSubmission, 10) < COOLDOWN_MS) {
+      const remaining = Math.ceil((COOLDOWN_MS - (now - parseInt(lastSubmission, 10))) / 1000);
       setErrors({ message: `Submission rate limited. Please wait ${remaining}s.` });
       setStatus('error');
       return;
@@ -121,10 +121,18 @@ export function Contact() {
       // BOLT: Lazy-load @emailjs/browser to reduce initial bundle size (~15KB gzipped deferred)
       const emailjs = (await import('@emailjs/browser')).default;
 
-      await emailjs.sendForm(
+      // Security: Explicitly send only validated fields to avoid transmitting the entire form (including honeypot)
+      const templateParams = {
+        from_name: form.from_name,
+        from_email: form.from_email,
+        subject: form.subject,
+        message: form.message,
+      };
+
+      await emailjs.send(
         serviceId,
         templateId,
-        formRef.current,
+        templateParams,
         {
           publicKey: publicKey,
         }

@@ -32,6 +32,21 @@
   animation: button-scan 0.55s ease-in-out forwards;
 }
 
+.cyber-button:active {
+  transform: scale(0.98);
+}
+
+.hover-glow-card {
+  transition: transform 0.3s var(--ease-out-expo), box-shadow 0.3s var(--ease-out-expo);
+}
+
+.hover-glow-card:hover {
+  transform: perspective(1000px) rotateX(2deg) rotateY(2deg);
+  box-shadow: 0 0 20px rgba(0,245,255,0.15), inset 0 0 20px rgba(0,245,255,0.05);
+  border-color: rgba(0,245,255,0.4);
+}
+
+
 @keyframes scan-line {
   0% { top: 0; }
   100% { top: 100%; }
@@ -72,4 +87,14 @@
 
 .cinematic-reveal {
   animation: cinematic-mask-reveal 1.5s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+}
+/* ── Livie Bot Animations ───────────────────────────── */
+@keyframes orbPulse {
+  0%, 100% { box-shadow: 0 0 12px rgba(0,245,255,0.5); }
+  50%      { box-shadow: 0 0 22px rgba(0,245,255,0.8), 0 0 40px rgba(0,245,255,0.2); }
+}
+
+@keyframes typingDot {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+  40%           { transform: translateY(-4px); opacity: 1; }
 }

@@ -17,7 +17,7 @@ export const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
       <motion.div
         ref={ref}
         className={cn(
-          "relative rounded-xl overflow-hidden backdrop-blur-md border transition-all duration-300",
+          "relative rounded-card overflow-hidden backdrop-blur-md border transition-all duration-300",
           "bg-[var(--gradient-card)] border-border hover:border-border-glow",
           {
             'hover:shadow-[var(--glow-cyan-sm)]': glowColor === 'cyan',

@@ -7,7 +7,7 @@ export default ts.config(
   js.configs.recommended,
   ...ts.configs.recommended,
   {
-    ignores: ["dist", ".next", "out", "eslint.config.mjs"],
+    ignores: ["dist", ".next", "out", "eslint.config.mjs", "next.config.mjs"],
   },
   {
     files: ["**/*.ts", "**/*.tsx"],
@@ -18,7 +18,7 @@ export default ts.config(
     rules: {
       ...reactHooks.configs.recommended.rules,
       "react-refresh/only-export-components": "off",
-      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-explicit-any": "error",
     },
   }
 );

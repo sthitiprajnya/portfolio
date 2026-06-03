@@ -5,7 +5,7 @@ import clsx from 'clsx';
 import { CyberButton } from '@/components/ui/CyberButton';
 import { PERSONAL }    from '@/data/portfolio';
 
-const NAV_LINKS = [
+export const NAV_LINKS = [
   { label: 'About',    id: 'about'    },
   { label: 'Skills',   id: 'skills'   },
   { label: 'XP',       id: 'experience'},
@@ -22,6 +22,27 @@ export function Navigation() {
   const [activeSection,  setActiveSection]  = useState('hero');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
+
+  // UX Enhancement: Handle Escape key to close mobile menu & prevent body scroll
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && mobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [mobileMenuOpen]);
 
   useEffect(() => {
     // BOLT: Use IntersectionObserver instead of scroll listeners and getBoundingClientRect
@@ -66,6 +87,10 @@ export function Navigation() {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const openSearch = () => {
+    window.dispatchEvent(new CustomEvent('open-command-palette'));
+  };
+
   return (
     <>
       {/* BOLT: Sentinel element to detect scroll position without scroll event listeners */}
@@ -73,15 +98,19 @@ export function Navigation() {
       <nav
         aria-label="Main navigation"
         className={clsx(
-          'fixed top-0 left-0 w-full h-16 z-50 transition-all duration-300 flex items-center px-4 md:px-8',
-          'bg-black/70 backdrop-blur-xl',
-          scrolled ? 'border-b border-[rgba(0,245,255,0.3)]' : 'border-b border-[rgba(0,245,255,0.08)]'
+          'fixed top-0 left-0 right-0 h-16 z-50 transition-all duration-300 flex items-center px-4 md:px-8',
+          'glass-heavy rounded-b-xl border-t-0 border-l-0 border-r-0 border-b',
+          scrolled ? 'bg-[rgba(0,0,0,0.75)] backdrop-blur-glass-heavy border-[rgba(0,245,255,0.25)]' : 'border-[var(--glass-border)]'
         )}
       >
         <div className="w-full max-w-7xl mx-auto flex items-center justify-between">
 
           {/* Logo */}
-          <button onClick={() => scrollTo('hero')} className="flex items-center space-x-2 group" aria-label="Scroll to top">
+          <button
+            onClick={() => scrollTo('hero')}
+            className="flex items-center space-x-2 group outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card"
+            aria-label="Scroll to top"
+          >
             <span className="text-cyan font-mono font-bold">{'>_'}</span>
             <span className="font-display font-bold text-white tracking-widest text-sm md:text-base group-hover:text-cyan transition-colors">
               {PERSONAL.nameShort}
@@ -90,6 +119,19 @@ export function Navigation() {
 
           {/* Desktop nav */}
           <div className="hidden lg:flex items-center space-x-6 xl:space-x-8">
+            <button
+              onClick={openSearch}
+              className="flex items-center gap-3 px-3 py-1.5 rounded-card border border-border text-text-secondary hover:text-cyan hover:border-cyan hover:shadow-[var(--glow-cyan-sm)] transition-all outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black group"
+              aria-label="Search sections"
+              aria-keyshortcuts="/"
+            >
+              <svg className="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <span className="font-mono text-[0.65rem] uppercase tracking-widest opacity-60 group-hover:opacity-100 transition-opacity">Search</span>
+              <kbd className="font-mono text-[0.6rem] bg-black/50 px-1.5 py-0.5 rounded border border-border/50 opacity-40 group-hover:opacity-100 transition-opacity">[/]</kbd>
+            </button>
+
             <ul className="flex items-center space-x-4 xl:space-x-6">
               {NAV_LINKS.map(link => {
                 const isActive = activeSection === link.id;
@@ -98,16 +140,13 @@ export function Navigation() {
                     <button
                       onClick={() => scrollTo(link.id)}
                       className={clsx(
-                        'relative font-mono text-[0.72rem] uppercase tracking-widest py-2 transition-colors group',
-                        isActive ? 'text-cyan' : 'text-text-secondary hover:text-cyan'
+                        'relative font-mono text-[0.72rem] uppercase tracking-widest py-2 px-3 transition-colors group outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black',
+                        isActive ? 'text-cyan glass-pill rounded-pill border-b-2 border-cyan' : 'text-text-secondary hover:text-cyan rounded-pill border-b-2 border-transparent'
                       )}
                       aria-label={`Scroll to ${link.label} section`}
+                      aria-current={isActive ? 'page' : undefined}
                     >
                       {link.label}
-                      <span className={clsx(
-                        'absolute bottom-0 left-0 h-[1px] bg-cyan transition-transform duration-300 origin-left w-full',
-                        isActive ? 'scale-x-100 shadow-[var(--glow-cyan-sm)]' : 'scale-x-0 group-hover:scale-x-100'
-                      )} />
                     </button>
                   </li>
                 );
@@ -125,18 +164,30 @@ export function Navigation() {
             </CyberButton>
           </div>
 
-          {/* Mobile hamburger */}
-          <button
-            className="lg:hidden text-cyan p-2"
-            onClick={() => setMobileMenuOpen(true)}
-            aria-expanded={mobileMenuOpen}
-            aria-controls="mobile-menu"
-            aria-label="Open menu"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"/>
-            </svg>
-          </button>
+          {/* Mobile actions */}
+          <div className="flex items-center gap-2 lg:hidden">
+            <button
+              onClick={openSearch}
+              className="text-text-secondary p-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card"
+              aria-label="Search sections"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
+
+            <button
+              className="text-cyan p-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card"
+              onClick={() => setMobileMenuOpen(true)}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-menu"
+              aria-label="Open menu"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"/>
+              </svg>
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -155,30 +206,35 @@ export function Navigation() {
           >
             <div className="flex justify-between items-center mb-10">
               <span className="font-display font-bold text-white tracking-widest text-sm">SYSTEM_MENU</span>
-              <button onClick={() => setMobileMenuOpen(false)} className="text-cyan p-2" aria-label="Close menu">
+              <button onClick={() => setMobileMenuOpen(false)} className="text-cyan p-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card" aria-label="Close menu">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
               </button>
             </div>
 
-            <ul className="flex flex-col space-y-5">
-              {NAV_LINKS.map((link, i) => (
-                <motion.li key={link.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.05 + i * 0.07 }}>
-                  <button
-                    onClick={() => scrollTo(link.id)}
-                    className={clsx(
-                      'font-mono text-xl uppercase tracking-widest text-left w-full',
-                      activeSection === link.id ? 'text-cyan' : 'text-text-secondary'
-                    )}
-                    aria-label={`Scroll to ${link.label} section`}
-                  >
-                    <span className="opacity-40 mr-4 text-xs">// 0{i + 1}</span>
-                    {link.label}
-                  </button>
-                </motion.li>
-              ))}
-            </ul>
+            <div className="flex-1 overflow-y-auto">
+              <ul className="flex flex-col space-y-2">
+                {NAV_LINKS.map((link, i) => (
+                  <motion.li key={link.id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 + i * 0.05 }}>
+                    <button
+                      onClick={() => scrollTo(link.id)}
+                      className={clsx(
+                        'group flex items-center w-full p-4 rounded-card outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black font-mono transition-all',
+                        activeSection === link.id ? 'bg-cyan/10 text-cyan border border-cyan/20' : 'hover:bg-white/5 text-text-secondary hover:text-white border border-transparent'
+                      )}
+                      aria-label={`Scroll to ${link.label} section`}
+                      aria-current={activeSection === link.id ? 'page' : undefined}
+                    >
+                      <span className="opacity-40 mr-4 text-xs w-8 group-hover:text-cyan transition-colors">
+                        {activeSection === link.id ? '>>' : `$`}
+                      </span>
+                      <span className="text-lg uppercase tracking-widest">{link.label}</span>
+                    </button>
+                  </motion.li>
+                ))}
+              </ul>
+            </div>
 
             <motion.div className="mt-auto pt-8" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
               <CyberButton as="a" href={PERSONAL.resumeUrl} download color="green" className="w-full">

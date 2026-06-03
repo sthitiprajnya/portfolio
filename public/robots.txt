@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://sthitiprajnya.github.io/sitemap.xml
+Sitemap: https://sthitiprajnya.github.io/portfolio/sitemap.xml

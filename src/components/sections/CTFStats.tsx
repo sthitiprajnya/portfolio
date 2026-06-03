@@ -1,11 +1,65 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import clsx from 'clsx';
 import { SectionTitle }  from '@/components/ui/SectionTitle';
-import { GlassCard }     from '@/components/ui/GlassCard';
-import { ScrollReveal, fadeSlideUp, fadeSlideLeft, containerStagger } from '@/components/ui/ScrollReveal';
+import { ScrollReveal, fadeSlideUp, fadeSlideLeft } from '@/components/ui/ScrollReveal';
 import { useInView }     from 'react-intersection-observer';
 import { CTF_PROFILE }   from '@/data/portfolio';
+import dynamic from 'next/dynamic';
+import { LogoBadge } from '@/components/ui/LogoBadge';
+
+const Radar = dynamic(() => import('react-chartjs-2').then((mod) => mod.Radar), {
+  ssr: false,
+  loading: () => <div className="w-full h-full flex items-center justify-center font-mono text-[0.6rem] text-text-muted animate-pulse">LOADING_DATA_VIZ...</div>
+});
+
+// BOLT: Hoist static configurations and data transformations to module level
+const HTB_STATS = [
+  { label: 'Points',        value: CTF_PROFILE.htbPoints.toLocaleString() },
+  { label: 'Top',           value: `${CTF_PROFILE.globalPercentile}%` },
+  { label: 'User Owns',     value: CTF_PROFILE.htbUserOwns },
+  { label: 'Root Owns',     value: CTF_PROFILE.htbRootOwns },
+  { label: 'Challenges',    value: CTF_PROFILE.htbChallengesSolved },
+  { label: 'Competitions',  value: CTF_PROFILE.competitions.length },
+];
+
+const RADAR_DATA = {
+  labels: CTF_PROFILE.attackCategories.map(c => c.label.split(' ')[0]),
+  datasets: [{
+    label: 'Proficiency',
+    data: CTF_PROFILE.attackCategories.map(c => c.level),
+    backgroundColor: 'rgba(57, 255, 20, 0.2)',
+    borderColor: 'rgba(57, 255, 20, 0.8)',
+    pointBackgroundColor: 'rgba(57, 255, 20, 1)',
+    pointBorderColor: '#fff',
+  }]
+};
+
+const RADAR_OPTIONS = {
+  scales: {
+    r: {
+      angleLines: { color: 'rgba(255,255,255,0.1)' },
+      grid: { color: 'rgba(255,255,255,0.1)' },
+      pointLabels: { color: '#7FA8C4', font: { family: 'JetBrains Mono', size: 9 } },
+      ticks: { display: false },
+      suggestedMin: 0,
+      suggestedMax: 100
+    }
+  },
+  plugins: { legend: { display: false } },
+  maintainAspectRatio: false
+};
+
+import type { ChartData, ChartOptions } from 'chart.js';
+
+function RadarChartWrapper({ data, options }: { data: ChartData<'radar'>, options: ChartOptions<'radar'> }) {
+  const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
+  return (
+    <div ref={ref} className="w-full h-full flex justify-center items-center">
+      {inView && <Radar data={data} options={{...options, animation: {duration: 2000}}} />}
+    </div>
+  );
+}
 
 export function CTFStats() {
   return (
@@ -27,35 +81,36 @@ export function CTFStats() {
 
           {/* ── Left: HackTheBox profile card ── */}
           <ScrollReveal variants={fadeSlideUp} className="lg:col-span-4">
-            <GlassCard className="p-6 h-full border-cyan/20 hover:shadow-[var(--glow-cyan-sm)]">
+            <div className="p-6 h-full border-cyan/20 hover:shadow-[var(--glow-cyan-sm)] glass rounded-card relative overflow-hidden" data-orb-target="true">
 
               {/* HTB logo row */}
               <div className="flex items-center justify-between mb-6">
-                <div>
-                  <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest mb-1">
-                    Platform
-                  </div>
-                  <div className="font-display text-lg text-white font-bold tracking-widest">
-                    HackTheBox
+                <div className="flex items-center gap-3">
+                  <LogoBadge
+                    src="/portfolio/logos/wargames/hackthebox.svg"
+                    alt="HackTheBox"
+                    width={32}
+                    height={32}
+                  />
+                  <div>
+                    <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest mb-1">
+                      Platform
+                    </div>
+                    <div className="font-display text-lg text-white font-bold tracking-widest leading-none">
+                      HackTheBox
+                    </div>
                   </div>
                 </div>
                 {/* Rank badge */}
-                <div className="px-3 py-1.5 rounded bg-cyan-ghost border border-cyan/40 text-cyan font-mono text-xs font-bold uppercase tracking-wider shadow-[var(--glow-cyan-sm)]">
+                <div className="px-3 py-1.5 glass-pill rounded-pill text-cyan font-mono text-xs font-bold uppercase tracking-wider shadow-[var(--glow-cyan-sm)] border-cyan/40">
                   {CTF_PROFILE.htbRank}
                 </div>
               </div>
 
               {/* Stats grid */}
-              <div className="grid grid-cols-2 gap-3 mb-6">
-                {[
-                  { label: 'Points',        value: CTF_PROFILE.htbPoints.toLocaleString() },
-                  { label: 'Top',           value: `${CTF_PROFILE.globalPercentile}%` },
-                  { label: 'User Owns',     value: CTF_PROFILE.htbUserOwns },
-                  { label: 'Root Owns',     value: CTF_PROFILE.htbRootOwns },
-                  { label: 'Challenges',    value: CTF_PROFILE.htbChallengesSolved },
-                  { label: 'Competitions',  value: CTF_PROFILE.competitions.length },
-                ].map(({ label, value }) => (
-                  <div key={label} className="p-3 rounded bg-black/40 border border-border">
+              <div className="grid grid-cols-2 gap-3 mb-6" >
+                {HTB_STATS.map(({ label, value }) => (
+                  <div key={label} className="p-3 glass rounded-card bg-[rgba(0,0,0,0.4)]">
                     <div className="font-display text-xl text-cyan font-bold">{value}</div>
                     <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest mt-0.5">
                       {label}
@@ -76,36 +131,72 @@ export function CTFStats() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="View HackTheBox Profile in a new tab"
-                className="mt-6 flex items-center justify-center space-x-2 w-full py-2.5 border border-cyan/30 text-cyan font-mono text-xs uppercase tracking-widest rounded-sm hover:bg-cyan hover:text-black transition-all hover:shadow-[var(--glow-cyan-sm)]"
+                className="mt-6 flex items-center justify-center space-x-2 w-full py-2.5 border border-cyan/30 text-cyan font-mono text-xs uppercase tracking-widest rounded-pill hover:bg-cyan hover:text-black transition-all hover:shadow-[var(--glow-cyan-sm)]"
               >
                 <span>VIEW HTB PROFILE</span>
                 <span aria-hidden="true" className="text-[10px]">↗</span>
               </a>
-            </GlassCard>
+            </div>
           </ScrollReveal>
 
-          {/* ── Right: Attack category proficiency ── */}
-          <ScrollReveal variants={fadeSlideLeft} className="lg:col-span-8">
-            <GlassCard className="p-6 h-full">
-              <h3 className="font-mono text-sm text-white mb-6 border-b border-border pb-3">
+          {/* ── Right: Attack category proficiency & Recent Activity ── */}
+          <ScrollReveal variants={fadeSlideLeft} className="lg:col-span-8 space-y-6">
+            <div className="p-6 glass rounded-card">
+              <h3 className="font-mono text-sm text-white mb-6 border-b border-[var(--glass-border)] pb-3">
                 // ATTACK_CATEGORY_PROFICIENCY
               </h3>
 
-              <ScrollReveal variants={containerStagger} className="space-y-5">
-                {CTF_PROFILE.attackCategories.map((cat) => (
-                  <ScrollReveal key={cat.label} variants={fadeSlideUp}>
-                    <SkillBar label={cat.label} level={cat.level} />
-                  </ScrollReveal>
-                ))}
-              </ScrollReveal>
-            </GlassCard>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                 <div className="space-y-4">
+                  {CTF_PROFILE.attackCategories.slice(0, 4).map((cat) => (
+                    <SkillBar key={cat.label} label={cat.label} level={cat.level} />
+                  ))}
+                  <div className="pt-2">
+                     <p className="font-mono text-[0.65rem] text-text-muted leading-relaxed">Proficiency measured across HTB matrices and real-world VAPT engagements.</p>
+                  </div>
+                 </div>
+
+                 {/* Hexagonal Radar Chart mapped from same data */}
+                 <div className="h-[240px] relative flex justify-center items-center">
+                   <RadarChartWrapper data={RADAR_DATA} options={RADAR_OPTIONS} />
+                 </div>
+              </div>
+            </div>
+
+            <div className="p-6 glass rounded-card">
+               <h3 className="font-mono text-sm text-white mb-4 border-b border-[var(--glass-border)] pb-3 flex justify-between items-end">
+                 <span>// RECENT_ACTIVITY</span>
+                 <span className="text-[0.6rem] text-text-muted">Live Feed (Mock)</span>
+               </h3>
+               <div className="space-y-3">
+                 {CTF_PROFILE.recentActivity.map((act, i) => (
+                    <div key={i} className="flex items-center justify-between p-3 rounded-card glass bg-[rgba(0,0,0,0.4)] hover:border-green/30 transition-colors">
+                      <div className="flex items-center gap-3">
+                         <span className={clsx("w-2 h-2 rounded-full", act.type === 'machine' ? 'bg-green shadow-[var(--glow-green-sm)]' : 'bg-amber shadow-[var(--glow-amber-sm)]')} />
+                         <div>
+                            <div className="font-heading font-bold text-sm text-white">{act.title}</div>
+                            <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest">{act.type}</div>
+                         </div>
+                      </div>
+                      <div className="text-right">
+                        <div className={clsx("font-mono text-[0.65rem] uppercase tracking-widest mb-1",
+                          act.difficulty === 'Easy' ? 'text-green' : act.difficulty === 'Medium' ? 'text-amber' : 'text-red-500'
+                        )}>
+                           {act.difficulty}
+                        </div>
+                        <div className="font-mono text-[0.6rem] text-text-secondary">{act.date}</div>
+                      </div>
+                    </div>
+                 ))}
+               </div>
+            </div>
           </ScrollReveal>
         </div>
 
         {/* ── CTF competition history ── */}
         <ScrollReveal variants={fadeSlideUp} delay={0.3} className="mt-10">
-          <GlassCard className="p-6">
-            <h3 className="font-mono text-sm text-white mb-6 border-b border-border pb-3">
+          <div className="p-6 glass rounded-card">
+            <h3 className="font-mono text-sm text-white mb-6 border-b border-[var(--glass-border)] pb-3">
               // CTF_COMPETITION_HISTORY
             </h3>
 
@@ -113,13 +204,13 @@ export function CTFStats() {
               {CTF_PROFILE.competitions.map((comp, i) => (
                 <div
                   key={i}
-                  className="p-4 rounded bg-black/50 border border-border hover:border-cyan/40 transition-colors group"
+                  className="p-4 glass rounded-card bg-[rgba(0,0,0,0.5)] hover:border-[rgba(0,245,255,0.4)] transition-colors group"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest">
                       {comp.year}
                     </div>
-                    <div className="px-2 py-0.5 rounded-sm bg-green-ghost border border-green/30 font-mono text-[0.6rem] text-green uppercase tracking-widest">
+                    <div className="px-2 py-0.5 rounded-pill glass-pill border border-green/30 font-mono text-[0.6rem] text-green uppercase tracking-widest">
                       {comp.placement}
                     </div>
                   </div>
@@ -136,7 +227,7 @@ export function CTFStats() {
 
                   <div className="flex flex-wrap gap-1.5 mt-3">
                     {comp.tags.map(tag => (
-                      <span key={tag} className="font-mono text-[0.55rem] text-text-muted px-2 py-0.5 rounded bg-surface border border-border uppercase tracking-wide">
+                      <span key={tag} className="font-mono text-[0.55rem] text-text-muted px-2 py-0.5 rounded-pill glass-pill border border-[var(--glass-border)] uppercase tracking-wide">
                         {tag}
                       </span>
                     ))}
@@ -144,7 +235,7 @@ export function CTFStats() {
                 </div>
               ))}
             </div>
-          </GlassCard>
+          </div>
         </ScrollReveal>
       </div>
     </section>
@@ -155,11 +246,6 @@ export function CTFStats() {
 
 function SkillBar({ label, level }: { label: string; level: number }) {
   const { ref, inView } = useInView({ threshold: 0.12, triggerOnce: true });
-  const [animated, setAnimated] = useState(false);
-
-  useEffect(() => {
-    if (inView && !animated) setAnimated(true);
-  }, [inView, animated]);
 
   const colorClass =
     level >= 85 ? 'bg-cyan shadow-[var(--glow-cyan-sm)]'  :
@@ -177,7 +263,7 @@ function SkillBar({ label, level }: { label: string; level: number }) {
       <div className="h-2 bg-border rounded-full overflow-hidden">
         <div
           className={clsx('h-full rounded-full transition-[width] duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)]', colorClass)}
-          style={{ width: animated ? `${level}%` : '0%' }}
+          style={{ width: inView ? `${level}%` : '0%' }}
         />
       </div>
     </div>
@@ -186,12 +272,7 @@ function SkillBar({ label, level }: { label: string; level: number }) {
 
 function OwnsBar({ label, value, max, color }: { label: string; value: number; max: number; color: 'cyan' | 'green' }) {
   const { ref, inView } = useInView({ threshold: 0.12, triggerOnce: true });
-  const [animated, setAnimated] = useState(false);
   const pct = Math.min(100, (value / max) * 100);
-
-  useEffect(() => {
-    if (inView && !animated) setAnimated(true);
-  }, [inView, animated]);
 
   const barClass = color === 'cyan'
     ? 'bg-cyan shadow-[var(--glow-cyan-sm)]'
@@ -208,7 +289,7 @@ function OwnsBar({ label, value, max, color }: { label: string; value: number; m
       <div className="h-1.5 bg-border rounded-full overflow-hidden">
         <div
           className={clsx('h-full rounded-full transition-[width] duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)]', barClass)}
-          style={{ width: animated ? `${pct}%` : '0%' }}
+          style={{ width: inView ? `${pct}%` : '0%' }}
         />
       </div>
     </div>

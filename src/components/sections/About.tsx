@@ -2,12 +2,17 @@
 import React from 'react';
 import CountUp from 'react-countup';
 import { AsciiAvatar }   from '@/components/ui/AsciiAvatar';
-import { TerminalWindow } from '@/components/ui/TerminalWindow';
+import { InteractiveTerminal } from '@/components/ui/InteractiveTerminal';
 import { SectionTitle }  from '@/components/ui/SectionTitle';
-import { ScrollReveal, fadeSlideUp, fadeSlideLeft, containerStagger } from '@/components/ui/ScrollReveal';
-import { ABOUT_BIO, ABOUT_STATS, TERMINAL_LINES } from '@/data/portfolio';
+import { ScrollReveal, fadeSlideUp, containerStagger } from '@/components/ui/ScrollReveal';
+import { ABOUT_BIO, ABOUT_STATS, PERSONAL } from '@/data/portfolio';
+import { useInView } from 'react-intersection-observer';
+import { CyberButton } from '@/components/ui/CyberButton';
+import { TypewriterText } from '@/components/ui/TypewriterText';
 
 export function About() {
+  const { ref: bioRef, inView: bioInView } = useInView({ triggerOnce: true, threshold: 0.2 });
+
   return (
     <section id="about" className="py-24 bg-deep relative border-t border-border">
 
@@ -26,7 +31,7 @@ export function About() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
 
           {/* ── Left column: terminal biometric avatar ── */}
-          <ScrollReveal variants={fadeSlideUp} className="order-2 lg:order-1">
+          <ScrollReveal variants={fadeSlideUp} className="order-2 lg:order-1" data-orb-target="true">
             <AsciiAvatar className="w-full max-w-sm mx-auto lg:mx-0" />
 
             {/* Availability badge beneath avatar */}
@@ -43,28 +48,32 @@ export function About() {
 
           {/* ── Right column: bio + terminal + stats ── */}
           <div className="order-1 lg:order-2 space-y-8">
-            <ScrollReveal variants={containerStagger} className="space-y-6">
-              {ABOUT_BIO.map((paragraph, i) => (
-                <ScrollReveal key={i} variants={fadeSlideLeft}>
-                  <p className="font-body text-text-secondary leading-relaxed">
-                    {paragraph}
-                  </p>
-                </ScrollReveal>
+            <div ref={bioRef} className="space-y-6">
+              {bioInView && ABOUT_BIO.map((paragraph, i) => (
+                <p key={i} className="font-body text-text-secondary leading-relaxed">
+                  <TypewriterText sequence={[paragraph]} speed={10} cursor={i === ABOUT_BIO.length - 1} />
+                </p>
               ))}
+            </div>
+
+            <ScrollReveal variants={fadeSlideUp} delay={0.2} className="flex gap-4">
+              <CyberButton as="a" href={PERSONAL.resumeUrl} download color="cyan">
+                DOWNLOAD_CV
+              </CyberButton>
             </ScrollReveal>
 
-            <ScrollReveal variants={fadeSlideUp} delay={0.2}>
-              <TerminalWindow lines={TERMINAL_LINES} />
+            <ScrollReveal variants={fadeSlideUp} delay={0.3}>
+              <InteractiveTerminal />
             </ScrollReveal>
 
             {/* Animated stat counters */}
             <ScrollReveal
               variants={containerStagger}
-              className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-8 border-t border-border"
+              className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-8 border-t border-[var(--glass-border)]"
             >
               {ABOUT_STATS.map((stat, i) => (
-                <ScrollReveal key={i} variants={fadeSlideUp} className="flex flex-col">
-                  <div className="font-display text-3xl md:text-4xl text-cyan mb-2">
+                <ScrollReveal key={i} variants={fadeSlideUp} className="flex flex-col glass rounded-card px-4 py-3 relative overflow-hidden">
+                  <div className="font-display text-3xl md:text-4xl text-cyan mb-2 relative z-10">
                     <CountUp
                       end={stat.value}
                       duration={2.5}
@@ -74,7 +83,7 @@ export function About() {
                     />
                     {stat.suffix}
                   </div>
-                  <div className="font-mono text-[0.65rem] text-text-muted uppercase tracking-widest leading-snug">
+                  <div className="font-mono text-[0.65rem] text-text-muted uppercase tracking-widest leading-snug relative z-10">
                     {stat.label}
                   </div>
                 </ScrollReveal>

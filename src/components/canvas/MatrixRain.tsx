@@ -9,6 +9,10 @@ interface MatrixRainProps {
   opacity?: number;
 }
 
+// BOLT: Hoist static data outside component to avoid redundant creation on every mount/effect run
+const MATRIX_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-*/=%""\'#&_(),.;:?!\\|{}<>[]^~ｦｧｨｩｪｫｬｭｮｯｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0x&&||>><<'.split('');
+const MATRIX_CHAR_LEN = MATRIX_CHARS.length;
+
 export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const { ref: inViewRef, inView } = useInView({ threshold: 0 });
@@ -31,11 +35,6 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
     let width: number;
     let height: number;
 
-    // BOLT: Hoisting character array and length lookup outside the hot loop
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-*/=%""\'#&_(),.;:?!\\|{}<>[]^~ｦｧｨｩｪｫｬｭｮｯｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0x&&||>><<';
-    const charArray = chars.split('');
-    const charLen = charArray.length;
-
     const fontSize = 18;
     let columns: number;
     let drops: number[];
@@ -57,7 +56,18 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
       }
     };
 
-    window.addEventListener('resize', resize);
+    const RAND_POOL_SIZE = 2048;
+    const randPool = new Float32Array(RAND_POOL_SIZE);
+    let poolIdx = 0;
+    for (let i = 0; i < RAND_POOL_SIZE; i++) {
+      randPool[i] = Math.random();
+    }
+    const fastRand = () => {
+      poolIdx = (poolIdx + 1) & (RAND_POOL_SIZE - 1);
+      return randPool[poolIdx];
+    };
+
+    window.addEventListener('resize', resize, { passive: true });
     resize();
 
     ctx.font = `${fontSize}px "JetBrains Mono", monospace`;
@@ -70,21 +80,21 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
       ctx.fillStyle = '#00F5FF'; // Cyan text
 
       const dropsLen = drops.length;
-      const charLen = charArray.length;
+      const charCount = MATRIX_CHAR_LEN;
 
       for (let i = 0; i < dropsLen; i++) {
         // BOLT: Cache calculations and hoist length lookups to optimize 60fps loop
-        const x = i * fontSize;
+        const x = xCoords[i];
         const y = drops[i] * fontSize;
 
         // Draw character
-        const text = charArray[Math.floor(Math.random() * charLen)];
-        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+        const text = MATRIX_CHARS[Math.floor(fastRand() * charCount)];
+        ctx.fillText(text, x, y);
 
         // Reset drop if at bottom or randomly
-        if (y > height && Math.random() > 0.975) {
+        if (y > height && fastRand() > 0.975) {
           drops[i] = 0;
-          speeds[i] = 0.3 + Math.random() * 0.6; // Reset speed randomly
+          speeds[i] = 0.3 + fastRand() * 0.6; // Reset speed randomly
         }
 
         // Move drop
@@ -94,11 +104,18 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
       animationFrameId = requestAnimationFrame(draw);
     };
 
+    const intervalId = setInterval(() => {
+      for (let i = 0; i < RAND_POOL_SIZE; i++) {
+        randPool[i] = Math.random();
+      }
+    }, 5000);
+
     draw();
 
     return () => {
       window.removeEventListener('resize', resize);
       cancelAnimationFrame(animationFrameId);
+      clearInterval(intervalId);
     };
   }, [prefersReducedMotion, inView]);
 

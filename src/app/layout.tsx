@@ -1,6 +1,25 @@
 import type { Metadata, Viewport } from 'next';
+import { JetBrains_Mono, Orbitron, Inter } from 'next/font/google';
 import '@/index.css';
 import '@/animations.css';
+
+const jbm = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono-loaded',
+  display: 'swap',
+});
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-body-loaded',
+  display: 'swap',
+});
+
+const orbitron = Orbitron({
+  subsets: ['latin'],
+  variable: '--font-display',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'Sthitaprajna Biswal — Cybersecurity & Cloud Security Engineer',
@@ -11,7 +30,6 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://sthitiprajnya.github.io/portfolio/',
   },
-  referrer: 'strict-origin-when-cross-origin',
   openGraph: {
     type: 'website',
     url: 'https://sthitiprajnya.github.io/portfolio/',
@@ -19,37 +37,84 @@ export const metadata: Metadata = {
     description: 'Information Security Engineer with 2+ years in application VAPT, cloud security, and red team operations for major Indian FinTech and banking clients.',
     siteName: 'Sthitaprajna Biswal Portfolio',
     images: [{
+      url: 'https://sthitiprajnya.github.io/portfolio/og-image.webp',
+      width: 1200,
+      height: 630,
+    }, {
       url: 'https://sthitiprajnya.github.io/portfolio/og-image.png',
       width: 1200,
       height: 630,
     }],
     locale: 'en_US',
   },
-  referrer: 'strict-origin-when-cross-origin',
   twitter: {
     card: 'summary_large_image',
     title: 'Sthitaprajna Biswal — Cybersecurity Engineer',
     description: '50+ pen tests · 230+ vulnerabilities · NPCI · UIDAI · Axis Bank · Kotak Mahindra',
-    images: ['https://sthitiprajnya.github.io/portfolio/og-image.png'],
+    images: ['https://sthitiprajnya.github.io/portfolio/og-image.webp'],
   },
+  referrer: 'strict-origin-when-cross-origin',
 };
 
 export const viewport: Viewport = {
   themeColor: '#00F5FF',
 };
 
+import { FaviconBlinkProvider } from '@/components/providers/FaviconBlinkProvider';
+import { AudioProvider } from '@/components/providers/AudioProvider';
+import { VisibilityOptimiserProvider } from '@/components/providers/VisibilityOptimiserProvider';
+import LivieBot from '@/components/livie/LivieBot';
+import Sentinel from '@/components/canvas/Sentinel';
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: 'Sthitaprajna Biswal',
+    jobTitle: 'Information Security Engineer',
+    url: 'https://sthitiprajnya.github.io/portfolio/',
+    sameAs: [
+      'https://www.linkedin.com/in/sthitaprajna-biswal-0175b7171/',
+      'https://github.com/sthitiprajnya',
+      'https://profile.hackthebox.com/profile/019db8ae-9364-73ed-bb47-1336835663a7'
+    ],
+    worksFor: {
+      '@type': 'Organization',
+      name: 'iServeU Technology'
+    },
+    knowsAbout: [
+      'Cybersecurity',
+      'Penetration Testing',
+      'Cloud Security',
+      'Application Security',
+      'GCP',
+      'AWS',
+      'VAPT'
+    ]
+  };
+
+  // Security: Escape JSON-LD to prevent XSS via script tag breakout.
+  // Specifically, replacing '<' and '>' prevents script tag breakout and provides defense-in-depth.
+  const jsonLdString = JSON.stringify(jsonLd)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e');
+
   return (
-    <html lang="en">
+    <html lang="en" className={`${jbm.variable} ${inter.variable} ${orbitron.variable}`}>
       <head>
         <meta
-          http-equiv="Content-Security-Policy"
-          content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://github-readme-stats.vercel.app https://streak-stats.demolab.com https://images.unsplash.com; connect-src 'self' https://api.github.com https://api.emailjs.com; object-src 'none'; base-uri 'self'; upgrade-insecure-requests; frame-ancestors 'none';"
+          httpEquiv="Content-Security-Policy"
+          content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://images.unsplash.com https://ghchart.rshah.org; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://api.github.com https://api.emailjs.com; form-action 'self' https://api.emailjs.com; object-src 'none'; base-uri 'none'; manifest-src 'self'; worker-src 'none'; upgrade-insecure-requests; frame-ancestors 'none';"
         />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLdString }}
+        />
+        <link rel="preload" href="/portfolio/og-image.webp" as="image" />
       </head>
       <body>
         <a
@@ -58,7 +123,17 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <div id="root">{children}</div>
+        <div id="root">
+          <VisibilityOptimiserProvider>
+            <AudioProvider>
+              <FaviconBlinkProvider>
+                <Sentinel />
+                {children}
+                <LivieBot />
+              </FaviconBlinkProvider>
+            </AudioProvider>
+          </VisibilityOptimiserProvider>
+        </div>
       </body>
     </html>
   );

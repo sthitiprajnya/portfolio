@@ -66,6 +66,9 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
     window.addEventListener('resize', resize, { passive: true });
     resize();
 
+    // BOLT: Hoist bucket arrays to avoid re-allocation in the 60fps loop
+    const buckets: number[][] = [[], [], [], [], [], []];
+
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
 
@@ -86,28 +89,41 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       }
       ctx.fill();
 
-      // BOLT: Use globalAlpha for connection opacity and squared distance thresholding to avoid Math.sqrt() in the 60fps loop.
-      // String template allocations for colors are eliminated.
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = '#00F5FF';
+      // BOLT: Connection lines are batched into opacity buckets to minimize stroke() calls
+      // from O(E) to a constant (6). This significantly reduces draw call overhead.
+      for (let b = 0; b < 6; b++) buckets[b].length = 0;
+
       for (let i = 0; i < NUM_NODES; i++) {
         const nodeA = nodes[i];
         for (let j = i + 1; j < NUM_NODES; j++) {
           const nodeB = nodes[j];
           const dx = nodeA.x - nodeB.x;
           const dy = nodeA.y - nodeB.y;
-          const distanceSq = dx * dx + dy * dy;
+          const d2 = dx * dx + dy * dy;
 
-          if (distanceSq < MAX_DISTANCE_SQ) {
-            const distance = Math.sqrt(distanceSq);
-            const opacity = (1 - distance / MAX_DISTANCE) * 0.3;
-            ctx.globalAlpha = opacity;
-            ctx.beginPath();
-            ctx.moveTo(nodeA.x, nodeA.y);
-            ctx.lineTo(nodeB.x, nodeB.y);
-            ctx.stroke();
+          if (d2 < MAX_DISTANCE_SQ) {
+            const dist = Math.sqrt(d2);
+            // Group into 6 buckets of ~0.05 opacity increments
+            const bIdx = Math.min(5, Math.floor((1 - dist / MAX_DISTANCE) * 6));
+            buckets[bIdx].push(nodeA.x, nodeA.y, nodeB.x, nodeB.y);
           }
         }
+      }
+
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = '#00F5FF';
+      for (let b = 0; b < 6; b++) {
+        const bucket = buckets[b];
+        const len = bucket.length;
+        if (len === 0) continue;
+
+        ctx.globalAlpha = (b + 1) * 0.05;
+        ctx.beginPath();
+        for (let i = 0; i < len; i += 4) {
+          ctx.moveTo(bucket[i], bucket[i + 1]);
+          ctx.lineTo(bucket[i + 2], bucket[i + 3]);
+        }
+        ctx.stroke();
       }
       ctx.globalAlpha = 1.0;
 

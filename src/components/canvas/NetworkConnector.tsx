@@ -48,6 +48,8 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
     let numNodes = DEFAULT_NUM_NODES;
 
     let nodes: Node[] = [];
+    // BOLT: Reuse bucket arrays to minimize garbage collection (GC) during the 60fps animation loop
+    const buckets: number[][] = [[], [], [], [], [], []];
 
     const initNodes = () => {
       nodes = [];

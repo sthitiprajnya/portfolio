@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { useInView } from 'react-intersection-observer';
 import clsx from 'clsx';
 
 interface GlitchTextProps {
@@ -12,9 +13,12 @@ interface GlitchTextProps {
 export function GlitchText({ children, className, style }: GlitchTextProps) {
   const [isGlitching, setIsGlitching] = useState(false);
   const prefersReducedMotion = usePrefersReducedMotion();
+  const { ref, inView } = useInView({ threshold: 0 });
 
+  // BOLT: Only schedule background glitches when the component is in the viewport
+  // to prevent unnecessary state updates and re-renders when the user has scrolled past.
   useEffect(() => {
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion || !inView) return;
 
     const scheduleNextGlitch = () => {
       const delay = Math.floor(Math.random() * (15000 - 8000 + 1)) + 8000;
@@ -28,7 +32,7 @@ export function GlitchText({ children, className, style }: GlitchTextProps) {
     let timeoutId = scheduleNextGlitch();
 
     return () => clearTimeout(timeoutId);
-  }, [prefersReducedMotion]);
+  }, [prefersReducedMotion, inView]);
 
   if (prefersReducedMotion) {
     return <span className={className} style={style}>{children}</span>;
@@ -36,6 +40,7 @@ export function GlitchText({ children, className, style }: GlitchTextProps) {
 
   return (
     <div
+      ref={ref}
       className={clsx('relative inline-block', className)}
       style={style}
       onMouseEnter={() => {

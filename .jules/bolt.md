@@ -47,3 +47,7 @@
 ## 2026-07-10 - [Pausing Background Timers When Off-screen]
 **Learning:** Periodic interval timers (like those driving typing effects or UI animations) inside components like `AsciiAvatar` run perpetually and consume CPU/trigger React renders even when the component is scrolled entirely out of view.
 **Action:** Always combine `setInterval` calls with `IntersectionObserver` (e.g. `useInView` hook from `react-intersection-observer`) to ensure timers are paused when the element is not visible on-screen, preventing needless main thread congestion and battery drain.
+
+## 2026-07-15 - [Batching Canvas stroke() calls via Opacity Bucketing]
+**Learning:** In high-frequency (60fps) Canvas 2D animation loops, individual `stroke()` calls for every line segment (edges $E$) create significant CPU overhead due to the large number of state changes and draw commands sent to the GPU. By grouping lines into discrete "opacity buckets" (e.g., 6 levels) and using `ctx.globalAlpha`, the number of `stroke()` calls can be reduced from $O(E)$ to a small constant (e.g., 6), drastically improving rendering efficiency with minimal visual impact.
+**Action:** Always audit animation loops for per-element `stroke()` or `fill()` calls. Batch elements with similar styles into a single path and perform one draw call. Use `globalAlpha` with buckets to handle variable transparency without breaking the batch.

@@ -1,99 +1,85 @@
-type Topic = 'experience' | 'cert' | 'skill' | 'contact' | 'project' | 'htb' | 'default';
+import { PERSONAL, SKILLS, EXPERIENCE, PROJECTS, CERTIFICATIONS, CTF_PROFILE } from '@/data/portfolio';
 
-const BANKS = {
-  openers: [
-    "Analyzing query...",
-    "Retrieving data matrix...",
-    "Scanning memory banks...",
-    "Accessing Sthita's records...",
-    "Decrypting payload..."
-  ],
-  closers: [
-    "Would you like to know more?",
-    "Awaiting further inquiries.",
-    "System standing by.",
-    "Data transmission complete.",
-    "Let me know if you need deeper analysis."
-  ],
-  content: {
-    experience: [
-      "Sthitaprajna has been an Information Security Engineer and Pen Tester at iServeU Technology for over 2 years.",
-      "His battle log shows 2+ years of securing FinTech pipelines at iServeU.",
-      "He leads VAPT operations and cloud security architecture at iServeU, backed by 2 years of field experience."
-    ],
-    cert: [
-      "He holds 11 active certifications, prominently eJPT v2, TCM PEH, and INE Cloud Associate.",
-      "His certification stack includes eJPT v2, CCNA, PEH, and multiple EC-Council credentials.",
-      "Currently maintaining 11 active certs across offensive security and network defense."
-    ],
-    skill: [
-      "Primary weapons: Burp Suite Pro, Nessus, Nuclei, and Wazuh. Scripting in Python and Bash.",
-      "He specializes in Web App Sec, Cloud Security (GCP/AWS), and custom Python automation.",
-      "His skill matrix covers advanced VAPT, SIEM deployment, and deep GCP security hardening."
-    ],
-    contact: [
-      "You can ping him at sthitabiswal2002@gmail.com or access his LinkedIn profile.",
-      "Establish a secure channel via sthitabiswal2002@gmail.com.",
-      "Reach out directly at sthitabiswal2002@gmail.com for recruitment protocols."
-    ],
-    project: [
-      "Key deployments include GCP bucket hardening, a custom Wazuh SIEM setup, and PCI/PII DLP pipelines.",
-      "He has built automated VAPT pipelines and executed an MQTT IoT attack chain PoC.",
-      "Notable projects revolve around cloud infrastructure defense and automated vulnerability scanning."
-    ],
-    htb: [
-      "Current HackTheBox rank: Hacker. 1,240 points, Top 15%, with 42 system owns.",
-      "He's highly active on HTB: 1,240 points, Top 15% globally.",
-      "HTB telemetry shows 24 User owns, 18 Root owns, and 45 completed challenges."
-    ],
-    default: [
-      "I am an interactive terminal. Please query a specific topic like 'experience' or 'skills'.",
-      "Query out of bounds. Try asking about his projects, certifications, or HackTheBox rank.",
-      "That is classified or unknown. Ask me about his tech stack or contact details instead."
+const PATTERNS: { pattern: RegExp; response: string | string[] }[] = [
+  {
+    pattern: /(experience|years|background|work|history|job)/i,
+    response: [
+      `Sthitaprajna has been an Information Security Engineer and Pen Tester at ${EXPERIENCE[0].company} since ${EXPERIENCE[0].period.split(' — ')[0]}.`,
+      `His battle log shows solid experience in securing FinTech pipelines at ${EXPERIENCE[0].company}.`,
+      `He leads VAPT operations and cloud security architecture at ${EXPERIENCE[0].company}.`
+    ]
+  },
+  {
+    pattern: /(project|built|made|portfolio)/i,
+    response: [
+      `Key deployments include ${PROJECTS.map(p => p.title).join(', ')}.`,
+      `He has built automated VAPT pipelines and executed an MQTT IoT attack chain PoC.`,
+      `Notable projects revolve around cloud infrastructure defense, like his ${PROJECTS[0].title}.`
+    ]
+  },
+  {
+    pattern: /(cert|certification)/i,
+    response: [
+      `He holds ${CERTIFICATIONS.length} active certifications, prominently ${CERTIFICATIONS[0].name} and ${CERTIFICATIONS[1].name}.`,
+      `His certification stack includes ${CERTIFICATIONS.map(c => c.name).slice(0,3).join(', ')}.`,
+      `Currently maintaining ${CERTIFICATIONS.length} active certs across offensive security and network defense.`
+    ]
+  },
+  {
+    pattern: /(skill|tool|stack|tech)/i,
+    response: [
+      `Primary weapons: ${SKILLS[0].skills.map((s: { name: string }) => s.name).slice(0, 4).join(', ')}.`,
+      `He specializes in Web App Sec, Cloud Security, and ${SKILLS[2].skills.map((s: { name: string }) => s.name).slice(0, 2).join(' / ')}.`,
+      `His skill matrix covers advanced VAPT, SIEM deployment, and deep GCP security hardening.`
+    ]
+  },
+  {
+    pattern: /(ctf|hackthebox|htb|rank|points)/i,
+    response: [
+      `Current HackTheBox rank: ${CTF_PROFILE.htbRank}. ${CTF_PROFILE.htbPoints} points, N/A respect.`,
+      `He's highly active on HTB: ${CTF_PROFILE.htbPoints} points, Top ${CTF_PROFILE.globalPercentile} globally.`,
+      `HTB telemetry shows ${CTF_PROFILE.htbRootOwns} System owns, ${CTF_PROFILE.htbUserOwns} User owns, and ${CTF_PROFILE.htbChallengesSolved} completed challenges.`
+    ]
+  },
+  {
+    pattern: /(contact|email|hire|reach)/i,
+    response: [
+      `You can ping him at ${PERSONAL.email} or access his LinkedIn profile.`,
+      `Establish a secure channel via ${PERSONAL.email}.`,
+      `Reach out directly at ${PERSONAL.email} for recruitment protocols.`
+    ]
+  },
+  {
+    pattern: /(github|open source|code|commit)/i,
+    response: [
+      `He's active on GitHub with 852 commits and 43 PRs this year.`,
+      `His open source activity shows 852 commits. Check out his GitHub for scripts and tools.`
+    ]
+  },
+  {
+    pattern: /(hello|hi|hey|greet)/i,
+    response: [
+      "Greetings. How can I assist you in learning about Sthita?",
+      "Hello. Please query a specific topic like 'experience' or 'skills'.",
+      "System online. Awaiting your query."
     ]
   }
-};
-
-const recentResponses: string[] = [];
+];
 
 export function generateDynamicSpeech(input: string): string {
-  const q = input.toLowerCase();
-
-  let topic: Topic = 'default';
-  if (q.includes('experience') || q.includes('years') || q.includes('work')) topic = 'experience';
-  else if (q.includes('cert')) topic = 'cert';
-  else if (q.includes('skill') || q.includes('tool') || q.includes('stack')) topic = 'skill';
-  else if (q.includes('contact') || q.includes('hire') || q.includes('email')) topic = 'contact';
-  else if (q.includes('project')) topic = 'project';
-  else if (q.includes('hackthebox') || q.includes('htb')) topic = 'htb';
-
-  const openers = BANKS.openers;
-  const closers = BANKS.closers;
-  const contents = BANKS.content[topic];
-
-  const opener = openers[Math.floor(Math.random() * openers.length)];
-  const closer = closers[Math.floor(Math.random() * closers.length)];
-
-  // Try to find a content piece we haven't used recently
-  let content = contents[Math.floor(Math.random() * contents.length)];
-  let attempts = 0;
-  while (recentResponses.includes(content) && attempts < 3) {
-    content = contents[Math.floor(Math.random() * contents.length)];
-    attempts++;
+  for (const { pattern, response } of PATTERNS) {
+    if (pattern.test(input)) {
+      if (Array.isArray(response)) {
+        return response[Math.floor(Math.random() * response.length)];
+      }
+      return response;
+    }
   }
 
-  // Update recent responses
-  recentResponses.push(content);
-  if (recentResponses.length > 10) recentResponses.shift();
-
-  // 1 in 4 chance to omit opener or closer for conversational variety
-  const useOpener = Math.random() > 0.25;
-  const useCloser = Math.random() > 0.25;
-
-  let finalSpeech = '';
-  if (useOpener) finalSpeech += opener + ' ';
-  finalSpeech += content;
-  if (useCloser) finalSpeech += ' ' + closer;
-
-  return finalSpeech.trim();
+  const defaults = [
+    "I am an interactive terminal. Please query a specific topic like 'experience' or 'skills'.",
+    "Query out of bounds. Try asking about his projects, certifications, or HackTheBox rank.",
+    "That is classified or unknown. Ask me about his tech stack or contact details instead."
+  ];
+  return defaults[Math.floor(Math.random() * defaults.length)];
 }

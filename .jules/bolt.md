@@ -44,6 +44,6 @@
 **Learning:** In high-frequency (60fps) Canvas 2D loops, individual `fill()` calls for dozens of elements and per-frame RGBA string template literals (`rgba(...)`) cause significant CPU overhead and trigger frequent Garbage Collection (GC) pauses. Batching similar shapes into a single path and using `ctx.globalAlpha` for transparency allows the browser and GPU to process the frame much more efficiently.
 **Action:** Always batch primitive shapes (like `arc`) into a single path before calling `fill()` or `stroke()`. Avoid dynamic color string generation in hot loops; use a static color and control opacity via `globalAlpha`.
 
-## 2026-07-10 - [Visibility-Gated Background Side Effects]
-**Learning:** Background side effects like periodic state-driven animations (e.g., periodic glitching), even if infrequent, contribute to unnecessary main-thread work and React re-renders when the component is not in the viewport. Gating these effects with `IntersectionObserver` ensures the CPU is only used for effects the user can actually see.
-**Action:** Use `react-intersection-observer` to gate all periodic background side effects. Ensure timers are cleared when components leave the viewport to eliminate idle-time CPU usage and re-renders.
+## 2026-07-10 - [Pausing Background Timers When Off-screen]
+**Learning:** Periodic interval timers (like those driving typing effects or UI animations) inside components like `AsciiAvatar` run perpetually and consume CPU/trigger React renders even when the component is scrolled entirely out of view.
+**Action:** Always combine `setInterval` calls with `IntersectionObserver` (e.g. `useInView` hook from `react-intersection-observer`) to ensure timers are paused when the element is not visible on-screen, preventing needless main thread congestion and battery drain.

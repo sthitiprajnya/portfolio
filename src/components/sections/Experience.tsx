@@ -1,15 +1,13 @@
 "use client";
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useScroll, useTransform } from 'framer-motion';
 import clsx from 'clsx';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { LogoBadge } from '@/components/ui/LogoBadge';
 import { EXPERIENCE } from '@/data/portfolio';
 
-gsap.registerPlugin(ScrollTrigger);
 
 // BOLT: Hoist static configurations and regexes to module level to avoid redundant allocations on every render
 const ACTIVE_COLOR_MAP = {
@@ -26,74 +24,14 @@ const METRIC_MATCH_REGEX = /(\d+%|\d+\+? hours|55%|100%|80%|35%|zero)/i;
 
 export function Experience() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const lineRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
-  const triggersRef = useRef<ScrollTrigger[]>([]);
 
-  useEffect(() => {
-    if (prefersReducedMotion || !containerRef.current || !lineRef.current) return;
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start center", "end center"]
+  });
 
-    const container = containerRef.current;
-
-    // Timeline self-drawing animation
-    const st1 = ScrollTrigger.create({
-        trigger: container,
-        start: "top center",
-        end: "bottom center",
-        scrub: 1, // Smooth scrubbing
-        animation: gsap.fromTo(lineRef.current,
-          { scaleY: 0 },
-          { scaleY: 1, ease: "none" }
-        )
-    });
-    triggersRef.current.push(st1);
-
-    // BOLT: Scope GSAP queries to the container to avoid scanning the entire document
-    // Cinematic staggering for the experience cards using GSAP ScrollTrigger
-    const cards = container.querySelectorAll('.experience-card-wrapper');
-    cards.forEach((card) => {
-      gsap.fromTo(card,
-        { opacity: 0, y: 100, rotateX: 5, scale: 0.95 },
-        {
-          opacity: 1,
-          y: 0,
-          rotateX: 0,
-          scale: 1,
-          duration: 1.2,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: card,
-            start: "top 80%",
-            toggleActions: "play none none reverse"
-          }
-        }
-      );
-    });
-
-    // Animate nodes popping in when line reaches them
-    const nodes = container.querySelectorAll('.timeline-node');
-    nodes.forEach((node) => {
-      gsap.fromTo(node,
-        { scale: 0, opacity: 0 },
-        {
-          scale: 1,
-          opacity: 1,
-          duration: 0.6,
-          ease: "elastic.out(1, 0.5)",
-          scrollTrigger: {
-            trigger: node,
-            start: "top 60%", // Triggers slightly before reaching center
-            toggleActions: "play none none reverse"
-          }
-        }
-      );
-    });
-
-    return () => {
-      triggersRef.current.forEach(t => t.kill());
-      triggersRef.current = [];
-    };
-  }, [prefersReducedMotion]);
+  const scaleY = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
   return (
     <section id="experience" className="py-24 bg-deep relative border-t border-border">
@@ -104,12 +42,11 @@ export function Experience() {
           {/* Animated Timeline Line */}
           <div className="absolute top-0 left-0 bottom-0 w-[2px] bg-border z-0">
             {!prefersReducedMotion ? (
-              <div
-                ref={lineRef}
+              <motion.div
                 className="absolute top-0 left-0 w-full h-full origin-top"
                 style={{
                   background: 'linear-gradient(to bottom, var(--color-cyan), var(--color-violet))',
-                  transform: 'scaleY(0)'
+                  scaleY
                 }}
               />
             ) : (
@@ -168,11 +105,15 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
   const cardContent = (
     <div className="relative pl-8 md:pl-12" data-orb-target="experience">
       {/* Timeline Node */}
-      <div
+      <motion.div
         className={clsx(
           "timeline-node absolute left-[-7px] top-1 w-[16px] h-[16px] rounded-full z-10 bg-deep border-2",
           isFirst ? "border-cyan shadow-[var(--glow-cyan-sm)]" : "border-violet shadow-[var(--glow-violet-sm)]"
         )}
+        initial={prefersReducedMotion ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
+        whileInView={prefersReducedMotion ? {} : { scale: 1, opacity: 1 }}
+        viewport={{ once: false, margin: "-40%" }}
+        transition={{ duration: 0.6, type: "spring", bounce: 0.5 }}
       />
 
       {/* Date Indicator (Mobile primarily, but visible on desktop too) */}
@@ -322,8 +263,14 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
   );
 
   return (
-    <div className={clsx("experience-card-wrapper", prefersReducedMotion ? "" : "opacity-0")} >
+    <motion.div
+      initial={prefersReducedMotion ? { opacity: 1, y: 0, rotateX: 0, scale: 1 } : { opacity: 0, y: 100, rotateX: 5, scale: 0.95 }}
+      whileInView={prefersReducedMotion ? {} : { opacity: 1, y: 0, rotateX: 0, scale: 1 }}
+      viewport={{ once: false, margin: "-20%" }}
+      transition={{ duration: 1.2, ease: "easeOut" }}
+      className="experience-card-wrapper"
+    >
       {cardContent}
-    </div>
+    </motion.div>
   );
 }

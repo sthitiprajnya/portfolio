@@ -50,7 +50,9 @@ const RADAR_OPTIONS = {
   maintainAspectRatio: false
 };
 
-function RadarChartWrapper({ data, options }: { data: any, options: any }) {
+import type { ChartData, ChartOptions } from 'chart.js';
+
+function RadarChartWrapper({ data, options }: { data: ChartData<'radar'>, options: ChartOptions<'radar'> }) {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
   return (
     <div ref={ref} className="w-full h-full flex justify-center items-center">
@@ -79,7 +81,7 @@ export function CTFStats() {
 
           {/* ── Left: HackTheBox profile card ── */}
           <ScrollReveal variants={fadeSlideUp} className="lg:col-span-4">
-            <div className="p-6 h-full border-cyan/20 hover:shadow-[var(--glow-cyan-sm)] glass rounded-card relative overflow-hidden">
+            <div className="p-6 h-full border-cyan/20 hover:shadow-[var(--glow-cyan-sm)] glass rounded-card relative overflow-hidden" data-orb-target="true">
 
               {/* HTB logo row */}
               <div className="flex items-center justify-between mb-6">

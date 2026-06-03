@@ -25,7 +25,7 @@ export function Certifications() {
           className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mb-8"
         >
           {CERTIFICATIONS.map((cert) => (
-            <ScrollReveal key={cert.id} variants={fadeSlideUp} className="h-full">
+            <ScrollReveal key={cert.id} variants={fadeSlideUp} className="h-full" data-orb-target="true">
               <CertCard cert={cert} />
             </ScrollReveal>
           ))}

@@ -56,6 +56,7 @@ interface ScrollRevealProps extends HTMLMotionProps<"div"> {
   variants?: Variants;
   className?: string;
   delay?: number;
+  staggerDelay?: number;
 }
 
 export function ScrollReveal({
@@ -63,6 +64,7 @@ export function ScrollReveal({
   variants = fadeSlideUp,
   className,
   delay,
+  staggerDelay,
   ...props
 }: ScrollRevealProps) {
   const { ref, inView } = useInView({
@@ -98,6 +100,7 @@ export function ScrollReveal({
       initial="hidden"
       animate={inView ? "visible" : "hidden"}
       className={className}
+      style={staggerDelay !== undefined ? { ...props.style, transitionDelay: `calc(${staggerDelay} * 0.08s)` } : props.style}
       {...props}
     >
       {children}

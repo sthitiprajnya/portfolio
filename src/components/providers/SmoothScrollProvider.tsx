@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useRef } from 'react';
 import Lenis from 'lenis';
-import { gsap } from 'gsap';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 interface SmoothScrollProviderProps {
@@ -28,14 +27,14 @@ export function SmoothScrollProvider({ children }: SmoothScrollProviderProps) {
 
     lenisRef.current = lenis;
 
-    gsap.ticker.add((time) => {
-      lenis.raf(time * 1000);
-    });
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
 
-    gsap.ticker.lagSmoothing(0);
+    requestAnimationFrame(raf);
 
     return () => {
-      gsap.ticker.remove((time) => lenis.raf(time * 1000));
       lenis.destroy();
     };
   }, [prefersReducedMotion]);

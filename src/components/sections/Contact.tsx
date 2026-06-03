@@ -90,10 +90,16 @@ export function Contact() {
       return;
     }
 
-    // Security: Basic submission cooldown (60 seconds) to prevent spamming
+    // Security: Basic submission cooldown (60 seconds) to prevent spamming.
+    // Wrap in try-catch for private browsing modes that restrict storage access.
     const LAST_SUBMISSION_KEY = 'last_submission_time';
     const COOLDOWN_MS = 60 * 1000;
-    const lastSubmission = localStorage.getItem(LAST_SUBMISSION_KEY);
+    let lastSubmission: string | null = null;
+    try {
+      lastSubmission = localStorage.getItem(LAST_SUBMISSION_KEY);
+    } catch (e) {
+      console.warn('Storage access failed during rate-limit check.', e);
+    }
     const now = Date.now();
 
     if (lastSubmission && now - parseInt(lastSubmission, 10) < COOLDOWN_MS) {
@@ -140,7 +146,11 @@ export function Contact() {
 
       setStatus('sent');
       speak("Message transmitted. Awaiting response.");
-      localStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
+      try {
+        localStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
+      } catch (e) {
+        console.warn('Failed to set rate-limit timestamp in storage.', e);
+      }
       setForm({ from_name: '', from_email: '', subject: '', message: '', hp_field: '' });
       setTimeout(() => setStatus('idle'), 6000);
     } catch (error) {

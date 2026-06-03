@@ -85,7 +85,8 @@ export function ResumePanel() {
                   className="w-full h-[600px] border-none"
                   title="Resume PDF"
                   sandbox="allow-same-origin"
-                  allow="camera 'none'; microphone 'none'; geolocation 'none'; autoplay 'none'"
+                  referrerPolicy="no-referrer"
+                  allow="camera 'none'; microphone 'none'; geolocation 'none'; autoplay 'none'; payment 'none'; usb 'none'; magnetometer 'none'; accelerometer 'none'; gyroscope 'none'"
                 />
               </div>
 

@@ -43,3 +43,7 @@
 ## 2026-07-05 - [Batching Canvas Paths and Eliminating String Allocations]
 **Learning:** In high-frequency (60fps) Canvas 2D loops, individual `fill()` calls for dozens of elements and per-frame RGBA string template literals (`rgba(...)`) cause significant CPU overhead and trigger frequent Garbage Collection (GC) pauses. Batching similar shapes into a single path and using `ctx.globalAlpha` for transparency allows the browser and GPU to process the frame much more efficiently.
 **Action:** Always batch primitive shapes (like `arc`) into a single path before calling `fill()` or `stroke()`. Avoid dynamic color string generation in hot loops; use a static color and control opacity via `globalAlpha`.
+
+## 2026-07-10 - [Pausing Background Timers When Off-screen]
+**Learning:** Periodic interval timers (like those driving typing effects or UI animations) inside components like `AsciiAvatar` run perpetually and consume CPU/trigger React renders even when the component is scrolled entirely out of view.
+**Action:** Always combine `setInterval` calls with `IntersectionObserver` (e.g. `useInView` hook from `react-intersection-observer`) to ensure timers are paused when the element is not visible on-screen, preventing needless main thread congestion and battery drain.

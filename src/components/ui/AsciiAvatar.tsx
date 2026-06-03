@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import Image from 'next/image';
+import { useInView } from 'react-intersection-observer';
 
 // The avatar renders as a terminal "biometric ID scan" using JetBrains Mono,
 // which is already loaded by the project. Each character is chosen so the face
@@ -44,11 +45,12 @@ export function AsciiAvatar({ className }: AsciiAvatarProps) {
   const [scanPos, setScanPos] = useState(0);
   const [isHuman, setIsHuman] = useState(false);
   const prefersReducedMotion = usePrefersReducedMotion();
+  const { ref, inView } = useInView({ threshold: 0 });
 
   // Animate the metadata lines appearing one by one after mount
   useEffect(() => {
-    if (prefersReducedMotion) {
-      setVisibleMeta(META_LINES.length);
+    if (prefersReducedMotion || !inView) {
+      if (prefersReducedMotion) setVisibleMeta(META_LINES.length);
       return;
     }
     const timer = setInterval(() => {
@@ -58,19 +60,20 @@ export function AsciiAvatar({ className }: AsciiAvatarProps) {
       });
     }, 300);
     return () => clearInterval(timer);
-  }, [prefersReducedMotion]);
+  }, [prefersReducedMotion, inView]);
 
   // Animate the scanline sweeping downward over the face art
   useEffect(() => {
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion || !inView) return;
     const timer = setInterval(() => {
       setScanPos(prev => (prev >= AVATAR_LINES.length - 1 ? 0 : prev + 1));
     }, 120);
     return () => clearInterval(timer);
-  }, [prefersReducedMotion]);
+  }, [prefersReducedMotion, inView]);
 
   return (
     <div
+      ref={ref}
       className={clsx(
         'relative rounded-card border border-[var(--glass-border)] glass-heavy overflow-hidden',
         'shadow-[0_0_30px_rgba(0,245,255,0.12)]',

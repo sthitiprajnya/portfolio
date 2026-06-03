@@ -35,7 +35,7 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
     let width: number;
     let height: number;
 
-    const fontSize = 18;
+    let fontSize = 18;
     let columns: number;
     let drops: number[];
     let speeds: number[];
@@ -44,6 +44,11 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
     const resize = () => {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
+
+      // Day 2: Responsive font size
+      fontSize = Math.max(12, Math.min(18, window.innerWidth / 80));
+      ctx.font = `${fontSize}px "JetBrains Mono", monospace`;
+
       columns = Math.floor(width / fontSize);
 
       drops = [];
@@ -55,6 +60,11 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
         xCoords[i] = i * fontSize;
       }
     };
+
+    // Day 6: Glitch Burst state
+    let glitchedColumns: number[] = [];
+    let isGlitching = false;
+    let glitchTimeoutId: ReturnType<typeof setTimeout>;
 
     const RAND_POOL_SIZE = 2048;
     const randPool = new Float32Array(RAND_POOL_SIZE);
@@ -70,14 +80,10 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
     window.addEventListener('resize', resize, { passive: true });
     resize();
 
-    ctx.font = `${fontSize}px "JetBrains Mono", monospace`;
-
     const draw = () => {
       // Semi-transparent black to create fade effect
       ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
       ctx.fillRect(0, 0, width, height);
-
-      ctx.fillStyle = '#00F5FF'; // Cyan text
 
       const dropsLen = drops.length;
       const charCount = MATRIX_CHAR_LEN;
@@ -87,7 +93,31 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
         const x = xCoords[i];
         const y = drops[i] * fontSize;
 
-        // Draw character
+        // Day 6: Check for glitch column
+        const isGlitchedCol = isGlitching && glitchedColumns.includes(i);
+
+        // Day 10: Second pass over trailing characters
+        const trailLength = 12;
+        for (let j = 1; j <= trailLength; j++) {
+          const trailY = y - j * fontSize;
+          if (trailY < 0) continue;
+
+          const ratio = j / trailLength;
+          // Fade from cyan (0, 245, 255) to dark green (0, 85, 51)
+          const g = Math.round(245 - ratio * (245 - 85));
+          const b = Math.round(255 - ratio * (255 - 51));
+          const opacity = 1 - ratio;
+
+          ctx.fillStyle = isGlitchedCol
+            ? `rgba(255, 0, 85, ${opacity})`
+            : `rgba(0, ${g}, ${b}, ${opacity})`;
+
+          const trailText = MATRIX_CHARS[Math.floor(fastRand() * charCount)];
+          ctx.fillText(trailText, x, trailY);
+        }
+
+        // Draw lead character in bright white
+        ctx.fillStyle = '#FFFFFF';
         const text = MATRIX_CHARS[Math.floor(fastRand() * charCount)];
         ctx.fillText(text, x, y);
 
@@ -110,12 +140,36 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
       }
     }, 5000);
 
+    // Day 6: Glitch burst scheduler
+    const scheduleGlitch = () => {
+      const nextGlitchTime = 12000 + Math.random() * 6000; // 12-18 seconds
+      glitchTimeoutId = setTimeout(() => {
+        isGlitching = true;
+        glitchedColumns = [];
+        for (let i = 0; i < 3; i++) {
+          const colIndex = Math.floor(Math.random() * columns);
+          glitchedColumns.push(colIndex);
+          drops[colIndex] = 0; // Reset to top
+        }
+
+        setTimeout(() => {
+          isGlitching = false;
+          glitchedColumns = [];
+        }, 500); // 500ms duration
+
+        scheduleGlitch();
+      }, nextGlitchTime);
+    };
+
+    scheduleGlitch();
+
     draw();
 
     return () => {
       window.removeEventListener('resize', resize);
       cancelAnimationFrame(animationFrameId);
       clearInterval(intervalId);
+      clearTimeout(glitchTimeoutId);
     };
   }, [prefersReducedMotion, inView]);
 

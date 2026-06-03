@@ -9,13 +9,14 @@ interface OrbState {
   xOffset: number; // Sinusoidal offset
   glow: number; // Glow multiplier based on proximity
   phase: number; // Sinusoidal phase
+  trail: { x: number; y: number }[]; // Circular buffer for trail positions
+  trailIndex: number; // Index for circular buffer
 }
 
 interface TargetCache {
   centerY: number; // Document-relative center Y
 }
 
-const ORB_RADIUS = 12;
 const BASE_GLOW = 20;
 const MAX_GLOW = 60;
 
@@ -70,9 +71,19 @@ export default function Sentinel() {
     xOffset: 0,
     glow: BASE_GLOW,
     phase: 0,
+    trail: Array(8).fill({ x: 0, y: 0 }),
+    trailIndex: 0,
   });
 
   const targetThemeRef = useRef(DEFAULT_THEME);
+  const colorProximityRef = useRef(0);
+
+  // Day 12: Ring ripple state
+  const rippleRef = useRef({
+    active: false,
+    startTime: 0,
+    triggered: false, // Prevents multiple rapid triggers
+  });
 
   const currentColorRef = useRef({
     coreR: 0, coreG: 245, coreB: 255, coreA: 1,
@@ -154,6 +165,22 @@ export default function Sentinel() {
       return maxProximity;
     };
 
+    // Day 8: Proximity for #ctf element specifically to shift color to violet
+    const checkCtfProximity = (currentY: number) => {
+      const ctfElement = document.getElementById('ctf');
+      if (!ctfElement) return 0;
+
+      const rect = ctfElement.getBoundingClientRect();
+      const centerY = rect.top + window.scrollY + rect.height / 2;
+      const viewportCenterY = currentY + height / 2;
+      const dist = Math.abs(centerY - viewportCenterY);
+
+      if (dist < 400) {
+        return 1 - (dist / 400);
+      }
+      return 0;
+    };
+
     // Initial targets update after a short delay to ensure elements are rendered
     const timer = setTimeout(updateTargetCache, 1000);
 
@@ -175,9 +202,27 @@ export default function Sentinel() {
       const targetGlow = BASE_GLOW + (MAX_GLOW - BASE_GLOW) * proximity;
       s.glow += (targetGlow - s.glow) * LERP_FACTOR;
 
+      // Day 12: Trigger ripple if proximity exceeds 0.85
+      if (proximity > 0.85 && !rippleRef.current.triggered && !rippleRef.current.active) {
+        rippleRef.current.active = true;
+        rippleRef.current.startTime = Date.now();
+        rippleRef.current.triggered = true;
+      } else if (proximity < 0.5) {
+        // Reset trigger when moving away
+        rippleRef.current.triggered = false;
+      }
+
+      // Day 8: Update color proximity specifically for #ctf
+      const ctfProx = checkCtfProximity(s.y);
+      colorProximityRef.current += (ctfProx - colorProximityRef.current) * LERP_FACTOR;
+
       // Position: Center X + Sine offset, Center Y
       const cx = width / 2 + s.xOffset;
       const cy = height / 2;
+
+      // Update trail buffer
+      s.trail[s.trailIndex] = { x: cx, y: cy + s.y - stateRef.current.targetY }; // Adjusted for visual motion
+      s.trailIndex = (s.trailIndex + 1) % 8;
 
       // Parse target colors
       const tCore = parseRgba(targetThemeRef.current.core);
@@ -209,18 +254,66 @@ export default function Sentinel() {
       cur.specB = lerpColor(cur.specB, tSpec.b, COLOR_LERP);
       cur.specA = lerpColor(cur.specA, tSpec.a, COLOR_LERP);
 
-      const coreColor = `rgba(${Math.round(cur.coreR)},${Math.round(cur.coreG)},${Math.round(cur.coreB)},${cur.coreA})`;
-      const midColor = `rgba(${Math.round(cur.midR)},${Math.round(cur.midG)},${Math.round(cur.midB)},${cur.midA})`;
-      const haloColor = `rgba(${Math.round(cur.haloR)},${Math.round(cur.haloG)},${Math.round(cur.haloB)},${cur.haloA})`;
-      const specColor = `rgba(${Math.round(cur.specR)},${Math.round(cur.specG)},${Math.round(cur.specB)},${cur.specA})`;
+      // Day 8: Apply violet override based on ctf proximity
+      const vCore = parseRgba('rgba(191,0,255,1)');
+      const vMid = parseRgba('rgba(160,0,220,0.4)');
+      const vHalo = parseRgba('rgba(191,0,255,0.08)');
+      const vSpec = parseRgba('rgba(220,180,255,0.8)');
+      const p = colorProximityRef.current;
+
+      const finalCoreR = lerpColor(cur.coreR, vCore.r, p);
+      const finalCoreG = lerpColor(cur.coreG, vCore.g, p);
+      const finalCoreB = lerpColor(cur.coreB, vCore.b, p);
+      const finalCoreA = lerpColor(cur.coreA, vCore.a, p);
+
+      const finalMidR = lerpColor(cur.midR, vMid.r, p);
+      const finalMidG = lerpColor(cur.midG, vMid.g, p);
+      const finalMidB = lerpColor(cur.midB, vMid.b, p);
+      const finalMidA = lerpColor(cur.midA, vMid.a, p);
+
+      const finalHaloR = lerpColor(cur.haloR, vHalo.r, p);
+      const finalHaloG = lerpColor(cur.haloG, vHalo.g, p);
+      const finalHaloB = lerpColor(cur.haloB, vHalo.b, p);
+      const finalHaloA = lerpColor(cur.haloA, vHalo.a, p);
+
+      const finalSpecR = lerpColor(cur.specR, vSpec.r, p);
+      const finalSpecG = lerpColor(cur.specG, vSpec.g, p);
+      const finalSpecB = lerpColor(cur.specB, vSpec.b, p);
+      const finalSpecA = lerpColor(cur.specA, vSpec.a, p);
+
+      const coreColor = `rgba(${Math.round(finalCoreR)},${Math.round(finalCoreG)},${Math.round(finalCoreB)},${finalCoreA})`;
+      const midColor = `rgba(${Math.round(finalMidR)},${Math.round(finalMidG)},${Math.round(finalMidB)},${finalMidA})`;
+      const haloColor = `rgba(${Math.round(finalHaloR)},${Math.round(finalHaloG)},${Math.round(finalHaloB)},${finalHaloA})`;
+      const specColor = `rgba(${Math.round(finalSpecR)},${Math.round(finalSpecG)},${Math.round(finalSpecB)},${finalSpecA})`;
 
       const pulse = 1 + 0.08 * Math.sin(Date.now() * 0.002);
       const r = (s.glow + pulse * 10) * 2; // Making it significantly larger as requested
 
+      // 0. Trail effect
+      const trailLen = s.trail.length;
+      for (let i = 0; i < trailLen; i++) {
+        // Read buffer from newest to oldest
+        const idx = (s.trailIndex - 1 - i + trailLen) % trailLen;
+        const pt = s.trail[idx];
+
+        // Skip uninitialized points
+        if (pt.x === 0 && pt.y === 0) continue;
+
+        const opacity = 0.3 * (1 - i / trailLen);
+        if (opacity <= 0) continue;
+
+        ctx.fillStyle = `rgba(0, 245, 255, ${opacity})`;
+        ctx.beginPath();
+        // The trail is offset slightly based on the current orb movement to visually drag behind
+        const trailY = cy - (s.targetY - s.y) * 0.5 * (i + 1);
+        ctx.arc(pt.x, trailY, r * 0.15 * (1 - i / trailLen), 0, Math.PI * 2);
+        ctx.fill();
+      }
+
       // 1. Outer halo
       const halo = ctx.createRadialGradient(cx, cy, r * 0.6, cx, cy, r * 1.8);
       halo.addColorStop(0, haloColor);
-      halo.addColorStop(1, `rgba(${Math.round(cur.haloR)},${Math.round(cur.haloG)},${Math.round(cur.haloB)},0)`);
+      halo.addColorStop(1, `rgba(${Math.round(finalHaloR)},${Math.round(finalHaloG)},${Math.round(finalHaloB)},0)`);
 
       ctx.fillStyle = halo;
       ctx.beginPath();
@@ -230,7 +323,7 @@ export default function Sentinel() {
       // 2. Mid glow
       const mid = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
       mid.addColorStop(0.35, midColor);
-      mid.addColorStop(1, `rgba(${Math.round(cur.midR)},${Math.round(cur.midG)},${Math.round(cur.midB)},0)`);
+      mid.addColorStop(1, `rgba(${Math.round(finalMidR)},${Math.round(finalMidG)},${Math.round(finalMidB)},0)`);
 
       ctx.fillStyle = mid;
       ctx.beginPath();
@@ -243,7 +336,7 @@ export default function Sentinel() {
         cx, cy, r * 0.25
       );
       core.addColorStop(0, coreColor);
-      core.addColorStop(1, `rgba(${Math.round(cur.coreR)},${Math.round(cur.coreG)},${Math.round(cur.coreB)},0)`);
+      core.addColorStop(1, `rgba(${Math.round(finalCoreR)},${Math.round(finalCoreG)},${Math.round(finalCoreB)},0)`);
 
       ctx.fillStyle = core;
       ctx.beginPath();
@@ -256,12 +349,35 @@ export default function Sentinel() {
         cx - r * 0.06, cy - r * 0.09, r * 0.08
       );
       spec.addColorStop(0, specColor);
-      spec.addColorStop(1, `rgba(${Math.round(cur.specR)},${Math.round(cur.specG)},${Math.round(cur.specB)},0)`);
+      spec.addColorStop(1, `rgba(${Math.round(finalSpecR)},${Math.round(finalSpecG)},${Math.round(finalSpecB)},0)`);
 
       ctx.fillStyle = spec;
       ctx.beginPath();
       ctx.arc(cx, cy, r * 0.25, 0, Math.PI * 2);
       ctx.fill();
+
+      // Day 12: Ring ripple animation
+      if (rippleRef.current.active) {
+        const elapsed = Date.now() - rippleRef.current.startTime;
+        const duration = 800; // 800ms
+
+        if (elapsed >= duration) {
+          rippleRef.current.active = false;
+        } else {
+          const progress = elapsed / duration;
+          // Easing out
+          const easeOut = 1 - Math.pow(1 - progress, 3);
+
+          const rippleRadius = (BASE_GLOW * 2) + ((MAX_GLOW * 2) - (BASE_GLOW * 2)) * easeOut;
+          const rippleOpacity = 1 - easeOut; // Fade out as it expands
+
+          ctx.strokeStyle = `rgba(${Math.round(finalCoreR)},${Math.round(finalCoreG)},${Math.round(finalCoreB)},${rippleOpacity * 0.8})`;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(cx, cy, rippleRadius, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      }
 
       rafRef.current = requestAnimationFrame(draw);
     };

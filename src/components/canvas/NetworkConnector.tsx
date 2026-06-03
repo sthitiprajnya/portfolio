@@ -86,9 +86,6 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
     window.addEventListener('mouseleave', onMouseLeave, { passive: true });
     resize();
 
-    // BOLT: Hoist bucket arrays to avoid re-allocation in the 60fps loop
-    const buckets: number[][] = [[], [], [], [], [], []];
-
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
 

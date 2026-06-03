@@ -132,7 +132,26 @@ export function CommandPalette() {
                 spellCheck="false"
                 maxLength={100}
               />
+              {query && (
+                <button
+                  onClick={() => {
+                    setQuery('');
+                    inputRef.current?.focus();
+                  }}
+                  className="mr-2 p-1 text-text-secondary hover:text-cyan transition-colors rounded-card outline-none focus-visible:ring-1 focus-visible:ring-cyan"
+                  aria-label="Clear search"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
               <span className="text-text-secondary text-xs font-mono bg-black/50 px-2 py-1 rounded-card border border-border/50" aria-hidden="true">ESC</span>
+            </div>
+
+            {/* Accessibility: Announce result count */}
+            <div className="sr-only" aria-live="polite">
+              {query ? `${filteredLinks.length} results found for ${query}` : ''}
             </div>
 
             <div

@@ -104,6 +104,19 @@ export default function HeroOrb() {
     window.addEventListener('mousemove', onMouseMove, { passive: true });
     window.addEventListener('mouseleave', onMouseLeave);
 
+    // ── Touch tracking ───────────────────────────────────────────────
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        orbRef.current.mouseX      = e.touches[0].clientX;
+        orbRef.current.mouseY      = e.touches[0].clientY;
+        orbRef.current.mouseActive = true;
+      }
+    };
+    const onTouchEnd = () => { orbRef.current.mouseActive = false; };
+    window.addEventListener('touchstart', onTouchMove, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    window.addEventListener('touchend', onTouchEnd, { passive: true });
+
     // ── Drawing helpers ──────────────────────────────────────────────
     function drawOrb(x: number, y: number, t: number) {
       if (!ctx || !canvas) return;
@@ -215,6 +228,9 @@ export default function HeroOrb() {
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseleave', onMouseLeave);
+      window.removeEventListener('touchstart', onTouchMove);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
     };
   }, [inView, prefersReducedMotion]);
 

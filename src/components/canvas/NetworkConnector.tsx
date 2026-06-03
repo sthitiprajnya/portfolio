@@ -44,6 +44,8 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
     let height: number;
 
     let nodes: Node[] = [];
+    // BOLT: Reuse bucket arrays to minimize garbage collection (GC) during the 60fps animation loop
+    const buckets: number[][] = [[], [], [], [], [], []];
 
     const initNodes = () => {
       nodes = [];
@@ -86,10 +88,10 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       }
       ctx.fill();
 
-      // BOLT: Use globalAlpha for connection opacity and squared distance thresholding to avoid Math.sqrt() in the 60fps loop.
-      // String template allocations for colors are eliminated.
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = '#00F5FF';
+      // BOLT: Opacity bucketing system reduces stroke() calls from O(E) to O(1) (max 6 buckets).
+      // Connections are grouped by proximity and drawn in batches, significantly lowering draw call overhead.
+      for (let b = 0; b < 6; b++) buckets[b].length = 0;
+
       for (let i = 0; i < NUM_NODES; i++) {
         const nodeA = nodes[i];
         for (let j = i + 1; j < NUM_NODES; j++) {
@@ -101,13 +103,27 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
           if (distanceSq < MAX_DISTANCE_SQ) {
             const distance = Math.sqrt(distanceSq);
             const opacity = (1 - distance / MAX_DISTANCE) * 0.3;
-            ctx.globalAlpha = opacity;
-            ctx.beginPath();
-            ctx.moveTo(nodeA.x, nodeA.y);
-            ctx.lineTo(nodeB.x, nodeB.y);
-            ctx.stroke();
+            // Map opacity to bucket index (0-5)
+            const bucketIdx = Math.min(5, Math.floor(opacity / 0.05));
+            buckets[bucketIdx].push(nodeA.x, nodeA.y, nodeB.x, nodeB.y);
           }
         }
+      }
+
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = '#00F5FF';
+      for (let b = 0; b < 6; b++) {
+        const coords = buckets[b];
+        const len = coords.length;
+        if (len === 0) continue;
+
+        ctx.globalAlpha = (b + 1) * 0.05;
+        ctx.beginPath();
+        for (let k = 0; k < len; k += 4) {
+          ctx.moveTo(coords[k], coords[k + 1]);
+          ctx.lineTo(coords[k + 2], coords[k + 3]);
+        }
+        ctx.stroke();
       }
       ctx.globalAlpha = 1.0;
 

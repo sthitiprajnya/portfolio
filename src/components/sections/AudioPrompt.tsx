@@ -41,6 +41,9 @@ export function AudioPrompt({ onComplete }: AudioPromptProps) {
         className="fixed inset-0 z-[10001] bg-black text-white font-mono flex flex-col items-center justify-center p-8 overflow-hidden"
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
+        role="dialog"
+        aria-modal="true"
+        aria-label="System boot prompt"
       >
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}

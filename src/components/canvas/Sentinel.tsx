@@ -15,7 +15,6 @@ interface TargetCache {
   centerY: number; // Document-relative center Y
 }
 
-const ORB_RADIUS = 12;
 const BASE_GLOW = 20;
 const MAX_GLOW = 60;
 

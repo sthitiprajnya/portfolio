@@ -18,7 +18,11 @@ const nextConfig = {
 
   compiler: {
     removeConsole: process.env?.NODE_ENV === 'production'
-  }
+  },
+
+  experimental: {
+    optimizePackageImports: ['framer-motion'],
+  },
 };
 
 export default nextConfig;

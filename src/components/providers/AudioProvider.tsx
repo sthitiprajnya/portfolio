@@ -21,8 +21,8 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Check localStorage for audio preference
     const storedPreference = localStorage.getItem('audio_enabled');
-    if (storedPreference === 'true') {
-      setAudioEnabled(true);
+    if (storedPreference !== null) {
+      setAudioEnabled(storedPreference === 'true');
     }
 
     // Load voices
@@ -62,18 +62,21 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  // Update localStorage when preference changes
-  const handleSetAudioEnabled = useCallback((enabled: boolean) => {
-    setAudioEnabled(enabled);
-    localStorage.setItem('audio_enabled', String(enabled));
-  }, []);
-
   const cancelSpeech = useCallback(() => {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
       setIsSpeaking(false);
     }
   }, []);
+
+  // Update localStorage when preference changes
+  const handleSetAudioEnabled = useCallback((enabled: boolean) => {
+    setAudioEnabled(enabled);
+    localStorage.setItem('audio_enabled', String(enabled));
+    if (!enabled) {
+      cancelSpeech();
+    }
+  }, [cancelSpeech]);
 
   const speak = useCallback((text: string) => {
     if (!audioEnabled || !('speechSynthesis' in window)) return;

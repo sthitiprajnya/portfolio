@@ -5,3 +5,7 @@
 ## 2025-07-25 - [Command Palette Discoverability]
 **Learning:** "Power user" features like Command Palettes or keyboard-driven navigation are often underutilized if they lack a visible entry point. Providing a "Search" button in the main navigation with keyboard shortcut hints significantly increases engagement and accessibility for non-power users.
 **Action:** Always include a visible UI element (e.g., a search icon or button) to trigger hidden interactive features, and label them with their corresponding keyboard shortcuts (e.g., `[/]`) to bridge the gap between GUI and CLI patterns.
+
+## 2025-05-15 - [Audio Toggle & Feedback]
+**Learning:** Users need clear control over automated audio/speech features. Persistent audio settings (via localStorage) and an easily accessible toggle improve the user experience significantly. Furthermore, providing visual feedback (like a pulse indicator) when the system is "speaking" helps users understand the state of the application even when muted or in noisy environments.
+**Action:** Implement global audio toggles for applications with speech synthesis. Use visual indicators to represent non-visual output states and ensure immediate cancellation of output upon muting.

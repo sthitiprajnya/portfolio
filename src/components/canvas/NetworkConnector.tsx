@@ -86,10 +86,11 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
     window.addEventListener('mouseleave', onMouseLeave, { passive: true });
     resize();
 
-    // BOLT: Hoist bucket arrays to avoid re-allocation in the 60fps loop
-    const buckets: number[][] = [[], [], [], [], [], []];
-
     const draw = () => {
+      // BOLT: Clear bucket arrays at the start of each frame to prevent coordinate accumulation and memory leaks.
+      // Reusing the same arrays minimizes GC pressure.
+      for (let b = 0; b < 6; b++) buckets[b].length = 0;
+
       ctx.clearRect(0, 0, width, height);
 
       // BOLT: Replace forEach with for-loop and batch arc drawing into a single fill() call

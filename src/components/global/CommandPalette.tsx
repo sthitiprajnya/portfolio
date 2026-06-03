@@ -132,7 +132,20 @@ export function CommandPalette() {
                 spellCheck="false"
                 maxLength={100}
               />
+              {query && (
+                <button
+                  onClick={() => { setQuery(''); inputRef.current?.focus(); }}
+                  className="p-1 mx-2 text-text-secondary hover:text-cyan transition-colors focus-visible:text-cyan outline-none"
+                  aria-label="Clear search"
+                >
+                  ✕
+                </button>
+              )}
               <span className="text-text-secondary text-xs font-mono bg-black/50 px-2 py-1 rounded-card border border-border/50" aria-hidden="true">ESC</span>
+            </div>
+
+            <div className="sr-only" role="status" aria-live="polite">
+              {query ? (filteredLinks.length === 0 ? 'No matches found' : `Showing ${filteredLinks.length} results`) : ''}
             </div>
 
             <div

@@ -111,6 +111,11 @@ export function CommandPalette() {
             transition={{ duration: 0.2 }}
             className="relative glass-heavy rounded-card shadow-[0_0_40px_rgba(0,245,255,0.1)] w-full max-w-lg overflow-hidden flex flex-col"
           >
+            {/* Accessibility: Announce result count to screen readers */}
+            <div className="sr-only" aria-live="polite">
+              {query ? `${filteredLinks.length} results found for ${query}` : ''}
+            </div>
+
             <div className="flex items-center px-4 py-4 border-b border-[var(--glass-border)] bg-[rgba(0,0,0,0.4)] relative z-10">
               <span className="text-cyan font-mono mr-3">{'>'}</span>
               <input
@@ -132,6 +137,17 @@ export function CommandPalette() {
                 spellCheck="false"
                 maxLength={100}
               />
+              {query && (
+                <button
+                  onClick={() => { setQuery(''); inputRef.current?.focus(); }}
+                  className="p-1 mr-2 text-text-muted hover:text-cyan transition-colors outline-none focus-visible:ring-1 focus-visible:ring-cyan rounded-sm"
+                  aria-label="Clear search"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
               <span className="text-text-secondary text-xs font-mono bg-black/50 px-2 py-1 rounded-card border border-border/50" aria-hidden="true">ESC</span>
             </div>
 

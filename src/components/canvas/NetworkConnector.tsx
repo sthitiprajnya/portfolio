@@ -13,10 +13,12 @@ interface Node {
   y: number;
   vx: number;
   vy: number;
+  phase: number;
 }
 
 // BOLT: Hoist static animation constants to module level to avoid redundant allocations and property lookups
-const NUM_NODES = 70;
+const DEFAULT_NUM_NODES = 70;
+const MOBILE_NUM_NODES = 35;
 const MAX_DISTANCE = 150;
 const MAX_DISTANCE_SQ = MAX_DISTANCE * MAX_DISTANCE;
 const NODE_COLOR = 'rgba(0, 245, 255, 0.5)';
@@ -24,6 +26,7 @@ const NODE_COLOR = 'rgba(0, 245, 255, 0.5)';
 export default function NetworkConnector({ className }: NetworkConnectorProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const { ref: inViewRef, inView } = useInView({ threshold: 0 });
+  const mouseRef = useRef({ x: 0, y: 0, active: false });
   const prefersReducedMotion = usePrefersReducedMotion();
 
   // Combine refs for the canvas element
@@ -42,6 +45,7 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
     let animationFrameId: number;
     let width: number;
     let height: number;
+    let numNodes = DEFAULT_NUM_NODES;
 
     let nodes: Node[] = [];
     // BOLT: Reuse bucket arrays to minimize garbage collection (GC) during the 60fps animation loop
@@ -49,12 +53,13 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
 
     const initNodes = () => {
       nodes = [];
-      for (let i = 0; i < NUM_NODES; i++) {
+      for (let i = 0; i < numNodes; i++) {
         nodes.push({
           x: Math.random() * width,
           y: Math.random() * height,
           vx: (Math.random() - 0.5) * 1.5,
           vy: (Math.random() - 0.5) * 1.5,
+          phase: Math.random() * Math.PI * 2,
         });
       }
     };
@@ -62,11 +67,27 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
     const resize = () => {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
+      numNodes = window.innerWidth < 768 ? MOBILE_NUM_NODES : DEFAULT_NUM_NODES;
       initNodes();
     };
 
+    const onMouseMove = (e: MouseEvent) => {
+      mouseRef.current.x = e.clientX;
+      mouseRef.current.y = e.clientY;
+      mouseRef.current.active = true;
+    };
+
+    const onMouseLeave = () => {
+      mouseRef.current.active = false;
+    };
+
     window.addEventListener('resize', resize, { passive: true });
+    window.addEventListener('mousemove', onMouseMove, { passive: true });
+    window.addEventListener('mouseleave', onMouseLeave, { passive: true });
     resize();
+
+    // BOLT: Hoist bucket arrays to avoid re-allocation in the 60fps loop
+    const buckets: number[][] = [[], [], [], [], [], []];
 
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
@@ -74,8 +95,31 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       // BOLT: Replace forEach with for-loop and batch arc drawing into a single fill() call
       ctx.fillStyle = NODE_COLOR;
       ctx.beginPath();
-      for (let i = 0; i < NUM_NODES; i++) {
+      const now = Date.now();
+      for (let i = 0; i < numNodes; i++) {
         const node = nodes[i];
+
+        // Day 7: Mouse repulsion
+        if (mouseRef.current.active) {
+          const dx = node.x - mouseRef.current.x;
+          const dy = node.y - mouseRef.current.y;
+          const distSq = dx * dx + dy * dy;
+          if (distSq < 14400) { // 120 * 120
+            const dist = Math.sqrt(distSq);
+            const force = 0.8 * (1 - dist / 120);
+            node.vx += (dx / dist) * force;
+            node.vy += (dy / dist) * force;
+          }
+        }
+
+        // Day 7: Cap speed to 3px/frame
+        const speedSq = node.vx * node.vx + node.vy * node.vy;
+        if (speedSq > 9) {
+          const speed = Math.sqrt(speedSq);
+          node.vx = (node.vx / speed) * 3;
+          node.vy = (node.vy / speed) * 3;
+        }
+
         node.x += node.vx;
         node.y += node.vy;
 
@@ -83,29 +127,31 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
         if (node.x < 0 || node.x > width) node.vx *= -1;
         if (node.y < 0 || node.y > height) node.vy *= -1;
 
-        ctx.moveTo(node.x + 2, node.y);
-        ctx.arc(node.x, node.y, 2, 0, Math.PI * 2);
+        // Day 11: Dynamic pulsing radius
+        const radius = 2 + 1.5 * Math.sin(now * 0.002 + node.phase);
+
+        ctx.moveTo(node.x + radius, node.y);
+        ctx.arc(node.x, node.y, Math.max(0.1, radius), 0, Math.PI * 2);
       }
       ctx.fill();
 
-      // BOLT: Opacity bucketing system reduces stroke() calls from O(E) to O(1) (max 6 buckets).
-      // Connections are grouped by proximity and drawn in batches, significantly lowering draw call overhead.
-      for (let b = 0; b < 6; b++) buckets[b].length = 0;
-
-      for (let i = 0; i < NUM_NODES; i++) {
+      // BOLT: Use globalAlpha for connection opacity and squared distance thresholding to avoid Math.sqrt() in the 60fps loop.
+      // String template allocations for colors are eliminated.
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = '#00F5FF';
+      for (let i = 0; i < numNodes; i++) {
         const nodeA = nodes[i];
-        for (let j = i + 1; j < NUM_NODES; j++) {
+        for (let j = i + 1; j < numNodes; j++) {
           const nodeB = nodes[j];
           const dx = nodeA.x - nodeB.x;
           const dy = nodeA.y - nodeB.y;
-          const distanceSq = dx * dx + dy * dy;
+          const d2 = dx * dx + dy * dy;
 
-          if (distanceSq < MAX_DISTANCE_SQ) {
-            const distance = Math.sqrt(distanceSq);
-            const opacity = (1 - distance / MAX_DISTANCE) * 0.3;
-            // Map opacity to bucket index (0-5)
-            const bucketIdx = Math.min(5, Math.floor(opacity / 0.05));
-            buckets[bucketIdx].push(nodeA.x, nodeA.y, nodeB.x, nodeB.y);
+          if (d2 < MAX_DISTANCE_SQ) {
+            const dist = Math.sqrt(d2);
+            // Group into 6 buckets of ~0.05 opacity increments
+            const bIdx = Math.min(5, Math.floor((1 - dist / MAX_DISTANCE) * 6));
+            buckets[bIdx].push(nodeA.x, nodeA.y, nodeB.x, nodeB.y);
           }
         }
       }
@@ -113,15 +159,15 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       ctx.lineWidth = 1;
       ctx.strokeStyle = '#00F5FF';
       for (let b = 0; b < 6; b++) {
-        const coords = buckets[b];
-        const len = coords.length;
+        const bucket = buckets[b];
+        const len = bucket.length;
         if (len === 0) continue;
 
         ctx.globalAlpha = (b + 1) * 0.05;
         ctx.beginPath();
-        for (let k = 0; k < len; k += 4) {
-          ctx.moveTo(coords[k], coords[k + 1]);
-          ctx.lineTo(coords[k + 2], coords[k + 3]);
+        for (let i = 0; i < len; i += 4) {
+          ctx.moveTo(bucket[i], bucket[i + 1]);
+          ctx.lineTo(bucket[i + 2], bucket[i + 3]);
         }
         ctx.stroke();
       }
@@ -134,6 +180,8 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
 
     return () => {
       window.removeEventListener('resize', resize);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseleave', onMouseLeave);
       cancelAnimationFrame(animationFrameId);
     };
   }, [prefersReducedMotion, inView]);

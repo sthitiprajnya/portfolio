@@ -20,9 +20,13 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   // Initialize audio preference and voices
   useEffect(() => {
     // Check localStorage for audio preference
-    const storedPreference = localStorage.getItem('audio_enabled');
-    if (storedPreference !== null) {
-      setAudioEnabled(storedPreference === 'true');
+    try {
+      const storedPreference = localStorage.getItem('audio_enabled');
+      if (storedPreference !== null) {
+        setAudioEnabled(storedPreference === 'true');
+      }
+    } catch (e) {
+      console.warn('Failed to access audio preference from storage.', e);
     }
 
     // Load voices
@@ -72,7 +76,11 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   // Update localStorage when preference changes
   const handleSetAudioEnabled = useCallback((enabled: boolean) => {
     setAudioEnabled(enabled);
-    localStorage.setItem('audio_enabled', String(enabled));
+    try {
+      localStorage.setItem('audio_enabled', String(enabled));
+    } catch (e) {
+      console.warn('Failed to save audio preference to storage.', e);
+    }
     if (!enabled) {
       cancelSpeech();
     }

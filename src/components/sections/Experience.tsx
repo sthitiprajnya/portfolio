@@ -39,6 +39,12 @@ export function Experience() {
         <SectionTitle number="03" title="Battle Log." />
 
         <div className="relative mt-16 ml-4 md:ml-8">
+          {/* Day 16: Vertical timeline connector */}
+          <div
+            className="absolute top-0 bottom-0 left-[2px] w-[1px] border-l border-dashed border-cyan/40 z-0 pointer-events-none"
+            style={{ maskImage: 'linear-gradient(to bottom, transparent, black 10%, black 90%, transparent)' }}
+          />
+
           {/* Animated Timeline Line */}
           <div className="absolute top-0 left-0 bottom-0 w-[2px] bg-border z-0">
             {!prefersReducedMotion ? (

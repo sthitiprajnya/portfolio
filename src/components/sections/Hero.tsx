@@ -102,6 +102,9 @@ export function Hero() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 1.2 }}
           className="h-[2em] mb-6"
+          aria-live="polite"
+          aria-atomic="true"
+          aria-label="Current status"
         >
           <TypewriterText
             sequence={TYPEWRITER_SEQUENCE}

@@ -126,6 +126,7 @@ function CertCard({ cert }: { cert: typeof CERTIFICATIONS[0] }) {
               {cert.year}
             </span>
 
+            {/* Day 18: Verify Button implemented with external link SVG matching style guidelines */}
             {cert.verifyUrl && cert.verifyUrl !== '#' ? (
               <a
                 href={cert.verifyUrl}
@@ -133,7 +134,7 @@ function CertCard({ cert }: { cert: typeof CERTIFICATIONS[0] }) {
                 rel="noopener noreferrer"
                 aria-label={`Verify ${cert.name} certification`}
                 className={clsx(
-                  "font-mono text-[0.65rem] uppercase tracking-widest flex items-center transition-colors outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card px-3 py-1.5 border",
+                  "font-mono text-[0.65rem] uppercase tracking-widest flex items-center gap-1.5 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card px-3 py-1.5 border",
                   style.text, style.border,
                   "hover:bg-white/5",
                   cert.color === 'cyan' && "focus-visible:ring-cyan",
@@ -142,13 +143,12 @@ function CertCard({ cert }: { cert: typeof CERTIFICATIONS[0] }) {
                   cert.color === 'violet' && "focus-visible:ring-violet"
                 )}
               >
-                VERIFY <span aria-hidden="true" className="ml-1.5 text-[10px]">↗</span>
+                VERIFY
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
               </a>
-            ) : (
-              <span className="font-mono text-[0.65rem] text-text-muted uppercase tracking-widest flex items-center px-3 py-1.5 border border-transparent">
-                VERIFY <span aria-hidden="true" className="ml-1.5 text-[10px]">↗</span>
-              </span>
-            )}
+            ) : null}
           </div>
           {cert.verifyUrl === '#' && (
             <span className="font-mono text-[0.55rem] text-amber text-right mt-1" data-verify-url="#">

@@ -19,11 +19,20 @@ const FILTERS = [
 
 export function Projects() {
   const [activeFilter, setActiveFilter] = useState('all');
+  const [activeTechFilter, setActiveTechFilter] = useState<string | null>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
 
-  const filteredProjects = useMemo(() => PROJECTS.filter(p =>
-    activeFilter === 'all' ? true : p.category === activeFilter
-  ), [activeFilter]);
+  const uniqueTechTags = useMemo(() => {
+    const tags = new Set<string>();
+    PROJECTS.forEach(p => p.tags.forEach(tag => tags.add(tag)));
+    return Array.from(tags).sort();
+  }, []);
+
+  const filteredProjects = useMemo(() => PROJECTS.filter(p => {
+    const categoryMatch = activeFilter === 'all' ? true : p.category === activeFilter;
+    const techMatch = activeTechFilter ? p.tags.includes(activeTechFilter) : true;
+    return categoryMatch && techMatch;
+  }), [activeFilter, activeTechFilter]);
 
   return (
     <section id="projects" className="py-32 bg-black relative border-t border-border overflow-hidden">
@@ -36,26 +45,51 @@ export function Projects() {
         </div>
 
         {/* Filter Tabs */}
-        <ScrollReveal variants={fadeSlideUp} className="flex flex-wrap gap-3 mb-12">
-          {FILTERS.map(filter => {
-            const isActive = activeFilter === filter.id;
-            return (
-              <button
-                key={filter.id}
-                onClick={() => setActiveFilter(filter.id)}
-                className={clsx(
-                  "font-mono text-xs uppercase tracking-widest px-5 py-2 transition-all duration-300 rounded-card border outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black",
-                  isActive
-                    ? "bg-cyan border-cyan text-black shadow-[var(--glow-cyan-sm)] font-bold"
-                    : "bg-transparent border-border text-text-secondary hover:text-cyan hover:border-cyan/50"
-                )}
-                aria-pressed={isActive}
-                aria-label={`Filter by ${filter.label}`}
-              >
-                {filter.label}
-              </button>
-            );
-          })}
+        <ScrollReveal variants={fadeSlideUp} className="flex flex-col gap-6 mb-12">
+          <div className="flex flex-wrap gap-3">
+            {FILTERS.map(filter => {
+              const isActive = activeFilter === filter.id;
+              return (
+                <button
+                  key={filter.id}
+                  onClick={() => setActiveFilter(filter.id)}
+                  className={clsx(
+                    "font-mono text-xs uppercase tracking-widest px-5 py-2 transition-all duration-300 rounded-card border outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black",
+                    isActive
+                      ? "bg-cyan border-cyan text-black shadow-[var(--glow-cyan-sm)] font-bold"
+                      : "bg-transparent border-border text-text-secondary hover:text-cyan hover:border-cyan/50"
+                  )}
+                  aria-pressed={isActive}
+                  aria-label={`Filter by ${filter.label}`}
+                >
+                  {filter.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Day 17: Tech Stack Filter */}
+          <div className="flex flex-wrap gap-2 pt-2 border-t border-[var(--glass-border)]">
+            {uniqueTechTags.map(tag => {
+              const isActive = activeTechFilter === tag;
+              return (
+                <button
+                  key={tag}
+                  onClick={() => setActiveTechFilter(isActive ? null : tag)}
+                  className={clsx(
+                    "font-mono text-[0.65rem] px-3 py-1.5 transition-all duration-300 rounded-pill border outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black whitespace-nowrap",
+                    isActive
+                      ? "bg-cyan/20 border-cyan text-cyan shadow-[var(--glow-cyan-sm)] font-bold"
+                      : "bg-transparent border-border text-text-muted hover:text-cyan hover:border-cyan/50"
+                  )}
+                  aria-pressed={isActive}
+                  aria-label={`Filter by technology ${tag}`}
+                >
+                  {tag}
+                </button>
+              );
+            })}
+          </div>
         </ScrollReveal>
 
         {/* Project Grid */}

@@ -83,17 +83,24 @@ const SKILLS_TABS: ('ALL' | 'OFFENSIVE' | 'CLOUD' | 'AUTOMATION' | 'COMPLIANCE')
 
 export function Skills() {
   const [activeTab, setActiveTab] = useState<'ALL' | 'OFFENSIVE' | 'CLOUD' | 'AUTOMATION' | 'COMPLIANCE'>('ALL');
+  const [searchQuery, setSearchQuery] = useState('');
   const { ref: chartRef, inView: chartInView } = useInView({ triggerOnce: true, threshold: 0.5 });
 
   const { totalFilteredSkills, filteredCategories } = useMemo(() => {
     let count = 0;
+    const query = searchQuery.toLowerCase();
+
     const categories = SKILLS.map(category => {
-      const filteredSkills = category.skills.filter(s => activeTab === 'ALL' || s.domain === activeTab);
+      const filteredSkills = category.skills.filter(s => {
+        const matchesTab = activeTab === 'ALL' || s.domain === activeTab;
+        const matchesSearch = s.name.toLowerCase().includes(query);
+        return matchesTab && matchesSearch;
+      });
       count += filteredSkills.length;
       return { ...category, filteredSkills };
     }).filter(cat => cat.filteredSkills.length > 0);
     return { totalFilteredSkills: count, filteredCategories: categories };
-  }, [activeTab]);
+  }, [activeTab, searchQuery]);
 
   return (
     <section id="skills" className="py-24 bg-black overflow-hidden relative">
@@ -103,6 +110,18 @@ export function Skills() {
         {/* Accessibility: Announce number of filtered results */}
         <div className="sr-only" aria-live="polite">
           Showing {totalFilteredSkills} skills in {activeTab === 'ALL' ? 'all categories' : activeTab}
+        </div>
+
+        {/* Text Filter Input */}
+        <div className="mb-8">
+          <input
+            type="text"
+            placeholder="Search skills..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full max-w-md px-4 py-2 bg-black/40 border border-cyan/30 text-white font-mono text-sm outline-none focus:border-cyan focus:shadow-[var(--glow-cyan-sm)] rounded-card placeholder:text-text-muted transition-all"
+            aria-label="Filter skills by text"
+          />
         </div>
 
         {/* Filter Tabs & Radar Chart Row */}
@@ -151,6 +170,11 @@ export function Skills() {
 
         {/* Skill Rings Grid */}
         <div className="space-y-16 mb-24">
+          {filteredCategories.length === 0 && (
+            <div className="text-center font-mono text-sm text-amber py-12 border border-amber/30 rounded-card glass">
+              [ NO_MATCH_FOUND ] // Adjust your filter parameters
+            </div>
+          )}
           {filteredCategories.map((category) => {
             return (
               <ScrollReveal key={category.category} variants={containerStagger} className="space-y-6">

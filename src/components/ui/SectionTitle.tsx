@@ -14,6 +14,7 @@ export function SectionTitle({ number, title, className }: SectionTitleProps) {
     <ScrollReveal
       variants={fadeSlideLeft}
       className={clsx("mb-12 md:mb-16", className)}
+      data-orb-target="true"
     >
       <div className="flex flex-col items-start">
         <span className="font-mono text-label text-cyan mb-3 px-3 py-1 inline-block glass-pill rounded-pill">

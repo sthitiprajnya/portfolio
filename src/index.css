@@ -249,8 +249,8 @@ body {
 
 /* ── Scan line on sections ──────────────────────────────────── */
 @keyframes scan-line {
-  0%   { top: 0; }
-  100% { top: 100%; }
+  0%   { left: -100%; }
+  100% { left: 100%; }
 }
 
 .scan-line-effect::after {

@@ -24,7 +24,7 @@ export function TypewriterText({
     <div className={clsx("inline-block", className)} aria-live="polite">
       <TypeAnimation
         sequence={sequence}
-        wrapper={wrapper as any}
+        wrapper={wrapper as "span" | "div" | "p"}
         cursor={cursor}
         repeat={repeat}
         speed={speed}

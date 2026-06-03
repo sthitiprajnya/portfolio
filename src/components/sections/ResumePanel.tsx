@@ -48,7 +48,7 @@ export function ResumePanel() {
 
           {/* ── Left: Document viewer ── */}
           <ScrollReveal variants={fadeSlideUp} className="lg:col-span-7">
-            <div className="overflow-hidden border border-[var(--glass-border)] hover:shadow-[var(--glow-amber-sm)] glass-heavy rounded-card relative">
+            <div className="overflow-hidden border border-[var(--glass-border)] hover:shadow-[var(--glow-amber-sm)] glass-heavy rounded-card relative" data-orb-target="true">
 
               {/* Document title bar */}
               <div className="flex items-center justify-between px-5 py-3 bg-[rgba(0,0,0,0.6)] border-b border-[var(--glass-border)] relative z-10">

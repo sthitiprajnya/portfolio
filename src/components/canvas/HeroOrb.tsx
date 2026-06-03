@@ -138,7 +138,7 @@ export default function HeroOrb() {
         x - r * 0.08, y - r * 0.08, 0,
         x, y, r * 0.28
       );
-      core.addColorStop(0,   'rgba(255, 255, 255, 0.80)');
+      core.addColorStop(0,   'rgba(180, 255, 255, 0.80)');
       core.addColorStop(0.2, 'rgba(180, 255, 255, 0.65)');
       core.addColorStop(0.5, 'rgba(0,  245, 255, 0.45)');
       core.addColorStop(0.8, 'rgba(0,  160, 255, 0.20)');

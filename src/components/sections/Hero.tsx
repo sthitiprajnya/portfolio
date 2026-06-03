@@ -24,7 +24,7 @@ const NAME_CHARS = PERSONAL.nameShort.split('');
 const TYPEWRITER_SEQUENCE = HERO_ROLES.flatMap(role => [role, 2000]);
 
 export function Hero() {
-  const { ref: statsRef, inView: statsInView } = useInView({ triggerOnce: true, threshold: 0.5 });
+  const { ref: statsRef } = useInView({ triggerOnce: true, threshold: 0.5 });
   const [activeIntel, setActiveIntel] = React.useState<string | null>(null);
   const [showMethodology, setShowMethodology] = React.useState(false);
 
@@ -130,16 +130,12 @@ export function Hero() {
           {HERO_STATS.map((stat, i) => {
             const numericValue = parseInt(stat.value.toString().replace(/[^0-9]/g, ''), 10);
             return (
-              <div key={i} className="flex flex-col items-center">
-                <span className="font-display text-2xl text-cyan mb-1 flex items-center">
-                  {statsInView ? (
-                    <CountUp end={numericValue} duration={2.5} separator="," />
-                  ) : (
-                    '0'
-                  )}
+              <div key={i} className="flex flex-col items-center xs:px-2">
+                <span className="font-display text-xl xs:text-2xl text-cyan mb-1 flex items-center">
+                  <CountUp end={numericValue} duration={2.5} separator="," enableScrollSpy={true} scrollSpyOnce={true} />
                   {stat.suffix}
                 </span>
-                <span className="font-mono text-[0.6rem] uppercase tracking-widest text-text-muted">
+                <span className="font-mono text-[0.55rem] xs:text-[0.6rem] uppercase tracking-widest text-text-muted text-center max-w-[80px] xs:max-w-none">
                   {stat.label}
                 </span>
               </div>

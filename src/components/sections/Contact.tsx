@@ -231,7 +231,7 @@ export function Contact() {
           </ScrollReveal>
 
           {/* ── Right: form ── */}
-          <ScrollReveal variants={fadeSlideLeft} className="p-8 glass-heavy rounded-card relative overflow-hidden">
+          <ScrollReveal variants={fadeSlideLeft} className="p-8 glass-heavy rounded-card relative overflow-hidden" data-orb-target="true">
             <form ref={formRef} onSubmit={handleSubmit} noValidate className="space-y-6 relative z-10">
 
               {/* Honeypot field - hidden from human users */}

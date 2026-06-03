@@ -141,7 +141,7 @@ export function Navigation() {
                       onClick={() => scrollTo(link.id)}
                       className={clsx(
                         'relative font-mono text-[0.72rem] uppercase tracking-widest py-2 px-3 transition-colors group outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black',
-                        isActive ? 'text-cyan glass-pill rounded-pill' : 'text-text-secondary hover:text-cyan rounded-pill'
+                        isActive ? 'text-cyan glass-pill rounded-pill border-b-2 border-cyan' : 'text-text-secondary hover:text-cyan rounded-pill border-b-2 border-transparent'
                       )}
                       aria-label={`Scroll to ${link.label} section`}
                       aria-current={isActive ? 'page' : undefined}

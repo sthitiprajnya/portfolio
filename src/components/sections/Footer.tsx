@@ -18,7 +18,7 @@ export function Footer() {
   }, []);
 
   return (
-    <footer className="relative bg-black h-[120px] flex flex-col items-center justify-center border-t-2 border-transparent">
+    <footer className="relative bg-black h-[160px] pb-6 pt-2 flex flex-col items-center justify-center border-t-2 border-transparent">
 
       {/* Glowing top divider */}
       <div
@@ -57,13 +57,22 @@ export function Footer() {
         </div>
 
         {/* Fixed: was "React + Vite" — this project is Next.js */}
+        <div className="w-full text-center text-[0.4rem] xs:text-[0.5rem] sm:text-xs text-text-muted/30 font-mono tracking-[0.2em] leading-none select-none mb-4 whitespace-pre">
+          {'==================================================='}
+        </div>
+
+        {/* Fixed: was "React + Vite" — this project is Next.js */}
         <div className="font-mono text-[0.75rem] text-text-muted text-center flex flex-col md:flex-row items-center justify-center gap-4">
+          <span className="flex items-center gap-2 font-display">
+            {'>_'} built by Sthitaprajna Biswal
+          </span>
+          <span className="hidden md:inline">|</span>
           <span className="flex items-center gap-2">
             Built with
             <LogoBadge src="/portfolio/logos/footer/nextjs.svg" alt="Next.js" width={16} height={16} className="invert dark:invert-0 opacity-80" />
             · Deployed on
             <LogoBadge src="/portfolio/logos/footer/githubpages.svg" alt="GitHub Pages" width={16} height={16} className="invert dark:invert-0 opacity-80" />
-            · © {year} {PERSONAL.name}
+            · © {year}
           </span>
           <span className="hidden md:inline">|</span>
           <span className="flex items-center gap-2 px-2 py-0.5 bg-green/5 border border-green/20 rounded-card font-bold text-green shadow-[var(--glow-green-sm)]">

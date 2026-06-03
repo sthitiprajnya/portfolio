@@ -13,3 +13,7 @@
 ## 2024-06-02 - Added ARIA labels and focus states to dynamically rendered Hero modals
 **Learning:** Modal close buttons (`[X]` or SVG icons) rendered dynamically within `AnimatePresence` often miss crucial screen reader and keyboard accessibility attributes (`aria-label` and `focus-visible`), breaking the semantic and navigable flow of the UI.
 **Action:** Always ensure that dynamically mounted interactive elements, especially those acting as structural UI components like modal closures, include descriptive `aria-label`s and visible focus states (e.g., `outline-none focus-visible:ring-2`) to support full keyboard and screen reader accessibility.
+
+## 2026-06-02 - Decorative SVGs and Screen Readers
+**Learning:** Decorative SVG icons used strictly for visual flair (e.g. background patterns, standard button icons that accompany textual labels, lock symbols) were being read or interacted with inconsistently by screen readers.
+**Action:** Always include `aria-hidden="true"` on SVG elements that do not provide unique functional context, especially when they are nested alongside visible semantic text or interactable wrappers.

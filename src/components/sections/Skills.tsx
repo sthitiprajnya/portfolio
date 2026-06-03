@@ -32,7 +32,7 @@ ChartJS.register(
   Legend
 );
 
-// BOLT: Move static data outside component to avoid redundant allocations on every render
+// Generate flat list of tags for marquee outside component to avoid redundant allocations on every render
 const MARQUEE_TAGS = [
   'Burp Suite Pro', 'Nessus', 'IDOR/BOLA', 'Auth Bypass', 'SSRF', 'XSS',
   'SQL Injection', 'XXE', 'Business Logic Flaws', 'API Pentesting', 'Android VAPT',

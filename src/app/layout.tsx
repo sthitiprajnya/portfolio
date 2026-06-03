@@ -130,6 +130,7 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLdString }}
         />
+        <link rel="security" href="/portfolio/.well-known/security.txt" />
         <link rel="preload" href="/portfolio/og-image.webp" as="image" />
       </head>
       <body>

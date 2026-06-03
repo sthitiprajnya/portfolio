@@ -43,14 +43,24 @@ const GITHUB_FALLBACK_DATA: GitHubStats = {
 export async function fetchGitHubStats(): Promise<GitHubStats> {
   if (typeof window === 'undefined') return GITHUB_FALLBACK_DATA;
 
-  const cached = localStorage.getItem(CACHE_KEY);
+  let cached: string | null = null;
+  try {
+    cached = localStorage.getItem(CACHE_KEY);
+  } catch (e) {
+    console.warn('Failed to access GitHub stats cache from storage.', e);
+  }
+
   if (cached) {
     try {
       const parsed: GitHubStats = JSON.parse(cached);
       if (Date.now() - parsed.fetchedAt < CACHE_TTL) return parsed;
     } catch (e) {
       console.warn('Failed to parse cached GitHub stats, clearing cache.', e);
-      localStorage.removeItem(CACHE_KEY);
+      try {
+        localStorage.removeItem(CACHE_KEY);
+      } catch {
+        // Ignore
+      }
     }
   }
 
@@ -131,7 +141,11 @@ export async function fetchGitHubStats(): Promise<GitHubStats> {
       fetchedAt: Date.now(),
     };
 
-    localStorage.setItem(CACHE_KEY, JSON.stringify(stats));
+    try {
+      localStorage.setItem(CACHE_KEY, JSON.stringify(stats));
+    } catch (e) {
+      console.warn('Failed to save GitHub stats to storage cache.', e);
+    }
     return stats;
   } catch (error) {
     console.error('Failed to fetch github stats', error);

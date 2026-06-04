@@ -57,3 +57,11 @@
 ## 2026-07-15 - [Batching Canvas stroke() calls via Opacity Bucketing]
 **Learning:** In high-frequency (60fps) Canvas 2D animation loops, individual `stroke()` calls for every line segment (edges $E$) create significant CPU overhead due to the large number of state changes and draw commands sent to the GPU. By grouping lines into discrete "opacity buckets" (e.g., 6 levels) and using `ctx.globalAlpha`, the number of `stroke()` calls can be reduced from $O(E)$ to a small constant (e.g., 6), drastically improving rendering efficiency with minimal visual impact.
 **Action:** Always audit animation loops for per-element `stroke()` or `fill()` calls. Batch elements with similar styles into a single path and perform one draw call. Use `globalAlpha` with buckets to handle variable transparency without breaking the batch.
+
+## 2025-05-19 - [Eliminating Layout Thrashing and Per-Frame Color Parsing]
+**Learning:** Calling `getBoundingClientRect()` inside a 60fps loop causes forced synchronous layouts (layout thrashing), which is a major performance bottleneck. Furthermore, repeatedly parsing RGBA strings using Regular Expressions and `parseInt` adds measurable CPU overhead in hot loops.
+**Action:** Cache element positions in `resize` and `mount` handlers. Pre-parse all static color themes at the module level into numeric objects to avoid string manipulation and regex execution during animation frames.
+
+## 2025-05-20 - [Memory Leak in Reused Canvas Buckets]
+**Learning:** Reusing pre-allocated arrays (buckets) to minimize GC pressure is effective, but failing to clear them at the start of every frame (e.g., via `array.length = 0`) causes coordinate data to accumulate infinitely. This leads to a massive memory leak and linear performance degradation as the number of elements to draw increases every frame.
+**Action:** Always ensure reused arrays in animation loops are reset at the start of each frame. Setting `.length = 0` is the most efficient way to clear an array while retaining the underlying memory allocation.

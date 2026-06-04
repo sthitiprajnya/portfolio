@@ -111,6 +111,11 @@ export function CommandPalette() {
             transition={{ duration: 0.2 }}
             className="relative glass-heavy rounded-card shadow-[0_0_40px_rgba(0,245,255,0.1)] w-full max-w-lg overflow-hidden flex flex-col"
           >
+            {/* Accessibility: Announce result count to screen readers */}
+            <div className="sr-only" aria-live="polite">
+              {query ? `${filteredLinks.length} results found for ${query}` : ''}
+            </div>
+
             <div className="flex items-center px-4 py-4 border-b border-[var(--glass-border)] bg-[rgba(0,0,0,0.4)] relative z-10">
               <span className="text-cyan font-mono mr-3">{'>'}</span>
               <input
@@ -134,11 +139,8 @@ export function CommandPalette() {
               />
               {query && (
                 <button
-                  onClick={() => {
-                    setQuery('');
-                    inputRef.current?.focus();
-                  }}
-                  className="mr-2 p-1 text-text-secondary hover:text-cyan transition-colors rounded-card outline-none focus-visible:ring-1 focus-visible:ring-cyan"
+                  onClick={() => { setQuery(''); inputRef.current?.focus(); }}
+                  className="p-1 mr-2 text-text-muted hover:text-cyan transition-colors outline-none focus-visible:ring-1 focus-visible:ring-cyan rounded-sm"
                   aria-label="Clear search"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

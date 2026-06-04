@@ -101,9 +101,11 @@ export function Contact() {
       console.warn('Storage access failed during rate-limit check.', e);
     }
     const now = Date.now();
+    const lastSubmissionTime = lastSubmission ? parseInt(lastSubmission, 10) : 0;
 
-    if (lastSubmission && now - parseInt(lastSubmission, 10) < COOLDOWN_MS) {
-      const remaining = Math.ceil((COOLDOWN_MS - (now - parseInt(lastSubmission, 10))) / 1000);
+    // Security: Check for valid number and enforce cooldown to prevent spamming
+    if (lastSubmission && !isNaN(lastSubmissionTime) && now - lastSubmissionTime < COOLDOWN_MS) {
+      const remaining = Math.ceil((COOLDOWN_MS - (now - lastSubmissionTime)) / 1000);
       setErrors({ message: `Submission rate limited. Please wait ${remaining}s.` });
       setStatus('error');
       return;

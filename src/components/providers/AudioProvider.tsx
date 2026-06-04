@@ -22,7 +22,8 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     // Check localStorage for audio preference
     try {
       const storedPreference = localStorage.getItem('audio_enabled');
-      if (storedPreference !== null) {
+      // Security: Strictly validate boolean string to prevent logic errors from corrupted storage
+      if (storedPreference === 'true' || storedPreference === 'false') {
         setAudioEnabled(storedPreference === 'true');
       }
     } catch (e) {

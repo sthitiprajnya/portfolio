@@ -30,59 +30,57 @@ const BG_MAP = {
   violet: 'rgba(191, 0, 255, 0.1)',
 };
 
-// BOLT: Hoist useInView options to the module level to improve observer sharing and reduce object allocation per instance.
-const IN_VIEW_OPTIONS = {
-  threshold: 0.12,
-  triggerOnce: true,
-};
-
-// BOLT: Hoist geometric constants to avoid redundant arithmetic on every render.
+const IN_VIEW_OPTIONS = { threshold: 0.12, triggerOnce: true };
 const RADIUS = 28;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
-// BOLT: Use a module-level Map and Set to achieve O(1) icon lookup and cleaner code.
 const ICON_PATHS: Record<string, string> = {
-  burpsuite:  'tools/burp-suite.svg',
-  nessus:     'tools/nessus.svg',
-  kali:       'tools/kalilinux.svg',
-  metasploit: 'tools/metasploit.svg',
-  nmap:       'tools/nmap.png',
-  nuclei:     'tools/nuclei.svg',
-  wireshark:  'tools/wireshark.svg',
-  frida:      'tools/frida.png',
-  zap:        'tools/owasp.svg',
-  postman:    'tools/postman.svg',
-  gcp:        'cloud/gcp.svg',
-  aws:        'cloud/aws.svg',
-  kubernetes: 'cloud/kubernetes.svg',
-  docker:     'cloud/docker.svg',
-  python:     'scripting/python.svg',
-  bash:       'scripting/bash.svg',
-  powershell: 'scripting/powershell.svg',
-  owasp:      'tools/owasp.svg',
-  mitre:      'frameworks/mitre.png',
-  pcidss:     'frameworks/pcidss.jpg',
-  nist:       'frameworks/nist.png',
-  wazuh:      'siem/wazuh.svg',
-  zabbix:     'siem/zabbix.png',
+  burpsuite:   'tools/burp-suite.svg',
+  nessus:      'tools/nessus.svg',
+  kali:        'tools/kalilinux.svg',
+  metasploit:  'tools/metasploit.svg',
+  nmap:        'tools/nmap.png',
+  nuclei:      'tools/nuclei.svg',
+  wireshark:   'tools/wireshark.svg',
+  frida:       'tools/frida.png',
+  zap:         'tools/owasp.svg',
+  owasp:       'tools/owasp.svg',
+  postman:     'tools/postman.svg',
+  gcp:         'cloud/gcp.svg',
+  aws:         'cloud/aws.svg',
+  kubernetes:  'cloud/kubernetes.svg',
+  docker:      'cloud/docker.svg',
+  python:      'scripting/python.svg',
+  bash:        'scripting/bash.svg',
+  powershell:  'scripting/powershell.svg',
+  mitre:       'frameworks/mitre.png',
+  pcidss:      'frameworks/pcidss.jpg',
+  nist:        'frameworks/nist.png',
+  wazuh:       'siem/wazuh.svg',
+  zabbix:      'siem/zabbix.png',
 };
 
-const INVERT_ICONS = new Set(['nmap', 'frida', 'mitre', 'pcidss', 'nist', 'zabbix']);
+const KNOWN_ICONS = new Set(Object.keys(ICON_PATHS));
+const INVERTED_ICONS = new Set(['nmap', 'frida', 'mitre', 'pcidss', 'nist', 'zabbix']);
 
-function SkillBadgeComponent({ name, icon, proficiency, color, delay = 0, description, experience }: SkillBadgeProps) {
+export const SkillBadge = React.memo(function SkillBadge({
+  name, icon, proficiency, color, delay = 0, description, experience
+}: SkillBadgeProps) {
   const { ref, inView } = useInView(IN_VIEW_OPTIONS);
   const prefersReducedMotion = usePrefersReducedMotion();
   const tooltipId = React.useId();
 
   const strokeDashoffset = CIRCUMFERENCE - (proficiency / 100) * CIRCUMFERENCE;
 
-  // BOLT: Inlined style calculations to minimize reconciliation and allocation overhead.
-  const style = proficiency >= 80
-    ? { boxShadow: '0 0 8px rgba(0,245,255,0.4)', borderColor: 'rgba(0,245,255,0.4)' }
-    : proficiency < 50 ? { opacity: 0.6 } : {};
+  // BOLT: Pre-calculate styles to avoid function creation and redundant logic on every render
+  const isHighProficiency = proficiency >= 80;
+  const isLowProficiency = proficiency < 50;
 
-  const badgeStyle = proficiency >= 80 ? "border border-transparent" : "";
-  const iconPath = ICON_PATHS[icon];
+  const badgeStyle = isHighProficiency
+    ? { boxShadow: '0 0 8px rgba(0,245,255,0.4)', borderColor: 'rgba(0,245,255,0.4)' }
+    : isLowProficiency ? { opacity: 0.6 } : {};
+
+  const badgeClassName = isHighProficiency ? "border border-transparent" : "";
 
   return (
     <div
@@ -90,8 +88,8 @@ function SkillBadgeComponent({ name, icon, proficiency, color, delay = 0, descri
       tabIndex={0}
       aria-label={`Skill: ${name}`}
       aria-describedby={tooltipId}
-      className={`relative flex flex-col items-center justify-center p-2 group skill-tag outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card transition-all ${badgeStyle}`}
-      style={style}
+      className={`relative flex flex-col items-center justify-center p-2 group skill-tag outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card transition-all ${badgeClassName}`}
+      style={badgeStyle}
       data-orb-target="true"
     >
       <div className="relative w-16 h-16 flex items-center justify-center mb-3">
@@ -133,13 +131,13 @@ function SkillBadgeComponent({ name, icon, proficiency, color, delay = 0, descri
 
         {/* Icon / Monogram */}
         <div className="relative z-10 flex items-center justify-center pointer-events-none">
-          {iconPath ? (
+          {KNOWN_ICONS.has(icon) ? (
             <LogoBadge
-              src={`/portfolio/logos/${iconPath}`}
+              src={`/portfolio/logos/${ICON_PATHS[icon]}`}
               alt={name}
               width={20}
               height={20}
-              className={`invert dark:invert-0 drop-shadow-lg ${INVERT_ICONS.has(icon) ? 'invert dark:invert-0' : 'fill-current opacity-90'} `}
+              className={`invert dark:invert-0 drop-shadow-lg ${INVERTED_ICONS.has(icon) ? 'invert dark:invert-0' : 'fill-current opacity-90'} `}
             />
           ) : (
             <div
@@ -174,8 +172,4 @@ function SkillBadgeComponent({ name, icon, proficiency, color, delay = 0, descri
       </div>
     </div>
   );
-}
-
-// BOLT: Wrap the SkillBadge component in React.memo to prevent unnecessary re-renders
-// when the parent Skills section filters results.
-export const SkillBadge = React.memo(SkillBadgeComponent);
+});

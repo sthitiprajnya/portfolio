@@ -54,6 +54,10 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       for (let i = 0; i < 6; i++) buckets[i].length = 0;
     };
 
+    const clearBuckets = () => {
+      for (let i = 0; i < 6; i++) buckets[i].length = 0;
+    };
+
     const initNodes = () => {
       nodes = [];
       for (let i = 0; i < numNodes; i++) {
@@ -91,7 +95,7 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
 
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
-      // BOLT: Clear reused buckets at the start of every frame to prevent infinite accumulation and memory leaks.
+      // Security: Clear bucket arrays at the start of each frame to prevent infinite memory growth (DoS mitigation)
       clearBuckets();
 
       // BOLT: Replace forEach with for-loop and batch arc drawing into a single fill() call

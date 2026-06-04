@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
+import clsx from 'clsx';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { CyberButton }  from '@/components/ui/CyberButton';
 import { ScrollReveal, fadeSlideUp, fadeSlideLeft, containerStagger } from '@/components/ui/ScrollReveal';
@@ -13,6 +14,7 @@ const RESUME_SHA256 = 'f4a9f24d314dd2a6869c505d896746a84561e97392e77d1a53c6b8adc
 // security-engineer aesthetic and gets recruiters to interact with the page.
 export function ResumePanel() {
   const [downloadStarted, setDownloadStarted] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   const handleDownload = () => {
     setDownloadStarted(true);
@@ -23,6 +25,19 @@ export function ResumePanel() {
     try {
       await navigator.clipboard.writeText(text);
       toast.success(`${label} copied to clipboard! 📋`);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+      toast.error('Failed to copy. Please try again.');
+    }
+  };
+
+  const handleCopyLink = async () => {
+    const link = window.location.origin + window.location.pathname + '#resume';
+    try {
+      await navigator.clipboard.writeText(link);
+      setLinkCopied(true);
+      toast.success('Resume link copied to clipboard! 📋');
+      setTimeout(() => setLinkCopied(false), 2000);
     } catch (err) {
       console.error('Failed to copy:', err);
       toast.error('Failed to copy. Please try again.');
@@ -198,13 +213,30 @@ export function ResumePanel() {
                 </CyberButton>
 
                 <button
-                  onClick={() => handleCopy(window.location.origin + window.location.pathname + '#resume', 'Resume Link')}
-                  className="w-full mt-3 flex items-center justify-center space-x-2 py-2 border border-cyan/30 text-cyan font-mono text-xs uppercase tracking-widest rounded-pill glass hover:bg-cyan/10 transition-all outline-none focus-visible:ring-2 focus-visible:ring-cyan relative z-10"
+                  onClick={handleCopyLink}
+                  className={clsx(
+                    "w-full mt-3 flex items-center justify-center space-x-2 py-2 border font-mono text-xs uppercase tracking-widest rounded-pill glass transition-all outline-none focus-visible:ring-2 relative z-10",
+                    linkCopied
+                      ? "border-green text-green bg-green/10 shadow-[var(--glow-green-sm)] focus-visible:ring-green"
+                      : "border-cyan/30 text-cyan hover:bg-cyan/10 focus-visible:ring-cyan"
+                  )}
+                  aria-label={linkCopied ? "Resume link copied to clipboard" : "Copy direct link to resume"}
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                  </svg>
-                  <span>COPY_DIRECT_LINK</span>
+                  {linkCopied ? (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>LINK_COPIED</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                      </svg>
+                      <span>COPY_DIRECT_LINK</span>
+                    </>
+                  )}
                 </button>
 
                 {/* Audit trail label */}

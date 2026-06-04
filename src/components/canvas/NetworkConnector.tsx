@@ -48,9 +48,6 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
     let numNodes = DEFAULT_NUM_NODES;
 
     let nodes: Node[] = [];
-    // BOLT: Reuse bucket arrays to minimize garbage collection (GC) during the 60fps animation loop
-    const buckets: number[][] = [[], [], [], [], [], []];
-
     const initNodes = () => {
       nodes = [];
       for (let i = 0; i < numNodes; i++) {
@@ -86,7 +83,7 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
     window.addEventListener('mouseleave', onMouseLeave, { passive: true });
     resize();
 
-    // BOLT: Hoist bucket arrays to avoid re-allocation in the 60fps loop
+    // BOLT: Reuse bucket arrays to minimize garbage collection (GC) during the 60fps animation loop
     const buckets: number[][] = [[], [], [], [], [], []];
 
     const draw = () => {

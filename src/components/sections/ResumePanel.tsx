@@ -31,6 +31,19 @@ export function ResumePanel() {
     }
   };
 
+  const handleCopyLink = async () => {
+    const link = window.location.origin + window.location.pathname + '#resume';
+    try {
+      await navigator.clipboard.writeText(link);
+      setLinkCopied(true);
+      toast.success('Resume link copied to clipboard! 📋');
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+      toast.error('Failed to copy. Please try again.');
+    }
+  };
+
   return (
     <section id="resume" className="py-24 bg-deep relative border-t border-border overflow-hidden">
 

@@ -117,7 +117,23 @@ export default function RootLayout({
               if (window.trustedTypes && window.trustedTypes.createPolicy) {
                 if (!window.trustedTypes.defaultPolicy) {
                   window.trustedTypes.createPolicy('default', {
-                    createHTML: (s) => s,
+                    createHTML: (s) => {
+                      if (typeof s === 'string') {
+                        // Naive but effective mitigation against basic XSS injections
+                        // Next.js hydration needs to inject HTML, but we can block known dangerous tags
+                        const lower = s.toLowerCase();
+                        if (
+                          lower.includes('<script') ||
+                          lower.includes('javascript:') ||
+                          lower.includes('onerror=') ||
+                          lower.includes('onload=')
+                        ) {
+                          console.warn('Blocked dangerous HTML pattern in Trusted Types default policy');
+                          return s.replace(/<(script)/gi, '<blocked-$1').replace(/on(error|load)=/gi, 'blocked-$1=');
+                        }
+                      }
+                      return s;
+                    },
                     createScript: (s) => s,
                     createScriptURL: (s) => s,
                   });

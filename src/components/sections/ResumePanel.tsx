@@ -213,14 +213,16 @@ export function ResumePanel() {
                 </CyberButton>
 
                 <button
-                  onClick={handleCopyLink}
+                  onClick={() => {
+                    handleCopy(window.location.origin + window.location.pathname + '#resume', 'Resume Link');
+                    setLinkCopied(true);
+                    setTimeout(() => setLinkCopied(false), 2000);
+                  }}
                   className={clsx(
-                    "w-full mt-3 flex items-center justify-center space-x-2 py-2 border font-mono text-xs uppercase tracking-widest rounded-pill glass transition-all outline-none focus-visible:ring-2 relative z-10",
-                    linkCopied
-                      ? "border-green text-green bg-green/10 shadow-[var(--glow-green-sm)] focus-visible:ring-green"
-                      : "border-cyan/30 text-cyan hover:bg-cyan/10 focus-visible:ring-cyan"
+                    "w-full mt-3 flex items-center justify-center space-x-2 py-2 border font-mono text-xs uppercase tracking-widest rounded-pill glass transition-all outline-none focus-visible:ring-2 focus-visible:ring-cyan relative z-10",
+                    linkCopied ? "border-green text-green bg-green/10" : "border-cyan/30 text-cyan hover:bg-cyan/10"
                   )}
-                  aria-label={linkCopied ? "Resume link copied to clipboard" : "Copy direct link to resume"}
+                  aria-label={linkCopied ? "Link copied to clipboard" : "Copy direct link to resume"}
                 >
                   {linkCopied ? (
                     <>

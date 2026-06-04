@@ -57,3 +57,7 @@
 ## 2026-07-15 - [Batching Canvas stroke() calls via Opacity Bucketing]
 **Learning:** In high-frequency (60fps) Canvas 2D animation loops, individual `stroke()` calls for every line segment (edges $E$) create significant CPU overhead due to the large number of state changes and draw commands sent to the GPU. By grouping lines into discrete "opacity buckets" (e.g., 6 levels) and using `ctx.globalAlpha`, the number of `stroke()` calls can be reduced from $O(E)$ to a small constant (e.g., 6), drastically improving rendering efficiency with minimal visual impact.
 **Action:** Always audit animation loops for per-element `stroke()` or `fill()` calls. Batch elements with similar styles into a single path and perform one draw call. Use `globalAlpha` with buckets to handle variable transparency without breaking the batch.
+
+## 2026-05-31 - [Chart.js Lazy Loading]
+**Learning:** In Next.js static exports, declaring `ChartJS.register()` at the module level in a component causes `chart.js` to be included in the main JavaScript bundle, even if the actual `<Radar>` component is dynamically imported. This adds ~50KB of unnecessary bloat to the initial load for a component that isn't immediately visible.
+**Action:** Always move `ChartJS.register()` inside the dynamically imported wrapper component itself. This guarantees `chart.js` is truly lazy-loaded only when the chart actually mounts.

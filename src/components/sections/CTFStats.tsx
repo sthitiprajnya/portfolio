@@ -8,7 +8,7 @@ import { CTF_PROFILE }   from '@/data/portfolio';
 import dynamic from 'next/dynamic';
 import { LogoBadge } from '@/components/ui/LogoBadge';
 
-const Radar = dynamic(() => import('react-chartjs-2').then((mod) => mod.Radar), {
+const Radar = dynamic(() => import('@/components/ui/RadarChart'), {
   ssr: false,
   loading: () => <div className="w-full h-full flex items-center justify-center font-mono text-[0.6rem] text-text-muted animate-pulse">LOADING_DATA_VIZ...</div>
 });

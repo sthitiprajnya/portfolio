@@ -48,7 +48,6 @@
     "@types/react-dom": "^18.3.7",
     "@typescript-eslint/eslint-plugin": "^8.59.2",
     "@typescript-eslint/parser": "^8.59.2",
-    "typescript-eslint": "^8.59.2",
     "autoprefixer": "^10.4.19",
     "esbuild": "^0.28.0",
     "eslint": "^9.14.0",
@@ -58,10 +57,12 @@
     "globals": "^17.6.0",
     "intersection-observer": "^0.12.2",
     "jsdom": "^29.1.1",
+    "playwright": "^1.60.0",
     "postcss": "^8.5.15",
     "prettier": "^3.8.3",
     "tailwindcss": "^3.4.6",
     "typescript": "^5.7.2",
+    "typescript-eslint": "^8.59.2",
     "vitest": "^4.1.7"
   }
 }

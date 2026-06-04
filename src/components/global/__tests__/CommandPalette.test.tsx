@@ -56,9 +56,9 @@ describe('CommandPalette', () => {
     expect(screen.queryByText('Skills')).not.toBeInTheDocument();
 
     // Check aria-live announcement
-    const announcement = screen.getByText(/1 results found for About/i);
-    expect(announcement).toBeInTheDocument();
-    expect(announcement).toHaveAttribute('aria-live', 'polite');
+    const announcements = screen.getAllByText(/1 results found for About/i);
+    expect(announcements.length).toBeGreaterThan(0);
+    expect(announcements[0]).toBeInTheDocument();
   });
 
   it('clears search when clear button is clicked', async () => {

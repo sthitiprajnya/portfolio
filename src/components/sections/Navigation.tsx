@@ -52,13 +52,22 @@ export function Navigation() {
 
     const observer = new IntersectionObserver(
       (entries) => {
+        // Day 24: Find the section that is most visible in the viewport
+        let maxRatio = 0;
+        let mostVisible = ''; // Start without depending on outer scope directly to avoid hook dependencies error if activeSection is used inside closure without listing it
+
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
+          if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
+            maxRatio = entry.intersectionRatio;
+            mostVisible = entry.target.id;
           }
         });
+
+        if (maxRatio > 0 && mostVisible) {
+          setActiveSection(mostVisible);
+        }
       },
-      { rootMargin: '-30% 0px -60% 0px', threshold: 0 }
+      { rootMargin: '-20% 0px -40% 0px', threshold: [0, 0.2, 0.4, 0.6, 0.8, 1] }
     );
 
     sections.forEach((id) => {

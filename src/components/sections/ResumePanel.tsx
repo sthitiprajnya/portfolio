@@ -196,15 +196,27 @@ export function ResumePanel() {
                   </span>
                 </CyberButton>
 
-                <button
-                  onClick={() => handleCopy(window.location.origin + window.location.pathname + '#resume', 'Resume Link')}
-                  className="w-full mt-3 flex items-center justify-center space-x-2 py-2 border border-cyan/30 text-cyan font-mono text-xs uppercase tracking-widest rounded-pill glass hover:bg-cyan/10 transition-all outline-none focus-visible:ring-2 focus-visible:ring-cyan relative z-10"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                  </svg>
-                  <span>COPY_DIRECT_LINK</span>
-                </button>
+                <div className="flex gap-3 mt-3 w-full relative z-10">
+                  <button
+                    onClick={() => handleCopy(window.location.origin + window.location.pathname + '#resume', 'Resume Link')}
+                    className="flex-1 flex items-center justify-center space-x-2 py-2 border border-cyan/30 text-cyan font-mono text-xs uppercase tracking-widest rounded-pill glass hover:bg-cyan/10 transition-all outline-none focus-visible:ring-2 focus-visible:ring-cyan"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                    </svg>
+                    <span>COPY_LINK</span>
+                  </button>
+
+                  <button
+                    onClick={() => window.print()}
+                    className="flex-1 flex items-center justify-center space-x-2 py-2 border border-violet/30 text-violet font-mono text-xs uppercase tracking-widest rounded-pill glass hover:bg-violet/10 transition-all outline-none focus-visible:ring-2 focus-visible:ring-violet"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    <span>PRINT_CV</span>
+                  </button>
+                </div>
 
                 {/* Audit trail label */}
                 <div className="mt-4 text-center font-mono text-[0.6rem] text-text-muted flex items-center justify-center gap-2 relative z-10">

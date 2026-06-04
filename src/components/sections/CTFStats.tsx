@@ -96,8 +96,16 @@ export function CTFStats() {
                     <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest mb-1">
                       Platform
                     </div>
-                    <div className="font-display text-lg text-white font-bold tracking-widest leading-none">
-                      HackTheBox
+                    <div className="flex items-center gap-2">
+                      <div className="font-display text-lg text-white font-bold tracking-widest leading-none">
+                        HackTheBox
+                      </div>
+                      {/* Day 19: Global Rank Badge */}
+                      {CTF_PROFILE.globalPercentile && (
+                        <div className="px-2 py-0.5 glass-pill rounded-pill text-amber font-mono text-[0.55rem] font-bold uppercase tracking-widest shadow-[var(--glow-amber-sm)] border-amber/40 whitespace-nowrap">
+                          RANK #{CTF_PROFILE.globalPercentile}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

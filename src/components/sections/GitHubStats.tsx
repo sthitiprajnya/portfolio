@@ -6,11 +6,44 @@ import { PERSONAL } from '@/data/portfolio';
 import CountUp from 'react-countup';
 import useSWR from 'swr';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, Component, ReactNode } from 'react';
+
+// Day 20: React Error Boundary to catch GitHub API failures gracefully
+interface ErrorBoundaryProps {
+  children: ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+}
+
+class GitHubErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <section id="github" className="py-24 bg-black relative border-t border-border flex items-center justify-center min-h-[500px]">
+          <div className="font-mono text-sm text-text-secondary border border-border p-6 rounded-card glass text-center">
+            [ GITHUB_API_OFFLINE ] <br /> Stats unavailable at this time.
+          </div>
+        </section>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
-export function GitHubStats() {
+function GitHubStatsContent() {
   const [heatmapError, setHeatmapError] = useState(false);
   const { data: githubData } = useSWR(
     'https://api.github.com/users/sthitiprajnya',
@@ -207,5 +240,13 @@ function StatCard({ label, value }: { label: string, value: number }) {
         {label}
       </div>
     </div>
+  );
+}
+
+export function GitHubStats() {
+  return (
+    <GitHubErrorBoundary>
+      <GitHubStatsContent />
+    </GitHubErrorBoundary>
   );
 }

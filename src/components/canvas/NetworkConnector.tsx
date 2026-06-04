@@ -54,10 +54,6 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       for (let i = 0; i < 6; i++) buckets[i].length = 0;
     };
 
-    const clearBuckets = () => {
-      for (let i = 0; i < 6; i++) buckets[i].length = 0;
-    };
-
     const initNodes = () => {
       nodes = [];
       for (let i = 0; i < numNodes; i++) {

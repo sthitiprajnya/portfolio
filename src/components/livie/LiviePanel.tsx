@@ -192,6 +192,7 @@ export default function LiviePanel({ onClose }: { onClose: () => void }) {
         <button
           onClick={send}
           disabled={!input.trim() || loading}
+          aria-label="Send message to Livie assistant"
           className="
             glass-pill rounded-pill
             px-3 py-1.5

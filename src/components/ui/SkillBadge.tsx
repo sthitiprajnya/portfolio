@@ -30,32 +30,57 @@ const BG_MAP = {
   violet: 'rgba(191, 0, 255, 0.1)',
 };
 
-export function SkillBadge({ name, icon, proficiency, color, delay = 0, description, experience }: SkillBadgeProps) {
-  const { ref, inView } = useInView({
-    threshold: 0.12,
-    triggerOnce: true,
-  });
+const IN_VIEW_OPTIONS = { threshold: 0.12, triggerOnce: true };
+const RADIUS = 28;
+const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+
+const ICON_PATHS: Record<string, string> = {
+  burpsuite:   'tools/burp-suite.svg',
+  nessus:      'tools/nessus.svg',
+  kali:        'tools/kalilinux.svg',
+  metasploit:  'tools/metasploit.svg',
+  nmap:        'tools/nmap.png',
+  nuclei:      'tools/nuclei.svg',
+  wireshark:   'tools/wireshark.svg',
+  frida:       'tools/frida.png',
+  zap:         'tools/owasp.svg',
+  owasp:       'tools/owasp.svg',
+  postman:     'tools/postman.svg',
+  gcp:         'cloud/gcp.svg',
+  aws:         'cloud/aws.svg',
+  kubernetes:  'cloud/kubernetes.svg',
+  docker:      'cloud/docker.svg',
+  python:      'scripting/python.svg',
+  bash:        'scripting/bash.svg',
+  powershell:  'scripting/powershell.svg',
+  mitre:       'frameworks/mitre.png',
+  pcidss:      'frameworks/pcidss.jpg',
+  nist:        'frameworks/nist.png',
+  wazuh:       'siem/wazuh.svg',
+  zabbix:      'siem/zabbix.png',
+};
+
+const KNOWN_ICONS = new Set(Object.keys(ICON_PATHS));
+const INVERTED_ICONS = new Set(['nmap', 'frida', 'mitre', 'pcidss', 'nist', 'zabbix']);
+
+export const SkillBadge = React.memo(function SkillBadge({
+  name, icon, proficiency, color, delay = 0, description, experience
+}: SkillBadgeProps) {
+  const { ref, inView } = useInView(IN_VIEW_OPTIONS);
   const prefersReducedMotion = usePrefersReducedMotion();
   const tooltipId = React.useId();
 
-  const radius = 28;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (proficiency / 100) * circumference;
+  const strokeDashoffset = CIRCUMFERENCE - (proficiency / 100) * CIRCUMFERENCE;
 
-  const getStyle = () => {
-    if (proficiency >= 80) {
-      return { boxShadow: '0 0 8px rgba(0,245,255,0.4)', borderColor: 'rgba(0,245,255,0.4)' };
-    }
-    if (proficiency < 50) {
-      return { opacity: 0.6 };
-    }
-    return {};
-  };
+  // BOLT: Pre-calculate styles to avoid function creation and redundant logic on every render
+  const isHighProficiency = proficiency >= 80;
+  const isLowProficiency = proficiency < 50;
 
-  const getBadgeStyle = () => {
-    if (proficiency >= 80) return "border border-transparent";
-    return "";
-  }
+  const badgeStyle = isHighProficiency
+    ? { boxShadow: '0 0 8px rgba(0,245,255,0.4)', borderColor: 'rgba(0,245,255,0.4)' }
+    : isLowProficiency ? { opacity: 0.6 } : {};
+
+  const badgeClassName = isHighProficiency ? "border border-transparent" : "";
 
   return (
     <div
@@ -63,8 +88,8 @@ export function SkillBadge({ name, icon, proficiency, color, delay = 0, descript
       tabIndex={0}
       aria-label={`Skill: ${name}`}
       aria-describedby={tooltipId}
-      className={`relative flex flex-col items-center justify-center p-2 group skill-tag outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card transition-all ${getBadgeStyle()}`}
-      style={getStyle()}
+      className={`relative flex flex-col items-center justify-center p-2 group skill-tag outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card transition-all ${badgeClassName}`}
+      style={badgeStyle}
       data-orb-target="true"
     >
       <div className="relative w-16 h-16 flex items-center justify-center mb-3">
@@ -73,7 +98,7 @@ export function SkillBadge({ name, icon, proficiency, color, delay = 0, descript
           <circle
             cx="32"
             cy="32"
-            r={radius}
+            r={RADIUS}
             fill={BG_MAP[color]}
             stroke="var(--color-border)"
             strokeWidth="2"
@@ -82,17 +107,17 @@ export function SkillBadge({ name, icon, proficiency, color, delay = 0, descript
           <motion.circle
             cx="32"
             cy="32"
-            r={radius}
+            r={RADIUS}
             fill="none"
             stroke={COLOR_MAP[color]}
             strokeWidth="3"
             strokeLinecap="round"
-            strokeDasharray={circumference}
-            initial={{ strokeDashoffset: circumference }}
+            strokeDasharray={CIRCUMFERENCE}
+            initial={{ strokeDashoffset: CIRCUMFERENCE }}
             animate={
               (inView || prefersReducedMotion)
                 ? { strokeDashoffset }
-                : { strokeDashoffset: circumference }
+                : { strokeDashoffset: CIRCUMFERENCE }
             }
             transition={{
               duration: 1.2,
@@ -106,38 +131,13 @@ export function SkillBadge({ name, icon, proficiency, color, delay = 0, descript
 
         {/* Icon / Monogram */}
         <div className="relative z-10 flex items-center justify-center pointer-events-none">
-          {['burpsuite', 'nessus', 'kali', 'metasploit', 'nmap', 'nuclei', 'wireshark', 'frida', 'zap', 'postman', 'gcp', 'aws', 'kubernetes', 'docker', 'python', 'bash', 'powershell', 'owasp', 'mitre', 'pcidss', 'nist', 'wazuh', 'zabbix'].includes(icon) ? (
+          {KNOWN_ICONS.has(icon) ? (
             <LogoBadge
-              src={`/portfolio/logos/${
-                icon === 'burpsuite' ? 'tools/burp-suite.svg' :
-                icon === 'nessus' ? 'tools/nessus.svg' :
-                icon === 'kali' ? 'tools/kalilinux.svg' :
-                icon === 'metasploit' ? 'tools/metasploit.svg' :
-                icon === 'nmap' ? 'tools/nmap.png' :
-                icon === 'nuclei' ? 'tools/nuclei.svg' :
-                icon === 'wireshark' ? 'tools/wireshark.svg' :
-                icon === 'frida' ? 'tools/frida.png' :
-                icon === 'zap' ? 'tools/owasp.svg' :
-                icon === 'postman' ? 'tools/postman.svg' :
-                icon === 'gcp' ? 'cloud/gcp.svg' :
-                icon === 'aws' ? 'cloud/aws.svg' :
-                icon === 'kubernetes' ? 'cloud/kubernetes.svg' :
-                icon === 'docker' ? 'cloud/docker.svg' :
-                icon === 'python' ? 'scripting/python.svg' :
-                icon === 'bash' ? 'scripting/bash.svg' :
-                icon === 'powershell' ? 'scripting/powershell.svg' :
-                icon === 'owasp' ? 'tools/owasp.svg' :
-                icon === 'mitre' ? 'frameworks/mitre.png' :
-                icon === 'pcidss' ? 'frameworks/pcidss.jpg' :
-                icon === 'nist' ? 'frameworks/nist.png' :
-                icon === 'wazuh' ? 'siem/wazuh.svg' :
-                icon === 'zabbix' ? 'siem/zabbix.png' :
-                ''
-              }`}
+              src={`/portfolio/logos/${ICON_PATHS[icon]}`}
               alt={name}
               width={20}
               height={20}
-              className={`invert dark:invert-0 drop-shadow-lg ${['nmap', 'frida', 'mitre', 'pcidss', 'nist', 'zabbix'].includes(icon) ? 'invert dark:invert-0' : 'fill-current opacity-90'} `}
+              className={`invert dark:invert-0 drop-shadow-lg ${INVERTED_ICONS.has(icon) ? 'invert dark:invert-0' : 'fill-current opacity-90'} `}
             />
           ) : (
             <div
@@ -172,4 +172,4 @@ export function SkillBadge({ name, icon, proficiency, color, delay = 0, descript
       </div>
     </div>
   );
-}
+});

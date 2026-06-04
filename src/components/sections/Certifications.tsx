@@ -99,17 +99,44 @@ function CertCard({ cert }: { cert: typeof CERTIFICATIONS[0] }) {
             />
           </div>
 
-          {cert.status === 'active' && (
-             <div className="flex flex-col items-end gap-1">
-               <div className="flex items-center space-x-1 bg-green/10 border border-green/20 px-2 py-0.5 rounded-full">
-                 <span className="w-1.5 h-1.5 rounded-full bg-green animate-pulse" />
-                 <span className="font-mono text-[0.55rem] uppercase text-green tracking-widest font-bold">Active</span>
-               </div>
-               {cert.expiry && (
+          {/* Day 33: Expiry Indicator */}
+          {(() => {
+            if (!cert.expiry) return null;
+            const expiryDate = new Date(cert.expiry);
+            const now = new Date();
+            const daysUntilExpiry = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 3600 * 24));
+
+            let statusColor = "green";
+            let statusText = "VALID";
+
+            if (daysUntilExpiry < 0) {
+              statusColor = "red";
+              statusText = "EXPIRED";
+            } else if (daysUntilExpiry <= 90) {
+              statusColor = "amber";
+              statusText = "EXPIRES SOON";
+            }
+
+            return (
+               <div className="flex flex-col items-end gap-1">
+                 <div className={clsx("flex items-center space-x-1 px-2 py-0.5 rounded-full border",
+                    statusColor === 'green' ? "bg-green/10 border-green/20" :
+                    statusColor === 'amber' ? "bg-amber/10 border-amber/20" :
+                    "bg-red-500/10 border-red-500/20"
+                 )}>
+                   {statusColor !== 'red' && <span className={clsx("w-1.5 h-1.5 rounded-full animate-pulse", statusColor === 'green' ? 'bg-green' : 'bg-amber')} />}
+                   <span className={clsx("font-mono text-[0.55rem] uppercase tracking-widest font-bold",
+                      statusColor === 'green' ? "text-green" :
+                      statusColor === 'amber' ? "text-amber" :
+                      "text-red-500"
+                   )}>
+                     {statusText}
+                   </span>
+                 </div>
                  <span className="font-mono text-[0.55rem] text-text-muted mt-1">Exp: {cert.expiry}</span>
-               )}
-             </div>
-          )}
+               </div>
+            );
+          })()}
         </div>
 
         <h3 className="font-heading text-[1rem] font-bold text-white mb-2 leading-tight group-hover:text-cyan transition-colors">

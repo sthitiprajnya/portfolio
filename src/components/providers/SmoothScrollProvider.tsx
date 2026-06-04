@@ -12,6 +12,7 @@ export function SmoothScrollProvider({ children }: SmoothScrollProviderProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
+    // Day 62: Return early if prefers-reduced-motion is true
     if (prefersReducedMotion) return;
 
     const lenis = new Lenis({

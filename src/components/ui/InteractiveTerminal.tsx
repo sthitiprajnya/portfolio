@@ -30,12 +30,28 @@ export function InteractiveTerminal({ className }: { className?: string }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const { ref } = useInView({ threshold: 0.1, triggerOnce: true });
 
+  const terminalBodyRef = useRef<HTMLDivElement>(null);
+
+  // Day 55: Auto-scroll to bottom only if already near bottom
   const scrollToBottom = () => {
-    endOfTerminalRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (!terminalBodyRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = terminalBodyRef.current;
+
+    // Auto-scroll if user is within 50px of the bottom
+    if (scrollHeight - scrollTop - clientHeight < 50) {
+      requestAnimationFrame(() => {
+        endOfTerminalRef.current?.scrollIntoView({ behavior: 'auto' });
+      });
+    }
   };
 
   useEffect(() => {
-    scrollToBottom();
+    // Force scroll to bottom on initial render
+    if (lines.length <= 7) {
+      endOfTerminalRef.current?.scrollIntoView({ behavior: 'auto' });
+    } else {
+      scrollToBottom();
+    }
   }, [lines]);
 
   const addLinesWithDelay = async (newOutputLines: string[], delay: number = 200) => {
@@ -153,6 +169,7 @@ export function InteractiveTerminal({ className }: { className?: string }) {
     setCurrentInput('');
   };
 
+  // Day 46: Command History Navigation
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleCommand(currentInput);
@@ -176,6 +193,26 @@ export function InteractiveTerminal({ className }: { className?: string }) {
     }
   };
 
+  // Day 51: Copy Terminal Output
+  const [copied, setCopied] = useState(false);
+  const handleCopyOutput = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!terminalBodyRef.current) return;
+
+    // Extract plain text from terminal lines
+    const textOutput = lines.map(line => {
+      let text = '';
+      if (line.prompt) text += `${line.prompt} `;
+      if (line.command) text += `${line.command}\n`;
+      if (line.output) text += `${line.output}\n`;
+      return text;
+    }).join('').trim();
+
+    navigator.clipboard.writeText(textOutput);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+
   return (
     <div
       ref={ref}
@@ -185,15 +222,34 @@ export function InteractiveTerminal({ className }: { className?: string }) {
       )}
       onClick={() => inputRef.current?.focus()}
     >
-      <div className="flex bg-[#1a1a1a] px-3 py-1 items-center border-b border-border shrink-0">
+      <div className="flex bg-[#1a1a1a] px-3 py-1 items-center border-b border-border shrink-0 justify-between">
         <div className="flex space-x-2">
           <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
           <div className="w-3 h-3 rounded-full bg-amber-500/80"></div>
           <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
         </div>
-        <div className="mx-auto text-[0.65rem] text-text-muted">sthitaprajna@kali ~</div>
+        <div className="absolute left-1/2 -translate-x-1/2 text-[0.65rem] text-text-muted">sthitaprajna@kali ~</div>
+
+        {/* Copy Button */}
+        <button
+          onClick={handleCopyOutput}
+          className="text-text-muted hover:text-cyan transition-colors z-10"
+          title="Copy terminal output"
+          aria-label="Copy terminal output"
+        >
+          {copied ? (
+            <span className="text-[0.6rem] text-cyan font-bold tracking-widest">COPIED</span>
+          ) : (
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+          )}
+        </button>
       </div>
-      <div className="p-4 leading-relaxed overflow-y-auto flex-grow scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+      <div
+        ref={terminalBodyRef}
+        className="p-4 leading-relaxed overflow-y-auto flex-grow scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent"
+      >
         {lines.map((line, lineIdx) => (
           <div key={lineIdx} className="flex whitespace-pre-wrap break-words">
             {line.prompt && <span className="text-text-muted mr-2 shrink-0">{line.prompt}</span>}

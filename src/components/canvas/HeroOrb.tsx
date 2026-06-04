@@ -76,6 +76,7 @@ export default function HeroOrb() {
     let cx = 0;
     let cy = 0;
 
+    // Day 86: Defer loop start to improve FCP
     // Day 9: Setup OffscreenCanvas
     let offscreenCanvas: OffscreenCanvas | HTMLCanvasElement;
     let offscreenCtx: OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D | null = null;
@@ -263,9 +264,12 @@ export default function HeroOrb() {
       rafRef.current = requestAnimationFrame(tick);
     }
 
-    rafRef.current = requestAnimationFrame(tick);
+    const bootTimer = setTimeout(() => {
+      rafRef.current = requestAnimationFrame(tick);
+    }, 500);
 
     return () => {
+      clearTimeout(bootTimer);
       cancelAnimationFrame(rafRef.current);
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', onMouseMove);

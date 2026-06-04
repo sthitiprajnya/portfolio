@@ -62,7 +62,7 @@ export function Footer() {
         </div>
 
         {/* Fixed: was "React + Vite" — this project is Next.js */}
-        <div className="font-mono text-[0.75rem] text-text-muted text-center flex flex-col md:flex-row items-center justify-center gap-4 relative w-full">
+        <div className="font-mono text-[0.75rem] text-text-muted text-center flex flex-col md:flex-row items-center justify-center gap-4">
           <span className="flex items-center gap-2 font-display">
             {'>_'} built by Sthitaprajna Biswal
           </span>
@@ -79,18 +79,6 @@ export function Footer() {
             <span className="w-1.5 h-1.5 rounded-full bg-green animate-pulse"></span>
             SESSIONS_LOGGED: {visitorCount.toString().padStart(4, '0')}
           </span>
-
-          {/* Day 23: Back to Top Button */}
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="md:absolute right-0 flex items-center gap-2 text-cyan hover:text-white transition-colors outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card p-1"
-            aria-label="Scroll to top of page"
-          >
-            BACK_TO_TOP
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-            </svg>
-          </button>
         </div>
       </div>
     </footer>

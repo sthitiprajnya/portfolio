@@ -94,6 +94,14 @@ const config: Config = {
         'glow-cyan':   '0 0 24px rgba(0,245,255,0.25), 0 0 48px rgba(0,245,255,0.10)',
         'glow-green':  '0 0 24px rgba(0,255,128,0.25)',
       },
+      // Day 82: Map animations to project's custom keyframes
+      animation: {
+        "ticker": "ticker-scroll 40s linear infinite",
+        "glitch-1": "glitch-layer-1 0.6s steps(1) infinite",
+        "glitch-2": "glitch-layer-2 0.6s steps(1) 0.05s infinite",
+        "scan": "scan-line 8s linear infinite",
+        "orb-pulse": "orbPulse 2.5s ease-in-out infinite",
+      },
     },
   },
   plugins: [],

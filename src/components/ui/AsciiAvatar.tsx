@@ -38,9 +38,15 @@ const META_LINES = [
 
 interface AsciiAvatarProps {
   className?: string;
+  scanSweepDuration?: number; // Day 52
+  scanSweepColor?: string; // Day 52
 }
 
-export function AsciiAvatar({ className }: AsciiAvatarProps) {
+export function AsciiAvatar({
+  className,
+  scanSweepDuration = 2000,
+  scanSweepColor = '#00F5FF'
+}: AsciiAvatarProps) {
   const [visibleMeta, setVisibleMeta] = useState(0);
   const [scanPos, setScanPos] = useState(0);
   const [isHuman, setIsHuman] = useState(false);
@@ -126,8 +132,11 @@ export function AsciiAvatar({ className }: AsciiAvatarProps) {
           ))}
           {!prefersReducedMotion && (
             <div
-              className="absolute left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan/40 to-transparent pointer-events-none"
-              style={{ animation: 'scan-sweep 3s linear infinite' }}
+              className="absolute left-0 w-full h-[2px] pointer-events-none"
+              style={{
+                background: `linear-gradient(to right, transparent, ${scanSweepColor}66, transparent)`,
+                animation: `scan-sweep ${scanSweepDuration}ms linear infinite`
+              }}
             />
           )}
         </div>

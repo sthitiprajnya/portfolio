@@ -114,6 +114,18 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
   const prefersReducedMotion = usePrefersReducedMotion();
   const [showMethodology, setShowMethodology] = useState(false);
 
+  const handleCardKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      // Activate primary CTA - here just toggle methodology as default action if github link doesn't exist
+      if (project.methodology) {
+        setShowMethodology(!showMethodology);
+      } else if (project.githubUrl) {
+        window.open(project.githubUrl, '_blank', 'noopener,noreferrer');
+      }
+    }
+  };
+
   return (
     <motion.div
       layout={!prefersReducedMotion}
@@ -127,11 +139,16 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
       }}
       className="h-full flex"
     >
+      {/* Day 32: Keyboard Navigation */}
       <div
         ref={ref as unknown as React.RefObject<HTMLDivElement>}
         data-orb-target="project"
-        className="w-full flex flex-col group glass rounded-card relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--glass-shadow-hover)] cursor-pointer"
+        className="w-full flex flex-col group glass rounded-card relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--glass-shadow-hover)] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-4 focus-visible:ring-offset-black"
         style={prefersReducedMotion ? {} : { transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`, transformStyle: 'preserve-3d' }}
+        role="article"
+        aria-label={`Project: ${project.title}`}
+        tabIndex={0}
+        onKeyDown={handleCardKeyDown}
       >
         {/* Top accent bar */}
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#00F5FF]/50 to-transparent rounded-t-card z-30" />

@@ -3,7 +3,9 @@ import type {
   Project, Certification, Education, CTFProfile
 } from '@/types';
 
-export const PERSONAL: PersonalInfo = {
+import type { SocialLink } from '@/types'; // Day 81
+
+export const PERSONAL: PersonalInfo & { socialLinks: SocialLink[] } = {
   name:           'Sthitaprajna Biswal',
   nameShort:      'STHITAPRAJNA',
   title:          'Information Security Engineer · Application VAPT Specialist',
@@ -19,9 +21,15 @@ export const PERSONAL: PersonalInfo = {
   currentRole:    'Information Security Engineer',
   currentCompany: 'iServeU Technology Pvt. Ltd.',
   resumeUrl:      '/portfolio/resume/Sthitaprajna_Biswal_Resume.pdf',
+  // Day 81: socialLinks array
+  socialLinks: [
+    { platform: 'LinkedIn', url: 'https://www.linkedin.com/in/sthitaprajna-biswal-0175b7171/' },
+    { platform: 'GitHub', url: 'https://github.com/sthitiprajnya' },
+    { platform: 'HackTheBox', url: 'https://profile.hackthebox.com/profile/019db8ae-9364-73ed-bb47-1336835663a7' }
+  ]
 };
 
-export const HERO_ROLES: string[] = [
+export const HERO_ROLES: readonly string[] = [ // Day 81 string union optimizations
   'Application VAPT Specialist.',
   'Cloud Security Engineer.',
   'Red Team Practitioner.',
@@ -42,21 +50,21 @@ export const HERO_TICKER: string[] = [
   '⬤ COMPLIANCE · ISO 27001:2022 · UIDAI AUDIT · RESULT: ZERO NON-CONFORMANCES',
 ];
 
-export const HERO_STATS: Stat[] = [
+export const HERO_STATS: readonly Stat[] = [
   { value: 50,  suffix: '+', label: 'Pen Tests' },
   { value: 230, suffix: '+', label: 'Vulnerabilities' },
   { value: 11,  suffix: '',  label: 'Certifications' },
   { value: 2,   suffix: '+', label: 'Yrs Experience' },
 ];
 
-export const ABOUT_STATS: Stat[] = [
+export const ABOUT_STATS: readonly Stat[] = [
   { value: 50,  suffix: '+', label: 'Pen Tests Executed' },
   { value: 230, suffix: '+', label: 'Unique Vulnerabilities' },
   { value: 8,   suffix: '',  label: 'Compliance Audits' },
   { value: 11,  suffix: '',  label: 'Certifications' },
 ];
 
-export const ABOUT_BIO = [
+export const ABOUT_BIO: readonly string[] = [
   "Information Security Engineer at iServeU Technology, where I've spent 2+ years breaking production FinTech systems before the bad actors can. I've executed 50+ full-scope penetration tests across web applications, REST/SOAP APIs, mobile apps, and cloud infrastructure — uncovering 230+ unique vulnerabilities for clients including NPCI, UIDAI, Axis Bank, Kotak Mahindra, and Bank of Baroda.",
   "My work lives at the intersection of offense and engineering — I don't just find the hole, I build the PoC, write the remediation playbook, and track closure to zero. Double award winner at iServeU: Best Intern 2024, Rising Performer 2025. Actively seeking roles in Cloud Security, AppSec, and Red Team operations.",
 ];

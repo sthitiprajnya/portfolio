@@ -1,7 +1,14 @@
 import { useMotionValue, useSpring } from 'framer-motion';
 import { useRef, useEffect } from 'react';
 
-export function useCardTilt() {
+import { clamp } from '@/lib/utils';
+
+interface TiltOptions {
+  maxTiltDegrees?: number; // Day 78
+  scale?: number; // Day 78
+}
+
+export function useCardTilt({ maxTiltDegrees = 10, scale = 1.02 }: TiltOptions = {}) {
   const ref = useRef<HTMLDivElement>(null);
 
   const x = useMotionValue(0);
@@ -48,12 +55,14 @@ export function useCardTilt() {
       const px = e.clientX - centerX;
       const py = e.clientY - centerY;
 
-      // Max rotation: ±10 degrees
-      const rx = (py / (docRect.height / 2)) * -10;
-      const ry = (px / (docRect.width / 2)) * 10;
+      // Day 78: Use configurable max clamp limit
+      const rx = clamp((py / (docRect.height / 2)) * -maxTiltDegrees, -maxTiltDegrees, maxTiltDegrees);
+      const ry = clamp((px / (docRect.width / 2)) * maxTiltDegrees, -maxTiltDegrees, maxTiltDegrees);
 
       x.set(rx);
       y.set(ry);
+
+      el.style.transform = `scale(${scale})`; // Apply configurable scale
 
       mouseX.set(e.clientX - currentLeft);
       mouseY.set(e.clientY - currentTop);
@@ -66,6 +75,7 @@ export function useCardTilt() {
       docRect = null;
       x.set(0);
       y.set(0);
+      el.style.transform = `scale(1)`; // Reset scale
       el.style.setProperty('--mouse-x', `-1000px`);
       el.style.setProperty('--mouse-y', `-1000px`);
     };
@@ -82,7 +92,7 @@ export function useCardTilt() {
       el.removeEventListener('mouseleave', handleMouseLeave);
       window.removeEventListener('resize', updateRect);
     };
-  }, [x, y, mouseX, mouseY]);
+  }, [x, y, mouseX, mouseY, maxTiltDegrees, scale]);
 
   return { ref, rotateX, rotateY };
 }

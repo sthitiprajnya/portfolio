@@ -56,7 +56,7 @@ interface ScrollRevealProps extends HTMLMotionProps<"div"> {
   variants?: Variants;
   className?: string;
   delay?: number;
-  staggerDelay?: number;
+  stagger?: number; // Day 48
 }
 
 export function ScrollReveal({
@@ -64,7 +64,7 @@ export function ScrollReveal({
   variants = fadeSlideUp,
   className,
   delay,
-  staggerDelay,
+  stagger,
   ...props
 }: ScrollRevealProps) {
   const { ref, inView } = useInView({
@@ -93,6 +93,31 @@ export function ScrollReveal({
     return <div className={className}>{children}</div>;
   }
 
+  // Day 48: Stagger children implementation
+  if (stagger !== undefined) {
+    // Strip motion props if returning a standard div wrapper to avoid TS errors
+    const standardProps = { ...props } as Omit<HTMLMotionProps<"div">, "style" | "transition" | "variants" | "initial" | "animate">;
+
+    return (
+      <div ref={ref} className={className} style={props.style as React.CSSProperties} {...standardProps}>
+        {React.Children.map(children, (child, index) => {
+          if (!React.isValidElement(child)) return child;
+
+          return (
+            <motion.div
+              variants={variants}
+              initial="hidden"
+              animate={inView ? "visible" : "hidden"}
+              transition={{ delay: delay ? delay + index * stagger : index * stagger }}
+            >
+              {child}
+            </motion.div>
+          );
+        })}
+      </div>
+    );
+  }
+
   return (
     <motion.div
       ref={ref}
@@ -100,7 +125,6 @@ export function ScrollReveal({
       initial="hidden"
       animate={inView ? "visible" : "hidden"}
       className={className}
-      style={staggerDelay !== undefined ? { ...props.style, transitionDelay: `calc(${staggerDelay} * 0.08s)` } : props.style}
       {...props}
     >
       {children}

@@ -7,12 +7,18 @@ const QUERY = '(prefers-reduced-motion: reduce)';
 // This replaces two useEffects and one useState per component with a single
 // optimized synchronization point, reducing memory footprint and effect churn.
 const subscribe = (callback: () => void) => {
+  // Day 80: SSR guard
+  if (typeof window === 'undefined') return () => {};
+
   const mql = window.matchMedia(QUERY);
   mql.addEventListener('change', callback);
   return () => mql.removeEventListener('change', callback);
 };
 
-const getSnapshot = () => window.matchMedia(QUERY).matches;
+const getSnapshot = () => {
+  if (typeof window === 'undefined') return false;
+  return window.matchMedia(QUERY).matches;
+};
 
 const getServerSnapshot = () => false;
 

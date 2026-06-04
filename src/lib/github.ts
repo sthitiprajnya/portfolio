@@ -57,9 +57,10 @@ export async function fetchGitHubStats(): Promise<GitHubStats> {
   const headers = { 'Accept': 'application/vnd.github.v3+json' };
 
   try {
+    // Day 73: Fetch retry wrapper with exponential backoff
     const [userRes, reposRes] = await Promise.all([
-      fetch(`https://api.github.com/users/${GITHUB_USER}`, { headers }),
-      fetch(`https://api.github.com/users/${GITHUB_USER}/repos?per_page=100&sort=updated`, { headers }),
+      fetchWithRetry(`https://api.github.com/users/${GITHUB_USER}`, { headers }),
+      fetchWithRetry(`https://api.github.com/users/${GITHUB_USER}/repos?per_page=100&sort=updated`, { headers }),
     ]);
 
     if (!userRes.ok || !reposRes.ok) {
@@ -137,4 +138,52 @@ export async function fetchGitHubStats(): Promise<GitHubStats> {
     console.error('Failed to fetch github stats', error);
     return GITHUB_FALLBACK_DATA;
   }
+}
+
+// Day 74: In-memory module-level map cache keyed by API URL to prevent duplicates within the same page session
+const fetchCache = new Map<string, { data: Response; timestamp: number }>();
+
+// Day 73: Retry logic with exponential backoff
+export async function fetchWithRetry(url: string, options?: RequestInit): Promise<Response> {
+  // Check memory cache first (Day 74)
+  const cached = fetchCache.get(url);
+  if (cached && Date.now() - cached.timestamp < 300000) { // 5 minutes
+    return cached.data.clone(); // Clone response so it can be read multiple times
+  }
+
+  const delays = [500, 1000, 2000];
+  let attempt = 0;
+
+  while (attempt <= 3) {
+    try {
+      const response = await fetch(url, options);
+
+      // Cache successful response (Day 74)
+      if (response.ok) {
+        // Only clone if the environment supports it (not in vitest basic mocks)
+        try {
+          fetchCache.set(url, { data: response.clone(), timestamp: Date.now() });
+        } catch {
+          fetchCache.set(url, { data: response, timestamp: Date.now() });
+        }
+        return response;
+      }
+
+      // Retry on 429 (rate limit) or 5xx (server errors)
+      if (response.status === 429 || response.status >= 500) {
+        if (attempt === 3) return response; // Final attempt, return the error response
+        await new Promise(resolve => setTimeout(resolve, delays[attempt]));
+        attempt++;
+      } else {
+        // Do not retry on 4xx (except 429)
+        return response;
+      }
+    } catch (error) {
+      if (attempt === 3) throw error;
+      await new Promise(resolve => setTimeout(resolve, delays[attempt]));
+      attempt++;
+    }
+  }
+
+  throw new Error('Maximum retry attempts exceeded');
 }

@@ -131,6 +131,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: jsonLdString }}
         />
         <link rel="preload" href="/portfolio/og-image.webp" as="image" />
+        <link rel="author" href="/portfolio/humans.txt" />
       </head>
       <body>
         <a

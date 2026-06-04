@@ -8,11 +8,13 @@ import { generateDynamicSpeech } from '@/lib/sentinelSpeech';
 interface Message {
   role:    'user' | 'assistant';
   content: string;
+  timestamp: string; // Day 71
 }
 
 const GREETING: Message = {
   role:    'assistant',
   content: 'LIVIE_v1.0 ONLINE. I know everything about Sthita\'s background. Ask me about his experience, projects, certs, or anything you\'d ask a recruiter.',
+  timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
 };
 
 export default function LiviePanel({ onClose }: { onClose: () => void }) {
@@ -36,7 +38,12 @@ export default function LiviePanel({ onClose }: { onClose: () => void }) {
     const text = input.trim();
     if (!text || loading) return;
 
-    const userMsg: Message = { role: 'user', content: text };
+    const userMsg: Message = {
+      role: 'user',
+      content: text,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+
     setMessages(prev => [...prev, userMsg]);
     setInput('');
     setLoading(true);
@@ -45,16 +52,33 @@ export default function LiviePanel({ onClose }: { onClose: () => void }) {
       // Simulate API call delay
       await new Promise(r => setTimeout(r, 900 + Math.random() * 600));
       const reply = generateDynamicSpeech(text);
-      setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: reply,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      }]);
       speak(reply);
     } catch {
       const errorReply = 'NETWORK_ERROR. Try again.';
-      setMessages(prev => [...prev, { role: 'assistant', content: errorReply }]);
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: errorReply,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      }]);
       speak(errorReply);
     } finally {
       setLoading(false);
     }
   }
+
+  // Day 72: Clear Chat Functionality
+  const [flashClear, setFlashClear] = useState(false);
+  const handleClearChat = () => {
+    // Re-generate greeting with fresh timestamp
+    setMessages([{ ...GREETING, timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }]);
+    setFlashClear(true);
+    setTimeout(() => setFlashClear(false), 200);
+  };
 
   function onKey(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
@@ -76,6 +100,7 @@ export default function LiviePanel({ onClose }: { onClose: () => void }) {
         flex flex-col
         overflow-hidden
       "
+      style={{ backgroundColor: flashClear ? 'rgba(0,245,255,0.05)' : undefined }}
     >
       {/* Header */}
       <div className="
@@ -97,11 +122,23 @@ export default function LiviePanel({ onClose }: { onClose: () => void }) {
             AI ASSISTANT · ONLINE
           </span>
         </div>
-        <button
-          onClick={onClose}
-          className="text-[#00F5FF]/40 hover:text-[#00F5FF] transition-colors text-sm"
-          aria-label="Close"
-        >✕</button>
+        <div className="flex items-center gap-2">
+          {/* Day 72: Clear Chat Button */}
+          <button
+            onClick={handleClearChat}
+            className="flex items-center gap-1 text-text-secondary hover:text-red transition-colors text-[0.6rem] font-mono border border-transparent hover:border-red/30 px-1.5 py-0.5 rounded outline-none focus-visible:ring-1 focus-visible:ring-red"
+            aria-label="Clear chat history"
+            title="Clear Chat"
+          >
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+            CLEAR
+          </button>
+          <button
+            onClick={onClose}
+            className="text-[#00F5FF]/40 hover:text-[#00F5FF] transition-colors text-sm ml-1"
+            aria-label="Close panel"
+          >✕</button>
+        </div>
       </div>
 
       {/* Messages */}
@@ -119,6 +156,10 @@ export default function LiviePanel({ onClose }: { onClose: () => void }) {
                 <span className="text-[#00F5FF]/50 text-[10px] block mb-1">LIVIE ▸</span>
               )}
               {msg.content}
+              {/* Day 71: Timestamps */}
+              <time className={`block text-[9px] mt-1 opacity-50 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+                {msg.timestamp}
+              </time>
             </div>
           </div>
         ))}

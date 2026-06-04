@@ -18,7 +18,8 @@ export const NAV_LINKS = [
   { label: 'Contact',  id: 'contact'  },
 ];
 
-export function Navigation() {
+// Day 88: Memoize section components
+export const Navigation = React.memo(function Navigation() {
   const [scrolled,       setScrolled]       = useState(false);
   const [activeSection,  setActiveSection]  = useState('hero');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -212,11 +213,11 @@ export function Navigation() {
             id="mobile-menu"
             role="dialog"
             aria-modal="true"
-            initial={{ opacity: 0, x: '100%' }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: '100%' }}
+            initial={{ opacity: 0, y: '-100%' }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: '-100%' }}
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 z-[60] bg-black border-l border-border flex flex-col p-8 lg:hidden overflow-y-auto"
+            className="fixed inset-0 z-[60] bg-black border-b border-border flex flex-col p-8 lg:hidden overflow-y-auto"
           >
             <div className="flex justify-between items-center mb-10">
               <span className="font-display font-bold text-white tracking-widest text-sm">SYSTEM_MENU</span>
@@ -260,7 +261,7 @@ export function Navigation() {
       </AnimatePresence>
     </>
   );
-}
+});
 
 function AudioToggle({ mobile = false }: { mobile?: boolean }) {
   const { audioEnabled, setAudioEnabled, isSpeaking } = useAudio();

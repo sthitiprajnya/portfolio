@@ -21,6 +21,11 @@ export function CursorProvider({ children }: CursorProviderProps) {
   const isClicking = useRef(false);
   const isInitial = useRef(true);
 
+  // Day 60: Cursor Trail Array
+  const trailRef = useRef<Array<{ x: number; y: number }>>(Array(8).fill({ x: 0, y: 0 }));
+  const trailIndexRef = useRef(0);
+  const trailContainerRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     setIsTouchDevice(window.matchMedia('(pointer: coarse)').matches);
   }, []);
@@ -33,8 +38,13 @@ export function CursorProvider({ children }: CursorProviderProps) {
       if (isInitial.current) {
         if (dotRef.current) dotRef.current.style.opacity = '1';
         if (ringRef.current) ringRef.current.style.opacity = '1';
+        if (trailContainerRef.current) trailContainerRef.current.style.opacity = '1';
         isInitial.current = false;
       }
+
+      // Day 60: Update circular buffer
+      trailRef.current[trailIndexRef.current] = { x: e.clientX, y: e.clientY };
+      trailIndexRef.current = (trailIndexRef.current + 1) % 8;
     };
 
     const handleMouseOver = (e: MouseEvent) => {
@@ -51,10 +61,11 @@ export function CursorProvider({ children }: CursorProviderProps) {
 
       isHovering.current = isInteractive;
       if (ringRef.current) {
+        // Day 61: Scale up logic added to `.custom-cursor-ring.active` class behavior manually
         if (isInteractive) {
-          ringRef.current.classList.add('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]');
+          ringRef.current.classList.add('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]', 'active');
         } else {
-          ringRef.current.classList.remove('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]');
+          ringRef.current.classList.remove('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]', 'active');
         }
       }
     };
@@ -86,17 +97,41 @@ export function CursorProvider({ children }: CursorProviderProps) {
       }
 
       if (ringRef.current) {
-        const scale = isClicking.current ? 0.5 : isHovering.current ? 1.5 : 1;
+        // Day 61: The 'active' class handles width/height now via CSS, so we only need to position
+        const scale = isClicking.current ? 0.5 : 1;
         ringRef.current.style.transform = `translate(calc(${ringPos.current.x}px - 50%), calc(${ringPos.current.y}px - 50%)) scale(${scale})`;
 
         // Ensure opacity and classes are correct after potential React re-renders
         if (!isInitial.current) {
           ringRef.current.style.opacity = '1';
           if (isHovering.current) {
-            ringRef.current.classList.add('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]');
+            ringRef.current.classList.add('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]', 'active');
           } else {
-            ringRef.current.classList.remove('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]');
+            ringRef.current.classList.remove('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]', 'active');
           }
+        }
+      }
+
+      // Day 60: Render trail elements using raw DOM manipulation to avoid React reconciliation
+      if (trailContainerRef.current && !isInitial.current) {
+        const children = trailContainerRef.current.children;
+        const trailLen = trailRef.current.length;
+
+        for (let i = 0; i < trailLen; i++) {
+          const child = children[i] as HTMLDivElement;
+          if (!child) continue;
+
+          // Oldest point to newest
+          const dataIdx = (trailIndexRef.current - 1 - i + trailLen) % trailLen;
+          const point = trailRef.current[dataIdx];
+
+          if (point.x === 0 && point.y === 0) continue; // Uninitialized
+
+          const targetOpacity = 1 / (i + 2);
+          const targetScale = Math.pow(0.9, i);
+
+          child.style.transform = `translate(calc(${point.x}px - 50%), calc(${point.y}px - 50%)) scale(${targetScale})`;
+          child.style.opacity = targetOpacity.toString();
         }
       }
 
@@ -118,6 +153,15 @@ export function CursorProvider({ children }: CursorProviderProps) {
     <>
       {!isTouchDevice && !prefersReducedMotion && (
         <>
+          <div ref={trailContainerRef} className="fixed inset-0 pointer-events-none z-[10000]" style={{ opacity: 0 }}>
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div
+                key={i}
+                className="absolute w-[4px] h-[4px] bg-cyan rounded-full pointer-events-none top-0 left-0"
+                style={{ opacity: 0, transformOrigin: 'center center' }}
+              />
+            ))}
+          </div>
           <div
             ref={dotRef}
             className="custom-cursor-dot"

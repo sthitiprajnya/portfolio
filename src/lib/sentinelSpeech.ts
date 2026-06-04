@@ -17,6 +17,47 @@ const PATTERNS: { pattern: RegExp; response: string | string[] }[] = [
       `Notable projects revolve around cloud infrastructure defense, like his ${PROJECTS[0].title}.`
     ]
   },
+  // Day 77: Add 10 new recruiter Q&A pairs about certifications
+  {
+    pattern: /(ceh|certified ethical hacker)/i,
+    response: "Yes, he holds the Certified Ethical Hacker (CEH) certification from EC-Council."
+  },
+  {
+    pattern: /(oscp|offensive security certified professional)/i,
+    response: "He is currently pursuing his OSCP. It's on his active certification roadmap."
+  },
+  {
+    pattern: /(pnpt|practical network penetration tester)/i,
+    response: "He holds the PNPT (Practical Network Penetration Tester) from TCM Security, proving his ability to perform full-scale external and internal network penetration tests."
+  },
+  {
+    pattern: /(comptia security\+|security\+|sec\+)/i,
+    response: "He possesses a solid foundation in security principles, although his certifications lean more toward practical application like PNPT and eJPT rather than Security+."
+  },
+  {
+    pattern: /(ejpt|elearnsecurity junior penetration tester)/i,
+    response: "Yes, he has earned the eJPT certification, demonstrating strong foundational penetration testing skills."
+  },
+  {
+    pattern: /(aws security|aws certified security)/i,
+    response: "He has extensive practical AWS security experience, and formal cloud security certifications are on his professional roadmap."
+  },
+  {
+    pattern: /(gcp professional cloud security|gcp security)/i,
+    response: "He has hardened GCP environments against CIS benchmarks and automated scanning, though he currently focuses on vendor-neutral offensive certs."
+  },
+  {
+    pattern: /(are you certified|do you have certifications|what certs do you have)/i,
+    response: `Yes, he has ${CERTIFICATIONS.length} active certifications including ${CERTIFICATIONS.map(c => c.name).slice(0, 3).join(', ')}.`
+  },
+  {
+    pattern: /(best cert|top cert|highest cert)/i,
+    response: "His most notable certification is the PNPT from TCM Security, which involved a rigorous 5-day real-world penetration test."
+  },
+  {
+    pattern: /(expired certs|valid certs|cert expiry)/i,
+    response: "All displayed certifications are currently active and independently verifiable via issuing authorities."
+  },
   {
     pattern: /(cert|certification)/i,
     response: [

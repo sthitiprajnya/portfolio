@@ -3,12 +3,28 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAudio } from '@/components/providers/AudioProvider';
 
+const HACKER_QUOTES = [
+  "The quieter you become, the more you can hear.",
+  "Trust is a vulnerability.",
+  "Security is a process, not a product.",
+  "There is no patch for human stupidity.",
+  "Amateurs hack systems, professionals hack people.",
+  "Information is the currency of the realm.",
+  "We are what we repeatedly do.",
+  "A system is only as secure as its weakest link."
+];
+
 export function Preloader() {
   const [isVisible, setIsVisible] = useState(true);
   const [stage, setStage] = useState(0);
   const [hexDump, setHexDump] = useState<string[]>([]);
   const [progress, setProgress] = useState(0);
+  const [quote, setQuote] = useState("");
   const { speak } = useAudio();
+
+  useEffect(() => {
+    setQuote(HACKER_QUOTES[Math.floor(Math.random() * HACKER_QUOTES.length)]);
+  }, []);
 
   useEffect(() => {
     // Check if booted in this session
@@ -180,7 +196,22 @@ export function Preloader() {
               ACCESS GRANTED
             </div>
           )}
+
+          {/* Day 25: Random Hacker Quote */}
+          {stage >= 8 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="mt-4 font-mono text-[0.6rem] text-text-muted"
+            >
+              "{quote}"
+            </motion.div>
+          )}
         </motion.div>
+
+        {/* Day 42: Scanline CRT Effect Overlay */}
+        <div className="fixed inset-0 pointer-events-none z-[10001]" style={{ background: 'repeating-linear-gradient(transparent, transparent 1px, rgba(0,0,0,0.03) 1px, rgba(0,0,0,0.03) 2px)' }} />
       </motion.div>
     </AnimatePresence>
   );

@@ -113,3 +113,5 @@ export interface CTFProfile {
   attackCategories: { label: string; level: number }[]; // level 0-100
   recentActivity: { title: string; type: 'machine' | 'challenge'; difficulty: string; date: string }[];
 }
+
+export type SocialLink = { platform: string; url: string; icon?: string }; // Day 81

@@ -81,7 +81,7 @@ const RADAR_OPTIONS = {
 
 const SKILLS_TABS: ('ALL' | 'OFFENSIVE' | 'CLOUD' | 'AUTOMATION' | 'COMPLIANCE')[] = ['ALL', 'OFFENSIVE', 'CLOUD', 'AUTOMATION', 'COMPLIANCE'];
 
-export function Skills() {
+export const Skills = React.memo(function Skills() {
   const [activeTab, setActiveTab] = useState<'ALL' | 'OFFENSIVE' | 'CLOUD' | 'AUTOMATION' | 'COMPLIANCE'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const { ref: chartRef, inView: chartInView } = useInView({ triggerOnce: true, threshold: 0.5 });
@@ -279,4 +279,4 @@ export function Skills() {
       `}</style>
     </section>
   );
-}
+});

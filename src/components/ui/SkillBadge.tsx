@@ -160,7 +160,13 @@ export function SkillBadge({ name, icon, proficiency, color, delay = 0, descript
         role="tooltip"
         className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-3 glass rounded-card opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-visible:opacity-100 group-focus-visible:visible transition-all duration-200 z-50 pointer-events-none translate-y-2 group-hover:translate-y-0 group-focus-visible:translate-y-0 relative overflow-hidden"
       >
-        <div className="font-mono text-[0.6rem] text-cyan font-bold mb-1 tracking-widest">{name}</div>
+        <div className="font-mono text-[0.6rem] font-bold mb-1 tracking-widest" style={{ color: COLOR_MAP[color] }}>{name}</div>
+
+        {/* Day 30: Display proficiency level note */}
+        <div className="mb-2 font-mono text-[0.55rem] uppercase tracking-widest" style={{ color: COLOR_MAP[color], opacity: 0.8 }}>
+          {proficiency >= 85 ? '[ ADVANCED ]' : proficiency >= 65 ? '[ PROFICIENT ]' : '[ FAMILIAR ]'}
+        </div>
+
         <div className="flex justify-between items-center mb-2 font-mono text-[0.6rem]">
            <span className="text-text-secondary">EXP: <span className="text-white">{experience || 'N/A'}</span></span>
            <span className="text-text-secondary">LVL: <span className="text-white">{proficiency}%</span></span>

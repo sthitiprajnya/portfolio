@@ -1,0 +1,11 @@
+/* TEAM */
+Developer: Sthitaprajna Biswal
+Role: Cybersecurity & Cloud Security Engineer
+Location: Bhubaneswar, India
+GitHub: https://github.com/sthitiprajnya
+
+/* TECHNOLOGIES */
+Next.js, TypeScript, React, Tailwind CSS, Three.js, GSAP, Framer Motion
+
+/* THANKS */
+Built with ❤️ and too much caffeine.

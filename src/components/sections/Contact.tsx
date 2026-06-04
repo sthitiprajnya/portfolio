@@ -409,11 +409,7 @@ function FloatingTextarea({ id, name, label, value, onChange, error, required, m
             aria-live="polite"
             className={clsx(
               "font-mono text-[0.65rem] transition-colors",
-              charCount >= maxLength
-                ? "text-red"
-                : charCount >= 1500
-                  ? "text-amber"
-                  : "text-text-muted"
+              charCount >= maxLength ? "text-red" : "text-text-muted"
             )}
           >
             {charCount} / {maxLength}

@@ -10,8 +10,21 @@ export function CommandPalette() {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [recentCmds, setRecentCmds] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const { speak } = useAudio();
+
+  // Day 65: Recent commands from sessionStorage
+  useEffect(() => {
+    try {
+      const recent = sessionStorage.getItem('cmd-recent');
+      if (recent) {
+        setRecentCmds(JSON.parse(recent));
+      }
+    } catch (e) {
+      console.warn("Could not load recent commands from sessionStorage", e);
+    }
+  }, []);
 
   useEffect(() => {
     const handleOpen = () => {
@@ -38,6 +51,13 @@ export function CommandPalette() {
       // Close palette
       if (e.key === 'Escape' && isOpen) {
         setIsOpen(false);
+        // Day 65: Clear recents on ESC
+        try {
+          sessionStorage.removeItem('cmd-recent');
+          setRecentCmds([]);
+        } catch {
+          // ignore
+        }
       }
     };
 
@@ -60,10 +80,18 @@ export function CommandPalette() {
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
-  const filteredLinks = NAV_LINKS.filter(link =>
+  const filteredLinks = React.useMemo(() => NAV_LINKS.filter(link =>
     link.label.toLowerCase().includes(query.toLowerCase()) ||
     link.id.toLowerCase().includes(query.toLowerCase())
-  );
+  ), [query]);
+
+  // Day 65: Build recent links list
+  const recentLinks = React.useMemo(() => {
+    if (query !== '') return [];
+    return recentCmds.map(id => NAV_LINKS.find(l => l.id === id)).filter(Boolean) as typeof NAV_LINKS;
+  }, [query, recentCmds]);
+
+  const displayLinks = query === '' && recentLinks.length > 0 ? recentLinks : filteredLinks;
 
   useEffect(() => {
     setSelectedIndex(0);
@@ -72,18 +100,28 @@ export function CommandPalette() {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setSelectedIndex(prev => (prev + 1) % filteredLinks.length);
+      setSelectedIndex(prev => (prev + 1) % displayLinks.length);
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setSelectedIndex(prev => (prev - 1 + filteredLinks.length) % filteredLinks.length);
-    } else if (e.key === 'Enter' && filteredLinks[selectedIndex]) {
+      setSelectedIndex(prev => (prev - 1 + displayLinks.length) % displayLinks.length);
+    } else if (e.key === 'Enter' && displayLinks[selectedIndex]) {
       e.preventDefault();
-      handleSelect(filteredLinks[selectedIndex].id, filteredLinks[selectedIndex].label);
+      handleSelect(displayLinks[selectedIndex].id, displayLinks[selectedIndex].label);
     }
   };
 
   const handleSelect = (id: string, label?: string) => {
     setIsOpen(false);
+
+    // Day 65: Add to recent
+    try {
+      const newRecents = [id, ...recentCmds.filter(r => r !== id)].slice(0, 5);
+      sessionStorage.setItem('cmd-recent', JSON.stringify(newRecents));
+      setRecentCmds(newRecents);
+    } catch {
+      // ignore
+    }
+
     if (label) {
       speak(label);
     }
@@ -141,8 +179,14 @@ export function CommandPalette() {
               aria-label="Search results"
               className="max-h-80 overflow-y-auto py-2 px-2 scrollbar-thin scrollbar-thumb-[var(--glass-border)] scrollbar-track-transparent relative z-10"
             >
-              {filteredLinks.length > 0 ? (
-                filteredLinks.map((link, i) => {
+              {query === '' && recentLinks.length > 0 && (
+                <div className="px-3 py-2 text-[0.6rem] font-mono text-text-muted uppercase tracking-widest mb-1 flex items-center gap-2">
+                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                   Recent
+                </div>
+              )}
+              {displayLinks.length > 0 ? (
+                displayLinks.map((link, i) => {
                   const isSelected = i === selectedIndex;
                   return (
                     <button
@@ -173,19 +217,31 @@ export function CommandPalette() {
               )}
             </div>
 
-            <div className="px-4 py-3 border-t border-[var(--glass-border)] bg-[rgba(0,0,0,0.4)] flex items-center justify-between text-xs text-text-secondary font-mono relative z-10">
+            <div className="px-4 py-3 border-t border-[var(--glass-border)] bg-[rgba(0,0,0,0.4)] flex items-center justify-between text-xs text-text-secondary font-mono relative z-10 flex-wrap gap-y-2">
               <div className="flex items-center gap-4">
                 <span className="flex items-center gap-1">
                   <kbd className="bg-white/10 px-1.5 py-0.5 rounded-card border border-white/20">↑</kbd>
                   <kbd className="bg-white/10 px-1.5 py-0.5 rounded-card border border-white/20">↓</kbd>
-                  <span className="ml-1">Navigate</span>
+                  <span className="ml-1 hidden sm:inline">Navigate</span>
                 </span>
                 <span className="flex items-center gap-1">
                   <kbd className="bg-white/10 px-1.5 py-0.5 rounded-card border border-white/20">↵</kbd>
-                  <span className="ml-1">Select</span>
+                  <span className="ml-1 hidden sm:inline">Select</span>
                 </span>
               </div>
-              <span className="opacity-50">v2.0_SYSTEM_NAV</span>
+              <div className="flex items-center gap-4">
+                {/* Day 66: Command hints */}
+                <span className="flex items-center gap-1">
+                  <kbd className="bg-white/10 px-1.5 py-0.5 rounded-card border border-white/20">Ctrl+/</kbd>
+                  <span className="ml-1 hidden sm:inline">Livie</span>
+                </span>
+                <span className="flex items-center gap-1">
+                  <kbd className="bg-white/10 px-1.5 py-0.5 rounded-card border border-white/20">?</kbd>
+                  <span className="ml-1 hidden sm:inline">or</span>
+                  <kbd className="bg-white/10 px-1.5 py-0.5 rounded-card border border-white/20">/</kbd>
+                  <span className="ml-1 hidden sm:inline">Search</span>
+                </span>
+              </div>
             </div>
           </motion.div>
         </div>

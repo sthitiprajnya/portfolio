@@ -107,7 +107,7 @@ export function ResumePanel() {
                     }}
                   >SB-RESUME-2025-v3</span><br className="md:hidden" />
                   <span className="hidden md:inline"> · </span>SHA256: <span
-                    className="redacted group/hash"
+                    className="redacted group/hash transition-[filter,background-position] duration-300 ease-in-out hover:animate-scan focus-visible:animate-scan"
                     tabIndex={0}
                     role="button"
                     aria-label="Reveal and copy SHA256 hash"

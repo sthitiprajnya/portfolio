@@ -21,6 +21,7 @@ describe('HeroOrb Component', () => {
     (usePrefersReducedMotion as unknown as ReturnType<typeof vi.fn>).mockReturnValue(false);
 
     mockRequestAnimationFrame = vi.spyOn(window, 'requestAnimationFrame').mockImplementation(() => 1);
+    mockRequestAnimationFrame.mockClear();
     vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {});
 
     // Create a mock canvas context
@@ -55,13 +56,19 @@ describe('HeroOrb Component', () => {
   });
 
   it('starts animation loop when in view', () => {
+    vi.useFakeTimers();
     render(<HeroOrb />);
+    vi.advanceTimersByTime(600); // Advance past bootTimer
     expect(mockRequestAnimationFrame).toHaveBeenCalled();
+    vi.useRealTimers();
   });
 
   it('does not animate when not in view', () => {
+    vi.useFakeTimers();
     (useInView as unknown as ReturnType<typeof vi.fn>).mockReturnValue({ ref: vi.fn(), inView: false });
     render(<HeroOrb />);
+    vi.advanceTimersByTime(600); // Advance past bootTimer
     expect(mockRequestAnimationFrame).not.toHaveBeenCalled();
+    vi.useRealTimers();
   });
 });

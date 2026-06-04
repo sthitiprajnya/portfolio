@@ -9,6 +9,7 @@ import CountUp from 'react-countup';
 import { useInView } from 'react-intersection-observer';
 import { AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 const MatrixRain = lazy(() => import('@/components/canvas/MatrixRain'));
 const NetworkConnector = lazy(() => import('@/components/canvas/NetworkConnector'));
@@ -32,18 +33,46 @@ export function Hero() {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Day 28: Subtle parallax scroll effect
+  const [scrollY, setScrollY] = React.useState(0);
+  const prefersReducedMotion = usePrefersReducedMotion();
+
+  React.useEffect(() => {
+    if (prefersReducedMotion) return;
+
+    let rafId: number;
+    const handleScroll = () => {
+      rafId = requestAnimationFrame(() => {
+        setScrollY(window.scrollY);
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, [prefersReducedMotion]);
+
   return (
     <section
       id="hero"
       className="relative min-h-screen flex flex-col items-center justify-center pt-16 bg-[var(--gradient-hero)] overflow-hidden"
     >
-      <HeroOrb />
-      {/* Background effects */}
-      <Suspense fallback={null}>
-        <MatrixRain opacity={0.055} />
-        <NetworkConnector />
-      </Suspense>
-      <div className="absolute inset-0 scan-line-effect z-0" />
+      <div
+        className="absolute inset-0 z-0 pointer-events-none"
+        style={{
+          transform: prefersReducedMotion ? 'none' : `translateY(${scrollY * 0.15}px)`
+        }}
+      >
+        <HeroOrb />
+        {/* Background effects */}
+        <Suspense fallback={null}>
+          <MatrixRain opacity={0.055} />
+          <NetworkConnector />
+        </Suspense>
+      </div>
+      <div className="absolute inset-0 scan-line-effect z-0 pointer-events-none" />
 
       {/* ── Main content ── */}
       <div className="relative z-10 w-full max-w-[900px] px-6 flex flex-col items-center text-center flex-1 justify-center">

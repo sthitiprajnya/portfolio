@@ -1,8 +1,13 @@
 import { useEffect } from 'react';
 
-export function useFaviconBlink() {
+// Day 63: Add multiple blink patterns via prop
+export function useFaviconBlink(pattern: 'fast' | 'slow' | 'default' = 'default') {
   useEffect(() => {
     let isBlank = false;
+
+    let intervalTime = 800; // default
+    if (pattern === 'fast') intervalTime = 200;
+    else if (pattern === 'slow') intervalTime = 1000;
 
     const link = document.querySelector("link[rel~='icon']") as HTMLLinkElement || document.createElement('link');
     link.rel = 'icon';
@@ -21,8 +26,8 @@ export function useFaviconBlink() {
     };
 
     updateFavicon(); // Initial set
-    const intervalId = setInterval(updateFavicon, 800);
+    const intervalId = setInterval(updateFavicon, intervalTime);
 
     return () => clearInterval(intervalId);
-  }, []);
+  }, [pattern]);
 }

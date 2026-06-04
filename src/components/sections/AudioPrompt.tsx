@@ -23,6 +23,22 @@ export function AudioPrompt({ onComplete }: AudioPromptProps) {
     }
   }, [onComplete]);
 
+  const { voices, voiceURI, setVoiceURI, speak } = useAudio();
+
+  // Day 40: Persist Voice Preference
+  useEffect(() => {
+    const savedVoice = localStorage.getItem("sentinel-voice-preference");
+    if (savedVoice) {
+      setVoiceURI(savedVoice);
+    }
+  }, [setVoiceURI]);
+
+  const handleVoiceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newVoice = e.target.value;
+    setVoiceURI(newVoice);
+    localStorage.setItem("sentinel-voice-preference", newVoice);
+  };
+
   const handleChoice = () => {
     setAudioEnabled(true);
     setIsVisible(false);
@@ -31,6 +47,12 @@ export function AudioPrompt({ onComplete }: AudioPromptProps) {
     setTimeout(() => {
       onComplete();
     }, 400);
+  };
+
+  // Day 26: Preview Voice
+  const handlePreviewVoice = (e: React.MouseEvent) => {
+    e.stopPropagation(); // prevent clicking from triggering boot
+    speak("SENTINEL ONLINE. Voice test successful.");
   };
 
   if (!isVisible) return null;
@@ -56,13 +78,41 @@ export function AudioPrompt({ onComplete }: AudioPromptProps) {
                SENTINEL ONLINE
             </div>
 
+            <div className="mb-6 relative z-10 text-left">
+              <label htmlFor="voice-select" className="block text-xs text-text-muted mb-2 font-mono uppercase tracking-widest">
+                Select Audio Profile (Optional)
+              </label>
+              <div className="flex gap-2">
+                <select
+                  id="voice-select"
+                  value={voiceURI || ''}
+                  onChange={handleVoiceChange}
+                  className="flex-1 bg-black/50 border border-[var(--glass-border)] text-text-secondary text-xs rounded p-2 outline-none focus:border-cyan appearance-none cursor-pointer"
+                >
+                  <option value="">Default System Voice</option>
+                  {voices.map(voice => (
+                    <option key={voice.voiceURI} value={voice.voiceURI}>
+                      {voice.name} ({voice.lang})
+                    </option>
+                  ))}
+                </select>
+                <button
+                  onClick={handlePreviewVoice}
+                  className="px-3 bg-[rgba(0,245,255,0.1)] hover:bg-[rgba(0,245,255,0.2)] border border-[var(--glass-border)] hover:border-cyan text-cyan text-[0.65rem] rounded transition-colors whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-cyan uppercase tracking-widest font-bold"
+                  title="Test selected voice"
+                >
+                  Test
+                </button>
+              </div>
+            </div>
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
               <CyberButton
                 onClick={handleChoice}
                 color="cyan"
                 className="w-full"
               >
-                [ CLICK ANYWHERE TO BOOT SYSTEM ]
+                [ CLICK HERE TO BOOT SYSTEM ]
               </CyberButton>
             </div>
           </NeonBorder>

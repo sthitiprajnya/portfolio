@@ -5,13 +5,7 @@ import { SectionTitle }  from '@/components/ui/SectionTitle';
 import { ScrollReveal, fadeSlideUp, fadeSlideLeft } from '@/components/ui/ScrollReveal';
 import { useInView }     from 'react-intersection-observer';
 import { CTF_PROFILE }   from '@/data/portfolio';
-import dynamic from 'next/dynamic';
 import { LogoBadge } from '@/components/ui/LogoBadge';
-
-const Radar = dynamic(() => import('react-chartjs-2').then((mod) => mod.Radar), {
-  ssr: false,
-  loading: () => <div className="w-full h-full flex items-center justify-center font-mono text-[0.6rem] text-text-muted animate-pulse">LOADING_DATA_VIZ...</div>
-});
 
 // BOLT: Hoist static configurations and data transformations to module level
 const HTB_STATS = [
@@ -23,40 +17,55 @@ const HTB_STATS = [
   { label: 'Competitions',  value: CTF_PROFILE.competitions.length },
 ];
 
-const RADAR_DATA = {
-  labels: CTF_PROFILE.attackCategories.map(c => c.label.split(' ')[0]),
-  datasets: [{
-    label: 'Proficiency',
-    data: CTF_PROFILE.attackCategories.map(c => c.level),
-    backgroundColor: 'rgba(57, 255, 20, 0.2)',
-    borderColor: 'rgba(57, 255, 20, 0.8)',
-    pointBackgroundColor: 'rgba(57, 255, 20, 1)',
-    pointBorderColor: '#fff',
-  }]
-};
+// Day 34: SVG Donut Chart
+function SVGDunutChart({ data }: { data: { label: string; value: number; color: string }[] }) {
+  const total = React.useMemo(() => data.reduce((acc, cur) => acc + cur.value, 0), [data]);
 
-const RADAR_OPTIONS = {
-  scales: {
-    r: {
-      angleLines: { color: 'rgba(255,255,255,0.1)' },
-      grid: { color: 'rgba(255,255,255,0.1)' },
-      pointLabels: { color: '#7FA8C4', font: { family: 'JetBrains Mono', size: 9 } },
-      ticks: { display: false },
-      suggestedMin: 0,
-      suggestedMax: 100
-    }
-  },
-  plugins: { legend: { display: false } },
-  maintainAspectRatio: false
-};
+  let currentOffset = 0;
 
-import type { ChartData, ChartOptions } from 'chart.js';
-
-function RadarChartWrapper({ data, options }: { data: ChartData<'radar'>, options: ChartOptions<'radar'> }) {
-  const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
   return (
-    <div ref={ref} className="w-full h-full flex justify-center items-center">
-      {inView && <Radar data={data} options={{...options, animation: {duration: 2000}}} />}
+    <div className="flex flex-col items-center justify-center w-full">
+      <div className="relative w-48 h-48 mb-4">
+        <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
+          <circle cx="50" cy="50" r="40" fill="transparent" stroke="rgba(255,255,255,0.05)" strokeWidth="15" />
+
+          {data.map((item, index) => {
+            const percentage = (item.value / total) * 100;
+            const strokeDasharray = `${percentage} 100`;
+            const strokeDashoffset = -currentOffset;
+
+            currentOffset += percentage;
+
+            return (
+              <circle
+                key={index}
+                cx="50"
+                cy="50"
+                r="40"
+                fill="transparent"
+                stroke={item.color}
+                strokeWidth="15"
+                strokeDasharray={strokeDasharray}
+                strokeDashoffset={strokeDashoffset}
+                className="transition-all duration-1000 ease-out"
+              />
+            );
+          })}
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center flex-col">
+          <span className="font-display text-2xl font-bold text-white">{total}</span>
+          <span className="font-mono text-[0.55rem] text-text-muted uppercase tracking-widest">Solves</span>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap justify-center gap-3 mt-2">
+        {data.map((item, index) => (
+          <div key={index} className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }}></span>
+            <span className="font-mono text-[0.6rem] text-text-secondary uppercase">{item.label} <span className="opacity-50">({item.value})</span></span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -166,7 +175,13 @@ export function CTFStats() {
 
                  {/* Hexagonal Radar Chart mapped from same data */}
                  <div className="h-[240px] relative flex justify-center items-center">
-                   <RadarChartWrapper data={RADAR_DATA} options={RADAR_OPTIONS} />
+                   <SVGDunutChart data={[
+                     { label: 'Web', value: 35, color: '#00F5FF' }, // cyan
+                     { label: 'Crypto', value: 15, color: '#BF00FF' }, // violet
+                     { label: 'Pwn', value: 20, color: '#FF0055' }, // red
+                     { label: 'Misc', value: 12, color: '#FFB300' }, // amber
+                     { label: 'Forensics', value: 18, color: '#39FF14' } // green
+                   ]} />
                  </div>
               </div>
             </div>

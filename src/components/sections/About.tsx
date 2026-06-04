@@ -10,10 +10,14 @@ import { useInView } from 'react-intersection-observer';
 import { CyberButton } from '@/components/ui/CyberButton';
 import { TypewriterText } from '@/components/ui/TypewriterText';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useCardTilt } from '@/hooks/useCardTilt';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
-export function About() {
+export const About = React.memo(function About() {
   const { ref: bioRef, inView: bioInView } = useInView({ triggerOnce: true, threshold: 0.2 });
   const [copied, setCopied] = React.useState(false);
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const { ref: tiltRef, rotateX, rotateY } = useCardTilt();
 
   const handleCopyEmail = () => {
     navigator.clipboard.writeText(PERSONAL.email);
@@ -40,17 +44,24 @@ export function About() {
 
           {/* ── Left column: terminal biometric avatar ── */}
           <ScrollReveal variants={fadeSlideUp} className="order-2 lg:order-1" data-orb-target="true">
-            <AsciiAvatar className="w-full max-w-sm mx-auto lg:mx-0" />
+            {/* Day 29: Added hover tilt effect to profile card wrapper */}
+            <div
+              ref={tiltRef as React.RefObject<HTMLDivElement>}
+              className="transition-transform duration-300 ease-out"
+              style={prefersReducedMotion ? {} : { transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`, transformStyle: 'preserve-3d' }}
+            >
+              <AsciiAvatar className="w-full max-w-sm mx-auto lg:mx-0" />
 
-            {/* Availability badge beneath avatar */}
-            <div className="mt-6 flex items-center space-x-3">
-              <span className="relative flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green opacity-75" />
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-green" />
-              </span>
-              <span className="font-mono text-[0.7rem] text-green uppercase tracking-widest">
-                OPEN TO OPPORTUNITIES — CLOUD SEC · APPSEC · RED TEAM
-              </span>
+              {/* Availability badge beneath avatar */}
+              <div className="mt-6 flex items-center space-x-3">
+                <span className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green opacity-75" />
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-green" />
+                </span>
+                <span className="font-mono text-[0.7rem] text-green uppercase tracking-widest">
+                  OPEN TO OPPORTUNITIES — CLOUD SEC · APPSEC · RED TEAM
+                </span>
+              </div>
             </div>
           </ScrollReveal>
 
@@ -123,4 +134,4 @@ export function About() {
       </div>
     </section>
   );
-}
+});

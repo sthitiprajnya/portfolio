@@ -167,6 +167,8 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
               </a>
             ) : (
               <div
+                role="img"
+                aria-label="Classified project indicator"
                 className="group/lock relative ml-4 flex-shrink-0 cursor-help outline-none focus-visible:ring-2 focus-visible:ring-amber focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-sm"
                 onClick={(e) => e.stopPropagation()}
                 tabIndex={0}

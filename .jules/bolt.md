@@ -65,3 +65,7 @@
 ## 2025-05-20 - [Memory Leak in Reused Canvas Buckets]
 **Learning:** Reusing pre-allocated arrays (buckets) to minimize GC pressure is effective, but failing to clear them at the start of every frame (e.g., via `array.length = 0`) causes coordinate data to accumulate infinitely. This leads to a massive memory leak and linear performance degradation as the number of elements to draw increases every frame.
 **Action:** Always ensure reused arrays in animation loops are reset at the start of each frame. Setting `.length = 0` is the most efficient way to clear an array while retaining the underlying memory allocation.
+
+## 2025-05-21 - [Hoisting and Memoization for List Items]
+**Learning:** In components that are rendered frequently or in large lists (like `SkillBadge` within the `Skills` section), redundant arithmetic, object allocations, and (N)$ array lookups inside the render body accumulate significant overhead. Furthermore, when parent components trigger re-renders due to filtering or layout updates, all children re-render by default even if their props are unchanged.
+**Action:** Hoist all static configurations, `useInView` options, geometric constants, and lookup logic (preferring `Map`/`Set` for (1)$) to the module level. Wrap list item components in `React.memo` to ensure they only re-render when their specific data actually changes, drastically reducing the total work React performs during filter transitions.

@@ -7,15 +7,15 @@ import { PERSONAL }    from '@/data/portfolio';
 import { useAudio }    from '@/components/providers/AudioProvider';
 
 export const NAV_LINKS = [
-  { label: 'About',    id: 'about'    },
-  { label: 'Skills',   id: 'skills'   },
-  { label: 'XP',       id: 'experience'},
+  { label: 'About',    id: 'about' },
+  { label: 'Skills',   id: 'skills' },
+  { label: 'XP',       id: 'experience', ariaLabel: 'Experience' },
   { label: 'Projects', id: 'projects' },
-  { label: 'Certs',    id: 'certifications' },
-  { label: 'War Games',id: 'ctf'      },
-  { label: 'GitHub',   id: 'github'   },
-  { label: 'Resume',   id: 'resume'   },
-  { label: 'Contact',  id: 'contact'  },
+  { label: 'Certs',    id: 'certifications', ariaLabel: 'Certifications' },
+  { label: 'War Games', id: 'ctf', ariaLabel: 'War Games / CTF' },
+  { label: 'GitHub',   id: 'github' },
+  { label: 'Resume',   id: 'resume' },
+  { label: 'Contact',  id: 'contact' },
 ];
 
 export function Navigation() {
@@ -146,7 +146,7 @@ export function Navigation() {
                         'relative font-mono text-[0.72rem] uppercase tracking-widest py-2 px-3 transition-colors group outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black',
                         isActive ? 'text-cyan glass-pill rounded-pill border-b-2 border-cyan' : 'text-text-secondary hover:text-cyan rounded-pill border-b-2 border-transparent'
                       )}
-                      aria-label={`Scroll to ${link.label} section`}
+                      aria-label={`Scroll to ${link.ariaLabel || link.label} section`}
                       aria-current={isActive ? 'page' : undefined}
                     >
                       {link.label}
@@ -228,7 +228,7 @@ export function Navigation() {
                         'group flex items-center w-full p-4 rounded-card outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black font-mono transition-all',
                         activeSection === link.id ? 'bg-cyan/10 text-cyan border border-cyan/20' : 'hover:bg-white/5 text-text-secondary hover:text-white border border-transparent'
                       )}
-                      aria-label={`Scroll to ${link.label} section`}
+                      aria-label={`Scroll to ${link.ariaLabel || link.label} section`}
                       aria-current={activeSection === link.id ? 'page' : undefined}
                     >
                       <span className="opacity-40 mr-4 text-xs w-8 group-hover:text-cyan transition-colors">

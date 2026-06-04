@@ -21,6 +21,7 @@ export default function LiviePanel({ onClose }: { onClose: () => void }) {
   const [loading, setLoading]     = useState(false);
   const bottomRef                 = useRef<HTMLDivElement>(null);
   const inputRef                  = useRef<HTMLInputElement>(null);
+  const lastMessageTime           = useRef<number>(0);
   const { speak }                 = useAudio();
 
   useEffect(() => {
@@ -34,10 +35,14 @@ export default function LiviePanel({ onClose }: { onClose: () => void }) {
 
   async function send() {
     const text = input.trim();
-    if (!text || loading) return;
+    const now = Date.now();
+    // Security: Enforce a 2-second rate limit between messages and prevent race conditions via loading state
+    if (!text || loading || now - lastMessageTime.current < 2000) return;
 
+    lastMessageTime.current = now;
     const userMsg: Message = { role: 'user', content: text };
-    setMessages(prev => [...prev, userMsg]);
+    // Security: Limit message history to 50 entries to prevent client-side memory exhaustion (DoS mitigation)
+    setMessages(prev => [...prev, userMsg].slice(-50));
     setInput('');
     setLoading(true);
 
@@ -45,7 +50,8 @@ export default function LiviePanel({ onClose }: { onClose: () => void }) {
       // Simulate API call delay
       await new Promise(r => setTimeout(r, 900 + Math.random() * 600));
       const reply = generateDynamicSpeech(text);
-      setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
+      const assistantMsg: Message = { role: 'assistant', content: reply };
+      setMessages(prev => [...prev, assistantMsg].slice(-50));
       speak(reply);
     } catch {
       const errorReply = 'NETWORK_ERROR. Try again.';

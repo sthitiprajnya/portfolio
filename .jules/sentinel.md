@@ -19,3 +19,8 @@
 **Vulnerability:** Overly permissive iframe sandboxing and missing restrictive Permissions Policy on static asset viewers (like PDF resumes).
 **Learning:** Even if a file is trusted, providing `allow-scripts` in a sandbox when not strictly required (e.g., for PDF.js vs native browser viewer) violates the principle of least privilege. Additionally, the lack of a Permissions Policy (the `allow` attribute) on iframes leaves the door open for hardware API abuse if the source is compromised.
 **Prevention:** Always use the most restrictive `sandbox` possible (e.g., omit `allow-scripts` for static documents) and explicitly block hardware/geolocation APIs using the `allow` attribute on all iframes. Position the CSP meta tag as the first child of `<head>` to ensure policies are active before secondary resources are parsed.
+
+## 2025-05-25 - Client-Side DoS via Animation State
+**Vulnerability:** Unbounded memory growth in high-frequency Canvas animation loops.
+**Learning:** Performance optimizations that reuse global arrays (like buckets for connection drawing) can introduce security risks if the state is not reset every frame. In this case, `NetworkConnector.tsx` was pushing to arrays without clearing them, leading to an O(n*frames) memory leak that could crash the tab.
+**Prevention:** Ensure all state used within `requestAnimationFrame` or high-frequency intervals is strictly bounded or explicitly cleared at the start of every iteration. Use `array.length = 0` as an efficient way to clear reused arrays while avoiding GC pressure.

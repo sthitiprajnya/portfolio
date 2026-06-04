@@ -8,7 +8,7 @@ import clsx from 'clsx';
 import dynamic from 'next/dynamic';
 import { useInView } from 'react-intersection-observer';
 
-const Radar = dynamic(() => import('@/components/ui/RadarChart'), {
+const RadarChart = dynamic(() => import('@/components/ui/RadarChart'), {
   ssr: false,
   loading: () => <div className="w-full h-full flex items-center justify-center font-mono text-[0.6rem] text-text-muted animate-pulse">LOADING_DATA_VIZ...</div>
 });
@@ -122,7 +122,7 @@ export function Skills() {
                [ DOMAIN_PROFICIENCY_RADAR ]
              </div>
              {chartInView && (
-               <Radar
+               <RadarChart
                  data={RADAR_DATA}
                  options={RADAR_OPTIONS}
                />

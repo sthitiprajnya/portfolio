@@ -6,31 +6,12 @@ import { ScrollReveal, fadeSlideUp, containerStagger } from '@/components/ui/Scr
 import { SKILLS } from '@/data/portfolio';
 import clsx from 'clsx';
 import dynamic from 'next/dynamic';
+import { useInView } from 'react-intersection-observer';
 
-const Radar = dynamic(() => import('react-chartjs-2').then((mod) => mod.Radar), {
+const RadarChart = dynamic(() => import('@/components/ui/RadarChart'), {
   ssr: false,
   loading: () => <div className="w-full h-full flex items-center justify-center font-mono text-[0.6rem] text-text-muted animate-pulse">LOADING_DATA_VIZ...</div>
 });
-
-import {
-  Chart as ChartJS,
-  RadialLinearScale,
-  PointElement,
-  LineElement,
-  Filler,
-  Tooltip,
-  Legend,
-} from 'chart.js';
-import { useInView } from 'react-intersection-observer';
-
-ChartJS.register(
-  RadialLinearScale,
-  PointElement,
-  LineElement,
-  Filler,
-  Tooltip,
-  Legend
-);
 
 // Generate flat list of tags for marquee outside component to avoid redundant allocations on every render
 const MARQUEE_TAGS = [
@@ -141,7 +122,7 @@ export function Skills() {
                [ DOMAIN_PROFICIENCY_RADAR ]
              </div>
              {chartInView && (
-               <Radar
+               <RadarChart
                  data={RADAR_DATA}
                  options={RADAR_OPTIONS}
                />

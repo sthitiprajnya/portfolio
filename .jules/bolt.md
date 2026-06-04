@@ -69,3 +69,7 @@
 ## 2025-05-21 - [Hoisting and Memoization for List Items]
 **Learning:** In components that are rendered frequently or in large lists (like `SkillBadge` within the `Skills` section), redundant arithmetic, object allocations, and (N)$ array lookups inside the render body accumulate significant overhead. Furthermore, when parent components trigger re-renders due to filtering or layout updates, all children re-render by default even if their props are unchanged.
 **Action:** Hoist all static configurations, `useInView` options, geometric constants, and lookup logic (preferring `Map`/`Set` for (1)$) to the module level. Wrap list item components in `React.memo` to ensure they only re-render when their specific data actually changes, drastically reducing the total work React performs during filter transitions.
+
+## 2025-06-04 - [Eliminating Layout Thrashing and Per-Frame Color Parsing in Sentinel]
+**Learning:** In high-frequency (60fps) Canvas 2D animation loops, repeatedly calling `getBoundingClientRect()` and `window.scrollY` for proximity checks causes significant layout thrashing. Furthermore, parsing RGBA strings using regex inside the `draw` loop adds unnecessary CPU overhead.
+**Action:** Always cache vertical positions of target elements (like `#ctf`) in a `useRef` and update them only during `resize` or specific events. Pre-parse all static color themes at the module level into numeric objects to eliminate string manipulation and regex execution during animation frames.

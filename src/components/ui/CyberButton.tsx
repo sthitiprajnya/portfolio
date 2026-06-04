@@ -2,12 +2,23 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 
-interface CyberButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+type CyberButtonBaseProps = {
+  children: React.ReactNode;
+  className?: string;
   color?: 'cyan' | 'green' | 'amber';
-  as?: 'button' | 'a';
-  href?: string;
-  download?: string | boolean;
-}
+};
+
+type CyberButtonAsButtonProps = CyberButtonBaseProps &
+  React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    as?: 'button';
+  };
+
+type CyberButtonAsAnchorProps = CyberButtonBaseProps &
+  React.AnchorHTMLAttributes<HTMLAnchorElement> & {
+    as: 'a';
+  };
+
+export type CyberButtonProps = CyberButtonAsButtonProps | CyberButtonAsAnchorProps;
 
 export function CyberButton({
   children,
@@ -49,15 +60,17 @@ export function CyberButton({
   );
 
   if (as === 'a') {
+    const { ...anchorProps } = props as React.AnchorHTMLAttributes<HTMLAnchorElement>;
     return (
-      <a className={baseClasses} {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}>
+      <a className={baseClasses} {...anchorProps}>
         {innerContent}
       </a>
     );
   }
 
+  const { type, ...buttonProps } = props as React.ButtonHTMLAttributes<HTMLButtonElement>;
   return (
-    <button className={baseClasses} {...props}>
+    <button type={type || 'button'} className={baseClasses} {...buttonProps}>
       {innerContent}
     </button>
   );

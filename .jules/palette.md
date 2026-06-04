@@ -9,3 +9,7 @@
 ## 2025-05-15 - [Audio Toggle & Feedback]
 **Learning:** Users need clear control over automated audio/speech features. Persistent audio settings (via localStorage) and an easily accessible toggle improve the user experience significantly. Furthermore, providing visual feedback (like a pulse indicator) when the system is "speaking" helps users understand the state of the application even when muted or in noisy environments.
 **Action:** Implement global audio toggles for applications with speech synthesis. Use visual indicators to represent non-visual output states and ensure immediate cancellation of output upon muting.
+
+## 2026-06-03 - [Search Interface Polish & A11y]
+**Learning:** Providing a conditional "Clear search" button in filtered interfaces significantly reduces friction for users, especially when paired with automatic re-focusing of the input. Additionally, for screen reader accessibility, dynamic result lists must be accompanied by `aria-live` announcements of the result count to ensure users are aware of the system's state changes.
+**Action:** Always include a reset mechanism for search/filter inputs and use `aria-live="polite"` regions to announce filtered result counts.

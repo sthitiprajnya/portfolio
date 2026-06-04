@@ -24,3 +24,8 @@
 **Vulnerability:** Unbounded memory growth in high-frequency Canvas animation loops.
 **Learning:** Performance optimizations that reuse global arrays (like buckets for connection drawing) can introduce security risks if the state is not reset every frame. In this case, `NetworkConnector.tsx` was pushing to arrays without clearing them, leading to an O(n*frames) memory leak that could crash the tab.
 **Prevention:** Ensure all state used within `requestAnimationFrame` or high-frequency intervals is strictly bounded or explicitly cleared at the start of every iteration. Use `array.length = 0` as an efficient way to clear reused arrays while avoiding GC pressure.
+
+## 2026-06-04 - Client-Side DoS via Terminal State
+**Vulnerability:** Unbounded growth of React state arrays representing terminal output lines and command history.
+**Learning:** Interactive components that simulate long-running processes (like a terminal or chat bot) can lead to browser memory exhaustion if users or malicious scripts flood them with entries.
+**Prevention:** Always cap state arrays that are updated via user input or automated responses using `.slice(-LIMIT)`. This ensures the application remains responsive and stable regardless of interaction volume.

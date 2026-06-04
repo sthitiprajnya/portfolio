@@ -185,7 +185,7 @@ export function CommandPalette() {
                   <span className="ml-1">Select</span>
                 </span>
               </div>
-              <span className="opacity-50">v2.0_SYSTEM_NAV</span>
+              <span className="opacity-50" aria-hidden="true">v2.0_SYSTEM_NAV</span>
             </div>
           </motion.div>
         </div>

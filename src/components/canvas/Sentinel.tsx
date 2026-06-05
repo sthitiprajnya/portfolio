@@ -34,87 +34,55 @@ interface ParsedTheme {
 const BASE_GLOW = 20;
 const MAX_GLOW = 60;
 
-const SECTION_THEMES: Record<string, ParsedTheme> = {
-  hero: {
-    core: { r: 0, g: 245, b: 255, a: 1 },
-    mid: { r: 0, g: 200, b: 255, a: 0.4 },
-    halo: { r: 0, g: 245, b: 255, a: 0.08 },
-    specular: { r: 255, g: 255, b: 255, a: 0.9 }
-  },
-  about: {
-    core: { r: 191, g: 0, b: 255, a: 1 },
-    mid: { r: 160, g: 0, b: 220, a: 0.4 },
-    halo: { r: 191, g: 0, b: 255, a: 0.08 },
-    specular: { r: 220, g: 180, b: 255, a: 0.8 }
-  },
-  skills: {
-    core: { r: 57, g: 255, b: 20, a: 1 },
-    mid: { r: 40, g: 200, b: 10, a: 0.4 },
-    halo: { r: 57, g: 255, b: 20, a: 0.08 },
-    specular: { r: 200, g: 255, b: 180, a: 0.8 }
-  },
-  experience: {
-    core: { r: 255, g: 179, b: 0, a: 1 },
-    mid: { r: 220, g: 150, b: 0, a: 0.4 },
-    halo: { r: 255, g: 179, b: 0, a: 0.08 },
-    specular: { r: 255, g: 240, b: 180, a: 0.8 }
-  },
-  projects: {
-    core: { r: 0, g: 245, b: 255, a: 1 },
-    mid: { r: 0, g: 180, b: 255, a: 0.5 },
-    halo: { r: 0, g: 245, b: 255, a: 0.10 },
-    specular: { r: 255, g: 255, b: 255, a: 0.9 }
-  },
-  writeups: {
-    core: { r: 255, g: 0, b: 85, a: 1 },
-    mid: { r: 220, g: 0, b: 60, a: 0.4 },
-    halo: { r: 255, g: 0, b: 85, a: 0.08 },
-    specular: { r: 255, g: 180, b: 180, a: 0.8 }
-  },
-  certifications: {
-    core: { r: 0, g: 245, b: 255, a: 1 },
-    mid: { r: 0, g: 200, b: 255, a: 0.4 },
-    halo: { r: 0, g: 245, b: 255, a: 0.08 },
-    specular: { r: 255, g: 255, b: 255, a: 0.9 }
-  },
-  ctf: {
-    core: { r: 255, g: 0, b: 85, a: 1 },
-    mid: { r: 200, g: 0, b: 60, a: 0.5 },
-    halo: { r: 255, g: 0, b: 85, a: 0.10 },
-    specular: { r: 255, g: 200, b: 200, a: 0.8 }
-  },
-  github: {
-    core: { r: 57, g: 255, b: 20, a: 1 },
-    mid: { r: 40, g: 200, b: 10, a: 0.4 },
-    halo: { r: 57, g: 255, b: 20, a: 0.08 },
-    specular: { r: 200, g: 255, b: 180, a: 0.8 }
-  },
-  resume: {
-    core: { r: 255, g: 179, b: 0, a: 1 },
-    mid: { r: 220, g: 150, b: 0, a: 0.4 },
-    halo: { r: 255, g: 179, b: 0, a: 0.08 },
-    specular: { r: 255, g: 240, b: 180, a: 0.8 }
-  },
-  contact: {
-    core: { r: 0, g: 245, b: 255, a: 1 },
-    mid: { r: 0, g: 220, b: 255, a: 0.5 },
-    halo: { r: 0, g: 245, b: 255, a: 0.12 },
-    specular: { r: 255, g: 255, b: 255, a: 0.9 }
-  },
-};
-
-const VIOLET_THEME: ParsedTheme = {
-  core: { r: 191, g: 0, b: 255, a: 1 },
-  mid: { r: 160, g: 0, b: 220, a: 0.4 },
-  halo: { r: 191, g: 0, b: 255, a: 0.08 },
-  specular: { r: 220, g: 180, b: 255, a: 0.8 }
-};
-
-const DEFAULT_THEME = SECTION_THEMES.hero;
-
 function lerpColor(current: number, target: number, factor: number) {
   return current + (target - current) * factor;
 }
+
+function parseRgba(rgba: string) {
+  const match = rgba.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+  if (!match) return { r: 0, g: 0, b: 0, a: 1 };
+  return {
+    r: parseInt(match[1], 10),
+    g: parseInt(match[2], 10),
+    b: parseInt(match[3], 10),
+    a: match[4] !== undefined ? parseFloat(match[4]) : 1,
+  };
+}
+
+const SECTION_THEMES: Record<string, {
+  core: string;       // rgba for the solid inner core
+  mid: string;        // rgba for mid-glow ring
+  halo: string;       // rgba for outer halo
+  specular: string;   // rgba for highlight
+}> = {
+  hero:           { core: 'rgba(0,245,255,1)',   mid: 'rgba(0,200,255,0.4)', halo: 'rgba(0,245,255,0.08)', specular: 'rgba(255,255,255,0.9)' },
+  about:          { core: 'rgba(191,0,255,1)',   mid: 'rgba(160,0,220,0.4)', halo: 'rgba(191,0,255,0.08)', specular: 'rgba(220,180,255,0.8)' },
+  skills:         { core: 'rgba(57,255,20,1)',   mid: 'rgba(40,200,10,0.4)', halo: 'rgba(57,255,20,0.08)', specular: 'rgba(200,255,180,0.8)' },
+  experience:     { core: 'rgba(255,179,0,1)',   mid: 'rgba(220,150,0,0.4)', halo: 'rgba(255,179,0,0.08)', specular: 'rgba(255,240,180,0.8)' },
+  projects:       { core: 'rgba(0,245,255,1)',   mid: 'rgba(0,180,255,0.5)', halo: 'rgba(0,245,255,0.10)', specular: 'rgba(255,255,255,0.9)' },
+  writeups:       { core: 'rgba(255,0,85,1)',    mid: 'rgba(220,0,60,0.4)',  halo: 'rgba(255,0,85,0.08)',  specular: 'rgba(255,180,180,0.8)' },
+  certifications: { core: 'rgba(0,245,255,1)',   mid: 'rgba(0,200,255,0.4)', halo: 'rgba(0,245,255,0.08)', specular: 'rgba(255,255,255,0.9)' },
+  ctf:            { core: 'rgba(255,0,85,1)',    mid: 'rgba(200,0,60,0.5)',  halo: 'rgba(255,0,85,0.10)',  specular: 'rgba(255,200,200,0.8)' },
+  github:         { core: 'rgba(57,255,20,1)',   mid: 'rgba(40,200,10,0.4)', halo: 'rgba(57,255,20,0.08)', specular: 'rgba(200,255,180,0.8)' },
+  resume:         { core: 'rgba(255,179,0,1)',   mid: 'rgba(220,150,0,0.4)', halo: 'rgba(255,179,0,0.08)', specular: 'rgba(255,240,180,0.8)' },
+  contact:        { core: 'rgba(0,245,255,1)',   mid: 'rgba(0,220,255,0.5)', halo: 'rgba(0,245,255,0.12)', specular: 'rgba(255,255,255,0.9)' },
+};
+
+// BOLT: Pre-parse color themes into numeric objects at the module level to avoid regex and string parsing in 60fps loop.
+const PARSED_SECTION_THEMES = Object.fromEntries(
+  Object.entries(SECTION_THEMES).map(([key, theme]) => [
+    key,
+    {
+      core: parseRgba(theme.core),
+      mid: parseRgba(theme.mid),
+      halo: parseRgba(theme.halo),
+      specular: parseRgba(theme.specular),
+    }
+  ])
+);
+
+const DEFAULT_THEME = PARSED_SECTION_THEMES.hero;
+const VIOLET_THEME = PARSED_SECTION_THEMES.about;
 
 const SWEEP_AMPLITUDE = 60; // Max horizontal pixel offset
 const SWEEP_FREQUENCY = 0.005; // Frequency of sine wave relative to scroll
@@ -126,7 +94,7 @@ export default function Sentinel() {
   const prefersReducedMotion = usePrefersReducedMotion();
   // BOLT: Cache target positions to avoid layout thrashing (getBoundingClientRect) in the 60fps loop
   const targetCacheRef = useRef<TargetCache[]>([]);
-  const ctfCenterYRef = useRef<number>(0);
+  const ctfCenterYRef = useRef<number | null>(null);
 
   const stateRef = useRef<OrbState>({
     y: 0,
@@ -138,7 +106,7 @@ export default function Sentinel() {
     trailIndex: 0,
   });
 
-  const targetThemeRef = useRef(DEFAULT_THEME);
+  const targetThemeRef = useRef<ParsedTheme>(DEFAULT_THEME);
   const colorProximityRef = useRef(0);
 
   // Day 12: Ring ripple state
@@ -168,8 +136,9 @@ export default function Sentinel() {
 
     // BOLT: Centralized cache update to keep the animation loop layout-free
     const updateTargetCache = () => {
-      const targets = document.querySelectorAll('[data-orb-target]');
       const scrollY = window.scrollY;
+
+      const targets = document.querySelectorAll('[data-orb-target]');
       targetCacheRef.current = Array.from(targets).map(target => {
         const rect = target.getBoundingClientRect();
         return {
@@ -177,7 +146,6 @@ export default function Sentinel() {
         };
       });
 
-      // Cache #ctf position
       const ctfElement = document.getElementById('ctf');
       if (ctfElement) {
         const rect = ctfElement.getBoundingClientRect();
@@ -205,8 +173,8 @@ export default function Sentinel() {
       entries.forEach(entry => {
         if (entry.isIntersecting && entry.intersectionRatio > 0.3) {
           const id = entry.target.id;
-          if (SECTION_THEMES[id]) {
-            targetThemeRef.current = SECTION_THEMES[id];
+          if (PARSED_SECTION_THEMES[id]) {
+            targetThemeRef.current = PARSED_SECTION_THEMES[id];
           }
         }
       });
@@ -236,12 +204,12 @@ export default function Sentinel() {
     };
 
     // Day 8: Proximity for #ctf element specifically to shift color to violet
+    // BOLT: Optimized to use cached document-relative Y position, eliminating per-frame layout thrashing.
     const checkCtfProximity = (currentY: number) => {
-      if (ctfCenterYRef.current === 0) return 0;
+      if (ctfCenterYRef.current === null) return 0;
 
-      const centerY = ctfCenterYRef.current;
       const viewportCenterY = currentY + height / 2;
-      const dist = Math.abs(centerY - viewportCenterY);
+      const dist = Math.abs(ctfCenterYRef.current - viewportCenterY);
 
       if (dist < 400) {
         return 1 - (dist / 400);
@@ -292,7 +260,7 @@ export default function Sentinel() {
       s.trail[s.trailIndex] = { x: cx, y: cy + s.y - stateRef.current.targetY }; // Adjusted for visual motion
       s.trailIndex = (s.trailIndex + 1) % 8;
 
-      // BOLT: Use pre-parsed numeric color values to avoid regex-based string parsing in the 60fps loop.
+      // BOLT: Use pre-parsed numeric color objects to avoid regex and string manipulation in the 60fps loop.
       const tCore = targetThemeRef.current.core;
       const tMid = targetThemeRef.current.mid;
       const tHalo = targetThemeRef.current.halo;

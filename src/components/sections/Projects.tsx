@@ -231,6 +231,7 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
                   onClick={(e) => { e.stopPropagation(); setShowMethodology(!showMethodology); }}
                   aria-expanded={showMethodology}
                   aria-controls={`methodology-${project.id}`}
+                  aria-label={showMethodology ? `Hide methodology for ${project.title}` : `View methodology for ${project.title}`}
                   className="w-full flex items-center justify-between p-2.5 bg-[rgba(0,245,255,0.05)] hover:bg-[rgba(0,245,255,0.1)] transition-colors font-mono text-[0.65rem] text-text-secondary uppercase tracking-widest outline-none focus-visible:ring-2 focus-visible:ring-cyan"
                 >
                   <span>{showMethodology ? 'HIDE_METHODOLOGY' : 'VIEW_METHODOLOGY'}</span>

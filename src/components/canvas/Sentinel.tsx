@@ -38,12 +38,6 @@ const SECTION_THEMES: Record<string, {
   resume:         { core: 'rgba(255,179,0,1)',   mid: 'rgba(220,150,0,0.4)', halo: 'rgba(255,179,0,0.08)', specular: 'rgba(255,240,180,0.8)' },
   contact:        { core: 'rgba(0,245,255,1)',   mid: 'rgba(0,220,255,0.5)', halo: 'rgba(0,245,255,0.12)', specular: 'rgba(255,255,255,0.9)' },
 };
-const DEFAULT_THEME = SECTION_THEMES.hero;
-
-function lerpColor(current: number, target: number, factor: number) {
-  return current + (target - current) * factor;
-}
-
 function parseRgba(rgba: string) {
   const match = rgba.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
   if (!match) return { r: 0, g: 0, b: 0, a: 1 };
@@ -54,6 +48,37 @@ function parseRgba(rgba: string) {
     a: match[4] !== undefined ? parseFloat(match[4]) : 1,
   };
 }
+
+// BOLT: Pre-parse static colors at module level to avoid regex and string parsing in 60fps loop
+const PARSED_SECTION_THEMES: Record<string, {
+  core: { r: number, g: number, b: number, a: number };
+  mid: { r: number, g: number, b: number, a: number };
+  halo: { r: number, g: number, b: number, a: number };
+  specular: { r: number, g: number, b: number, a: number };
+}> = {};
+
+for (const [key, value] of Object.entries(SECTION_THEMES)) {
+  PARSED_SECTION_THEMES[key] = {
+    core: parseRgba(value.core),
+    mid: parseRgba(value.mid),
+    halo: parseRgba(value.halo),
+    specular: parseRgba(value.specular),
+  };
+}
+
+const PARSED_VIOLET_THEME = {
+  core: parseRgba('rgba(191,0,255,1)'),
+  mid: parseRgba('rgba(160,0,220,0.4)'),
+  halo: parseRgba('rgba(191,0,255,0.08)'),
+  specular: parseRgba('rgba(220,180,255,0.8)'),
+};
+
+const DEFAULT_THEME = PARSED_SECTION_THEMES.hero;
+
+function lerpColor(current: number, target: number, factor: number) {
+  return current + (target - current) * factor;
+}
+
 const SWEEP_AMPLITUDE = 60; // Max horizontal pixel offset
 const SWEEP_FREQUENCY = 0.005; // Frequency of sine wave relative to scroll
 const LERP_FACTOR = 0.1; // Smoothness of scroll follow
@@ -135,8 +160,8 @@ export default function Sentinel() {
       entries.forEach(entry => {
         if (entry.isIntersecting && entry.intersectionRatio > 0.3) {
           const id = entry.target.id;
-          if (SECTION_THEMES[id]) {
-            targetThemeRef.current = SECTION_THEMES[id];
+          if (PARSED_SECTION_THEMES[id]) {
+            targetThemeRef.current = PARSED_SECTION_THEMES[id];
           }
         }
       });
@@ -224,11 +249,11 @@ export default function Sentinel() {
       s.trail[s.trailIndex] = { x: cx, y: cy + s.y - stateRef.current.targetY }; // Adjusted for visual motion
       s.trailIndex = (s.trailIndex + 1) % 8;
 
-      // Parse target colors
-      const tCore = parseRgba(targetThemeRef.current.core);
-      const tMid = parseRgba(targetThemeRef.current.mid);
-      const tHalo = parseRgba(targetThemeRef.current.halo);
-      const tSpec = parseRgba(targetThemeRef.current.specular);
+      // Use pre-parsed target colors directly
+      const tCore = targetThemeRef.current.core;
+      const tMid = targetThemeRef.current.mid;
+      const tHalo = targetThemeRef.current.halo;
+      const tSpec = targetThemeRef.current.specular;
 
       const cur = currentColorRef.current;
       const COLOR_LERP = 0.04;
@@ -254,11 +279,11 @@ export default function Sentinel() {
       cur.specB = lerpColor(cur.specB, tSpec.b, COLOR_LERP);
       cur.specA = lerpColor(cur.specA, tSpec.a, COLOR_LERP);
 
-      // Day 8: Apply violet override based on ctf proximity
-      const vCore = parseRgba('rgba(191,0,255,1)');
-      const vMid = parseRgba('rgba(160,0,220,0.4)');
-      const vHalo = parseRgba('rgba(191,0,255,0.08)');
-      const vSpec = parseRgba('rgba(220,180,255,0.8)');
+      // Day 8: Apply violet override based on ctf proximity using pre-parsed constants
+      const vCore = PARSED_VIOLET_THEME.core;
+      const vMid = PARSED_VIOLET_THEME.mid;
+      const vHalo = PARSED_VIOLET_THEME.halo;
+      const vSpec = PARSED_VIOLET_THEME.specular;
       const p = colorProximityRef.current;
 
       const finalCoreR = lerpColor(cur.coreR, vCore.r, p);

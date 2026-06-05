@@ -31,6 +31,7 @@ export function ResumePanel() {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleCopyLink = async () => {
     const link = window.location.origin + window.location.pathname + '#resume';
     try {

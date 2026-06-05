@@ -17,6 +17,20 @@ interface TargetCache {
   centerY: number; // Document-relative center Y
 }
 
+interface RgbaColor {
+  r: number;
+  g: number;
+  b: number;
+  a: number;
+}
+
+interface ParsedTheme {
+  core: RgbaColor;
+  mid: RgbaColor;
+  halo: RgbaColor;
+  specular: RgbaColor;
+}
+
 const BASE_GLOW = 20;
 const MAX_GLOW = 60;
 

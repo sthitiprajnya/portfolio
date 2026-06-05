@@ -124,12 +124,14 @@ export default function RootLayout({
                         const lower = s.toLowerCase();
                         if (
                           lower.includes('<script') ||
+                          lower.includes('<base') ||
                           lower.includes('javascript:') ||
-                          lower.includes('onerror=') ||
-                          lower.includes('onload=')
+                          /on[a-z]+=/.test(lower)
                         ) {
                           console.warn('Blocked dangerous HTML pattern in Trusted Types default policy');
-                          return s.replace(/<(script)/gi, '<blocked-$1').replace(/on(error|load)=/gi, 'blocked-$1=');
+                          return s
+                            .replace(/<(script|base)/gi, '<blocked-$1')
+                            .replace(/on([a-z]+)=/gi, 'blocked-$1=');
                         }
                       }
                       return s;

@@ -80,6 +80,20 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
     window.addEventListener('resize', resize, { passive: true });
     resize();
 
+    // Pre-calculate trail colors to avoid string concatenation in the loop
+    const trailLength = 12;
+    const trailColorsNormal = new Array(trailLength + 1);
+    const trailColorsGlitch = new Array(trailLength + 1);
+
+    for (let j = 1; j <= trailLength; j++) {
+      const ratio = j / trailLength;
+      const g = Math.round(245 - ratio * (245 - 85));
+      const b = Math.round(255 - ratio * (255 - 51));
+      const opacity = (1 - ratio).toFixed(2);
+      trailColorsNormal[j] = `rgba(0, ${g}, ${b}, ${opacity})`;
+      trailColorsGlitch[j] = `rgba(255, 0, 85, ${opacity})`;
+    }
+
     const draw = () => {
       // Semi-transparent black to create fade effect
       ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
@@ -89,29 +103,16 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
       const charCount = MATRIX_CHAR_LEN;
 
       for (let i = 0; i < dropsLen; i++) {
-        // BOLT: Cache calculations and hoist length lookups to optimize 60fps loop
         const x = xCoords[i];
         const y = drops[i] * fontSize;
-
-        // Day 6: Check for glitch column
         const isGlitchedCol = isGlitching && glitchedColumns.includes(i);
 
-        // Day 10: Second pass over trailing characters
-        const trailLength = 12;
-        for (let j = 1; j <= trailLength; j++) {
+        // Batch trail characters by color to minimize fillStyle changes
+        for (let j = trailLength; j >= 1; j--) {
           const trailY = y - j * fontSize;
           if (trailY < 0) continue;
 
-          const ratio = j / trailLength;
-          // Fade from cyan (0, 245, 255) to dark green (0, 85, 51)
-          const g = Math.round(245 - ratio * (245 - 85));
-          const b = Math.round(255 - ratio * (255 - 51));
-          const opacity = 1 - ratio;
-
-          ctx.fillStyle = isGlitchedCol
-            ? `rgba(255, 0, 85, ${opacity})`
-            : `rgba(0, ${g}, ${b}, ${opacity})`;
-
+          ctx.fillStyle = isGlitchedCol ? trailColorsGlitch[j] : trailColorsNormal[j];
           const trailText = MATRIX_CHARS[Math.floor(fastRand() * charCount)];
           ctx.fillText(trailText, x, trailY);
         }
@@ -124,7 +125,7 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
         // Reset drop if at bottom or randomly
         if (y > height && fastRand() > 0.975) {
           drops[i] = 0;
-          speeds[i] = 0.3 + fastRand() * 0.6; // Reset speed randomly
+          speeds[i] = 0.3 + fastRand() * 0.6;
         }
 
         // Move drop

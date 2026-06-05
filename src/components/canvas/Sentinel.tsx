@@ -20,6 +20,21 @@ interface TargetCache {
 const BASE_GLOW = 20;
 const MAX_GLOW = 60;
 
+function lerpColor(current: number, target: number, factor: number) {
+  return current + (target - current) * factor;
+}
+
+function parseRgba(rgba: string) {
+  const match = rgba.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+  if (!match) return { r: 0, g: 0, b: 0, a: 1 };
+  return {
+    r: parseInt(match[1], 10),
+    g: parseInt(match[2], 10),
+    b: parseInt(match[3], 10),
+    a: match[4] !== undefined ? parseFloat(match[4]) : 1,
+  };
+}
+
 const SECTION_THEMES: Record<string, {
   core: string;       // rgba for the solid inner core
   mid: string;        // rgba for mid-glow ring
@@ -39,54 +54,22 @@ const SECTION_THEMES: Record<string, {
   contact:        { core: 'rgba(0,245,255,1)',   mid: 'rgba(0,220,255,0.5)', halo: 'rgba(0,245,255,0.12)', specular: 'rgba(255,255,255,0.9)' },
 };
 
-function lerpColor(current: number, target: number, factor: number) {
-  return current + (target - current) * factor;
-}
+// BOLT: Pre-parse color themes into numeric objects at the module level to avoid regex and string parsing in 60fps loop.
+const PARSED_SECTION_THEMES = Object.fromEntries(
+  Object.entries(SECTION_THEMES).map(([key, theme]) => [
+    key,
+    {
+      core: parseRgba(theme.core),
+      mid: parseRgba(theme.mid),
+      halo: parseRgba(theme.halo),
+      specular: parseRgba(theme.specular),
+    }
+  ])
+);
 
-interface RgbaColor {
-  r: number;
-  g: number;
-  b: number;
-  a: number;
-}
+const DEFAULT_THEME = PARSED_SECTION_THEMES.hero;
+const VIOLET_THEME = PARSED_SECTION_THEMES.about;
 
-interface ParsedTheme {
-  core: RgbaColor;
-  mid: RgbaColor;
-  halo: RgbaColor;
-  specular: RgbaColor;
-}
-
-function parseRgba(rgba: string): RgbaColor {
-  const match = rgba.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
-  if (!match) return { r: 0, g: 0, b: 0, a: 1 };
-  return {
-    r: parseInt(match[1], 10),
-    g: parseInt(match[2], 10),
-    b: parseInt(match[3], 10),
-    a: match[4] !== undefined ? parseFloat(match[4]) : 1,
-  };
-}
-
-// BOLT: Pre-parse color themes at the module level to eliminate redundant regex execution and string parsing in the 60fps loop.
-const PARSED_THEMES = Object.entries(SECTION_THEMES).reduce((acc, [key, theme]) => {
-  acc[key] = {
-    core: parseRgba(theme.core),
-    mid: parseRgba(theme.mid),
-    halo: parseRgba(theme.halo),
-    specular: parseRgba(theme.specular),
-  };
-  return acc;
-}, {} as Record<string, ParsedTheme>);
-
-const DEFAULT_THEME = PARSED_THEMES.hero;
-
-const VIOLET_OVERRIDE = {
-  core: parseRgba('rgba(191,0,255,1)'),
-  mid: parseRgba('rgba(160,0,220,0.4)'),
-  halo: parseRgba('rgba(191,0,255,0.08)'),
-  specular: parseRgba('rgba(220,180,255,0.8)'),
-};
 const SWEEP_AMPLITUDE = 60; // Max horizontal pixel offset
 const SWEEP_FREQUENCY = 0.005; // Frequency of sine wave relative to scroll
 const LERP_FACTOR = 0.1; // Smoothness of scroll follow
@@ -97,7 +80,7 @@ export default function Sentinel() {
   const prefersReducedMotion = usePrefersReducedMotion();
   // BOLT: Cache target positions to avoid layout thrashing (getBoundingClientRect) in the 60fps loop
   const targetCacheRef = useRef<TargetCache[]>([]);
-  const ctfCenterYRef = useRef<number>(0);
+  const ctfCenterYRef = useRef<number | null>(null);
 
   const stateRef = useRef<OrbState>({
     y: 0,
@@ -139,8 +122,9 @@ export default function Sentinel() {
 
     // BOLT: Centralized cache update to keep the animation loop layout-free
     const updateTargetCache = () => {
-      const targets = document.querySelectorAll('[data-orb-target]');
       const scrollY = window.scrollY;
+
+      const targets = document.querySelectorAll('[data-orb-target]');
       targetCacheRef.current = Array.from(targets).map(target => {
         const rect = target.getBoundingClientRect();
         return {
@@ -148,9 +132,9 @@ export default function Sentinel() {
         };
       });
 
-      const ctf = document.getElementById('ctf');
-      if (ctf) {
-        const rect = ctf.getBoundingClientRect();
+      const ctfElement = document.getElementById('ctf');
+      if (ctfElement) {
+        const rect = ctfElement.getBoundingClientRect();
         ctfCenterYRef.current = rect.top + scrollY + rect.height / 2;
       }
     };
@@ -175,8 +159,8 @@ export default function Sentinel() {
       entries.forEach(entry => {
         if (entry.isIntersecting && entry.intersectionRatio > 0.3) {
           const id = entry.target.id;
-          if (PARSED_THEMES[id]) {
-            targetThemeRef.current = PARSED_THEMES[id];
+          if (PARSED_SECTION_THEMES[id]) {
+            targetThemeRef.current = PARSED_SECTION_THEMES[id];
           }
         }
       });
@@ -208,10 +192,10 @@ export default function Sentinel() {
     // Day 8: Proximity for #ctf element specifically to shift color to violet
     // BOLT: Optimized to use cached document-relative Y position, eliminating per-frame layout thrashing.
     const checkCtfProximity = (currentY: number) => {
-      const centerY = ctfCenterYRef.current;
-      if (centerY === 0) return 0;
+      if (ctfCenterYRef.current === null) return 0;
+
       const viewportCenterY = currentY + height / 2;
-      const dist = Math.abs(centerY - viewportCenterY);
+      const dist = Math.abs(ctfCenterYRef.current - viewportCenterY);
 
       if (dist < 400) {
         return 1 - (dist / 400);
@@ -262,7 +246,7 @@ export default function Sentinel() {
       s.trail[s.trailIndex] = { x: cx, y: cy + s.y - stateRef.current.targetY }; // Adjusted for visual motion
       s.trailIndex = (s.trailIndex + 1) % 8;
 
-      // BOLT: Use pre-parsed colors to avoid redundant regex parsing and string manipulation in the hot loop.
+      // BOLT: Use pre-parsed numeric color objects to avoid regex and string manipulation in the 60fps loop.
       const tCore = targetThemeRef.current.core;
       const tMid = targetThemeRef.current.mid;
       const tHalo = targetThemeRef.current.halo;
@@ -293,11 +277,10 @@ export default function Sentinel() {
       cur.specA = lerpColor(cur.specA, tSpec.a, COLOR_LERP);
 
       // Day 8: Apply violet override based on ctf proximity
-      // BOLT: Optimized to use pre-parsed VIOLET_OVERRIDE colors.
-      const vCore = VIOLET_OVERRIDE.core;
-      const vMid = VIOLET_OVERRIDE.mid;
-      const vHalo = VIOLET_OVERRIDE.halo;
-      const vSpec = VIOLET_OVERRIDE.specular;
+      const vCore = VIOLET_THEME.core;
+      const vMid = VIOLET_THEME.mid;
+      const vHalo = VIOLET_THEME.halo;
+      const vSpec = VIOLET_THEME.specular;
       const p = colorProximityRef.current;
 
       const finalCoreR = lerpColor(cur.coreR, vCore.r, p);

@@ -82,6 +82,7 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
       ctx.font = `${fontSize}px "JetBrains Mono", monospace`;
 
       columns = Math.floor(width / fontSize);
+      glitchedColumnsMask = new Uint8Array(columns);
 
       // BOLT: Use TypedArrays for better performance and memory efficiency in the hot loop.
       drops = new Float32Array(columns);
@@ -145,7 +146,7 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
         // Reset drop if at bottom or randomly
         if (y > height && fastRand() > 0.975) {
           drops[i] = 0;
-          speeds[i] = 0.3 + fastRand() * 0.6; // Reset speed randomly
+          speeds[i] = 0.3 + fastRand() * 0.6;
         }
         // Move drop
         drops[i] += speeds[i];

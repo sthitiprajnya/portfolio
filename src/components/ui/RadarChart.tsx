@@ -31,6 +31,8 @@ interface RadarChartProps {
   options: ChartOptions<'radar'>;
 }
 
-export default function RadarChart({ data, options }: RadarChartProps) {
+function RadarChartComponent({ data, options }: RadarChartProps) {
   return <Radar data={data} options={options} />;
 }
+
+export default React.memo(RadarChartComponent);

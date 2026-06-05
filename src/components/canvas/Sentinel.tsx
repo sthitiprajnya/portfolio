@@ -92,7 +92,7 @@ export default function Sentinel() {
     trailIndex: 0,
   });
 
-  const targetThemeRef = useRef(DEFAULT_THEME);
+  const targetThemeRef = useRef<ParsedTheme>(DEFAULT_THEME);
   const colorProximityRef = useRef(0);
 
   // Day 12: Ring ripple state
@@ -190,6 +190,7 @@ export default function Sentinel() {
     };
 
     // Day 8: Proximity for #ctf element specifically to shift color to violet
+    // BOLT: Optimized to use cached document-relative Y position, eliminating per-frame layout thrashing.
     const checkCtfProximity = (currentY: number) => {
       if (ctfCenterYRef.current === null) return 0;
 

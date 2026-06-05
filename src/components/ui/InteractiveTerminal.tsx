@@ -42,7 +42,7 @@ export function InteractiveTerminal({ className }: { className?: string }) {
     setIsProcessing(true);
     for (let i = 0; i < newOutputLines.length; i++) {
       await new Promise(r => setTimeout(r, delay));
-      // Security: Cap lines at 100 to prevent client-side DoS (memory exhaustion) from excessive output.
+      // Security: Limit terminal lines to 100 to prevent client-side memory exhaustion (DoS mitigation)
       setLines(prev => [...prev, { output: newOutputLines[i] }].slice(-100));
     }
     setIsProcessing(false);
@@ -55,13 +55,13 @@ export function InteractiveTerminal({ className }: { className?: string }) {
     const lowerCmd = trimmedCmd.toLowerCase();
 
     if (trimmedCmd) {
-      // Security: Cap history at 50 to prevent client-side DoS (memory exhaustion) from excessive history.
+      // Security: Limit command history to 50 entries to prevent memory exhaustion
       setCommandHistory(prev => [...prev, trimmedCmd].slice(-50));
       setHistoryIndex(-1);
     }
 
     const currentPromptLine: TerminalLine = { prompt: 'sthitaprajna@kali:~$', command: trimmedCmd, isInput: false };
-    // Security: Cap lines at 100 to prevent client-side DoS (memory exhaustion) from excessive output.
+    // Security: Limit terminal lines to 100 to prevent memory exhaustion
     setLines(prev => [...prev, currentPromptLine].slice(-100));
 
     let outputToDelay: string[] = [];

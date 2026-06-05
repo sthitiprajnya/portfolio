@@ -1,20 +1,60 @@
 @keyframes glitch-layer-1 {
-  0%   { clip-path: inset(20% 0 60% 0); transform: translate(-4px, 0) skewX(-2deg); }
-  20%  { clip-path: inset(45% 0 30% 0); transform: translate(4px, 0)  skewX(2deg); }
-  40%  { clip-path: inset(70% 0 5%  0); transform: translate(-2px, 0); }
-  100% { clip-path: inset(70% 0 5%  0); transform: translate(0, 0); }
+  0% {
+    clip-path: inset(20% 0 60% 0);
+    transform: translate(-4px, 0) skewX(-2deg);
+  }
+
+  20% {
+    clip-path: inset(45% 0 30% 0);
+    transform: translate(4px, 0) skewX(2deg);
+  }
+
+  40% {
+    clip-path: inset(70% 0 5% 0);
+    transform: translate(-2px, 0);
+  }
+
+  100% {
+    clip-path: inset(70% 0 5% 0);
+    transform: translate(0, 0);
+  }
 }
 
 @keyframes glitch-layer-2 {
-  0%   { clip-path: inset(60% 0 10% 0); transform: translate(4px, 0)  skewX(3deg);  color: var(--color-violet); }
-  30%  { clip-path: inset(10% 0 70% 0); transform: translate(-4px, 0) skewX(-3deg); color: var(--color-green); }
-  60%  { clip-path: inset(35% 0 45% 0); transform: translate(2px, 0);               color: var(--color-cyan); }
-  100% { clip-path: inset(35% 0 45% 0); transform: translate(0, 0); }
+  0% {
+    clip-path: inset(60% 0 10% 0);
+    transform: translate(4px, 0) skewX(3deg);
+    color: var(--color-violet);
+  }
+
+  30% {
+    clip-path: inset(10% 0 70% 0);
+    transform: translate(-4px, 0) skewX(-3deg);
+    color: var(--color-green);
+  }
+
+  60% {
+    clip-path: inset(35% 0 45% 0);
+    transform: translate(2px, 0);
+    color: var(--color-cyan);
+  }
+
+  100% {
+    clip-path: inset(35% 0 45% 0);
+    transform: translate(0, 0);
+  }
 }
 
 @keyframes button-scan {
-  0%   { top: -100%; opacity: 0.8; }
-  100% { top: 200%;  opacity: 0; }
+  0% {
+    top: -100%;
+    opacity: 0.8;
+  }
+
+  100% {
+    top: 200%;
+    opacity: 0;
+  }
 }
 
 .cyber-button::after {
@@ -23,13 +63,13 @@
   left: 0;
   width: 100%;
   height: 35%;
-  background: linear-gradient(transparent, rgba(0,245,255,0.2), transparent);
+  background: linear-gradient(transparent, rgba(0, 245, 255, 0.2), transparent);
   pointer-events: none;
   top: -100%;
 }
 
 .cyber-button:hover::after {
-  animation: button-scan 0.55s ease-in-out forwards;
+  animation: button-scan 0.55s var(--ease-out-quart) forwards;
 }
 
 .cyber-button:active {
@@ -42,14 +82,18 @@
 
 .hover-glow-card:hover {
   transform: perspective(1000px) rotateX(2deg) rotateY(2deg);
-  box-shadow: 0 0 20px rgba(0,245,255,0.15), inset 0 0 20px rgba(0,245,255,0.05);
-  border-color: rgba(0,245,255,0.4);
+  box-shadow: 0 0 20px rgba(0, 245, 255, 0.15), inset 0 0 20px rgba(0, 245, 255, 0.05);
+  border-color: rgba(0, 245, 255, 0.4);
 }
 
-
 @keyframes scan-line {
-  0% { top: 0; }
-  100% { top: 100%; }
+  0% {
+    top: 0;
+  }
+
+  100% {
+    top: 100%;
+  }
 }
 
 .scan-line-effect::after {
@@ -66,9 +110,17 @@
 }
 
 @keyframes text-shimmer {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .text-gradient-shimmer {
@@ -81,20 +133,78 @@
 }
 
 @keyframes cinematic-mask-reveal {
-  0% { clip-path: inset(100% 0 0 0); transform: translateY(15px); }
-  100% { clip-path: inset(0% 0 0 0); transform: translateY(0); }
+  0% {
+    clip-path: inset(100% 0 0 0);
+    transform: translateY(15px);
+    opacity: 0.4;
+  }
+
+  15% {
+    opacity: 1;
+  }
+
+  100% {
+    clip-path: inset(0% 0 0 0);
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .cinematic-reveal {
   animation: cinematic-mask-reveal 1.5s cubic-bezier(0.77, 0, 0.175, 1) forwards;
 }
+
+@keyframes ripple-expand {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes neon-border-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes glare-sweep {
+  0% {
+    transform: translateX(-150%) skewX(-15deg);
+  }
+
+  100% {
+    transform: translateX(250%) skewX(-15deg);
+  }
+}
+
 /* ── Livie Bot Animations ───────────────────────────── */
 @keyframes orbPulse {
-  0%, 100% { box-shadow: 0 0 12px rgba(0,245,255,0.5); }
-  50%      { box-shadow: 0 0 22px rgba(0,245,255,0.8), 0 0 40px rgba(0,245,255,0.2); }
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(0, 245, 255, 0.5);
+  }
+
+  50% {
+    box-shadow: 0 0 22px rgba(0, 245, 255, 0.8), 0 0 40px rgba(0, 245, 255, 0.2);
+  }
 }
 
 @keyframes typingDot {
-  0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
-  40%           { transform: translateY(-4px); opacity: 1; }
+  0%, 80%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+
+  40% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
 }

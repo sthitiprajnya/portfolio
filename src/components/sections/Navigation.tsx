@@ -7,15 +7,15 @@ import { PERSONAL }    from '@/data/portfolio';
 import { useAudio }    from '@/components/providers/AudioProvider';
 
 export const NAV_LINKS = [
-  { label: 'About',    id: 'about'    },
-  { label: 'Skills',   id: 'skills'   },
-  { label: 'XP',       id: 'experience'},
-  { label: 'Projects', id: 'projects' },
-  { label: 'Certs',    id: 'certifications' },
-  { label: 'War Games',id: 'ctf'      },
-  { label: 'GitHub',   id: 'github'   },
-  { label: 'Resume',   id: 'resume'   },
-  { label: 'Contact',  id: 'contact'  },
+  { label: 'About',     id: 'about'          },
+  { label: 'Skills',    id: 'skills'         },
+  { label: 'XP',        id: 'experience',     ariaLabel: 'Experience' },
+  { label: 'Projects',  id: 'projects'       },
+  { label: 'Certs',     id: 'certifications', ariaLabel: 'Certifications' },
+  { label: 'War Games', id: 'ctf'            },
+  { label: 'GitHub',    id: 'github'         },
+  { label: 'Resume',    id: 'resume'         },
+  { label: 'Contact',   id: 'contact'        },
 ];
 
 export function Navigation() {
@@ -125,8 +125,8 @@ export function Navigation() {
             <button
               onClick={openSearch}
               className="flex items-center gap-3 px-3 py-1.5 rounded-card border border-border text-text-secondary hover:text-cyan hover:border-cyan hover:shadow-[var(--glow-cyan-sm)] transition-all outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black group"
-              aria-label="Search sections"
-              aria-keyshortcuts="/"
+              aria-label="Search site sections"
+              aria-keyshortcuts="/ ?"
             >
               <svg className="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -146,7 +146,7 @@ export function Navigation() {
                         'relative font-mono text-[0.72rem] uppercase tracking-widest py-2 px-3 transition-colors group outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black',
                         isActive ? 'text-cyan glass-pill rounded-pill border-b-2 border-cyan' : 'text-text-secondary hover:text-cyan rounded-pill border-b-2 border-transparent'
                       )}
-                      aria-label={`Scroll to ${link.label} section`}
+                      aria-label={`Scroll to ${link.ariaLabel || link.label} section`}
                       aria-current={isActive ? 'page' : undefined}
                     >
                       {link.label}
@@ -156,7 +156,7 @@ export function Navigation() {
               })}
             </ul>
 
-            <CyberButton as="a" href={PERSONAL.resumeUrl} download color="green" className="py-2 px-4 text-[0.7rem]">
+            <CyberButton as="a" href={PERSONAL.resumeUrl} download color="green" className="py-2 px-4 text-[0.7rem]" aria-label="Download Resume (CV)">
               <span className="flex items-center gap-2">
                 CV
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -174,7 +174,7 @@ export function Navigation() {
             <button
               onClick={openSearch}
               className="text-text-secondary p-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card"
-              aria-label="Search sections"
+              aria-label="Search site sections"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -186,7 +186,7 @@ export function Navigation() {
               onClick={() => setMobileMenuOpen(true)}
               aria-expanded={mobileMenuOpen}
               aria-controls="mobile-menu"
-              aria-label="Open menu"
+              aria-label="Open navigation menu"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"/>
@@ -211,7 +211,7 @@ export function Navigation() {
           >
             <div className="flex justify-between items-center mb-10">
               <span className="font-display font-bold text-white tracking-widest text-sm">SYSTEM_MENU</span>
-              <button onClick={() => setMobileMenuOpen(false)} className="text-cyan p-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card" aria-label="Close menu">
+              <button onClick={() => setMobileMenuOpen(false)} className="text-cyan p-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card" aria-label="Close navigation menu">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
@@ -228,7 +228,7 @@ export function Navigation() {
                         'group flex items-center w-full p-4 rounded-card outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black font-mono transition-all',
                         activeSection === link.id ? 'bg-cyan/10 text-cyan border border-cyan/20' : 'hover:bg-white/5 text-text-secondary hover:text-white border border-transparent'
                       )}
-                      aria-label={`Scroll to ${link.label} section`}
+                      aria-label={`Scroll to ${link.ariaLabel || link.label} section`}
                       aria-current={activeSection === link.id ? 'page' : undefined}
                     >
                       <span className="opacity-40 mr-4 text-xs w-8 group-hover:text-cyan transition-colors">
@@ -242,7 +242,7 @@ export function Navigation() {
             </div>
 
             <motion.div className="mt-auto pt-8" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
-              <CyberButton as="a" href={PERSONAL.resumeUrl} download color="green" className="w-full">
+              <CyberButton as="a" href={PERSONAL.resumeUrl} download color="green" className="w-full" aria-label="Download Resume (CV)">
                 DOWNLOAD_CV
               </CyberButton>
             </motion.div>

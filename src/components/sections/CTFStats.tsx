@@ -47,7 +47,8 @@ const RADAR_OPTIONS = {
     }
   },
   plugins: { legend: { display: false } },
-  maintainAspectRatio: false
+  maintainAspectRatio: false,
+  animation: { duration: 2000 }
 };
 
 import type { ChartData, ChartOptions } from 'chart.js';
@@ -56,7 +57,7 @@ function RadarChartWrapper({ data, options }: { data: ChartData<'radar'>, option
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
   return (
     <div ref={ref} className="w-full h-full flex justify-center items-center">
-      {inView && <RadarChart data={data} options={{...options, animation: {duration: 2000}}} />}
+      {inView && <RadarChart data={data} options={options} />}
     </div>
   );
 }

@@ -1,3 +1,9 @@
+import withBundleAnalyzer from '@next/bundle-analyzer';
+
+const bundleAnalyzer = withBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+});
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Tells Next.js to produce a fully static export into the `out/` directory.
@@ -20,9 +26,11 @@ const nextConfig = {
     removeConsole: process.env?.NODE_ENV === 'production'
   },
 
+  reactStrictMode: true,
+
   experimental: {
-    optimizePackageImports: ['framer-motion'],
+    optimizePackageImports: ['framer-motion', 'chart.js', 'react-chartjs-2'],
   },
 };
 
-export default nextConfig;
+export default bundleAnalyzer(nextConfig);

@@ -31,6 +31,13 @@ export function ResumePanel() {
     }
   };
 
+  const handleCopyLink = () => {
+    const fullUrl = `${window.location.origin}${PERSONAL.resumeUrl}`;
+    handleCopy(fullUrl, 'Direct link');
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 2000);
+  };
+
   return (
     <section id="resume" className="py-24 bg-deep relative border-t border-border overflow-hidden">
 

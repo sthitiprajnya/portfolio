@@ -13,6 +13,37 @@ interface MatrixRainProps {
 const MATRIX_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-*/=%""\'#&_(),.;:?!\\|{}<>[]^~ｦｧｨｩｪｫｬｭｮｯｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0x&&||>><<'.split('');
 const MATRIX_CHAR_LEN = MATRIX_CHARS.length;
 
+// BOLT: Pre-calculate trail color strings at the module level to eliminate ~1,200 string allocations per frame.
+const TRAIL_LENGTH = 12;
+const TRAIL_COLORS = Array.from({ length: TRAIL_LENGTH + 1 }, (_, j) => {
+  if (j === 0) return '#FFFFFF'; // Lead character
+  const ratio = j / TRAIL_LENGTH;
+  // Fade from cyan (0, 245, 255) to dark green (0, 85, 51)
+  const g = Math.round(245 - ratio * (245 - 85));
+  const b = Math.round(255 - ratio * (255 - 51));
+  const opacity = 1 - ratio;
+  return `rgba(0, ${g}, ${b}, ${opacity})`;
+});
+
+const GLITCH_TRAIL_COLORS = Array.from({ length: TRAIL_LENGTH + 1 }, (_, j) => {
+  if (j === 0) return '#FFFFFF'; // Lead character remains white even in glitch
+  const ratio = j / TRAIL_LENGTH;
+  const opacity = 1 - ratio;
+  return `rgba(255, 0, 85, ${opacity})`;
+});
+
+// BOLT: Hoist random pool to module level to avoid redundant allocations and re-initialization on every mount.
+const RAND_POOL_SIZE = 2048;
+const randPool = new Float32Array(RAND_POOL_SIZE);
+let poolIdx = 0;
+for (let i = 0; i < RAND_POOL_SIZE; i++) {
+  randPool[i] = Math.random();
+}
+const fastRand = () => {
+  poolIdx = (poolIdx + 1) & (RAND_POOL_SIZE - 1);
+  return randPool[poolIdx];
+};
+
 export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const { ref: inViewRef, inView } = useInView({ threshold: 0 });
@@ -37,9 +68,10 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
 
     let fontSize = 18;
     let columns: number;
-    let drops: number[];
-    let speeds: number[];
-    let xCoords: number[];
+    let drops: Float32Array;
+    let speeds: Float32Array;
+    let xCoords: Float32Array;
+    let glitchMask: Uint8Array; // BOLT: Bitmask for O(1) glitch column lookup
 
     const resize = () => {
       width = canvas.width = window.innerWidth;
@@ -50,10 +82,14 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
       ctx.font = `${fontSize}px "JetBrains Mono", monospace`;
 
       columns = Math.floor(width / fontSize);
+      glitchedColumnsMask = new Uint8Array(columns);
 
-      drops = [];
-      speeds = [];
-      xCoords = [];
+      // BOLT: Use TypedArrays for better performance and memory efficiency in the hot loop.
+      drops = new Float32Array(columns);
+      speeds = new Float32Array(columns);
+      xCoords = new Float32Array(columns);
+      glitchMask = new Uint8Array(columns);
+
       for (let i = 0; i < columns; i++) {
         drops[i] = Math.random() * -100; // Start at random negative y positions
         speeds[i] = 0.3 + Math.random() * 0.6; // Speed between 0.3 and 0.9
@@ -62,20 +98,8 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
     };
 
     // Day 6: Glitch Burst state
-    let glitchedColumns: number[] = [];
     let isGlitching = false;
     let glitchTimeoutId: ReturnType<typeof setTimeout>;
-
-    const RAND_POOL_SIZE = 2048;
-    const randPool = new Float32Array(RAND_POOL_SIZE);
-    let poolIdx = 0;
-    for (let i = 0; i < RAND_POOL_SIZE; i++) {
-      randPool[i] = Math.random();
-    }
-    const fastRand = () => {
-      poolIdx = (poolIdx + 1) & (RAND_POOL_SIZE - 1);
-      return randPool[poolIdx];
-    };
 
     window.addEventListener('resize', resize, { passive: true });
     resize();
@@ -102,32 +126,42 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
       const dropsLen = drops.length;
       const charCount = MATRIX_CHAR_LEN;
 
-      for (let i = 0; i < dropsLen; i++) {
-        const x = xCoords[i];
-        const y = drops[i] * fontSize;
-        const isGlitchedCol = isGlitching && glitchedColumns.includes(i);
+      // BOLT: Refactor the loop to batch rendering by trail level.
+      // Iterating backwards from trail to lead ensures the bright white lead is drawn on top.
+      // This reduces ctx.fillStyle state changes from O(N * T) to O(T), where T is trail length (~13).
+      for (let j = TRAIL_LENGTH; j >= 0; j--) {
+        const normalColor = TRAIL_COLORS[j];
+        const glitchColor = GLITCH_TRAIL_COLORS[j];
 
-        // Batch trail characters by color to minimize fillStyle changes
-        for (let j = trailLength; j >= 1; j--) {
-          const trailY = y - j * fontSize;
-          if (trailY < 0) continue;
-
-          ctx.fillStyle = isGlitchedCol ? trailColorsGlitch[j] : trailColorsNormal[j];
-          const trailText = MATRIX_CHARS[Math.floor(fastRand() * charCount)];
-          ctx.fillText(trailText, x, trailY);
+        // Process glitching columns first for this trail level
+        if (isGlitching) {
+          ctx.fillStyle = glitchColor;
+          for (let i = 0; i < dropsLen; i++) {
+            if (glitchMask[i] === 0) continue;
+            const y = (drops[i] - j) * fontSize;
+            if (y < 0 || y > height + fontSize) continue;
+            ctx.fillText(MATRIX_CHARS[Math.floor(fastRand() * charCount)], xCoords[i], y);
+          }
         }
 
-        // Draw lead character in bright white
-        ctx.fillStyle = '#FFFFFF';
-        const text = MATRIX_CHARS[Math.floor(fastRand() * charCount)];
-        ctx.fillText(text, x, y);
+        // Process normal columns for this trail level
+        ctx.fillStyle = normalColor;
+        for (let i = 0; i < dropsLen; i++) {
+          if (isGlitching && glitchMask[i] === 1) continue;
+          const y = (drops[i] - j) * fontSize;
+          if (y < 0 || y > height + fontSize) continue;
+          ctx.fillText(MATRIX_CHARS[Math.floor(fastRand() * charCount)], xCoords[i], y);
+        }
+      }
 
+      // BOLT: Single pass for drop updates to maintain logic integrity while separating from batched render calls
+      for (let i = 0; i < dropsLen; i++) {
+        const y = drops[i] * fontSize;
         // Reset drop if at bottom or randomly
         if (y > height && fastRand() > 0.975) {
           drops[i] = 0;
           speeds[i] = 0.3 + fastRand() * 0.6;
         }
-
         // Move drop
         drops[i] += speeds[i];
       }
@@ -146,16 +180,16 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
       const nextGlitchTime = 12000 + Math.random() * 6000; // 12-18 seconds
       glitchTimeoutId = setTimeout(() => {
         isGlitching = true;
-        glitchedColumns = [];
+        glitchMask.fill(0);
         for (let i = 0; i < 3; i++) {
           const colIndex = Math.floor(Math.random() * columns);
-          glitchedColumns.push(colIndex);
+          glitchMask[colIndex] = 1;
           drops[colIndex] = 0; // Reset to top
         }
 
         setTimeout(() => {
           isGlitching = false;
-          glitchedColumns = [];
+          glitchMask.fill(0);
         }, 500); // 500ms duration
 
         scheduleGlitch();

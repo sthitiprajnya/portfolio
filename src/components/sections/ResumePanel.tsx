@@ -31,20 +31,6 @@ export function ResumePanel() {
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleCopyLink = async () => {
-    const link = window.location.origin + window.location.pathname + '#resume';
-    try {
-      await navigator.clipboard.writeText(link);
-      setLinkCopied(true);
-      toast.success('Resume link copied to clipboard! 📋');
-      setTimeout(() => setLinkCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy:', err);
-      toast.error('Failed to copy. Please try again.');
-    }
-  };
-
   return (
     <section id="resume" className="py-24 bg-deep relative border-t border-border overflow-hidden">
 
@@ -214,11 +200,7 @@ export function ResumePanel() {
                 </CyberButton>
 
                 <button
-                  onClick={() => {
-                    handleCopy(window.location.origin + window.location.pathname + '#resume', 'Resume Link');
-                    setLinkCopied(true);
-                    setTimeout(() => setLinkCopied(false), 2000);
-                  }}
+                  onClick={handleCopyLink}
                   className={clsx(
                     "w-full mt-3 flex items-center justify-center space-x-2 py-2 border font-mono text-xs uppercase tracking-widest rounded-pill glass transition-all outline-none focus-visible:ring-2 focus-visible:ring-cyan relative z-10",
                     linkCopied ? "border-green text-green bg-green/10" : "border-cyan/30 text-cyan hover:bg-cyan/10"

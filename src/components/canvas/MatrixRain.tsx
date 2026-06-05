@@ -104,6 +104,20 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
     window.addEventListener('resize', resize, { passive: true });
     resize();
 
+    // Pre-calculate trail colors to avoid string concatenation in the loop
+    const trailLength = 12;
+    const trailColorsNormal = new Array(trailLength + 1);
+    const trailColorsGlitch = new Array(trailLength + 1);
+
+    for (let j = 1; j <= trailLength; j++) {
+      const ratio = j / trailLength;
+      const g = Math.round(245 - ratio * (245 - 85));
+      const b = Math.round(255 - ratio * (255 - 51));
+      const opacity = (1 - ratio).toFixed(2);
+      trailColorsNormal[j] = `rgba(0, ${g}, ${b}, ${opacity})`;
+      trailColorsGlitch[j] = `rgba(255, 0, 85, ${opacity})`;
+    }
+
     const draw = () => {
       // Semi-transparent black to create fade effect
       ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';

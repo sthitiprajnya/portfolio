@@ -98,10 +98,12 @@ export default function RootLayout({
   };
 
   // Security: Escape JSON-LD to prevent XSS via script tag breakout.
-  // Specifically, replacing '<' and '>' prevents script tag breakout and provides defense-in-depth.
+  // Specifically, replacing '<', '>', '/', and '&' prevents script tag breakout and provides defense-in-depth.
   const jsonLdString = JSON.stringify(jsonLd)
     .replace(/</g, '\\u003c')
-    .replace(/>/g, '\\u003e');
+    .replace(/>/g, '\\u003e')
+    .replace(/\//g, '\\u002f')
+    .replace(/&/g, '\\u0026');
 
   return (
     <html lang="en" className={`${jbm.variable} ${inter.variable} ${orbitron.variable}`}>
@@ -126,18 +128,25 @@ export default function RootLayout({
                           lower.includes('<script') ||
                           lower.includes('<base') ||
                           lower.includes('javascript:') ||
-                          /on[a-z]+=/.test(lower)
+                          /on[a-z]+\\s*=/.test(lower)
                         ) {
                           console.warn('Blocked dangerous HTML pattern in Trusted Types default policy');
                           return s
                             .replace(/<(script|base)/gi, '<blocked-$1')
-                            .replace(/on[a-z]+=/gi, (match: string) => 'blocked-' + match);
+                            .replace(/on[a-z]+\\s*=/gi, (match) => 'blocked-' + match);
                         }
                       }
                       return s;
                     },
                     createScript: (s) => s,
-                    createScriptURL: (s) => s,
+                    createScriptURL: (s) => {
+                      // Security: Allow only same-origin script URLs to prevent cross-origin injection.
+                      if (s.startsWith('http') && !s.startsWith(window.location.origin)) {
+                        console.warn('Blocked cross-origin script URL in Trusted Types policy:', s);
+                        return '/blocked-cross-origin-script';
+                      }
+                      return s;
+                    },
                   });
                 }
               }

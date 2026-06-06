@@ -73,3 +73,7 @@
 ## 2025-06-04 - [Eliminating Layout Thrashing and Per-Frame Color Parsing in Sentinel]
 **Learning:** In high-frequency (60fps) Canvas 2D animation loops, repeatedly calling `getBoundingClientRect()` and `window.scrollY` for proximity checks causes significant layout thrashing. Furthermore, parsing RGBA strings using regex inside the `draw` loop adds unnecessary CPU overhead.
 **Action:** Always cache vertical positions of target elements (like `#ctf`) in a `useRef` and update them only during `resize` or specific events. Pre-parse all static color themes at the module level into numeric objects to eliminate string manipulation and regex execution during animation frames.
+
+## 2026-08-01 - [Minimizing Idle Timer Overheads]
+**Learning:** Polling mechanisms running via `setInterval` in global providers (like `AudioProvider.tsx`) or hooks (like `useFaviconBlink.ts`) consume background CPU cycles and cause React renders/DOM updates indefinitely, even when audio is not playing or the tab is inactive.
+**Action:** Always wrap background polling intervals or visual updates with visibility checks (e.g. `document.addEventListener('visibilitychange')`) or conditional state (only trigger when `isSpeaking === true`) to pause execution when idle or hidden.

@@ -21,8 +21,28 @@ export function useFaviconBlink() {
     };
 
     updateFavicon(); // Initial set
-    const intervalId = setInterval(updateFavicon, 800);
 
-    return () => clearInterval(intervalId);
+    let intervalId: NodeJS.Timeout | null = setInterval(updateFavicon, 800);
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        if (intervalId) {
+          clearInterval(intervalId);
+          intervalId = null;
+        }
+      } else {
+        if (!intervalId) {
+          updateFavicon();
+          intervalId = setInterval(updateFavicon, 800);
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, []);
 }

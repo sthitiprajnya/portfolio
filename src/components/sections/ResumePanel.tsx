@@ -14,7 +14,6 @@ const RESUME_SHA256 = 'f4a9f24d314dd2a6869c505d896746a84561e97392e77d1a53c6b8adc
 // security-engineer aesthetic and gets recruiters to interact with the page.
 export function ResumePanel() {
   const [downloadStarted, setDownloadStarted] = useState(false);
-  const [linkCopied, setLinkCopied] = useState(false);
 
   const handleDownload = () => {
     setDownloadStarted(true);

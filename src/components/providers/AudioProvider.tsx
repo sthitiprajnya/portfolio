@@ -113,14 +113,13 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   // Keep isSpeaking state somewhat in sync with actual speech synthesis state
   // This is needed because sometimes onend doesn't fire correctly in all browsers
   useEffect(() => {
-    if (!('speechSynthesis' in window)) return;
+    if (!('speechSynthesis' in window) || !isSpeaking) return;
 
     const interval = setInterval(() => {
-      const currentlySpeaking = window.speechSynthesis.speaking;
-      if (currentlySpeaking !== isSpeaking) {
-        setIsSpeaking(currentlySpeaking);
+      if (!window.speechSynthesis.speaking) {
+        setIsSpeaking(false);
       }
-    }, 100);
+    }, 500);
 
     return () => clearInterval(interval);
   }, [isSpeaking]);

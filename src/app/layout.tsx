@@ -133,24 +133,17 @@ export default function RootLayout({
                           console.warn('Blocked dangerous HTML pattern in Trusted Types default policy');
                           return s
                             .replace(/<(script|base)/gi, '<blocked-$1')
-                            .replace(/on[a-z]+\\s*=/gi, (match: string) => 'blocked-' + match);
+                            .replace(/on[a-z]+\\s*=/gi, (match) => 'blocked-' + match);
                         }
                       }
                       return s;
                     },
                     createScript: (s) => s,
                     createScriptURL: (s) => {
-                      if (typeof s === 'string') {
-                        // Security: Defense-in-depth. Only allow same-origin script URLs.
-                        try {
-                          const url = new URL(s, window.location.origin);
-                          if (url.origin !== window.location.origin) {
-                            console.warn('Blocked cross-origin script URL in Trusted Types default policy:', s);
-                            return 'about:blank';
-                          }
-                        } catch (e) {
-                          return 'about:blank';
-                        }
+                      // Security: Allow only same-origin script URLs to prevent cross-origin injection.
+                      if (s.startsWith('http') && !s.startsWith(window.location.origin)) {
+                        console.warn('Blocked cross-origin script URL in Trusted Types policy:', s);
+                        return '/blocked-cross-origin-script';
                       }
                       return s;
                     },

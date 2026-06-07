@@ -80,3 +80,7 @@
 ## 2026-05-31 - Passive Event Listeners for High-Frequency Events
 **Learning:** High-frequency global event listeners (like `mousemove`, `mouseover`, `mousedown`, `mouseup`, `touchstart`, `touchmove`, `scroll`) can block the main thread and cause layout jank, especially during scroll or animations, because the browser waits to see if `preventDefault()` will be called.
 **Action:** Always add `{ passive: true }` to these listeners when `preventDefault()` is not needed, so the browser can continue rendering/scrolling without waiting for the JavaScript event handler to finish.
+
+## 2026-06-07 - [Lazy-loading Large PDF Assets with IntersectionObserver]
+**Learning:** Loading large assets like PDF resumes (~1.5MB) via `iframe` or `object` tags immediately on component mount increases the initial page weight and delays Time to Interactive (TTI), even if the asset is "below the fold". Conditional rendering based on `IntersectionObserver` (e.g., via `useInView`) ensures that the network request is only initiated when the user is likely to interact with the section.
+**Action:** Always lazy-load heavy media or document assets (PDFs, videos, large charts) using `IntersectionObserver` with a reasonable `rootMargin` (e.g., `200px`) to balance performance and user experience. Provide a themed placeholder to maintain layout stability and prevent Cumulative Layout Shift (CLS).

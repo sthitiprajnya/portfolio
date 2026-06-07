@@ -29,3 +29,8 @@
 **Vulnerability:** Unbounded growth of React state arrays representing terminal output lines and command history.
 **Learning:** Interactive components that simulate long-running processes (like a terminal or chat bot) can lead to browser memory exhaustion if users or malicious scripts flood them with entries.
 **Prevention:** Always cap state arrays that are updated via user input or automated responses using `.slice(-LIMIT)`. This ensures the application remains responsive and stable regardless of interaction volume.
+
+## 2026-06-05 - Hardened Trusted Types Policies
+**Vulnerability:** XSS bypasses in Trusted Types default policies due to incomplete regex patterns (e.g., missing whitespace around event handler assignments) or missing URL origin validation.
+**Learning:** A "default" Trusted Types policy is a powerful defense-in-depth layer, but it must be robust against common bypasses. Simply checking for `onclick=` isn't enough if an attacker uses `onclick =`. Additionally, an open `createScriptURL` policy defeats the purpose of restricting external scripts via CSP.
+**Prevention:** Use `\\s*` in regex for event handlers to account for whitespace. Enforce same-origin checks in `createScriptURL` within the default policy to prevent cross-origin script injection through standard DOM sinks.

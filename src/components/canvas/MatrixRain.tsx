@@ -82,7 +82,6 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
       ctx.font = `${fontSize}px "JetBrains Mono", monospace`;
 
       columns = Math.floor(width / fontSize);
-      glitchedColumnsMask = new Uint8Array(columns);
 
       // BOLT: Use TypedArrays for better performance and memory efficiency in the hot loop.
       drops = new Float32Array(columns);

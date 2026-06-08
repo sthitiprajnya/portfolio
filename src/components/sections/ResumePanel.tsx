@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from 'react';
+import { useInView } from 'react-intersection-observer';
 import { toast } from 'react-hot-toast';
 import clsx from 'clsx';
 import { SectionTitle } from '@/components/ui/SectionTitle';
@@ -15,6 +16,14 @@ const RESUME_SHA256 = 'f4a9f24d314dd2a6869c505d896746a84561e97392e77d1a53c6b8adc
 export function ResumePanel() {
   const [downloadStarted, setDownloadStarted] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+
+  // BOLT: Lazy-load the resume PDF iframe only when the user is near the section.
+  // This avoids a ~1.5MB network request (including browser PDF viewer overhead)
+  // until it's actually needed, improving initial page load performance.
+  const { ref: viewerRef, inView: viewerInView } = useInView({
+    rootMargin: '200px',
+    triggerOnce: true
+  });
 
   const handleDownload = () => {
     setDownloadStarted(true);
@@ -88,15 +97,22 @@ export function ResumePanel() {
               </div>
 
               {/* Document body / PDF viewer */}
-              <div className="w-full bg-[rgba(0,0,0,0.4)] relative z-10">
-                <iframe
-                  src={PERSONAL.resumeUrl}
-                  className="w-full h-[600px] border-none"
-                  title="Resume PDF"
-                  sandbox="allow-same-origin"
-                  referrerPolicy="no-referrer"
-                  allow="camera 'none'; microphone 'none'; geolocation 'none'; autoplay 'none'; payment 'none'; usb 'none'; magnetometer 'none'; accelerometer 'none'; gyroscope 'none'"
-                />
+              <div ref={viewerRef} className="w-full h-[600px] bg-[rgba(0,0,0,0.4)] relative z-10 flex items-center justify-center">
+                {viewerInView ? (
+                  <iframe
+                    src={PERSONAL.resumeUrl}
+                    className="w-full h-full border-none"
+                    title="Resume PDF"
+                    sandbox="allow-same-origin"
+                    referrerPolicy="no-referrer"
+                    allow="camera 'none'; microphone 'none'; geolocation 'none'; autoplay 'none'; payment 'none'; usb 'none'; magnetometer 'none'; accelerometer 'none'; gyroscope 'none'"
+                  />
+                ) : (
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 border-4 border-amber/20 border-t-amber animate-spin rounded-full" />
+                    <span className="font-mono text-[0.6rem] text-amber/60 tracking-widest uppercase">Initializing_Secure_Viewer...</span>
+                  </div>
+                )}
               </div>
 
               {/* Footer stamp */}

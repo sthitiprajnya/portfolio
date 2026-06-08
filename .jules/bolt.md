@@ -80,3 +80,7 @@
 ## 2026-05-31 - Passive Event Listeners for High-Frequency Events
 **Learning:** High-frequency global event listeners (like `mousemove`, `mouseover`, `mousedown`, `mouseup`, `touchstart`, `touchmove`, `scroll`) can block the main thread and cause layout jank, especially during scroll or animations, because the browser waits to see if `preventDefault()` will be called.
 **Action:** Always add `{ passive: true }` to these listeners when `preventDefault()` is not needed, so the browser can continue rendering/scrolling without waiting for the JavaScript event handler to finish.
+
+## 2026-08-05 - [Lazy Loading Heavy Third-Party Assets]
+**Learning:** Embedding heavy third-party assets like PDF viewers via `iframe` (estimated ~1.5MB total load including viewer UI) at the bottom of a page causes significant unnecessary network overhead and CPU work during initial page load. Deferring these until the user scrolls near the section using `IntersectionObserver` drastically improves Core Web Vitals, specifically LCP and TTI.
+**Action:** Always lazy-load heavy iframes (PDFs, Maps, Videos) that are not immediately visible. Use `rootMargin` to start loading slightly before they enter the viewport to minimize perceived delay.

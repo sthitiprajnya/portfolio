@@ -34,3 +34,8 @@
 **Vulnerability:** XSS bypasses in Trusted Types default policies due to incomplete regex patterns (e.g., missing whitespace around event handler assignments) or missing URL origin validation.
 **Learning:** A "default" Trusted Types policy is a powerful defense-in-depth layer, but it must be robust against common bypasses. Simply checking for `onclick=` isn't enough if an attacker uses `onclick =`. Additionally, an open `createScriptURL` policy defeats the purpose of restricting external scripts via CSP.
 **Prevention:** Use `\\s*` in regex for event handlers to account for whitespace. Enforce same-origin checks in `createScriptURL` within the default policy to prevent cross-origin script injection through standard DOM sinks.
+
+## 2025-06-06 - Hardened Trusted Types and Regex Escaping in Sinks
+**Vulnerability:** Bypass in Trusted Types default policy due to incomplete tag blocklist and broken regex detection for event handlers.
+**Learning:** When defining a Trusted Types policy inside a string passed to `dangerouslySetInnerHTML`, regular expression backslashes must be double-escaped (e.g., `\\s`) to be correctly interpreted as regex tokens (e.g., `\s`) in the browser. Failing to do so can result in the regex searching for literal backslashes, effectively disabling the security check.
+**Prevention:** Always verify the "wire-format" of security policies injected via strings. Use comprehensive regex and blocklists that include tags like `<embed>`, `<object>`, and `<meta>` to prevent varied XSS vectors and CSP bypasses.

@@ -122,18 +122,18 @@ export default function RootLayout({
                     createHTML: (s) => {
                       if (typeof s === 'string') {
                         // Security: Defense-in-depth against DOM XSS.
-                        // We block known dangerous tags (script, base) and all inline event handlers (on*).
+                        // We block known dangerous tags and all inline event handlers (on*).
                         const lower = s.toLowerCase();
                         if (
-                          lower.includes('<script') ||
-                          lower.includes('<base') ||
-                          lower.includes('javascript:') ||
+                          /<(script|base|embed|object|applet|meta)/i.test(lower) ||
+                          /javascript\\s*:/i.test(lower) ||
                           /on[a-z]+\\s*=/.test(lower)
                         ) {
                           console.warn('Blocked dangerous HTML pattern in Trusted Types default policy');
                           return s
-                            .replace(/<(script|base)/gi, '<blocked-$1')
-                            .replace(/on[a-z]+\\s*=/gi, (match) => 'blocked-' + match);
+                            .replace(/<(script|base|embed|object|applet|meta)/gi, '<blocked-$1')
+                            .replace(/on[a-z]+\\s*=/gi, (match) => 'blocked-' + match)
+                            .replace(/javascript\\s*:/gi, 'blocked-javascript:');
                         }
                       }
                       return s;

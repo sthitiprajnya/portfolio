@@ -75,6 +75,7 @@ export default function RootLayout({
     '@context': 'https://schema.org',
     '@type': 'Person',
     name: 'Sthitaprajna Biswal',
+    description: 'Information Security Engineer and Penetration Tester specializing in FinTech and Cloud Security.',
     jobTitle: 'Information Security Engineer',
     url: 'https://sthitiprajnya.github.io/portfolio/',
     sameAs: [
@@ -85,6 +86,10 @@ export default function RootLayout({
     worksFor: {
       '@type': 'Organization',
       name: 'iServeU Technology'
+    },
+    alumniOf: {
+      '@type': 'EducationalOrganization',
+      name: 'Veer Surendra Sai University of Technology (VSSUT)'
     },
     knowsAbout: [
       'Cybersecurity',
@@ -127,12 +132,17 @@ export default function RootLayout({
                         if (
                           lower.includes('<script') ||
                           lower.includes('<base') ||
-                          lower.includes('javascript:') ||
-                          /on[a-z]+\\s*=/.test(lower)
+                          lower.includes('<embed') ||
+                          lower.includes('<object') ||
+                          lower.includes('<applet') ||
+                          lower.includes('<meta') ||
+                          /javascript\\s*:/gi.test(lower) ||
+                          /on[a-z]+\\s*=/gi.test(lower)
                         ) {
                           console.warn('Blocked dangerous HTML pattern in Trusted Types default policy');
                           return s
-                            .replace(/<(script|base)/gi, '<blocked-$1')
+                            .replace(/<(script|base|embed|object|applet|meta)/gi, '<blocked-$1')
+                            .replace(/javascript\\s*:/gi, 'blocked-javascript:')
                             .replace(/on[a-z]+\\s*=/gi, (match) => 'blocked-' + match);
                         }
                       }
@@ -141,9 +151,15 @@ export default function RootLayout({
                     createScript: (s) => s,
                     createScriptURL: (s) => {
                       // Security: Allow only same-origin script URLs to prevent cross-origin injection.
-                      if (s.startsWith('http') && !s.startsWith(window.location.origin)) {
-                        console.warn('Blocked cross-origin script URL in Trusted Types policy:', s);
-                        return '/blocked-cross-origin-script';
+                      try {
+                        const url = new URL(s, window.location.origin);
+                        if (url.origin !== window.location.origin) {
+                          console.warn('Blocked cross-origin script URL in Trusted Types policy:', s);
+                          return '/blocked-cross-origin-script';
+                        }
+                      } catch (e) {
+                        console.warn('Blocked invalid script URL in Trusted Types policy:', s);
+                        return '/blocked-invalid-script';
                       }
                       return s;
                     },

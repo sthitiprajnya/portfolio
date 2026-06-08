@@ -69,7 +69,7 @@ export function Experience() {
   );
 }
 
-function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE[0], isFirst: boolean }) {
+const ExperienceCard = React.memo(function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE[0], isFirst: boolean }) {
   const [openSection, setOpenSection] = useState<string | null>(experience.subsections[0]?.id || null);
   const prefersReducedMotion = usePrefersReducedMotion();
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -273,4 +273,4 @@ function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE
       {cardContent}
     </motion.div>
   );
-}
+});

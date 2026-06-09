@@ -75,6 +75,7 @@ export default function RootLayout({
     '@context': 'https://schema.org',
     '@type': 'Person',
     name: 'Sthitaprajna Biswal',
+    description: 'Information Security Engineer and Penetration Tester specializing in FinTech and Cloud Security.',
     jobTitle: 'Information Security Engineer',
     url: 'https://sthitiprajnya.github.io/portfolio/',
     sameAs: [
@@ -85,6 +86,10 @@ export default function RootLayout({
     worksFor: {
       '@type': 'Organization',
       name: 'iServeU Technology'
+    },
+    alumniOf: {
+      '@type': 'EducationalOrganization',
+      name: 'Veer Surendra Sai University of Technology (VSSUT)'
     },
     knowsAbout: [
       'Cybersecurity',
@@ -122,44 +127,39 @@ export default function RootLayout({
                     createHTML: (s) => {
                       if (typeof s === 'string') {
                         // Security: Defense-in-depth against DOM XSS.
-                        // We block known dangerous tags (script, base, embed, object, applet, meta) and all inline event handlers (on*).
+                        // We block known dangerous tags and all inline event handlers (on*).
                         const lower = s.toLowerCase();
                         if (
                           lower.includes('<script') ||
                           lower.includes('<base') ||
                           lower.includes('<embed') ||
                           lower.includes('<object') ||
-                          lower.includes('<applet') ||
-                          lower.includes('<meta') ||
                           lower.includes('javascript:') ||
                           /on[a-z]+\\s*=/.test(lower)
                         ) {
                           console.warn('Blocked dangerous HTML pattern in Trusted Types default policy');
                           return s
-                            .replace(/<(script|base|embed|object|applet|meta)/gi, '<blocked-$1')
-                            .replace(/on[a-z]+\\s*=/gi, (match) => 'blocked-' + match)
-                            .replace(/javascript:/gi, 'blocked-javascript:');
+                            .replace(/<(script|base|embed|object)/gi, '<blocked-$1')
+                            .replace(/javascript:/gi, 'blocked-javascript:')
+                            .replace(/on[a-z]+\\s*=/gi, (match) => 'blocked-' + match);
                         }
                       }
                       return s;
                     },
                     createScript: (s) => s,
                     createScriptURL: (s) => {
-                      // Security: Allow only same-origin script URLs to prevent cross-origin injection.
-                      // Using the URL constructor ensures we correctly handle protocol-relative URLs (e.g. //evil.com).
+                      // Security: Robust origin validation using the URL constructor.
+                      // Prevents bypasses using userinfo (e.g., https://origin@evil.com).
                       try {
                         const url = new URL(s, window.location.origin);
-                        if (url.origin !== window.location.origin) {
+                        if (url.origin !== window.location.origin && (s.startsWith('http') || s.startsWith('//'))) {
                           console.warn('Blocked cross-origin script URL in Trusted Types policy:', s);
                           return '/blocked-cross-origin-script';
                         }
                       } catch (e) {
-                        // If it's not a valid URL (and not relative), block it for safety.
-                        if (s.includes('://') || s.startsWith('//')) {
-                          return '/blocked-invalid-script-url';
-                        }
+                        console.warn('Blocked invalid script URL in Trusted Types policy:', s);
+                        return '/blocked-invalid-script';
                       }
-                      return s;
                     },
                   });
                 }

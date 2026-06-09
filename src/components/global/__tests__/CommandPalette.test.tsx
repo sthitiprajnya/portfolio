@@ -33,6 +33,8 @@ vi.mock('framer-motion', async () => {
 describe('CommandPalette', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Mock scrollIntoView which is not implemented in JSDOM
+    window.HTMLElement.prototype.scrollIntoView = vi.fn();
   });
 
   it('renders and allows searching', async () => {

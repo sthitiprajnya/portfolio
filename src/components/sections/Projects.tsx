@@ -25,6 +25,16 @@ export function Projects() {
     activeFilter === 'all' ? true : p.category === activeFilter
   ), [activeFilter]);
 
+  // Palette: Calculate project counts for each category to provide immediate user feedback
+  const filterCounts = useMemo(() => {
+    return FILTERS.reduce((acc, filter) => {
+      acc[filter.id] = filter.id === 'all'
+        ? PROJECTS.length
+        : PROJECTS.filter(p => p.category === filter.id).length;
+      return acc;
+    }, {} as Record<string, number>);
+  }, []);
+
   return (
     <section id="projects" className="py-32 bg-black relative border-t border-border overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -39,20 +49,30 @@ export function Projects() {
         <ScrollReveal variants={fadeSlideUp} className="flex flex-wrap gap-3 mb-12">
           {FILTERS.map(filter => {
             const isActive = activeFilter === filter.id;
+            const count = filterCounts[filter.id];
+
             return (
               <button
                 key={filter.id}
                 onClick={() => setActiveFilter(filter.id)}
                 className={clsx(
-                  "font-mono text-xs uppercase tracking-widest px-5 py-2 transition-all duration-300 rounded-card border outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black",
+                  "font-mono text-xs uppercase tracking-widest px-5 py-2 transition-all duration-300 rounded-card border outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black flex items-center gap-2 group",
                   isActive
                     ? "bg-cyan border-cyan text-black shadow-[var(--glow-cyan-sm)] font-bold"
                     : "bg-transparent border-border text-text-secondary hover:text-cyan hover:border-cyan/50"
                 )}
                 aria-pressed={isActive}
-                aria-label={`Filter by ${filter.label}`}
+                aria-label={`Filter by ${filter.label} (${count} projects)`}
               >
-                {filter.label}
+                <span>{filter.label}</span>
+                <span className={clsx(
+                  "text-[0.7rem] px-1.5 py-0.5 rounded-full border transition-colors",
+                  isActive
+                    ? "bg-black/20 border-black/10 text-black"
+                    : "bg-white/5 border-white/10 text-text-muted group-hover:text-cyan"
+                )}>
+                  {count}
+                </span>
               </button>
             );
           })}
@@ -75,7 +95,7 @@ export function Projects() {
   );
 }
 
-function ProjectCard({ project, index }: { project: Project, index: number }) {
+const ProjectCard = React.memo(function ProjectCard({ project, index }: { project: Project, index: number }) {
   const { ref, rotateX, rotateY } = useCardTilt();
   const prefersReducedMotion = usePrefersReducedMotion();
   const [showMethodology, setShowMethodology] = useState(false);
@@ -159,6 +179,7 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
                 rel="noopener noreferrer"
                 className="text-text-muted hover:text-white transition-colors ml-4 flex-shrink-0"
                 aria-label={`View ${project.title} on GitHub`}
+                title={`View ${project.title} on GitHub`}
                 onClick={(e) => e.stopPropagation()}
               >
                 <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">

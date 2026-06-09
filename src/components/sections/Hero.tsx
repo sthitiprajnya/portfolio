@@ -9,6 +9,7 @@ import CountUp from 'react-countup';
 import { useInView } from 'react-intersection-observer';
 import { AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 const MatrixRain = lazy(() => import('@/components/canvas/MatrixRain'));
 const NetworkConnector = lazy(() => import('@/components/canvas/NetworkConnector'));
@@ -27,6 +28,9 @@ export function Hero() {
   const { ref: statsRef } = useInView({ triggerOnce: true, threshold: 0.5 });
   const [activeIntel, setActiveIntel] = React.useState<string | null>(null);
   const [showMethodology, setShowMethodology] = React.useState(false);
+
+  const methodologyTrapRef = useFocusTrap(showMethodology);
+  const intelTrapRef = useFocusTrap(activeIntel !== null);
 
   // UX Enhancement: Handle Escape key to close modals and manage scroll lock
   React.useEffect(() => {
@@ -259,20 +263,15 @@ export function Hero() {
             onClick={() => setShowMethodology(false)}
           >
             <motion.div
+              ref={methodologyTrapRef}
               role="dialog"
               aria-modal="true"
               aria-labelledby="methodology-modal-title"
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="methodology-modal-title"
               className="bg-surface border border-amber/30 rounded-card p-6 max-w-4xl w-full shadow-[var(--glow-amber-md)] max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-border"
               onClick={e => e.stopPropagation()}
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="methodology-modal-title"
             >
               <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
                 <h2 id="methodology-modal-title" className="font-mono text-amber text-lg font-bold tracking-widest flex items-center gap-3">
@@ -351,20 +350,15 @@ export function Hero() {
             onClick={() => setActiveIntel(null)}
           >
             <motion.div
+              ref={intelTrapRef}
               role="dialog"
               aria-modal="true"
               aria-labelledby="intel-modal-title"
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="intel-modal-title"
               className="bg-surface border border-cyan/30 rounded-card p-6 max-w-md w-full shadow-[var(--glow-cyan-md)]"
               onClick={e => e.stopPropagation()}
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="intel-modal-title"
             >
               <div className="flex items-center justify-between mb-4 pb-2 border-b border-border">
                 <h2 id="intel-modal-title" className="font-mono text-cyan text-sm font-bold tracking-widest flex items-center gap-2">

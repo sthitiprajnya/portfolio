@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { NAV_LINKS } from '@/components/sections/Navigation'; // Will export this from Navigation.tsx
 import { useAudio } from '@/components/providers/AudioProvider';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 export function CommandPalette() {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,6 +13,7 @@ export function CommandPalette() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const { speak } = useAudio();
+  const containerRef = useFocusTrap(isOpen);
 
   useEffect(() => {
     const handleOpen = () => {
@@ -113,6 +115,7 @@ export function CommandPalette() {
           />
 
           <motion.div
+            ref={containerRef}
             role="dialog"
             aria-modal="true"
             aria-label="Command Palette"

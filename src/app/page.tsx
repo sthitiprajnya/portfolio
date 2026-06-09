@@ -12,6 +12,7 @@ import { Toaster }              from 'react-hot-toast';
 
 import { useState, useCallback } from 'react';
 import { AudioPrompt } from '@/components/sections/AudioPrompt';
+import { BackToTop } from '@/components/ui/BackToTop';
 import dynamic from 'next/dynamic';
 
 const About = dynamic(() => import('@/components/sections/About').then(mod => mod.About), { ssr: false, loading: () => null });
@@ -61,6 +62,7 @@ export default function Home() {
           </main>
 
           <Footer />
+          <BackToTop />
         </SmoothScrollProvider>
       </CursorProvider>
 

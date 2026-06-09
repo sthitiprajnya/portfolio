@@ -80,22 +80,12 @@ const CertCard = React.memo(function CertCard({ cert }: { cert: typeof CERTIFICA
         <div className="flex justify-between items-start mb-6 h-14">
           <div className="relative h-full flex items-center justify-center" role="img" aria-label={`${cert.issuer} logo`}>
             <LogoBadge
-              src={`${
-                cert.issuer === 'Cisco Systems' || cert.issuer === 'Cisco' ? '/portfolio/logos/certs/cisco.svg' :
-                cert.issuer === 'eLearnSecurity' || cert.issuer === 'INE Security' ? '/portfolio/logos/certs/cisco.svg' :
-                cert.issuer === 'TCM Security' ? '/portfolio/logos/certs/tcm.png' :
-                cert.issuer === 'EC-Council' ? '/portfolio/logos/certs/eccouncil.svg' :
-                cert.issuer === 'OpenEDG Python Institute' ? '/portfolio/logos/certs/openedg.png' :
-                cert.issuer === 'CRAW Security' ? '/portfolio/logos/certs/craw.png' :
-                cert.issuer === 'ISC2' ? '/portfolio/logos/certs/isc2.png' :
-                cert.issuer === 'KodeKloud' ? '/portfolio/logos/cloud/docker.svg' :
-                ''
-              }`}
+              src={cert.logo}
               alt={cert.issuer}
               width={80}
               height={28}
               monogram={cert.issuer.substring(0, 2).toUpperCase()}
-              className={`${['certs/tcm.png', 'certs/openedg.png', 'certs/craw.png', 'certs/isc2.png'].includes(cert.issuer) ? '' : 'invert dark:invert-0'} object-left w-auto h-full max-w-[100px]`}
+              className={clsx(cert.logoInvert ? 'invert dark:invert-0' : '', 'object-left w-auto h-full max-w-[100px]')}
             />
           </div>
 

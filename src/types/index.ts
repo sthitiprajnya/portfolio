@@ -82,6 +82,8 @@ export interface Certification {
   status: 'active' | 'expired' | 'in-progress';
   verifyUrl: string;
   expiry?: string;
+  logo?: string;
+  logoInvert?: boolean;
 }
 
 export interface Education {

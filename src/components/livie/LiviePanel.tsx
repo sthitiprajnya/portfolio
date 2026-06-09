@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, KeyboardEvent } from 'react';
 import { motion } from 'framer-motion';
 import { useAudio } from '@/components/providers/AudioProvider';
 import { generateDynamicSpeech } from '@/lib/sentinelSpeech';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 interface Message {
   role:    'user' | 'assistant';
@@ -23,6 +24,7 @@ export default function LiviePanel({ onClose }: { onClose: () => void }) {
   const inputRef                  = useRef<HTMLInputElement>(null);
   const lastMessageTime           = useRef<number>(0);
   const { speak }                 = useAudio();
+  const containerRef              = useFocusTrap(true);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -68,6 +70,7 @@ export default function LiviePanel({ onClose }: { onClose: () => void }) {
 
   return (
     <motion.div
+      ref={containerRef}
       initial={{ opacity: 0, y: 24, scale: 0.96 }}
       animate={{ opacity: 1, y: 0,  scale: 1    }}
       exit={{    opacity: 0, y: 16, scale: 0.97  }}

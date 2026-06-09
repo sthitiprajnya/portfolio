@@ -1,8 +1,7 @@
 import { useEffect } from 'react';
 
-// BOLT: Hoist static string allocations and encoding to the module level.
-// This prevents continuous memory allocation and garbage collection overhead
-// every 800ms when the favicon updates.
+// BOLT: Hoist static strings and URI encoding to module level
+// to avoid unnecessary allocations and CPU work every 800ms
 const CURSOR_COLOR = encodeURIComponent('#00F5FF');
 const SVG_CURSOR = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='0' y='12' width='16' height='4' fill='${CURSOR_COLOR}'/%3E%3C/svg%3E`;
 const SVG_BLANK = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3C/svg%3E`;

@@ -105,6 +105,9 @@ export function CommandPalette() {
           />
 
           <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Command Palette"
             initial={{ opacity: 0, scale: 0.95, y: -20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -20 }}
@@ -142,6 +145,7 @@ export function CommandPalette() {
                   onClick={() => { setQuery(''); inputRef.current?.focus(); }}
                   className="p-1 mr-2 text-text-muted hover:text-cyan transition-colors outline-none focus-visible:ring-1 focus-visible:ring-cyan rounded-sm"
                   aria-label="Clear search"
+                  title="Clear search"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />

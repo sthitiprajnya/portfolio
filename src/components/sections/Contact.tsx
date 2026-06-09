@@ -272,6 +272,15 @@ export function Contact() {
                      <div className="text-text-secondary">Routing through proxy... [OK]</div>
                      <div className="text-green font-bold mt-2">✓ MESSAGE_TRANSMITTED</div>
                      <div className="text-amber mt-2 animate-pulse">AWAITING_RESPONSE...</div>
+                     <div className="pt-4">
+                       <button
+                         type="button"
+                         onClick={() => setStatus('idle')}
+                         className="text-[0.6rem] text-cyan hover:text-white underline tracking-widest uppercase outline-none focus-visible:ring-1 focus-visible:ring-cyan"
+                       >
+                         [ SEND_ANOTHER_MESSAGE ]
+                       </button>
+                     </div>
                   </div>
                 </div>
               ) : (
@@ -284,7 +293,7 @@ export function Contact() {
                   <CyberButton
                     type={isEmailJSConfigured ? "submit" : "button"}
                     disabled={status === 'transmitting'}
-                    color={status === 'error' ? 'cyan' : 'cyan'}
+                    color={status === 'error' ? 'amber' : 'cyan'}
                     className={clsx(
                       'w-full mt-4',
                       status === 'error' && 'border-red text-red hover:bg-red'
@@ -376,7 +385,7 @@ function FloatingInput({ id, name, type, label, value, onChange, error, required
             aria-live="polite"
             className={clsx(
               "font-mono text-[0.65rem] transition-colors",
-              charCount >= maxLength ? "text-red" : "text-text-muted"
+              charCount >= maxLength ? "text-red" : charCount >= maxLength * 0.9 ? "text-amber" : "text-text-muted"
             )}
           >
             {charCount} / {maxLength}
@@ -440,7 +449,7 @@ function FloatingTextarea({ id, name, label, value, onChange, error, required, m
             aria-live="polite"
             className={clsx(
               "font-mono text-[0.65rem] transition-colors",
-              charCount >= maxLength ? "text-red" : "text-text-muted"
+              charCount >= maxLength ? "text-red" : charCount >= maxLength * 0.9 ? "text-amber" : "text-text-muted"
             )}
           >
             {charCount} / {maxLength}

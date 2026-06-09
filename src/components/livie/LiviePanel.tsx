@@ -107,6 +107,7 @@ export default function LiviePanel({ onClose }: { onClose: () => void }) {
           onClick={onClose}
           className="text-[#00F5FF]/40 hover:text-[#00F5FF] transition-colors text-sm"
           aria-label="Close Livie assistant"
+          title="Close Livie assistant"
         >✕</button>
       </div>
 
@@ -193,6 +194,7 @@ export default function LiviePanel({ onClose }: { onClose: () => void }) {
           onClick={send}
           disabled={!input.trim() || loading}
           aria-label="Send message to Livie assistant"
+          title="Send message to Livie assistant"
           className="
             glass-pill rounded-pill
             px-3 py-1.5

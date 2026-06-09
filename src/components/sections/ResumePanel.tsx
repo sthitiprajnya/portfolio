@@ -123,7 +123,7 @@ export function ResumePanel() {
               <div className="px-6 py-4 border-t border-[var(--glass-border)] flex flex-col md:flex-row justify-between items-center bg-[rgba(0,0,0,0.6)] gap-4 relative z-10">
                 <span className="text-[0.6rem] text-text-muted font-mono text-center md:text-left">
                   DOC_ID: <span
-                    className="redacted"
+                    className="redacted group/doc"
                     tabIndex={0}
                     role="button"
                     aria-label="Reveal and copy document ID"
@@ -135,7 +135,12 @@ export function ResumePanel() {
                         handleCopy('SB-RESUME-2025-v3', 'Document ID');
                       }
                     }}
-                  >SB-RESUME-2025-v3</span><br className="md:hidden" />
+                  >
+                    SB-RESUME-2025-v3
+                    <span className="absolute -top-6 left-1/2 -translate-x-1/2 bg-black border border-amber text-amber px-2 py-0.5 rounded-card opacity-0 invisible group-focus/doc:opacity-100 group-focus/doc:visible group-hover/doc:opacity-100 group-hover/doc:visible transition-all text-[0.5rem] w-max z-50 pointer-events-none">
+                      Click to copy
+                    </span>
+                  </span><br className="md:hidden" />
                   <span className="hidden md:inline"> · </span>SHA256: <span
                     className="redacted group/hash"
                     tabIndex={0}

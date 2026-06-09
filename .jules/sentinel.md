@@ -34,3 +34,8 @@
 **Vulnerability:** XSS bypasses in Trusted Types default policies due to incomplete regex patterns (e.g., missing whitespace around event handler assignments) or missing URL origin validation.
 **Learning:** A "default" Trusted Types policy is a powerful defense-in-depth layer, but it must be robust against common bypasses. Simply checking for `onclick=` isn't enough if an attacker uses `onclick =`. Additionally, an open `createScriptURL` policy defeats the purpose of restricting external scripts via CSP.
 **Prevention:** Use `\\s*` in regex for event handlers to account for whitespace. Enforce same-origin checks in `createScriptURL` within the default policy to prevent cross-origin script injection through standard DOM sinks.
+
+## 2026-06-07 - Robust Origin Validation in Trusted Types
+**Vulnerability:** Insecure origin validation in `createScriptURL` using simple string prefix matching (e.g., `startsWith('http')`), which can be bypassed by protocol-relative URLs or specially crafted strings.
+**Learning:** Security-critical origin checks should rely on built-in parser logic like the `URL` constructor rather than manual string manipulation to ensure consistent behavior across all edge cases (e.g., handling port numbers, trailing slashes, and protocol variations).
+**Prevention:** Always use `new URL(input, window.location.origin)` and compare the resulting `.origin` property against `window.location.origin` for robust same-origin enforcement. Additionally, expand HTML sanitization policies to cover modern and legacy embedding tags like `<embed>`, `<object>`, and `<applet>`.

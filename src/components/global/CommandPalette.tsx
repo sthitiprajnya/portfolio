@@ -69,6 +69,14 @@ export function CommandPalette() {
     setSelectedIndex(0);
   }, [query]);
 
+  // UX: Auto-scroll selected item into view during keyboard navigation
+  useEffect(() => {
+    if (isOpen && filteredLinks[selectedIndex]) {
+      const el = document.getElementById(`option-${filteredLinks[selectedIndex].id}`);
+      el?.scrollIntoView({ block: 'nearest' });
+    }
+  }, [selectedIndex, isOpen, filteredLinks]);
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();

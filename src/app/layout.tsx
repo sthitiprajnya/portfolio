@@ -155,7 +155,6 @@ export default function RootLayout({
                         console.warn('Blocked invalid script URL in Trusted Types policy:', s);
                         return '/blocked-invalid-script';
                       }
-                      return s;
                     },
                   });
                 }

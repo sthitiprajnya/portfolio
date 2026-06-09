@@ -1,4 +1,7 @@
-## 2025-05-15 - [Filter Tab Counts and Ambiguous Locators]
-**Learning:** In multi-section landing pages with repeating UI patterns (like category filters), using generic labels (e.g., "ALL") can lead to ambiguity for both assistive technologies and automated tests. Furthermore, when implementing hover effects on nested elements using Tailwind `group-hover`, it's easy to forget the `group` class on the parent, breaking the expected visual feedback.
+## 2024-05-14 - Screen Reader Context for Methodology Accordions
+**Learning:** Screen readers reading out "VIEW METHODOLOGY" for multiple identical buttons across a grid of project cards provides no context about *which* project is being expanded. Adding context mapping via `aria-label` is crucial.
+**Action:** When implementing repeating interactive components (like cards or list items) with identical visible call-to-actions, always provide disambiguating context using `aria-label` or `aria-describedby` referencing the item's title or ID.
 
-**Action:** Always scope interactive elements using section IDs or specific `aria-label` values. When adding nested hover effects, double-check that the `group` class is present on the trigger container. Ensure small text elements (like badges) maintain a minimum readable size (e.g., >= 0.7rem).
+## 2026-06-07 - Accessible Modal Lifecycle Pattern
+**Learning:** Modals require a trifecta of accessibility: WAI-ARIA roles/attributes (dialog, aria-modal, aria-labelledby), keyboard support (Escape key), and layout management (body scroll locking). Without these, the interaction feels disconnected and creates friction for users with assistive technology or those navigating via keyboard.
+**Action:** When implementing any overlay or modal component, always use a useEffect hook to synchronize visibility with the Escape key listener and document.body.style.overflow state. Ensure titles use semantic heading tags (h2-h4) with unique IDs.

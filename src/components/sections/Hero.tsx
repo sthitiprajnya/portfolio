@@ -195,7 +195,7 @@ export function Hero() {
           className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6"
         >
           <CyberButton onClick={() => scrollTo('projects')}>VIEW_PROJECTS</CyberButton>
-          <CyberButton color="amber" onClick={() => setShowMethodology(true)}>VIEW_METHODOLOGY</CyberButton>
+          <CyberButton color="amber" onClick={() => setShowMethodology(true)} aria-haspopup="dialog">VIEW_METHODOLOGY</CyberButton>
           <CyberButton color="green" onClick={() => scrollTo('contact')}>CONTACT_ME</CyberButton>
 
           <div className="flex space-x-4 pt-4 sm:pt-0 sm:ml-4">
@@ -245,6 +245,7 @@ export function Hero() {
               <button
                 key={i}
                 onClick={() => setActiveIntel(msg)}
+                aria-haspopup="dialog"
                 className="font-mono text-[0.65rem] text-text-secondary tracking-wide hover:text-cyan hover:underline cursor-pointer outline-none focus-visible:text-cyan focus-visible:underline glass-pill px-3 py-1 border-[var(--glass-border)]"
               >
                 {msg}

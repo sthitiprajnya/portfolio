@@ -80,6 +80,7 @@
 ## 2026-05-31 - Passive Event Listeners for High-Frequency Events
 **Learning:** High-frequency global event listeners (like `mousemove`, `mouseover`, `mousedown`, `mouseup`, `touchstart`, `touchmove`, `scroll`) can block the main thread and cause layout jank, especially during scroll or animations, because the browser waits to see if `preventDefault()` will be called.
 **Action:** Always add `{ passive: true }` to these listeners when `preventDefault()` is not needed, so the browser can continue rendering/scrolling without waiting for the JavaScript event handler to finish.
-## 2026-06-09 - [Hoisting Constant Values in Intervals]
-**Learning:** High-frequency event hooks or React components utilizing `setInterval` (e.g., a blinking favicon in `useFaviconBlink.ts`) often allocate static strings, template literals, and perform data conversions (like `encodeURIComponent`) continuously. This creates unnecessary CPU overhead and garbage collection (GC) pressure every tick.
-**Action:** Always hoist static string allocations and data conversions to the module level. This ensures they are calculated only once, making interval-based functions significantly leaner and preventing continuous memory allocation overhead.
+
+## 2025-06-05 - [Active Set Optimization for Sparse Animations]
+**Learning:** In high-frequency effects like the Matrix Rain glitch burst, iterating through the entire column set ( \approx 100$) for every trail level (=13$) to render a few active glitch columns (=3$) results in significant redundant work ((N \times T)$). By maintaining an "active set" array of glitch indices, we can reduce complexity to (G \times T)$, saving over 1,200 iterations per frame during bursts.
+**Action:** For animations that target a sparse subset of elements, maintain an array of active indices or objects instead of scanning the full state space with conditional checks in hot loops.

@@ -134,13 +134,19 @@ export default function RootLayout({
                           lower.includes('<base') ||
                           lower.includes('<embed') ||
                           lower.includes('<object') ||
-                          lower.includes('javascript:') ||
-                          /on[a-z]+\\s*=/.test(lower)
+                          lower.includes('<applet') ||
+                          lower.includes('<meta') ||
+                          lower.includes('<form') ||
+                          lower.includes('<iframe') ||
+                          lower.includes('<frame') ||
+                          lower.includes('<frameset') ||
+                          /javascript\\s*:/i.test(lower) ||
+                          /on[a-z]+\\s*=/i.test(lower)
                         ) {
                           console.warn('Blocked dangerous HTML pattern in Trusted Types default policy');
                           return s
-                            .replace(/<(script|base|embed|object)/gi, '<blocked-$1')
-                            .replace(/javascript:/gi, 'blocked-javascript:')
+                            .replace(/<(script|base|embed|object|applet|meta|form|iframe|frame|frameset)/gi, '<blocked-$1')
+                            .replace(/javascript\\s*:/gi, 'blocked-javascript:')
                             .replace(/on[a-z]+\\s*=/gi, (match) => 'blocked-' + match);
                         }
                       }
@@ -156,6 +162,7 @@ export default function RootLayout({
                           console.warn('Blocked cross-origin script URL in Trusted Types policy:', s);
                           return '/blocked-cross-origin-script';
                         }
+                        return url.href;
                       } catch (e) {
                         console.warn('Blocked invalid script URL in Trusted Types policy:', s);
                         return '/blocked-invalid-script';

@@ -28,9 +28,53 @@ export function Hero() {
   const [activeIntel, setActiveIntel] = React.useState<string | null>(null);
   const [showMethodology, setShowMethodology] = React.useState(false);
 
+  // UX Enhancement: Handle Escape key to close modals and manage scroll lock
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (showMethodology) setShowMethodology(false);
+        if (activeIntel) setActiveIntel(null);
+      }
+    };
+
+    if (showMethodology || activeIntel) {
+      window.addEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [showMethodology, activeIntel]);
+
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  // UX Enhancement: Handle Escape key to close modals & manage body scroll locking
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowMethodology(false);
+        setActiveIntel(null);
+      }
+    };
+
+    if (showMethodology || activeIntel !== null) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [showMethodology, activeIntel]);
 
   return (
     <section
@@ -221,6 +265,9 @@ export function Hero() {
             onClick={() => setShowMethodology(false)}
           >
             <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="methodology-modal-title"
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
@@ -228,10 +275,10 @@ export function Hero() {
               onClick={e => e.stopPropagation()}
             >
               <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
-                <span className="font-mono text-amber text-lg font-bold tracking-widest flex items-center gap-3">
+                <span id="methodology-modal-title" className="font-mono text-amber text-lg font-bold tracking-widest flex items-center gap-3">
                   <svg className="w-5 h-5 text-amber" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                   PENTEST_METHODOLOGY // LIFECYCLE
-                </span>
+                </h2>
                 <button
                   onClick={() => setShowMethodology(false)}
                   className="text-text-secondary hover:text-white transition-colors outline-none focus-visible:ring-2 focus-visible:ring-amber focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card"
@@ -304,6 +351,9 @@ export function Hero() {
             onClick={() => setActiveIntel(null)}
           >
             <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="intel-modal-title"
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
@@ -311,10 +361,10 @@ export function Hero() {
               onClick={e => e.stopPropagation()}
             >
               <div className="flex items-center justify-between mb-4 pb-2 border-b border-border">
-                <span className="font-mono text-cyan text-sm font-bold tracking-widest flex items-center gap-2">
+                <span id="intel-modal-title" className="font-mono text-cyan text-sm font-bold tracking-widest flex items-center gap-2">
                   <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                   INTEL_EXPANDED
-                </span>
+                </h2>
                 <button
                   onClick={() => setActiveIntel(null)}
                   className="text-text-secondary hover:text-white outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card p-1"

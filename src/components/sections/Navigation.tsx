@@ -111,6 +111,7 @@ export function Navigation() {
             onClick={() => scrollTo('hero')}
             className="flex items-center space-x-2 group outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card"
             aria-label="Scroll to top"
+            title="Scroll to top"
           >
             <span className="text-cyan font-mono font-bold">{'>_'}</span>
             <span className="font-display font-bold text-white tracking-widest text-sm md:text-base group-hover:text-cyan transition-colors">

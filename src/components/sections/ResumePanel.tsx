@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from 'react';
+import { useInView } from 'react-intersection-observer';
 import { toast } from 'react-hot-toast';
 import clsx from 'clsx';
 import { SectionTitle } from '@/components/ui/SectionTitle';

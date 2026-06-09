@@ -35,7 +35,7 @@
 **Learning:** A "default" Trusted Types policy is a powerful defense-in-depth layer, but it must be robust against common bypasses. Simply checking for `onclick=` isn't enough if an attacker uses `onclick =`. Additionally, an open `createScriptURL` policy defeats the purpose of restricting external scripts via CSP.
 **Prevention:** Use `\\s*` in regex for event handlers to account for whitespace. Enforce same-origin checks in `createScriptURL` within the default policy to prevent cross-origin script injection through standard DOM sinks.
 
-## 2025-06-06 - Hardened Trusted Types and Regex Escaping in Sinks
-**Vulnerability:** Bypass in Trusted Types default policy due to incomplete tag blocklist and broken regex detection for event handlers.
-**Learning:** When defining a Trusted Types policy inside a string passed to `dangerouslySetInnerHTML`, regular expression backslashes must be double-escaped (e.g., `\\s`) to be correctly interpreted as regex tokens (e.g., `\s`) in the browser. Failing to do so can result in the regex searching for literal backslashes, effectively disabling the security check.
-**Prevention:** Always verify the "wire-format" of security policies injected via strings. Use comprehensive regex and blocklists that include tags like `<embed>`, `<object>`, and `<meta>` to prevent varied XSS vectors and CSP bypasses.
+## 2026-06-07 - Robust Origin Validation in Trusted Types
+**Vulnerability:** Insecure origin validation in `createScriptURL` using simple string prefix matching (e.g., `startsWith('http')`), which can be bypassed by protocol-relative URLs or specially crafted strings.
+**Learning:** Security-critical origin checks should rely on built-in parser logic like the `URL` constructor rather than manual string manipulation to ensure consistent behavior across all edge cases (e.g., handling port numbers, trailing slashes, and protocol variations).
+**Prevention:** Always use `new URL(input, window.location.origin)` and compare the resulting `.origin` property against `window.location.origin` for robust same-origin enforcement. Additionally, expand HTML sanitization policies to cover modern and legacy embedding tags like `<embed>`, `<object>`, and `<applet>`.

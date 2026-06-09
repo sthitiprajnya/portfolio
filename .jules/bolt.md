@@ -81,6 +81,6 @@
 **Learning:** High-frequency global event listeners (like `mousemove`, `mouseover`, `mousedown`, `mouseup`, `touchstart`, `touchmove`, `scroll`) can block the main thread and cause layout jank, especially during scroll or animations, because the browser waits to see if `preventDefault()` will be called.
 **Action:** Always add `{ passive: true }` to these listeners when `preventDefault()` is not needed, so the browser can continue rendering/scrolling without waiting for the JavaScript event handler to finish.
 
-## 2026-08-05 - [Lazy Loading Heavy Third-Party Assets]
-**Learning:** Embedding heavy third-party assets like PDF viewers via `iframe` (estimated ~1.5MB total load including viewer UI) at the bottom of a page causes significant unnecessary network overhead and CPU work during initial page load. Deferring these until the user scrolls near the section using `IntersectionObserver` drastically improves Core Web Vitals, specifically LCP and TTI.
-**Action:** Always lazy-load heavy iframes (PDFs, Maps, Videos) that are not immediately visible. Use `rootMargin` to start loading slightly before they enter the viewport to minimize perceived delay.
+## 2025-06-05 - [Active Set Optimization for Sparse Animations]
+**Learning:** In high-frequency effects like the Matrix Rain glitch burst, iterating through the entire column set ( \approx 100$) for every trail level (=13$) to render a few active glitch columns (=3$) results in significant redundant work ((N \times T)$). By maintaining an "active set" array of glitch indices, we can reduce complexity to (G \times T)$, saving over 1,200 iterations per frame during bursts.
+**Action:** For animations that target a sparse subset of elements, maintain an array of active indices or objects instead of scanning the full state space with conditional checks in hot loops.

@@ -319,6 +319,7 @@ export function Hero() {
                   onClick={() => setActiveIntel(null)}
                   className="text-text-secondary hover:text-white outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card p-1"
                   aria-label="Close intel details"
+                  title="Close intel details"
                 >
                   [X]
                 </button>

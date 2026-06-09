@@ -71,7 +71,8 @@ export function useCardTilt() {
     };
 
     el.addEventListener('mouseenter', handleMouseEnter);
-    el.addEventListener('mousemove', handleMouseMove);
+    // BOLT: Add passive listener to high-frequency mousemove to ensure main-thread remains clear during scrolling
+    el.addEventListener('mousemove', handleMouseMove, { passive: true });
     el.addEventListener('mouseleave', handleMouseLeave);
     window.addEventListener('resize', updateRect, { passive: true });
     // Removed window.addEventListener('scroll', updateRect)

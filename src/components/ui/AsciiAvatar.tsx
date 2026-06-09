@@ -40,27 +40,21 @@ interface AsciiAvatarProps {
   className?: string;
 }
 
-/**
- * BOLT: Optimized sub-component to localize high-frequency scanline animation state.
- * This prevents the entire AsciiAvatar (including heavy images) from re-rendering every 120ms.
- */
-const AsciiFace = React.memo(({ inView, prefersReducedMotion, isHuman }: {
-  inView: boolean;
-  prefersReducedMotion: boolean;
-  isHuman: boolean;
-}) => {
+// BOLT: Extracting the face animation to a sub-component to prevent re-rendering the entire Avatar card every 120ms.
+function AsciiFace({ inView }: { inView: boolean }) {
   const [scanPos, setScanPos] = useState(0);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
-    if (prefersReducedMotion || !inView || isHuman) return;
+    if (prefersReducedMotion || !inView) return;
     const timer = setInterval(() => {
       setScanPos(prev => (prev >= AVATAR_LINES.length - 1 ? 0 : prev + 1));
     }, 120);
     return () => clearInterval(timer);
-  }, [prefersReducedMotion, inView, isHuman]);
+  }, [prefersReducedMotion, inView]);
 
   return (
-    <div className={clsx("absolute inset-0 pt-2 px-2 transition-opacity duration-500", !isHuman ? "opacity-100 z-10" : "opacity-0 z-0")}>
+    <>
       {AVATAR_LINES.map((line, idx) => (
         <div
           key={idx}
@@ -80,19 +74,14 @@ const AsciiFace = React.memo(({ inView, prefersReducedMotion, isHuman }: {
           style={{ animation: 'scan-sweep 3s linear infinite' }}
         />
       )}
-    </div>
+    </>
   );
-});
+}
 
-/**
- * BOLT: Optimized sub-component to localize the typing metadata state.
- * This prevents unnecessary re-renders of the parent AsciiAvatar component.
- */
-const MetadataPanel = React.memo(({ inView, prefersReducedMotion }: {
-  inView: boolean;
-  prefersReducedMotion: boolean;
-}) => {
+// BOLT: Extracting the metadata animation to a sub-component to prevent re-rendering the entire Avatar card every 300ms.
+function MetadataPanel({ inView }: { inView: boolean }) {
   const [visibleMeta, setVisibleMeta] = useState(0);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     if (prefersReducedMotion || !inView) {
@@ -128,7 +117,7 @@ const MetadataPanel = React.memo(({ inView, prefersReducedMotion }: {
       ))}
     </div>
   );
-});
+}
 
 export function AsciiAvatar({ className }: AsciiAvatarProps) {
   const [isHuman, setIsHuman] = useState(false);
@@ -174,7 +163,9 @@ export function AsciiAvatar({ className }: AsciiAvatarProps) {
       <div className="relative h-[240px] select-none flex items-center justify-center overflow-hidden bg-[rgba(0,0,0,0.4)] relative z-10" aria-hidden="true">
 
         {/* ASCII View */}
-        <AsciiFace inView={inView} prefersReducedMotion={prefersReducedMotion} isHuman={isHuman} />
+        <div className={clsx("absolute inset-0 pt-2 px-2 transition-opacity duration-500", !isHuman ? "opacity-100 z-10" : "opacity-0 z-0")}>
+          <AsciiFace inView={inView} />
+        </div>
 
         {/* Human View */}
         <div className={clsx("absolute inset-0 transition-opacity duration-500", isHuman ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none")}>
@@ -199,7 +190,7 @@ export function AsciiAvatar({ className }: AsciiAvatarProps) {
       </div>
 
       {/* ── Metadata panel ─────────────────────────────────── */}
-      <MetadataPanel inView={inView} prefersReducedMotion={prefersReducedMotion} />
+      <MetadataPanel inView={inView} />
 
       {/* ── Corner targeting reticles (matching hero aesthetic) ── */}
       <div className="absolute top-10 left-2 w-4 h-4 border-t-2 border-l-2 border-cyan/60 pointer-events-none z-20" />

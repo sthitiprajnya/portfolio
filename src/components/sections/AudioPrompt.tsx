@@ -13,11 +13,14 @@ interface AudioPromptProps {
 export function AudioPrompt({ onComplete }: AudioPromptProps) {
   const [isVisible, setIsVisible] = useState(false);
   const { setAudioEnabled } = useAudio();
+  const buttonRef = React.useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     // Only show if not booted
     if (sessionStorage.getItem('booted') !== 'true') {
       setIsVisible(true);
+      // Accessibility: Focus the button when modal appears
+      setTimeout(() => buttonRef.current?.focus(), 500);
     } else {
       onComplete();
     }
@@ -43,7 +46,7 @@ export function AudioPrompt({ onComplete }: AudioPromptProps) {
         transition={{ duration: 0.3 }}
         role="dialog"
         aria-modal="true"
-        aria-label="System boot prompt"
+        aria-labelledby="audio-prompt-title"
       >
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -54,13 +57,17 @@ export function AudioPrompt({ onComplete }: AudioPromptProps) {
             {/* Decorative scanline */}
             <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.25)_50%)] bg-[length:100%_4px] opacity-20 rounded-card" />
 
-            <div className="text-cyan font-bold text-xl mb-6 tracking-widest relative z-10 flex items-center justify-center gap-3">
+            <div
+              id="audio-prompt-title"
+              className="text-cyan font-bold text-xl mb-6 tracking-widest relative z-10 flex items-center justify-center gap-3"
+            >
                <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                SENTINEL ONLINE
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
               <CyberButton
+                ref={buttonRef}
                 onClick={handleChoice}
                 color="cyan"
                 className="w-full"

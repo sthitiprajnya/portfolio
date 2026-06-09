@@ -95,7 +95,7 @@ export function Projects() {
   );
 }
 
-function ProjectCard({ project, index }: { project: Project, index: number }) {
+const ProjectCard = React.memo(function ProjectCard({ project, index }: { project: Project, index: number }) {
   const { ref, rotateX, rotateY } = useCardTilt();
   const prefersReducedMotion = usePrefersReducedMotion();
   const [showMethodology, setShowMethodology] = useState(false);
@@ -179,6 +179,7 @@ function ProjectCard({ project, index }: { project: Project, index: number }) {
                 rel="noopener noreferrer"
                 className="text-text-muted hover:text-white transition-colors ml-4 flex-shrink-0"
                 aria-label={`View ${project.title} on GitHub`}
+                title={`View ${project.title} on GitHub`}
                 onClick={(e) => e.stopPropagation()}
               >
                 <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">

@@ -126,6 +126,7 @@ export function Navigation() {
               onClick={openSearch}
               className="flex items-center gap-3 px-3 py-1.5 rounded-card border border-border text-text-secondary hover:text-cyan hover:border-cyan hover:shadow-[var(--glow-cyan-sm)] transition-all outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black group"
               aria-label="Search site sections"
+              title="Search site sections"
               aria-keyshortcuts="/ ?"
             >
               <svg className="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

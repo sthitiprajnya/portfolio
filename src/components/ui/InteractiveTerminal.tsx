@@ -196,7 +196,11 @@ export function InteractiveTerminal({ className }: { className?: string }) {
         </div>
         <div className="mx-auto text-[0.65rem] text-text-muted">sthitaprajna@kali ~</div>
       </div>
-      <div className="p-4 leading-relaxed overflow-y-auto flex-grow scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+      <div
+        className="p-4 leading-relaxed overflow-y-auto flex-grow scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent"
+        aria-live="polite"
+        aria-atomic="false"
+      >
         {lines.map((line, lineIdx) => (
           <div key={lineIdx} className="flex whitespace-pre-wrap break-words">
             {line.prompt && <span className="text-text-muted mr-2 shrink-0">{line.prompt}</span>}

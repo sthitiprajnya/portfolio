@@ -75,6 +75,7 @@ export default function RootLayout({
     '@context': 'https://schema.org',
     '@type': 'Person',
     name: 'Sthitaprajna Biswal',
+    description: 'Information Security Engineer and Penetration Tester specializing in FinTech and Cloud Security.',
     jobTitle: 'Information Security Engineer',
     url: 'https://sthitiprajnya.github.io/portfolio/',
     sameAs: [
@@ -85,6 +86,10 @@ export default function RootLayout({
     worksFor: {
       '@type': 'Organization',
       name: 'iServeU Technology'
+    },
+    alumniOf: {
+      '@type': 'EducationalOrganization',
+      name: 'Veer Surendra Sai University of Technology (VSSUT)'
     },
     knowsAbout: [
       'Cybersecurity',

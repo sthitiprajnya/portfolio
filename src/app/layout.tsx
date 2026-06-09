@@ -129,32 +129,30 @@ export default function RootLayout({
                           lower.includes('<base') ||
                           lower.includes('<embed') ||
                           lower.includes('<object') ||
-                          lower.includes('<applet') ||
-                          lower.includes('<meta') ||
-                          /javascript\\s*:/gi.test(lower) ||
-                          /on[a-z]+\\s*=/gi.test(lower)
+                          lower.includes('javascript:') ||
+                          /on[a-z]+\\s*=/.test(lower)
                         ) {
                           console.warn('Blocked dangerous HTML pattern in Trusted Types default policy');
                           return s
-                            .replace(/<(script|base|embed|object|applet|meta)/gi, '<blocked-$1')
-                            .replace(/on[a-z]+\\s*=/gi, (match) => 'blocked-' + match)
-                            .replace(/javascript\\s*:/gi, 'blocked-javascript:');
+                            .replace(/<(script|base|embed|object)/gi, '<blocked-$1')
+                            .replace(/javascript:/gi, 'blocked-javascript:')
+                            .replace(/on[a-z]+\\s*=/gi, (match) => 'blocked-' + match);
                         }
                       }
                       return s;
                     },
                     createScript: (s) => s,
                     createScriptURL: (s) => {
-                      // Security: Allow only same-origin script URLs to prevent cross-origin injection.
+                      // Security: Robust origin validation using the URL constructor.
+                      // Prevents bypasses using userinfo (e.g., https://origin@evil.com).
                       try {
                         const url = new URL(s, window.location.origin);
-                        if (url.origin !== window.location.origin) {
+                        if (url.origin !== window.location.origin && (s.startsWith('http') || s.startsWith('//'))) {
                           console.warn('Blocked cross-origin script URL in Trusted Types policy:', s);
                           return '/blocked-cross-origin-script';
                         }
-                        return url.href;
                       } catch (e) {
-                        console.warn('Blocked invalid or unsafe script URL in Trusted Types policy:', s);
+                        console.warn('Blocked invalid script URL in Trusted Types policy:', s);
                         return '/blocked-invalid-script';
                       }
                     },

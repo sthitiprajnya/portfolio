@@ -103,20 +103,6 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
     window.addEventListener('resize', resize, { passive: true });
     resize();
 
-    // Pre-calculate trail colors to avoid string concatenation in the loop
-    const trailLength = 12;
-    const trailColorsNormal = new Array(trailLength + 1);
-    const trailColorsGlitch = new Array(trailLength + 1);
-
-    for (let j = 1; j <= trailLength; j++) {
-      const ratio = j / trailLength;
-      const g = Math.round(245 - ratio * (245 - 85));
-      const b = Math.round(255 - ratio * (255 - 51));
-      const opacity = (1 - ratio).toFixed(2);
-      trailColorsNormal[j] = `rgba(0, ${g}, ${b}, ${opacity})`;
-      trailColorsGlitch[j] = `rgba(255, 0, 85, ${opacity})`;
-    }
-
     const draw = () => {
       // Semi-transparent black to create fade effect
       ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
@@ -125,25 +111,27 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
       const dropsLen = drops.length;
       const charCount = MATRIX_CHAR_LEN;
 
-      // BOLT: Refactor the loop to batch rendering by trail level.
+      // BOLT: Batch rendering by trail level.
       // Iterating backwards from trail to lead ensures the bright white lead is drawn on top.
       // This reduces ctx.fillStyle state changes from O(N * T) to O(T), where T is trail length (~13).
       for (let j = TRAIL_LENGTH; j >= 0; j--) {
         const normalColor = TRAIL_COLORS[j];
         const glitchColor = GLITCH_TRAIL_COLORS[j];
 
-        // Process glitching columns first for this trail level
+        // BOLT: Process glitching columns first for this trail level.
+        // Complexity: O(G * T) instead of O(N * T) by using tracked indices.
         if (isGlitching) {
           ctx.fillStyle = glitchColor;
-          for (let i = 0; i < dropsLen; i++) {
-            if (glitchMask[i] === 0) continue;
-            const y = (drops[i] - j) * fontSize;
+          for (let i = 0; i < glitchIndices.length; i++) {
+            const idx = glitchIndices[i];
+            const y = (drops[idx] - j) * fontSize;
             if (y < 0 || y > height + fontSize) continue;
-            ctx.fillText(MATRIX_CHARS[Math.floor(fastRand() * charCount)], xCoords[i], y);
+            ctx.fillText(MATRIX_CHARS[Math.floor(fastRand() * charCount)], xCoords[idx], y);
           }
         }
 
-        // Process normal columns for this trail level
+        // Process normal columns for this trail level.
+        // Complexity: O(N * T) baseline for Matrix Rain.
         ctx.fillStyle = normalColor;
         for (let i = 0; i < dropsLen; i++) {
           if (isGlitching && glitchMask[i] === 1) continue;
@@ -168,11 +156,10 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
       animationFrameId = requestAnimationFrame(draw);
     };
 
-    const intervalId = setInterval(() => {
-      for (let i = 0; i < RAND_POOL_SIZE; i++) {
-        randPool[i] = Math.random();
-      }
-    }, 5000);
+    // BOLT: Regenerating the random pool is unnecessary for visual effects and adds periodic CPU work.
+    // We stick with the initial pool established at module level.
+
+    const glitchIndices: number[] = [];
 
     // Day 6: Glitch burst scheduler
     const scheduleGlitch = () => {
@@ -180,15 +167,18 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
       glitchTimeoutId = setTimeout(() => {
         isGlitching = true;
         glitchMask.fill(0);
+        glitchIndices.length = 0;
         for (let i = 0; i < 3; i++) {
           const colIndex = Math.floor(Math.random() * columns);
           glitchMask[colIndex] = 1;
+          glitchIndices.push(colIndex);
           drops[colIndex] = 0; // Reset to top
         }
 
         setTimeout(() => {
           isGlitching = false;
           glitchMask.fill(0);
+          glitchIndices.length = 0;
         }, 500); // 500ms duration
 
         scheduleGlitch();
@@ -202,7 +192,6 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
     return () => {
       window.removeEventListener('resize', resize);
       cancelAnimationFrame(animationFrameId);
-      clearInterval(intervalId);
       clearTimeout(glitchTimeoutId);
     };
   }, [prefersReducedMotion, inView]);

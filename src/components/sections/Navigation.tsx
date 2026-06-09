@@ -111,6 +111,7 @@ export function Navigation() {
             onClick={() => scrollTo('hero')}
             className="flex items-center space-x-2 group outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card"
             aria-label="Scroll to top"
+            title="Scroll to top"
           >
             <span className="text-cyan font-mono font-bold">{'>_'}</span>
             <span className="font-display font-bold text-white tracking-widest text-sm md:text-base group-hover:text-cyan transition-colors">
@@ -264,6 +265,8 @@ function AudioToggle({ mobile = false }: { mobile?: boolean }) {
         mobile ? "p-2 text-text-secondary" : "p-2 border border-border text-text-secondary hover:text-cyan hover:border-cyan hover:shadow-[var(--glow-cyan-sm)]"
       )}
       aria-label={audioEnabled ? "Mute audio" : "Unmute audio"}
+      title={audioEnabled ? "Mute audio" : "Unmute audio"}
+      aria-pressed={audioEnabled}
     >
       {isSpeaking && audioEnabled && (
         <span className="absolute -top-1 -right-1 flex h-2 w-2">

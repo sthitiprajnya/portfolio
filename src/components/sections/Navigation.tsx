@@ -126,6 +126,7 @@ export function Navigation() {
               onClick={openSearch}
               className="flex items-center gap-3 px-3 py-1.5 rounded-card border border-border text-text-secondary hover:text-cyan hover:border-cyan hover:shadow-[var(--glow-cyan-sm)] transition-all outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black group"
               aria-label="Search site sections"
+              title="Search site sections"
               aria-keyshortcuts="/ ?"
             >
               <svg className="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -175,6 +176,7 @@ export function Navigation() {
               onClick={openSearch}
               className="text-text-secondary p-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card"
               aria-label="Search site sections"
+              title="Search site sections"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -187,6 +189,7 @@ export function Navigation() {
               aria-expanded={mobileMenuOpen}
               aria-controls="mobile-menu"
               aria-label="Open navigation menu"
+              title="Open navigation menu"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"/>
@@ -211,7 +214,7 @@ export function Navigation() {
           >
             <div className="flex justify-between items-center mb-10">
               <span className="font-display font-bold text-white tracking-widest text-sm">SYSTEM_MENU</span>
-              <button onClick={() => setMobileMenuOpen(false)} className="text-cyan p-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card" aria-label="Close navigation menu">
+              <button onClick={() => setMobileMenuOpen(false)} className="text-cyan p-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card" aria-label="Close navigation menu" title="Close navigation menu">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
@@ -264,6 +267,8 @@ function AudioToggle({ mobile = false }: { mobile?: boolean }) {
         mobile ? "p-2 text-text-secondary" : "p-2 border border-border text-text-secondary hover:text-cyan hover:border-cyan hover:shadow-[var(--glow-cyan-sm)]"
       )}
       aria-label={audioEnabled ? "Mute audio" : "Unmute audio"}
+      title={audioEnabled ? "Mute audio" : "Unmute audio"}
+      aria-pressed={audioEnabled}
     >
       {isSpeaking && audioEnabled && (
         <span className="absolute -top-1 -right-1 flex h-2 w-2">

@@ -80,3 +80,6 @@
 ## 2026-05-31 - Passive Event Listeners for High-Frequency Events
 **Learning:** High-frequency global event listeners (like `mousemove`, `mouseover`, `mousedown`, `mouseup`, `touchstart`, `touchmove`, `scroll`) can block the main thread and cause layout jank, especially during scroll or animations, because the browser waits to see if `preventDefault()` will be called.
 **Action:** Always add `{ passive: true }` to these listeners when `preventDefault()` is not needed, so the browser can continue rendering/scrolling without waiting for the JavaScript event handler to finish.
+## 2026-06-09 - [Hoisting Static Strings from setInterval Loops]
+**Learning:** In high-frequency React hooks that utilize `setInterval` (such as `useFaviconBlink.ts`), declaring static strings, string interpolations, or functions like `encodeURIComponent` inside the callback function forces the V8 engine to continually allocate new memory and perform string processing on every tick. This results in unnecessary CPU overhead and triggers frequent garbage collection (GC) pauses.
+**Action:** Always hoist invariant strings, parsed colors, and heavy deterministic function calls outside of `setInterval` closures or React `useEffect` bodies to the module scope.

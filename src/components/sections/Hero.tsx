@@ -265,6 +265,9 @@ export function Hero() {
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="methodology-modal-title"
               className="bg-surface border border-amber/30 rounded-card p-6 max-w-4xl w-full shadow-[var(--glow-amber-md)] max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-border"
               onClick={e => e.stopPropagation()}
               role="dialog"
@@ -354,6 +357,9 @@ export function Hero() {
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="intel-modal-title"
               className="bg-surface border border-cyan/30 rounded-card p-6 max-w-md w-full shadow-[var(--glow-cyan-md)]"
               onClick={e => e.stopPropagation()}
               role="dialog"
@@ -392,6 +398,7 @@ export function Hero() {
         onClick={() => scrollTo('about')}
         className="absolute bottom-20 left-1/2 -translate-x-1/2 text-cyan flex flex-col items-center group p-4 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card"
         aria-label="Scroll to About section"
+        title="Scroll to About section"
       >
         <span className="font-mono text-[0.6rem] uppercase tracking-widest mb-2 opacity-50 group-hover:opacity-100 transition-opacity">
           SCROLL

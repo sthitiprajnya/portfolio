@@ -275,7 +275,7 @@ export function Hero() {
               aria-labelledby="methodology-modal-title"
             >
               <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
-                <span id="methodology-modal-title" className="font-mono text-amber text-lg font-bold tracking-widest flex items-center gap-3">
+                <h2 id="methodology-modal-title" className="font-mono text-amber text-lg font-bold tracking-widest flex items-center gap-3">
                   <svg className="w-5 h-5 text-amber" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                   PENTEST_METHODOLOGY // LIFECYCLE
                 </h2>
@@ -367,7 +367,7 @@ export function Hero() {
               aria-labelledby="intel-modal-title"
             >
               <div className="flex items-center justify-between mb-4 pb-2 border-b border-border">
-                <span id="intel-modal-title" className="font-mono text-cyan text-sm font-bold tracking-widest flex items-center gap-2">
+                <h2 id="intel-modal-title" className="font-mono text-cyan text-sm font-bold tracking-widest flex items-center gap-2">
                   <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                   INTEL_EXPANDED
                 </h2>

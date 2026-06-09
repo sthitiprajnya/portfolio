@@ -298,4 +298,4 @@ const ProjectCard = React.memo(function ProjectCard({ project, index }: { projec
       </div>
     </motion.div>
   );
-}
+});

@@ -39,3 +39,8 @@
 **Vulnerability:** Insecure origin validation in `createScriptURL` using simple string prefix matching (e.g., `startsWith('http')`), which can be bypassed by protocol-relative URLs or specially crafted strings.
 **Learning:** Security-critical origin checks should rely on built-in parser logic like the `URL` constructor rather than manual string manipulation to ensure consistent behavior across all edge cases (e.g., handling port numbers, trailing slashes, and protocol variations).
 **Prevention:** Always use `new URL(input, window.location.origin)` and compare the resulting `.origin` property against `window.location.origin` for robust same-origin enforcement. Additionally, expand HTML sanitization policies to cover modern and legacy embedding tags like `<embed>`, `<object>`, and `<applet>`.
+
+## 2026-06-10 - Resilient Trusted Types Configuration
+**Vulnerability:** Broken script loading due to missing return statements in Trusted Types callbacks and incomplete sanitization of `javascript:` URIs.
+**Learning:** Security-critical callbacks (like `createScriptURL`) must return the validated value; otherwise, they implicitly return `undefined`, which the browser treats as a block, breaking application functionality. Furthermore, sanitization regexes should be case-insensitive and account for whitespace to prevent trivial bypasses (e.g., `javaScript  :`).
+**Prevention:** Always ensure every branch of a Trusted Types policy returns a value. Use the `/i` flag and `\\s*` in sanitization regexes. Periodically audit policies to include modern and legacy sinks like `<applet>`, `<meta>`, and `<form>` to maintain a strong defense-in-depth posture.

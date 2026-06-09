@@ -8,7 +8,6 @@ import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { LogoBadge } from '@/components/ui/LogoBadge';
 import { EXPERIENCE } from '@/data/portfolio';
 
-
 // BOLT: Hoist static configurations and regexes to module level to avoid redundant allocations on every render
 const ACTIVE_COLOR_MAP = {
   cyan: 'bg-cyan/10 text-cyan border-cyan',
@@ -21,6 +20,37 @@ const CRITICAL_REGEX = /SQL Injection|RCE|critical/i;
 const HIGH_REGEX = /privilege escalation|high/i;
 const METRIC_REGEX = /(\d+%|\d+\+? hours|55%|100%|80%|35%|zero)/gi;
 const METRIC_MATCH_REGEX = /(\d+%|\d+\+? hours|55%|100%|80%|35%|zero)/i;
+
+// BOLT: Pre-process static experience data at the module level to eliminate 30+ regex executions and string splits per render.
+const PROCESSED_EXPERIENCE = EXPERIENCE.map(exp => ({
+  ...exp,
+  subsections: exp.subsections.map(sub => ({
+    ...sub,
+    processedBullets: sub.bullets.map(bullet => {
+      const severity: 'CRITICAL' | 'HIGH' | null = CRITICAL_REGEX.test(bullet) ? 'CRITICAL' : HIGH_REGEX.test(bullet) ? 'HIGH' : null;
+      const parts = bullet.split(METRIC_REGEX).map(part => ({
+        text: part,
+        isMetric: METRIC_MATCH_REGEX.test(part)
+      }));
+      return { parts, severity };
+    })
+  }))
+}));
+
+type ProcessedExperienceItem = typeof PROCESSED_EXPERIENCE[0];
+
+// BOLT: Hoist SeverityBadge to avoid recreation during render.
+const SeverityBadge = ({ severity }: { severity: 'CRITICAL' | 'HIGH' }) => {
+  const isCritical = severity === 'CRITICAL';
+  return (
+    <span className={clsx(
+      "inline-flex items-center ml-2 px-1.5 py-0.5 rounded-card border font-mono text-[0.55rem] uppercase font-bold",
+      isCritical ? "bg-red-500/20 text-red-500 border-red-500/50" : "bg-amber-500/20 text-amber-500 border-amber-500/50"
+    )}>
+      {severity}
+    </span>
+  );
+};
 
 export function Experience() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -59,7 +89,7 @@ export function Experience() {
 
           {/* Experience Items */}
           <div className="space-y-24">
-            {EXPERIENCE.map((exp, idx) => (
+            {PROCESSED_EXPERIENCE.map((exp, idx) => (
               <ExperienceCard key={exp.id} experience={exp} isFirst={idx === 0} />
             ))}
           </div>
@@ -69,7 +99,8 @@ export function Experience() {
   );
 }
 
-const ExperienceCard = React.memo(function ExperienceCard({ experience, isFirst }: { experience: typeof EXPERIENCE[0], isFirst: boolean }) {
+// BOLT: Wrap ExperienceCard in React.memo to prevent unnecessary re-renders of static experience data.
+const ExperienceCard = React.memo(function ExperienceCard({ experience, isFirst }: { experience: ProcessedExperienceItem, isFirst: boolean }) {
   const [openSection, setOpenSection] = useState<string | null>(experience.subsections[0]?.id || null);
   const prefersReducedMotion = usePrefersReducedMotion();
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -208,12 +239,6 @@ const ExperienceCard = React.memo(function ExperienceCard({ experience, isFirst 
               {experience.subsections.map((sub) => {
                 if (openSection !== sub.id) return null;
 
-                const getSeverityBadge = (text: string) => {
-                  if (CRITICAL_REGEX.test(text)) return <span className="inline-flex items-center ml-2 px-1.5 py-0.5 rounded-card bg-red-500/20 text-red-500 border border-red-500/50 font-mono text-[0.55rem] uppercase font-bold">CRITICAL</span>;
-                  if (HIGH_REGEX.test(text)) return <span className="inline-flex items-center ml-2 px-1.5 py-0.5 rounded-card bg-amber-500/20 text-amber-500 border border-amber-500/50 font-mono text-[0.55rem] uppercase font-bold">HIGH</span>;
-                  return null;
-                };
-
                 return (
                   <motion.div
                     key={sub.id}
@@ -227,17 +252,18 @@ const ExperienceCard = React.memo(function ExperienceCard({ experience, isFirst 
                     className="relative z-10"
                   >
                     <ul className="space-y-4">
-                      {sub.bullets.map((bullet, i) => (
+                      {sub.processedBullets.map((bullet, i) => (
                         <li key={i} className="flex items-start text-sm text-text-secondary leading-relaxed group/bullet">
                           <span className="mr-3 mt-1.5 text-cyan opacity-50 group-hover/bullet:opacity-100 transition-opacity">▹</span>
                           <span>
-                            {bullet.split(METRIC_REGEX).map((part, pIdx) => {
-                              if (METRIC_MATCH_REGEX.test(part)) {
-                                return <strong key={pIdx} className="text-white font-bold">{part}</strong>;
-                              }
-                              return part;
-                            })}
-                            {getSeverityBadge(bullet)}
+                            {bullet.parts.map((part, pIdx) => (
+                              part.isMetric ? (
+                                <strong key={pIdx} className="text-white font-bold">{part.text}</strong>
+                              ) : (
+                                <React.Fragment key={pIdx}>{part.text}</React.Fragment>
+                              )
+                            ))}
+                            {bullet.severity && <SeverityBadge severity={bullet.severity} />}
                           </span>
                         </li>
                       ))}

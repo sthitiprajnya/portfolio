@@ -40,29 +40,11 @@ interface AsciiAvatarProps {
   className?: string;
 }
 
-export function AsciiAvatar({ className }: AsciiAvatarProps) {
-  const [visibleMeta, setVisibleMeta] = useState(0);
+// BOLT: Extracting the face animation to a sub-component to prevent re-rendering the entire Avatar card every 120ms.
+function AsciiFace({ inView }: { inView: boolean }) {
   const [scanPos, setScanPos] = useState(0);
-  const [isHuman, setIsHuman] = useState(false);
   const prefersReducedMotion = usePrefersReducedMotion();
-  const { ref, inView } = useInView({ threshold: 0 });
 
-  // Animate the metadata lines appearing one by one after mount
-  useEffect(() => {
-    if (prefersReducedMotion || !inView) {
-      if (prefersReducedMotion) setVisibleMeta(META_LINES.length);
-      return;
-    }
-    const timer = setInterval(() => {
-      setVisibleMeta(prev => {
-        if (prev >= META_LINES.length) { clearInterval(timer); return prev; }
-        return prev + 1;
-      });
-    }, 300);
-    return () => clearInterval(timer);
-  }, [prefersReducedMotion, inView]);
-
-  // Animate the scanline sweeping downward over the face art
   useEffect(() => {
     if (prefersReducedMotion || !inView) return;
     const timer = setInterval(() => {
@@ -70,6 +52,77 @@ export function AsciiAvatar({ className }: AsciiAvatarProps) {
     }, 120);
     return () => clearInterval(timer);
   }, [prefersReducedMotion, inView]);
+
+  return (
+    <>
+      {AVATAR_LINES.map((line, idx) => (
+        <div
+          key={idx}
+          className={clsx(
+            'relative font-mono text-[0.68rem] leading-[1.45] whitespace-pre transition-colors duration-100',
+            !prefersReducedMotion && idx === scanPos
+              ? 'text-cyan bg-cyan/10'
+              : 'text-cyan/70'
+          )}
+        >
+          {line}
+        </div>
+      ))}
+      {!prefersReducedMotion && (
+        <div
+          className="absolute left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan/40 to-transparent pointer-events-none"
+          style={{ animation: 'scan-sweep 3s linear infinite' }}
+        />
+      )}
+    </>
+  );
+}
+
+// BOLT: Extracting the metadata animation to a sub-component to prevent re-rendering the entire Avatar card every 300ms.
+function MetadataPanel({ inView }: { inView: boolean }) {
+  const [visibleMeta, setVisibleMeta] = useState(0);
+  const prefersReducedMotion = usePrefersReducedMotion();
+
+  useEffect(() => {
+    if (prefersReducedMotion || !inView) {
+      if (prefersReducedMotion) setVisibleMeta(META_LINES.length);
+      return;
+    }
+    const timer = setInterval(() => {
+      setVisibleMeta(prev => {
+        if (prev >= META_LINES.length) {
+          clearInterval(timer);
+          return prev;
+        }
+        return prev + 1;
+      });
+    }, 300);
+    return () => clearInterval(timer);
+  }, [prefersReducedMotion, inView]);
+
+  return (
+    <div className="border-t border-[var(--glass-border)] bg-[rgba(0,0,0,0.6)] px-3 pt-2 pb-3 space-y-[2px] relative z-10">
+      {META_LINES.map((line, idx) => (
+        <div
+          key={idx}
+          className={clsx(
+            'font-mono text-[0.65rem] leading-relaxed transition-all duration-300',
+            idx < visibleMeta
+              ? 'opacity-100 translate-x-0 text-green/90'
+              : 'opacity-0 -translate-x-2'
+          )}
+        >
+          {line}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function AsciiAvatar({ className }: AsciiAvatarProps) {
+  const [isHuman, setIsHuman] = useState(false);
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const { ref, inView } = useInView({ threshold: 0 });
 
   return (
     <div
@@ -111,25 +164,7 @@ export function AsciiAvatar({ className }: AsciiAvatarProps) {
 
         {/* ASCII View */}
         <div className={clsx("absolute inset-0 pt-2 px-2 transition-opacity duration-500", !isHuman ? "opacity-100 z-10" : "opacity-0 z-0")}>
-          {AVATAR_LINES.map((line, idx) => (
-            <div
-              key={idx}
-              className={clsx(
-                'relative font-mono text-[0.68rem] leading-[1.45] whitespace-pre transition-colors duration-100',
-                !prefersReducedMotion && idx === scanPos
-                  ? 'text-cyan bg-cyan/10'
-                  : 'text-cyan/70'
-              )}
-            >
-              {line}
-            </div>
-          ))}
-          {!prefersReducedMotion && (
-            <div
-              className="absolute left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan/40 to-transparent pointer-events-none"
-              style={{ animation: 'scan-sweep 3s linear infinite' }}
-            />
-          )}
+          <AsciiFace inView={inView} />
         </div>
 
         {/* Human View */}
@@ -155,21 +190,7 @@ export function AsciiAvatar({ className }: AsciiAvatarProps) {
       </div>
 
       {/* ── Metadata panel ─────────────────────────────────── */}
-      <div className="border-t border-[var(--glass-border)] bg-[rgba(0,0,0,0.6)] px-3 pt-2 pb-3 space-y-[2px] relative z-10">
-        {META_LINES.map((line, idx) => (
-          <div
-            key={idx}
-            className={clsx(
-              'font-mono text-[0.65rem] leading-relaxed transition-all duration-300',
-              idx < visibleMeta
-                ? 'opacity-100 translate-x-0 text-green/90'
-                : 'opacity-0 -translate-x-2'
-            )}
-          >
-            {line}
-          </div>
-        ))}
-      </div>
+      <MetadataPanel inView={inView} />
 
       {/* ── Corner targeting reticles (matching hero aesthetic) ── */}
       <div className="absolute top-10 left-2 w-4 h-4 border-t-2 border-l-2 border-cyan/60 pointer-events-none z-20" />

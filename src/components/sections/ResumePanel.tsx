@@ -1,11 +1,13 @@
 "use client";
 import React, { useState } from 'react';
+import { useInView } from 'react-intersection-observer';
 import { toast } from 'react-hot-toast';
 import clsx from 'clsx';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { CyberButton }  from '@/components/ui/CyberButton';
 import { ScrollReveal, fadeSlideUp, fadeSlideLeft, containerStagger } from '@/components/ui/ScrollReveal';
 import { PERSONAL, RESUME_HIGHLIGHTS } from '@/data/portfolio';
+import { useInView } from 'react-intersection-observer';
 
 const RESUME_SHA256 = 'f4a9f24d314dd2a6869c505d896746a84561e97392e77d1a53c6b8adcbc06c91';
 
@@ -15,6 +17,14 @@ const RESUME_SHA256 = 'f4a9f24d314dd2a6869c505d896746a84561e97392e77d1a53c6b8adc
 export function ResumePanel() {
   const [downloadStarted, setDownloadStarted] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+
+  // BOLT: Performance Optimization — Lazy-load the ~1.5MB PDF asset.
+  // We use IntersectionObserver with a rootMargin of 200px to ensure the PDF starts
+  // loading just before the user scrolls to it, improving TTI and reducing initial bandwidth.
+  const { ref: iframeRef, inView } = useInView({
+    triggerOnce: true,
+    rootMargin: '200px',
+  });
 
   const handleDownload = () => {
     setDownloadStarted(true);
@@ -88,22 +98,32 @@ export function ResumePanel() {
               </div>
 
               {/* Document body / PDF viewer */}
-              <div className="w-full bg-[rgba(0,0,0,0.4)] relative z-10">
-                <iframe
-                  src={PERSONAL.resumeUrl}
-                  className="w-full h-[600px] border-none"
-                  title="Resume PDF"
-                  sandbox="allow-same-origin"
-                  referrerPolicy="no-referrer"
-                  allow="camera 'none'; microphone 'none'; geolocation 'none'; autoplay 'none'; payment 'none'; usb 'none'; magnetometer 'none'; accelerometer 'none'; gyroscope 'none'"
-                />
+              <div ref={iframeRef} className="w-full bg-[rgba(0,0,0,0.4)] relative z-10 min-h-[600px] flex items-center justify-center">
+                {inView ? (
+                  <iframe
+                    src={PERSONAL.resumeUrl}
+                    className="w-full h-[600px] border-none"
+                    title="Resume PDF"
+                    sandbox="allow-same-origin"
+                    referrerPolicy="no-referrer"
+                    loading="lazy"
+                    allow="camera 'none'; microphone 'none'; geolocation 'none'; autoplay 'none'; payment 'none'; usb 'none'; magnetometer 'none'; accelerometer 'none'; gyroscope 'none'"
+                  />
+                ) : (
+                  <div className="flex flex-col items-center gap-4 text-text-muted animate-pulse font-mono text-xs uppercase tracking-widest">
+                    <svg className="w-12 h-12 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Decrypting_Document_Buffer...
+                  </div>
+                )}
               </div>
 
               {/* Footer stamp */}
               <div className="px-6 py-4 border-t border-[var(--glass-border)] flex flex-col md:flex-row justify-between items-center bg-[rgba(0,0,0,0.6)] gap-4 relative z-10">
                 <span className="text-[0.6rem] text-text-muted font-mono text-center md:text-left">
                   DOC_ID: <span
-                    className="redacted"
+                    className="redacted group/doc"
                     tabIndex={0}
                     role="button"
                     aria-label="Reveal and copy document ID"
@@ -115,7 +135,12 @@ export function ResumePanel() {
                         handleCopy('SB-RESUME-2025-v3', 'Document ID');
                       }
                     }}
-                  >SB-RESUME-2025-v3</span><br className="md:hidden" />
+                  >
+                    SB-RESUME-2025-v3
+                    <span className="absolute -top-6 left-1/2 -translate-x-1/2 bg-black border border-amber text-amber px-2 py-0.5 rounded-card opacity-0 invisible group-focus/doc:opacity-100 group-focus/doc:visible group-hover/doc:opacity-100 group-hover/doc:visible transition-all text-[0.5rem] w-max z-50 pointer-events-none">
+                      Click to copy
+                    </span>
+                  </span><br className="md:hidden" />
                   <span className="hidden md:inline"> · </span>SHA256: <span
                     className="redacted group/hash"
                     tabIndex={0}

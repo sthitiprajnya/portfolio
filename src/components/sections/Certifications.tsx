@@ -65,7 +65,7 @@ export function Certifications() {
   );
 }
 
-function CertCard({ cert }: { cert: typeof CERTIFICATIONS[0] }) {
+const CertCard = React.memo(function CertCard({ cert }: { cert: typeof CERTIFICATIONS[0] }) {
   const style = CERT_COLOR_MAP[cert.color];
 
   return (
@@ -159,4 +159,4 @@ function CertCard({ cert }: { cert: typeof CERTIFICATIONS[0] }) {
       </div>
     </div>
   );
-}
+});

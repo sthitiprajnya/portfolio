@@ -2,6 +2,6 @@
 **Learning:** Screen readers reading out "VIEW METHODOLOGY" for multiple identical buttons across a grid of project cards provides no context about *which* project is being expanded. Adding context mapping via `aria-label` is crucial.
 **Action:** When implementing repeating interactive components (like cards or list items) with identical visible call-to-actions, always provide disambiguating context using `aria-label` or `aria-describedby` referencing the item's title or ID.
 
-## 2024-06-09 - Accessible Icon Buttons and Toggles
-**Learning:** Icon-only buttons with `aria-label` are accessible to screen readers, but sighted keyboard users and mouse users rely on tooltips for intent. A native `title` attribute should always accompany `aria-label` for icon-only interactive elements. Furthermore, buttons that act as toggles must use `aria-pressed` to semantically communicate their state changes to assistive technologies.
-**Action:** Always add a native `title` attribute alongside `aria-label` for icon-only buttons. Always ensure toggle buttons include the `aria-pressed` attribute reflecting their active state.
+## 2026-06-07 - Accessible Modal Lifecycle Pattern
+**Learning:** Modals require a trifecta of accessibility: WAI-ARIA roles/attributes (dialog, aria-modal, aria-labelledby), keyboard support (Escape key), and layout management (body scroll locking). Without these, the interaction feels disconnected and creates friction for users with assistive technology or those navigating via keyboard.
+**Action:** When implementing any overlay or modal component, always use a useEffect hook to synchronize visibility with the Escape key listener and document.body.style.overflow state. Ensure titles use semantic heading tags (h2-h4) with unique IDs.

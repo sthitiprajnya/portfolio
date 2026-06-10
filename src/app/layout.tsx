@@ -61,9 +61,7 @@ export const viewport: Viewport = {
 };
 
 import { FaviconBlinkProvider } from '@/components/providers/FaviconBlinkProvider';
-import { AudioProvider } from '@/components/providers/AudioProvider';
 import { VisibilityOptimiserProvider } from '@/components/providers/VisibilityOptimiserProvider';
-import LivieBot from '@/components/livie/LivieBot';
 import Sentinel from '@/components/canvas/Sentinel';
 
 export default function RootLayout({
@@ -190,13 +188,10 @@ export default function RootLayout({
         </a>
         <div id="root">
           <VisibilityOptimiserProvider>
-            <AudioProvider>
-              <FaviconBlinkProvider>
-                <Sentinel />
-                {children}
-                <LivieBot />
-              </FaviconBlinkProvider>
-            </AudioProvider>
+            <FaviconBlinkProvider>
+              <Sentinel />
+              {children}
+            </FaviconBlinkProvider>
           </VisibilityOptimiserProvider>
         </div>
       </body>

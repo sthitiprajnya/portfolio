@@ -8,12 +8,9 @@ import { PERSONAL } from '@/data/portfolio';
 
 type Status = 'idle' | 'transmitting' | 'sent' | 'error';
 
-import { useAudio } from '@/components/providers/AudioProvider';
-
 // This form uses EmailJS to send emails directly from the browser.
 export function Contact() {
   const formRef = useRef<HTMLFormElement>(null);
-  const { speak } = useAudio();
 
   const [form, setForm] = useState({
     from_name:  '',
@@ -147,7 +144,6 @@ export function Contact() {
       );
 
       setStatus('sent');
-      speak("Message transmitted. Awaiting response.");
       try {
         localStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
       } catch (e) {

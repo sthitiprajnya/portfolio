@@ -17,11 +17,11 @@ interface Node {
 }
 
 // BOLT: Hoist static animation constants to module level to avoid redundant allocations and property lookups
-const DEFAULT_NUM_NODES = 70;
-const MOBILE_NUM_NODES = 35;
-const MAX_DISTANCE = 150;
+const DEFAULT_NUM_NODES = 20;
+const MOBILE_NUM_NODES = 10;
+const MAX_DISTANCE = 100;
 const MAX_DISTANCE_SQ = MAX_DISTANCE * MAX_DISTANCE;
-const NODE_COLOR = 'rgba(0, 245, 255, 0.5)';
+const NODE_COLOR = 'rgba(0, 245, 255, 0.3)';
 
 export default function NetworkConnector({ className }: NetworkConnectorProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -166,7 +166,7 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
         const len = bucket.length;
         if (len === 0) continue;
 
-        ctx.globalAlpha = (b + 1) * 0.05;
+        ctx.globalAlpha = (b + 1) * 0.02; // Very faint lines
         ctx.beginPath();
         for (let i = 0; i < len; i += 4) {
           ctx.moveTo(bucket[i], bucket[i + 1]);

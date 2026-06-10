@@ -31,8 +31,8 @@ interface ParsedTheme {
   specular: RgbaColor;
 }
 
-const BASE_GLOW = 20;
-const MAX_GLOW = 60;
+const BASE_GLOW = 5; // Minimalistic base glow
+const MAX_GLOW = 20; // Only glow heavily when targeted/scrolled near
 
 function lerpColor(current: number, target: number, factor: number) {
   return current + (target - current) * factor;

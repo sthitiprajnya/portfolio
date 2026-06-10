@@ -4,14 +4,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { NAV_LINKS } from '@/components/sections/Navigation'; // Will export this from Navigation.tsx
-import { useAudio } from '@/components/providers/AudioProvider';
 
 export function CommandPalette() {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
-  const { speak } = useAudio();
 
   useEffect(() => {
     const handleOpen = () => {
@@ -19,7 +17,6 @@ export function CommandPalette() {
         setIsOpen(true);
         setQuery('');
         setSelectedIndex(0);
-        speak("Command terminal ready.");
       }
     };
 
@@ -47,7 +44,7 @@ export function CommandPalette() {
       document.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('open-command-palette', handleOpen);
     };
-  }, [isOpen, speak]);
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen) {
@@ -86,15 +83,12 @@ export function CommandPalette() {
       setSelectedIndex(prev => (prev - 1 + filteredLinks.length) % filteredLinks.length);
     } else if (e.key === 'Enter' && filteredLinks[selectedIndex]) {
       e.preventDefault();
-      handleSelect(filteredLinks[selectedIndex].id, filteredLinks[selectedIndex].label);
+      handleSelect(filteredLinks[selectedIndex].id);
     }
   };
 
-  const handleSelect = (id: string, label?: string) => {
+  const handleSelect = (id: string) => {
     setIsOpen(false);
-    if (label) {
-      speak(label);
-    }
     setTimeout(() => {
       document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
     }, 100);
@@ -188,7 +182,7 @@ export function CommandPalette() {
                         'w-full text-left px-4 py-3 rounded-card flex items-center justify-between font-mono text-sm transition-colors',
                         isSelected ? 'bg-cyan/10 text-cyan border border-cyan/20 glass-pill rounded-pill' : 'text-text-secondary hover:bg-white/5 hover:text-white border border-transparent rounded-pill'
                       )}
-                      onClick={() => handleSelect(link.id, link.label)}
+                      onClick={() => handleSelect(link.id)}
                       onMouseEnter={() => setSelectedIndex(i)}
                     >
                       <span className="flex items-center gap-3">

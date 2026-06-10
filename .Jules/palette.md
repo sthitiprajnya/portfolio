@@ -4,3 +4,6 @@
 ## 2026-06-08 - Native Tooltips for Icon-Only Buttons
 **Learning:** While `aria-label` ensures screen readers can interpret icon-only buttons, sighted users without screen readers may struggle to understand ambiguous icons since `aria-label` provides no visual hover feedback. Relying solely on `aria-label` leaves an accessibility gap for sighted users with cognitive impairments or those unfamiliar with specific iconography.
 **Action:** When adding `aria-label` to icon-only buttons, always accompany it with a native `title` attribute (or a custom visual tooltip) to ensure the intent is accessible via hover for all users. Additionally, ensure toggle buttons utilize `aria-pressed` to semantically communicate state changes.
+## 2026-06-10 - Added native titles to icon-only buttons
+**Learning:** Some custom components like `SkillBadge` combine `aria-describedby` (hinting at a custom tooltip) with `aria-label`. Sighted users need native tooltips (`title`) if custom visual tooltips are missing.
+**Action:** Always verify if a custom tooltip exists when an element has `aria-describedby` or `aria-label` but no visible text. If missing, fall back to native `title` for immediate accessibility win without introducing complex UI state.

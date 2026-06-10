@@ -44,3 +44,8 @@
 **Vulnerability:** Broken script loading due to missing return statements in Trusted Types callbacks and incomplete sanitization of `javascript:` URIs.
 **Learning:** Security-critical callbacks (like `createScriptURL`) must return the validated value; otherwise, they implicitly return `undefined`, which the browser treats as a block, breaking application functionality. Furthermore, sanitization regexes should be case-insensitive and account for whitespace to prevent trivial bypasses (e.g., `javaScript  :`).
 **Prevention:** Always ensure every branch of a Trusted Types policy returns a value. Use the `/i` flag and `\\s*` in sanitization regexes. Periodically audit policies to include modern and legacy sinks like `<applet>`, `<meta>`, and `<form>` to maintain a strong defense-in-depth posture.
+
+## 2025-06-12 - Resilient Regex Escaping in Inline Trusted Types
+**Vulnerability:** Bypassable security sanitization in Trusted Types policy due to incorrect regex escaping within inline script strings.
+**Learning:** When defining a Trusted Types policy inside a string literal (e.g., passed to `dangerouslySetInnerHTML`), regular expression backslashes (like `\s`) must be double-escaped (`\\s`). Single-escaped backslashes are consumed by the string parser, resulting in a regex literal like `/javascripts:/` instead of `/javascript\s*:/`, which attackers can easily bypass with whitespace.
+**Prevention:** Always use `\\s` and other double-escaped meta-characters when embedding regex logic inside strings intended for browser-side evaluation. Verify the final evaluated regex in the browser console or via automated tests to ensure it matches intended patterns.

@@ -153,7 +153,7 @@ export default function HeroOrb() {
       targetCtx.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
 
       const pulse = 1 + 0.06 * Math.sin(t * 4);    // slow breathing scale
-      const r     = 200 * pulse;                      // outer glow radius
+      const r     = 60 * pulse;                      // much smaller outer glow radius
 
       // Day 5: Slow color shift between cyan and violet over 20s
       const shiftFactor = (Math.sin(t * 0.05) + 1) / 2; // Maps to 0-1

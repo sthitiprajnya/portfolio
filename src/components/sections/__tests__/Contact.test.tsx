@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Contact } from '../Contact';
 import emailjs from '@emailjs/browser';
-import { AudioProvider } from '@/components/providers/AudioProvider';
 
 // Mock emailjs
 vi.mock('@emailjs/browser', () => ({
@@ -46,9 +45,7 @@ describe('Contact Component - Error Handling', () => {
     (emailjs.send as ReturnType<typeof vi.fn>).mockRejectedValueOnce(mockError);
 
     render(
-      <AudioProvider>
-        <Contact />
-      </AudioProvider>
+      <Contact />
     );
 
     // Fill the form using more specific queries since there are multiple "Email" text matches

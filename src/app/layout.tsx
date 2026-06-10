@@ -126,6 +126,7 @@ export default function RootLayout({
                       if (typeof s === 'string') {
                         // Security: Defense-in-depth against DOM XSS.
                         // We block known dangerous tags and all inline event handlers (on*).
+                        // Added <math>, <svg>, <template>, and <details> to prevent mXSS.
                         const lower = s.toLowerCase();
                         if (
                           lower.includes('<script') ||
@@ -138,13 +139,17 @@ export default function RootLayout({
                           lower.includes('<iframe') ||
                           lower.includes('<frame') ||
                           lower.includes('<frameset') ||
-                          /javascript\\s*:/i.test(lower) ||
+                          lower.includes('<math') ||
+                          lower.includes('<svg') ||
+                          lower.includes('<template') ||
+                          lower.includes('<details') ||
+                          /(javascript|data)\\s*:/i.test(lower) ||
                           /on[a-z]+\\s*=/i.test(lower)
                         ) {
                           console.warn('Blocked dangerous HTML pattern in Trusted Types default policy');
                           return s
-                            .replace(/<(script|base|embed|object|applet|meta|form|iframe|frame|frameset)/gi, '<blocked-$1')
-                            .replace(/javascript\\s*:/gi, 'blocked-javascript:')
+                            .replace(/<(script|base|embed|object|applet|meta|form|iframe|frame|frameset|math|svg|template|details)/gi, '<blocked-$1')
+                            .replace(/(javascript|data)\\s*:/gi, (match, p1) => 'blocked-' + p1.toLowerCase() + ':')
                             .replace(/on[a-z]+\\s*=/gi, (match) => 'blocked-' + match);
                         }
                       }

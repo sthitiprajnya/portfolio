@@ -23,6 +23,13 @@ const MAX_DISTANCE = 150;
 const MAX_DISTANCE_SQ = MAX_DISTANCE * MAX_DISTANCE;
 const NODE_COLOR = 'rgba(0, 245, 255, 0.5)';
 
+// BOLT: Pre-calculate squared thresholds for 6 discrete opacity buckets to eliminate Math.sqrt and Math.floor from the hot loop.
+const B1_SQ = Math.pow(MAX_DISTANCE * (1 / 6), 2);
+const B2_SQ = Math.pow(MAX_DISTANCE * (2 / 6), 2);
+const B3_SQ = Math.pow(MAX_DISTANCE * (3 / 6), 2);
+const B4_SQ = Math.pow(MAX_DISTANCE * (4 / 6), 2);
+const B5_SQ = Math.pow(MAX_DISTANCE * (5 / 6), 2);
+
 export default function NetworkConnector({ className }: NetworkConnectorProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const { ref: inViewRef, inView } = useInView({ threshold: 0 });
@@ -147,13 +154,23 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
         for (let j = i + 1; j < numNodes; j++) {
           const nodeB = nodes[j];
           const dx = nodeA.x - nodeB.x;
+          const dx2 = dx * dx;
+
+          // BOLT: Axial early-exit to skip expensive Y calculations and squared distance for distant nodes.
+          if (dx2 > MAX_DISTANCE_SQ) continue;
+
           const dy = nodeA.y - nodeB.y;
-          const d2 = dx * dx + dy * dy;
+          const d2 = dx2 + dy * dy;
 
           if (d2 < MAX_DISTANCE_SQ) {
-            const dist = Math.sqrt(d2);
-            // Group into 6 buckets of ~0.05 opacity increments
-            const bIdx = Math.min(5, Math.floor((1 - dist / MAX_DISTANCE) * 6));
+            // BOLT: Use pre-calculated squared thresholds to find the correct opacity bucket without Math.sqrt or Math.floor.
+            let bIdx = 0;
+            if (d2 < B1_SQ) bIdx = 5;
+            else if (d2 < B2_SQ) bIdx = 4;
+            else if (d2 < B3_SQ) bIdx = 3;
+            else if (d2 < B4_SQ) bIdx = 2;
+            else if (d2 < B5_SQ) bIdx = 1;
+
             buckets[bIdx].push(nodeA.x, nodeA.y, nodeB.x, nodeB.y);
           }
         }

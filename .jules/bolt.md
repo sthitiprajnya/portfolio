@@ -84,3 +84,7 @@
 ## 2025-06-05 - [Active Set Optimization for Sparse Animations]
 **Learning:** In high-frequency effects like the Matrix Rain glitch burst, iterating through the entire column set ( \approx 100$) for every trail level (=13$) to render a few active glitch columns (=3$) results in significant redundant work ((N \times T)$). By maintaining an "active set" array of glitch indices, we can reduce complexity to (G \times T)$, saving over 1,200 iterations per frame during bursts.
 **Action:** For animations that target a sparse subset of elements, maintain an array of active indices or objects instead of scanning the full state space with conditional checks in hot loops.
+
+## 2025-05-22 - [Eliminating Math.sqrt and Math.floor in N^2 Connection Loops]
+**Learning:** In high-frequency particle connection loops ((N^2)$), the overhead of calling `Math.sqrt()` for distance and `Math.floor()` for bucketing accumulates into measurable main-thread congestion. By hoisting squared distance thresholds to the module level and using an axial early-exit check (`dx^2 > limit^2`), we can skip the majority of calculations and determine opacity buckets using only simple comparisons.
+**Action:** Always use squared distance comparisons for proximity and bucketing in hot loops. Implement axial early-exits to minimize arithmetic for distant nodes. Avoid math function calls (`sqrt`, `floor`, `pow`) inside the loop body.

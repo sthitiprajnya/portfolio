@@ -51,7 +51,15 @@ export function Hero() {
   }, [showMethodology, activeIntel]);
 
   const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+      // Accessibility: Transfer focus to the target section after a short delay
+      // preventScroll: true ensures the browser doesn't hijack the smooth scroll.
+      setTimeout(() => {
+        el.focus({ preventScroll: true });
+      }, 100);
+    }
   };
 
   // UX Enhancement: Handle Escape key to close modals & manage body scroll locking

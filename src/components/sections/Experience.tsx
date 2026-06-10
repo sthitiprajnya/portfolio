@@ -64,7 +64,11 @@ export function Experience() {
   const scaleY = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
   return (
-    <section id="experience" className="py-24 bg-deep relative border-t border-border">
+    <section
+      id="experience"
+      tabIndex={-1}
+      className="py-24 bg-deep relative border-t border-border outline-none"
+    >
       <div className="max-w-5xl mx-auto px-6 relative z-10" ref={containerRef}>
         <SectionTitle number="03" title="Battle Log." />
 

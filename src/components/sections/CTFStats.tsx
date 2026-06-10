@@ -64,7 +64,11 @@ function RadarChartWrapper({ data, options }: { data: ChartData<'radar'>, option
 
 export function CTFStats() {
   return (
-    <section id="ctf" className="py-24 bg-black relative border-t border-border overflow-hidden">
+    <section
+      id="ctf"
+      tabIndex={-1}
+      className="py-24 bg-black relative border-t border-border overflow-hidden outline-none"
+    >
 
       {/* Subtle hex-grid background */}
       <div

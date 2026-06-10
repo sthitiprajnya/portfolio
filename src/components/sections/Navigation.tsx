@@ -84,7 +84,16 @@ export function Navigation() {
 
   const scrollTo = (id: string) => {
     setMobileMenuOpen(false);
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      // Accessibility: Move focus to the section for keyboard/screen reader users
+      // Use a slight delay to ensure scroll started and prevent jumping
+      setTimeout(() => {
+        element.setAttribute('tabindex', '-1');
+        element.focus({ preventScroll: true });
+      }, 100);
+    }
   };
 
   const openSearch = () => {
@@ -127,6 +136,7 @@ export function Navigation() {
               aria-label="Search site sections"
               title="Search site sections"
               aria-keyshortcuts="/ ?"
+              aria-haspopup="dialog"
             >
               <svg className="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -175,6 +185,7 @@ export function Navigation() {
               className="text-text-secondary p-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card"
               aria-label="Search site sections"
               title="Search site sections"
+              aria-haspopup="dialog"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -188,6 +199,7 @@ export function Navigation() {
               aria-controls="mobile-menu"
               aria-label="Open navigation menu"
               title="Open navigation menu"
+              aria-haspopup="dialog"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"/>

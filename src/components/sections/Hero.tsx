@@ -51,7 +51,15 @@ export function Hero() {
   }, [showMethodology, activeIntel]);
 
   const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      // Accessibility: Move focus to the section for keyboard/screen reader users
+      setTimeout(() => {
+        element.setAttribute('tabindex', '-1');
+        element.focus({ preventScroll: true });
+      }, 100);
+    }
   };
 
   // UX Enhancement: Handle Escape key to close modals & manage body scroll locking

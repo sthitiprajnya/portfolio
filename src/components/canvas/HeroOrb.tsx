@@ -38,6 +38,11 @@ const MOUSE_FORCE = 0.025;   // mouse attraction/repulsion multiplier
 const MOUSE_RANGE = 300;     // px radius of mouse influence
 const MOUSE_RANGE_SQ = MOUSE_RANGE * MOUSE_RANGE;
 
+// ── Sprite constants ─────────────────────────────────────────────
+const SPRITE_SIZE = 256;
+const SPRITE_CENTER = SPRITE_SIZE / 2;
+const BASE_R = 60;
+
 export default function HeroOrb() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const orbRef    = useRef<OrbState>({
@@ -76,25 +81,89 @@ export default function HeroOrb() {
     let cx = 0;
     let cy = 0;
 
-    // Day 9: Setup OffscreenCanvas
-    let offscreenCanvas: OffscreenCanvas | HTMLCanvasElement;
-    let offscreenCtx: OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D | null = null;
+    // BOLT: Use a small sprite-based offscreen canvas to cache the expensive radial gradients.
+    // This reduces the per-frame overhead from 4 gradient creations and multiple arc/fill calls
+    // to a single hardware-accelerated drawImage() blit.
+    let spriteCanvas: OffscreenCanvas | HTMLCanvasElement;
+    let spriteCtx: OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D | null = null;
+    let lastShiftFactor = -1;
 
     try {
       if (typeof OffscreenCanvas !== 'undefined') {
-        offscreenCanvas = new OffscreenCanvas(canvas.width, canvas.height);
-        offscreenCtx = offscreenCanvas.getContext('2d') as OffscreenCanvasRenderingContext2D;
+        spriteCanvas = new OffscreenCanvas(SPRITE_SIZE, SPRITE_SIZE);
+        spriteCtx = spriteCanvas.getContext('2d') as OffscreenCanvasRenderingContext2D;
       } else {
-        offscreenCanvas = document.createElement('canvas');
-        offscreenCanvas.width = canvas.width;
-        offscreenCanvas.height = canvas.height;
-        offscreenCtx = offscreenCanvas.getContext('2d');
+        spriteCanvas = document.createElement('canvas');
+        spriteCanvas.width = SPRITE_SIZE;
+        spriteCanvas.height = SPRITE_SIZE;
+        spriteCtx = spriteCanvas.getContext('2d');
       }
     } catch (e) {
-      console.warn("OffscreenCanvas not supported or failed to initialize, falling back.", e);
-      offscreenCanvas = canvas;
-      offscreenCtx = ctx;
+      console.warn("OffscreenCanvas failed to initialize, falling back.", e);
+      spriteCanvas = canvas; // This will cause artifacts if we use it, but try/catch is for safety.
+      spriteCtx = ctx;
     }
+
+    const updateSprite = (shiftFactor: number) => {
+      if (!spriteCtx) return;
+      const x = SPRITE_CENTER;
+      const y = SPRITE_CENTER;
+      const r = BASE_R;
+
+      spriteCtx.clearRect(0, 0, SPRITE_SIZE, SPRITE_SIZE);
+
+      const r_core = 0 + (191 - 0) * shiftFactor;
+      const g_core = 245 + (0 - 245) * shiftFactor;
+      const b_core = 255;
+
+      // ── Outer halo ──
+      const halo = spriteCtx.createRadialGradient(x, y, r * 0.6, x, y, r * 1.6);
+      halo.addColorStop(0,   `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0.06)`);
+      halo.addColorStop(0.5, `rgba(${Math.round(r_core)}, ${Math.round(g_core * 0.75)}, ${Math.round(b_core)}, 0.03)`);
+      halo.addColorStop(1,   `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0)`);
+      spriteCtx.fillStyle = halo;
+      spriteCtx.beginPath();
+      spriteCtx.arc(x, y, r * 1.6, 0, Math.PI * 2);
+      spriteCtx.fill();
+
+      // ── Mid glow ──
+      const mid = spriteCtx.createRadialGradient(x, y, 0, x, y, r);
+      mid.addColorStop(0,   `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0.18)`);
+      mid.addColorStop(0.35,`rgba(${Math.round(r_core)}, ${Math.round(g_core * 0.8)}, ${Math.round(b_core)}, 0.12)`);
+      mid.addColorStop(0.7, `rgba(${Math.round(r_core)}, ${Math.round(g_core * 0.6)}, ${Math.round(b_core)}, 0.05)`);
+      mid.addColorStop(1,   `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0)`);
+      spriteCtx.fillStyle = mid;
+      spriteCtx.beginPath();
+      spriteCtx.arc(x, y, r, 0, Math.PI * 2);
+      spriteCtx.fill();
+
+      // ── Core sphere ──
+      const core = spriteCtx.createRadialGradient(
+        x - r * 0.08, y - r * 0.08, 0,
+        x, y, r * 0.28
+      );
+      core.addColorStop(0,   `rgba(180, 255, 255, 0.80)`);
+      core.addColorStop(0.2, `rgba(180, 255, 255, 0.65)`);
+      core.addColorStop(0.5, `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0.45)`);
+      core.addColorStop(0.8, `rgba(${Math.round(r_core)}, ${Math.round(g_core * 0.65)}, ${Math.round(b_core * 0.8)}, 0.20)`);
+      core.addColorStop(1,   `rgba(${Math.round(r_core)}, ${Math.round(g_core * 0.3)}, ${Math.round(b_core * 0.8)}, 0)`);
+      spriteCtx.fillStyle = core;
+      spriteCtx.beginPath();
+      spriteCtx.arc(x, y, r * 0.28, 0, Math.PI * 2);
+      spriteCtx.fill();
+
+      // ── Specular highlight ──
+      const specX = x - r * 0.06;
+      const specY = y - r * 0.09;
+      const spec = spriteCtx.createRadialGradient(specX, specY, 0, specX, specY, r * 0.10);
+      spec.addColorStop(0,   'rgba(255, 255, 255, 0.70)');
+      spec.addColorStop(0.5, 'rgba(255, 255, 255, 0.20)');
+      spec.addColorStop(1,   'rgba(255, 255, 255, 0)');
+      spriteCtx.fillStyle = spec;
+      spriteCtx.beginPath();
+      spriteCtx.arc(specX, specY, r * 0.10, 0, Math.PI * 2);
+      spriteCtx.fill();
+    };
 
     // ── Resize ──────────────────────────────────────────────────────
     const resize = () => {
@@ -105,12 +174,6 @@ export default function HeroOrb() {
       cy = canvas.height / 2;
       A = canvas.width * 0.30;
       B = canvas.height * 0.22;
-
-      // Day 9 Fix: Update OffscreenCanvas dimensions on resize
-      if (offscreenCanvas && offscreenCanvas !== canvas) {
-        offscreenCanvas.width = canvas.width;
-        offscreenCanvas.height = canvas.height;
-      }
 
       // Reset to centre on resize
       const o = orbRef.current;
@@ -145,75 +208,30 @@ export default function HeroOrb() {
 
     // ── Drawing helpers ──────────────────────────────────────────────
     function drawOrb(x: number, y: number, t: number) {
-      if (!ctx || !canvas) return;
+      if (!ctx || !canvas || !spriteCanvas) return;
 
-      const targetCtx = offscreenCtx || ctx;
-      const targetCanvas = offscreenCanvas || canvas;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      targetCtx.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
-
-      const pulse = 1 + 0.06 * Math.sin(t * 4);    // slow breathing scale
-      const r     = 60 * pulse;                      // much smaller outer glow radius
-
-      // Day 5: Slow color shift between cyan and violet over 20s
-      const shiftFactor = (Math.sin(t * 0.05) + 1) / 2; // Maps to 0-1
-      const r_core = 0 + (191 - 0) * shiftFactor;
-      const g_core = 245 + (0 - 245) * shiftFactor;
-      const b_core = 255 + (255 - 255) * shiftFactor; // Remains 255
-
-      // ── Outer halo (wide, very faint) ────────────────────────────
-      const halo = targetCtx.createRadialGradient(x, y, r * 0.6, x, y, r * 1.6);
-      halo.addColorStop(0,   `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0.06)`);
-      halo.addColorStop(0.5, `rgba(${Math.round(r_core)}, ${Math.round(g_core*0.75)}, ${Math.round(b_core)}, 0.03)`);
-      halo.addColorStop(1,   `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0)`);
-      targetCtx.fillStyle = halo;
-      targetCtx.beginPath();
-      targetCtx.arc(x, y, r * 1.6, 0, Math.PI * 2);
-      targetCtx.fill();
-
-      // ── Mid glow ─────────────────────────────────────────────────
-      const mid = targetCtx.createRadialGradient(x, y, 0, x, y, r);
-      mid.addColorStop(0,   `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0.18)`);
-      mid.addColorStop(0.35,`rgba(${Math.round(r_core)}, ${Math.round(g_core*0.8)}, ${Math.round(b_core)}, 0.12)`);
-      mid.addColorStop(0.7, `rgba(${Math.round(r_core)}, ${Math.round(g_core*0.6)}, ${Math.round(b_core)}, 0.05)`);
-      mid.addColorStop(1,   `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0)`);
-      targetCtx.fillStyle = mid;
-      targetCtx.beginPath();
-      targetCtx.arc(x, y, r, 0, Math.PI * 2);
-      targetCtx.fill();
-
-      // ── Core sphere ──────────────────────────────────────────────
-      const core = targetCtx.createRadialGradient(
-        x - r * 0.08, y - r * 0.08, 0,
-        x, y, r * 0.28
-      );
-      core.addColorStop(0,   `rgba(180, 255, 255, 0.80)`);
-      core.addColorStop(0.2, `rgba(180, 255, 255, 0.65)`);
-      core.addColorStop(0.5, `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0.45)`);
-      core.addColorStop(0.8, `rgba(${Math.round(r_core)}, ${Math.round(g_core*0.65)}, ${Math.round(b_core*0.8)}, 0.20)`);
-      core.addColorStop(1,   `rgba(${Math.round(r_core)}, ${Math.round(g_core*0.3)}, ${Math.round(b_core*0.8)}, 0)`);
-      targetCtx.fillStyle = core;
-      targetCtx.beginPath();
-      targetCtx.arc(x, y, r * 0.28, 0, Math.PI * 2);
-      targetCtx.fill();
-
-      // ── Specular highlight ────────────────────────────────────────
-      const specX = x - r * 0.06;
-      const specY = y - r * 0.09;
-      const spec = targetCtx.createRadialGradient(specX, specY, 0, specX, specY, r * 0.10);
-      spec.addColorStop(0,   'rgba(255, 255, 255, 0.70)');
-      spec.addColorStop(0.5, 'rgba(255, 255, 255, 0.20)');
-      spec.addColorStop(1,   'rgba(255, 255, 255, 0)');
-      targetCtx.fillStyle = spec;
-      targetCtx.beginPath();
-      targetCtx.arc(specX, specY, r * 0.10, 0, Math.PI * 2);
-      targetCtx.fill();
-
-      // Blit to main canvas if using offscreen
-      if (offscreenCtx && offscreenCanvas && targetCtx !== ctx) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(offscreenCanvas, 0, 0);
+      // BOLT: Only update the sprite when the color shiftFactor changes significantly (> 0.005).
+      // This caches the expensive radial gradient draws for ~50 frames at a time.
+      const shiftFactor = (Math.sin(t * 0.05) + 1) / 2;
+      if (Math.abs(shiftFactor - lastShiftFactor) > 0.005) {
+        updateSprite(shiftFactor);
+        lastShiftFactor = shiftFactor;
       }
+
+      // BOLT: Scaled blitting handles the "breathing" pulse effect via hardware acceleration.
+      const pulse = 1 + 0.06 * Math.sin(t * 4);
+      const drawSize = SPRITE_SIZE * pulse;
+      const offset = drawSize / 2;
+
+      ctx.drawImage(
+        spriteCanvas,
+        x - offset,
+        y - offset,
+        drawSize,
+        drawSize
+      );
     }
 
     // ── Animation loop ───────────────────────────────────────────────

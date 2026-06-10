@@ -152,13 +152,16 @@ export default function RootLayout({
                     },
                     createScript: (s) => s,
                     createScriptURL: (s) => {
-                      // Security: Robust origin validation using the URL constructor.
-                      // Prevents bypasses using userinfo (e.g., https://origin@evil.com).
+                      // Security: Enforce strict same-origin policy and safe protocols (http/https) for all scripts.
+                      // This prevents bypasses using data:, blob:, or cross-origin URLs via the URL constructor.
                       try {
                         const url = new URL(s, window.location.origin);
-                        if (url.origin !== window.location.origin && (s.startsWith('http') || s.startsWith('//'))) {
-                          console.warn('Blocked cross-origin script URL in Trusted Types policy:', s);
-                          return '/blocked-cross-origin-script';
+                        const isSameOrigin = url.origin === window.location.origin;
+                        const hasSafeProtocol = url.protocol === 'http:' || url.protocol === 'https:';
+
+                        if (!isSameOrigin || !hasSafeProtocol) {
+                          console.warn('Blocked unsafe or cross-origin script URL in Trusted Types policy:', s);
+                          return '/blocked-unsafe-script';
                         }
                         return url.href;
                       } catch (e) {

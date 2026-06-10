@@ -44,3 +44,13 @@
 **Vulnerability:** Broken script loading due to missing return statements in Trusted Types callbacks and incomplete sanitization of `javascript:` URIs.
 **Learning:** Security-critical callbacks (like `createScriptURL`) must return the validated value; otherwise, they implicitly return `undefined`, which the browser treats as a block, breaking application functionality. Furthermore, sanitization regexes should be case-insensitive and account for whitespace to prevent trivial bypasses (e.g., `javaScript  :`).
 **Prevention:** Always ensure every branch of a Trusted Types policy returns a value. Use the `/i` flag and `\\s*` in sanitization regexes. Periodically audit policies to include modern and legacy sinks like `<applet>`, `<meta>`, and `<form>` to maintain a strong defense-in-depth posture.
+
+## 2026-06-12 - Strict Same-Origin Enforcement in Trusted Types
+**Vulnerability:** Potential XSS bypasses in  due to permissive protocol handling and fragile string-based origin checks.
+**Learning:** Even with CSP, a Trusted Types policy should explicitly enforce the Principle of Least Privilege. Checking for "starts with http" is insufficient as it ignores , , and  protocols which can be used for script execution.
+**Prevention:** Use the  constructor to perform robust origin and protocol validation. Explicitly whitelist safe protocols (, ) and enforce strict same-origin checks () to provide a strong defense-in-depth layer against DOM-based XSS.
+
+## 2026-06-12 - Strict Same-Origin Enforcement in Trusted Types
+**Vulnerability:** Potential XSS bypasses in `createScriptURL` due to permissive protocol handling and fragile string-based origin checks.
+**Learning:** Even with CSP, a Trusted Types policy should explicitly enforce the Principle of Least Privilege. Checking for "starts with http" is insufficient as it ignores `blob:`, `data:`, and `javascript:` protocols which can be used for script execution.
+**Prevention:** Use the `URL` constructor to perform robust origin and protocol validation. Explicitly whitelist safe protocols (`http:`, `https:`) and enforce strict same-origin checks (`url.origin === window.location.origin`) to provide a strong defense-in-depth layer against DOM-based XSS.

@@ -39,7 +39,9 @@ export default function LivieBot() {
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.94 }}
         aria-label={open ? 'Close Livie (Ctrl+/)' : 'Open Livie assistant (Ctrl+/)'}
-        title="Ask Livie (Ctrl+/)"
+        title={open ? 'Close Livie (Ctrl+/)' : 'Ask Livie (Ctrl+/)'}
+        aria-expanded={open}
+        aria-controls="livie-panel"
       >
         {/* Pulse ring */}
         {!open && (

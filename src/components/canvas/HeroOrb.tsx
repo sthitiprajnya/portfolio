@@ -155,7 +155,7 @@ export default function HeroOrb() {
       // ── Outer halo ───────────────────────────────────────────────
       const halo = spriteCtx.createRadialGradient(center, center, r * 0.6, center, center, r * 1.6);
       halo.addColorStop(0,   `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0.06)`);
-      halo.addColorStop(0.5, `rgba(${Math.round(r_core)}, ${Math.round(g_core*0.75)}, ${Math.round(b_core)}, 0.03)`);
+      halo.addColorStop(0.5, `rgba(${Math.round(r_core)}, ${Math.round(g_core * 0.75)}, ${Math.round(b_core)}, 0.03)`);
       halo.addColorStop(1,   `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0)`);
       spriteCtx.fillStyle = halo;
       spriteCtx.beginPath();
@@ -165,8 +165,8 @@ export default function HeroOrb() {
       // ── Mid glow ─────────────────────────────────────────────────
       const mid = spriteCtx.createRadialGradient(center, center, 0, center, center, r);
       mid.addColorStop(0,   `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0.18)`);
-      mid.addColorStop(0.35,`rgba(${Math.round(r_core)}, ${Math.round(g_core*0.8)}, ${Math.round(b_core)}, 0.12)`);
-      mid.addColorStop(0.7, `rgba(${Math.round(r_core)}, ${Math.round(g_core*0.6)}, ${Math.round(b_core)}, 0.05)`);
+      mid.addColorStop(0.35,`rgba(${Math.round(r_core)}, ${Math.round(g_core * 0.8)}, ${Math.round(b_core)}, 0.12)`);
+      mid.addColorStop(0.7, `rgba(${Math.round(r_core)}, ${Math.round(g_core * 0.6)}, ${Math.round(b_core)}, 0.05)`);
       mid.addColorStop(1,   `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0)`);
       spriteCtx.fillStyle = mid;
       spriteCtx.beginPath();

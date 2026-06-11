@@ -20,13 +20,13 @@ type CyberButtonAsAnchorProps = CyberButtonBaseProps &
 
 export type CyberButtonProps = CyberButtonAsButtonProps | CyberButtonAsAnchorProps;
 
-export function CyberButton({
+export const CyberButton = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, CyberButtonProps>(({
   children,
   className,
   color = 'cyan',
   as = 'button',
   ...props
-}: CyberButtonProps) {
+}, ref) => {
 
   const baseClasses = cn(
     "cyber-button relative inline-flex items-center justify-center font-mono text-xs uppercase tracking-widest px-6 py-3 transition-all duration-300 overflow-hidden group border-2 rounded-pill bg-transparent active:scale-[0.97] outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black glass-pill",
@@ -62,7 +62,7 @@ export function CyberButton({
   if (as === 'a') {
     const { ...anchorProps } = props as React.AnchorHTMLAttributes<HTMLAnchorElement>;
     return (
-      <a className={baseClasses} {...anchorProps}>
+      <a ref={ref as React.Ref<HTMLAnchorElement>} className={baseClasses} {...anchorProps}>
         {innerContent}
       </a>
     );
@@ -70,8 +70,10 @@ export function CyberButton({
 
   const { type, ...buttonProps } = props as React.ButtonHTMLAttributes<HTMLButtonElement>;
   return (
-    <button type={type || 'button'} className={baseClasses} {...buttonProps}>
+    <button ref={ref as React.Ref<HTMLButtonElement>} type={type || 'button'} className={baseClasses} {...buttonProps}>
       {innerContent}
     </button>
   );
-}
+});
+
+CyberButton.displayName = 'CyberButton';

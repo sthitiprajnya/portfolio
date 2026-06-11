@@ -67,7 +67,11 @@ export function GitHubStats() {
   };
 
   return (
-    <section id="github" className="py-24 bg-black relative border-t border-border">
+    <section
+      id="github"
+      tabIndex={-1}
+      className="py-24 bg-black relative border-t border-border outline-none"
+    >
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <SectionTitle number="07" title="Open Source Activity." />
 

@@ -121,15 +121,17 @@ export function CommandPalette() {
   const handleSelect = (id: string) => {
     triggerRef.current = null; // Don't return focus if we are navigating
     setIsOpen(false);
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-      // Accessibility: Move focus to the section for keyboard/screen reader users
-      setTimeout(() => {
-        element.setAttribute('tabindex', '-1');
-        element.focus({ preventScroll: true });
-      }, 100);
-    }
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+        // Accessibility: Transfer focus to target section. Using a nested timeout
+        // ensures the element is ready and scroll has initiated.
+        setTimeout(() => {
+          el.focus({ preventScroll: true });
+        }, 100);
+      }
+    }, 100);
   };
 
   return (

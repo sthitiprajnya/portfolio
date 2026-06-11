@@ -84,7 +84,15 @@ export function Navigation() {
 
   const scrollTo = (id: string) => {
     setMobileMenuOpen(false);
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+      // Accessibility: Transfer focus to the target section after a short delay
+      // to ensure the scroll has started. preventScroll: true avoids sudden jumps.
+      setTimeout(() => {
+        el.focus({ preventScroll: true });
+      }, 100);
+    }
   };
 
   const openSearch = () => {

@@ -14,7 +14,11 @@ export function About() {
   const { ref: bioRef, inView: bioInView } = useInView({ triggerOnce: true, threshold: 0.2 });
 
   return (
-    <section id="about" className="py-24 bg-deep relative border-t border-border">
+    <section
+      id="about"
+      tabIndex={-1}
+      className="py-24 bg-deep relative border-t border-border outline-none"
+    >
 
       {/* Decorative dot-grid background */}
       <div

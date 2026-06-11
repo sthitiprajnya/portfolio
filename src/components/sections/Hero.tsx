@@ -29,7 +29,15 @@ export function Hero() {
   const [showMethodology, setShowMethodology] = React.useState(false);
 
   const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+      // Accessibility: Transfer focus to the target section after a short delay
+      // preventScroll: true ensures the browser doesn't hijack the smooth scroll.
+      setTimeout(() => {
+        el.focus({ preventScroll: true });
+      }, 100);
+    }
   };
 
   // BOLT: Performance Optimization - Consolidated Redundant Effects

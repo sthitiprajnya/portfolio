@@ -24,6 +24,7 @@ const METRIC_MATCH_REGEX = /(\d+%|\d+\+? hours|55%|100%|80%|35%|zero)/i;
 // BOLT: Pre-process static experience data at the module level to eliminate 30+ regex executions and string splits per render.
 const PROCESSED_EXPERIENCE = EXPERIENCE.map(exp => ({
   ...exp,
+  roles: exp.role.split('/').map(r => r.trim()),
   subsections: exp.subsections.map(sub => ({
     ...sub,
     processedBullets: sub.bullets.map(bullet => {
@@ -187,9 +188,10 @@ const ExperienceCard = React.memo(function ExperienceCard({ experience, isFirst 
           </div>
 
           <div className="flex flex-wrap gap-2">
-            {experience.roles.map((r, i) => (
+            {/* Necessary Build Fix: Split role string into badges to match intended UI and handle singular 'role' field in data */}
+            {experience.role.split('/').map((r, i) => (
               <span key={i} className="px-3 py-1 rounded-full bg-cyan-ghost border border-cyan/30 text-cyan font-mono text-[0.65rem] uppercase tracking-wider">
-                {r}
+                {r.trim()}
               </span>
             ))}
           </div>

@@ -24,6 +24,7 @@ const METRIC_MATCH_REGEX = /(\d+%|\d+\+? hours|55%|100%|80%|35%|zero)/i;
 // BOLT: Pre-process static experience data at the module level to eliminate 30+ regex executions and string splits per render.
 const PROCESSED_EXPERIENCE = EXPERIENCE.map(exp => ({
   ...exp,
+  roles: exp.role.split('/').map(r => r.trim()),
   subsections: exp.subsections.map(sub => ({
     ...sub,
     processedBullets: sub.bullets.map(bullet => {

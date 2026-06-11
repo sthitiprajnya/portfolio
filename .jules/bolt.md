@@ -84,3 +84,7 @@
 ## 2025-06-05 - [Active Set Optimization for Sparse Animations]
 **Learning:** In high-frequency effects like the Matrix Rain glitch burst, iterating through the entire column set ( \approx 100$) for every trail level (=13$) to render a few active glitch columns (=3$) results in significant redundant work ((N \times T)$). By maintaining an "active set" array of glitch indices, we can reduce complexity to (G \times T)$, saving over 1,200 iterations per frame during bursts.
 **Action:** For animations that target a sparse subset of elements, maintain an array of active indices or objects instead of scanning the full state space with conditional checks in hot loops.
+
+## 2025-05-22 - [Sprite-based Caching for Complex Canvas Gradients]
+**Learning:** Calculating multiple radial gradients per frame (inside a `requestAnimationFrame` loop) is computationally expensive and can bottleneck the main thread. By pre-rendering the complex shape (like the Hero Orb) onto a small, fixed-size OffscreenCanvas "sprite" and only redrawing that sprite when visual properties (like color shift) change significantly, we drastically reduce per-frame CPU work.
+**Action:** Use sprite-based caching for complex Canvas 2D elements. Blit the cached sprite to the main canvas using hardware-accelerated `drawImage()`, and handle scaling (e.g., pulsing effects) during the blit instead of redrawing the primitive.

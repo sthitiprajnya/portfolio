@@ -28,34 +28,12 @@ export function Hero() {
   const [activeIntel, setActiveIntel] = React.useState<string | null>(null);
   const [showMethodology, setShowMethodology] = React.useState(false);
 
-  // UX Enhancement: Handle Escape key to close modals and manage scroll lock
+  // BOLT: Consolidate redundant useEffect hooks and optimize listener attachment.
+  // The listener is only attached to 'window' when a modal is actually active,
+  // reducing background event overhead when the user is simply browsing.
   React.useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (showMethodology) setShowMethodology(false);
-        if (activeIntel) setActiveIntel(null);
-      }
-    };
+    const isModalActive = showMethodology || activeIntel !== null;
 
-    if (showMethodology || activeIntel) {
-      window.addEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = '';
-    };
-  }, [showMethodology, activeIntel]);
-
-  const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  // UX Enhancement: Handle Escape key to close modals & manage body scroll locking
-  React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setShowMethodology(false);
@@ -63,18 +41,22 @@ export function Hero() {
       }
     };
 
-    if (showMethodology || activeIntel !== null) {
+    if (isModalActive) {
       document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
     } else {
       document.body.style.overflow = '';
     }
 
-    window.addEventListener('keydown', handleKeyDown);
     return () => {
       document.body.style.overflow = '';
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [showMethodology, activeIntel]);
+
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <section

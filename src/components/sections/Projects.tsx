@@ -17,6 +17,15 @@ const FILTERS = [
   { id: 'automation', label: 'AUTOMATION' },
 ];
 
+// BOLT: Hoist static data transformations to the module level.
+// Pre-calculating filter counts avoids redundant O(N*F) work on every component mount.
+const FILTER_COUNTS = FILTERS.reduce((acc, filter) => {
+  acc[filter.id] = filter.id === 'all'
+    ? PROJECTS.length
+    : PROJECTS.filter(p => p.category === filter.id).length;
+  return acc;
+}, {} as Record<string, number>);
+
 export function Projects() {
   const [activeFilter, setActiveFilter] = useState('all');
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -24,16 +33,6 @@ export function Projects() {
   const filteredProjects = useMemo(() => PROJECTS.filter(p =>
     activeFilter === 'all' ? true : p.category === activeFilter
   ), [activeFilter]);
-
-  // Palette: Calculate project counts for each category to provide immediate user feedback
-  const filterCounts = useMemo(() => {
-    return FILTERS.reduce((acc, filter) => {
-      acc[filter.id] = filter.id === 'all'
-        ? PROJECTS.length
-        : PROJECTS.filter(p => p.category === filter.id).length;
-      return acc;
-    }, {} as Record<string, number>);
-  }, []);
 
   return (
     <section id="projects" className="py-32 bg-black relative border-t border-border overflow-hidden">
@@ -49,7 +48,7 @@ export function Projects() {
         <ScrollReveal variants={fadeSlideUp} className="flex flex-wrap gap-3 mb-12">
           {FILTERS.map(filter => {
             const isActive = activeFilter === filter.id;
-            const count = filterCounts[filter.id];
+            const count = FILTER_COUNTS[filter.id];
 
             return (
               <button

@@ -4,3 +4,6 @@
 ## 2026-06-08 - Native Tooltips for Icon-Only Buttons
 **Learning:** While `aria-label` ensures screen readers can interpret icon-only buttons, sighted users without screen readers may struggle to understand ambiguous icons since `aria-label` provides no visual hover feedback. Relying solely on `aria-label` leaves an accessibility gap for sighted users with cognitive impairments or those unfamiliar with specific iconography.
 **Action:** When adding `aria-label` to icon-only buttons, always accompany it with a native `title` attribute (or a custom visual tooltip) to ensure the intent is accessible via hover for all users. Additionally, ensure toggle buttons utilize `aria-pressed` to semantically communicate state changes.
+## 2026-06-11 - Added Placeholder to Interactive Terminal Input
+**Learning:** While `aria-label` ensures screen reader accessibility, adding an explicit `placeholder` to interactive terminal inputs significantly improves discoverability and guidance for sighted users without cluttering the UI. This enhances the micro-UX by making the expected interaction pattern obvious.
+**Action:** Always provide visual guidance (like a `placeholder`) alongside semantic accessibility labels (`aria-label`) for custom input components to serve all user groups effectively.

@@ -259,9 +259,6 @@ export function Hero() {
             onClick={() => setShowMethodology(false)}
           >
             <motion.div
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="methodology-modal-title"
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
@@ -345,9 +342,6 @@ export function Hero() {
             onClick={() => setActiveIntel(null)}
           >
             <motion.div
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="intel-modal-title"
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}

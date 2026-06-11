@@ -183,9 +183,10 @@ const ExperienceCard = React.memo(function ExperienceCard({ experience, isFirst 
           </div>
 
           <div className="flex flex-wrap gap-2">
-            {experience.roles.map((r, i) => (
+            {/* Necessary Build Fix: Split role string into badges to match intended UI and handle singular 'role' field in data */}
+            {experience.role.split('/').map((r, i) => (
               <span key={i} className="px-3 py-1 rounded-full bg-cyan-ghost border border-cyan/30 text-cyan font-mono text-[0.65rem] uppercase tracking-wider">
-                {r}
+                {r.trim()}
               </span>
             ))}
           </div>

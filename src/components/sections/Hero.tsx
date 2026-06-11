@@ -27,6 +27,9 @@ export function Hero() {
   const { ref: statsRef } = useInView({ triggerOnce: true, threshold: 0.5 });
   const [activeIntel, setActiveIntel] = React.useState<string | null>(null);
   const [showMethodology, setShowMethodology] = React.useState(false);
+  const triggerRef = React.useRef<HTMLElement | null>(null);
+  const methodologyModalRef = React.useRef<HTMLDivElement>(null);
+  const intelModalRef = React.useRef<HTMLDivElement>(null);
 
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
@@ -41,8 +44,8 @@ export function Hero() {
   };
 
   // BOLT: Performance Optimization - Consolidated Redundant Effects
-  // Consolidating redundant effects for Escape key handling and body scroll locking
-  // reduces global event listener churn and ensures consistent UI state.
+  // Consolidating redundant effects for Escape key handling, body scroll locking,
+  // and accessibility focus management (focus trapping & restoration).
   React.useEffect(() => {
     const hasModalOpen = showMethodology || activeIntel !== null;
 
@@ -50,18 +53,59 @@ export function Hero() {
       if (e.key === 'Escape') {
         if (showMethodology) setShowMethodology(false);
         if (activeIntel) setActiveIntel(null);
+        return;
+      }
+
+      if (e.key === 'Tab' && hasModalOpen) {
+        const modalRef = showMethodology ? methodologyModalRef : intelModalRef;
+        if (!modalRef.current) return;
+
+        const focusableElements = Array.from(
+          modalRef.current.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          )
+        ) as HTMLElement[];
+
+        if (focusableElements.length === 0) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
       }
     };
 
     if (hasModalOpen) {
       window.addEventListener('keydown', handleKeyDown);
       document.body.style.overflow = 'hidden';
-    }
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      // Store trigger for focus restoration
+      if (!triggerRef.current) {
+        triggerRef.current = document.activeElement as HTMLElement;
+      }
+      // Focus the close button or first element in the modal
+      setTimeout(() => {
+        const modalRef = showMethodology ? methodologyModalRef : intelModalRef;
+        const firstFocusable = modalRef.current?.querySelector('button') as HTMLElement;
+        firstFocusable?.focus();
+      }, 100);
+    } else {
+      // Restore focus
+      if (triggerRef.current) {
+        triggerRef.current.focus();
+        triggerRef.current = null;
+      }
       document.body.style.overflow = '';
-    };
+    }
   }, [showMethodology, activeIntel]);
 
   return (
@@ -176,7 +220,7 @@ export function Hero() {
           className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6"
         >
           <CyberButton onClick={() => scrollTo('projects')}>VIEW_PROJECTS</CyberButton>
-          <CyberButton color="amber" onClick={() => setShowMethodology(true)} aria-haspopup="dialog">VIEW_METHODOLOGY</CyberButton>
+          <CyberButton color="amber" onClick={() => { triggerRef.current = null; setShowMethodology(true); }} aria-haspopup="dialog">VIEW_METHODOLOGY</CyberButton>
           <CyberButton color="green" onClick={() => scrollTo('contact')}>CONTACT_ME</CyberButton>
 
           <div className="flex space-x-4 pt-4 sm:pt-0 sm:ml-4">
@@ -247,6 +291,10 @@ export function Hero() {
             onClick={() => setShowMethodology(false)}
           >
             <motion.div
+              ref={methodologyModalRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="methodology-modal-title"
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
@@ -330,6 +378,10 @@ export function Hero() {
             onClick={() => setActiveIntel(null)}
           >
             <motion.div
+              ref={intelModalRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="intel-modal-title"
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}

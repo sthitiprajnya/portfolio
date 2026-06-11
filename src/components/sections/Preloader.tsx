@@ -86,13 +86,15 @@ export function Preloader() {
         className="fixed inset-0 z-[10000] bg-black text-green font-mono flex flex-col items-center justify-center p-8 overflow-hidden"
         exit={{ clipPath: 'inset(100% 0 0 0)' }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        aria-hidden="true"
-        aria-live="off"
+        role="status"
+        aria-label="System loading sequence"
       >
         <motion.div
           className="w-full max-w-3xl flex flex-col items-start space-y-4"
           animate={{ opacity: stage >= 10 ? 0 : 1 }}
           transition={{ duration: 0.3 }}
+          aria-live="polite"
+          aria-atomic="false"
         >
           {stage >= 0 && (
             <div className="flex">
@@ -110,7 +112,7 @@ export function Preloader() {
           {stage >= 2 && (
             <div className="flex text-sm md:text-base">
               <span className="mr-2">&gt;</span>
-              <Typewriter text="INITIALIZING STHITIPRAJNYA_BISWAL.sh..." speed={30} />
+              <Typewriter text="INITIALIZING STHITAPRAJNA_BISWAL.sh..." speed={30} />
             </div>
           )}
 

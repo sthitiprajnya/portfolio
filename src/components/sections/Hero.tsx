@@ -28,8 +28,16 @@ export function Hero() {
   const [activeIntel, setActiveIntel] = React.useState<string | null>(null);
   const [showMethodology, setShowMethodology] = React.useState(false);
 
-  // UX Enhancement: Handle Escape key to close modals and manage scroll lock
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // BOLT: Performance Optimization - Consolidated Redundant Effects
+  // Consolidating redundant effects for Escape key handling and body scroll locking
+  // reduces global event listener churn and ensures consistent UI state.
   React.useEffect(() => {
+    const hasModalOpen = showMethodology || activeIntel !== null;
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         if (showMethodology) setShowMethodology(false);
@@ -37,42 +45,14 @@ export function Hero() {
       }
     };
 
-    if (showMethodology || activeIntel) {
+    if (hasModalOpen) {
       window.addEventListener('keydown', handleKeyDown);
       document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
     }
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = '';
-    };
-  }, [showMethodology, activeIntel]);
-
-  const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  // UX Enhancement: Handle Escape key to close modals & manage body scroll locking
-  React.useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setShowMethodology(false);
-        setActiveIntel(null);
-      }
-    };
-
-    if (showMethodology || activeIntel !== null) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.body.style.overflow = '';
-      window.removeEventListener('keydown', handleKeyDown);
     };
   }, [showMethodology, activeIntel]);
 
@@ -259,9 +239,6 @@ export function Hero() {
             onClick={() => setShowMethodology(false)}
           >
             <motion.div
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="methodology-modal-title"
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
@@ -345,9 +322,6 @@ export function Hero() {
             onClick={() => setActiveIntel(null)}
           >
             <motion.div
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="intel-modal-title"
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}

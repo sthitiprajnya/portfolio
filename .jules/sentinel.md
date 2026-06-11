@@ -45,7 +45,7 @@
 **Learning:** Security-critical callbacks (like `createScriptURL`) must return the validated value; otherwise, they implicitly return `undefined`, which the browser treats as a block, breaking application functionality. Furthermore, sanitization regexes should be case-insensitive and account for whitespace to prevent trivial bypasses (e.g., `javaScript  :`).
 **Prevention:** Always ensure every branch of a Trusted Types policy returns a value. Use the `/i` flag and `\\s*` in sanitization regexes. Periodically audit policies to include modern and legacy sinks like `<applet>`, `<meta>`, and `<form>` to maintain a strong defense-in-depth posture.
 
-## 2026-06-11 - Client-Side DoS via Indefinite API Requests
-**Vulnerability:** Missing timeout configurations for external API calls (`fetch`) and potential Prototype Pollution via unsanitized data mapped to dictionary keys.
-**Learning:** `fetch` requests do not have a default timeout. If an external API hangs or responds slowly, it can exhaust available connections, memory, or cause UI freezes, leading to a Client-Side Denial of Service (DoS). Additionally, mapping arbitrary external data directly to object keys (e.g., GitHub repo languages to `const languages = {}`) without `Object.create(null)` introduces a risk of Prototype Pollution via reserved keys like `__proto__`.
-**Prevention:** Always implement an `AbortController` coupled with a `setTimeout` to enforce a strict upper bound on network requests. Furthermore, use `Object.create(null)` for dictionaries holding unbounded user or API data to ensure a clean prototype chain and prevent pollution attacks.
+## 2026-06-12 - Self-Intercepting Trusted Types Policies
+**Vulnerability:** XSS bypasses in Trusted Types default policies due to incomplete regex patterns.
+**Learning:** A robust Trusted Types policy that blocks strings like '<script' will inevitably intercept its own source code when that code is injected into the DOM via sinks like `dangerouslySetInnerHTML`. This leads to "Blocked dangerous HTML pattern" warnings in the console even if no actual attack is occurring.
+**Prevention:** This behavior is expected in a secure-by-default environment. Developers should be aware that these console warnings during initialization are evidence that the policy is functioning correctly and self-testing its own enforcement logic.

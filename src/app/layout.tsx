@@ -145,13 +145,19 @@ export default function RootLayout({
                           lower.includes('<math') ||
                           lower.includes('<svg') ||
                           lower.includes('<details') ||
-                          /(javascript|data)\\s*:/i.test(lower) ||
+                          lower.includes('<animate') ||
+                          lower.includes('<set') ||
+                          lower.includes('<use') ||
+                          lower.includes('<portal') ||
+                          lower.includes('<link') ||
+                          lower.includes('<style') ||
+                          /(javascript|data|vbscript|file)\\s*:/i.test(lower) ||
                           /on[a-z]+\\s*=/i.test(lower)
                         ) {
                           console.warn('Blocked dangerous HTML pattern in Trusted Types default policy:', s.slice(0, 50) + '...');
                           return s
-                            .replace(/<(script|base|embed|object|applet|meta|form|iframe|frame|frameset|template|math|svg|details)/gi, '<blocked-$1')
-                            .replace(/(javascript|data)\\s*:/gi, 'blocked-$1:')
+                            .replace(/<(script|base|embed|object|applet|meta|form|iframe|frame|frameset|template|math|svg|details|animate|set|use|portal|link|style)/gi, '<blocked-$1')
+                            .replace(/(javascript|data|vbscript|file)\\s*:/gi, 'blocked-$1:')
                             .replace(/on[a-z]+\\s*=/gi, (match) => 'blocked-' + match);
                         }
                       }
@@ -160,12 +166,15 @@ export default function RootLayout({
                     createScript: (s) => s,
                     createScriptURL: (s) => {
                       // Security: Robust origin validation using the URL constructor.
-                      // Prevents bypasses using userinfo (e.g., https://origin@evil.com).
+                      // Prevents bypasses using userinfo (e.g., https://origin@evil.com) and blocks non-origin schemes.
                       try {
                         const url = new URL(s, window.location.origin);
-                        if (url.origin !== window.location.origin && (s.startsWith('http') || s.startsWith('//'))) {
-                          console.warn('Blocked cross-origin script URL in Trusted Types policy:', s);
-                          return '/blocked-cross-origin-script';
+                        const isCrossOrigin = url.origin !== window.location.origin && (url.protocol === 'http:' || url.protocol === 'https:');
+                        const isForbiddenScheme = url.protocol === 'blob:' || url.protocol === 'data:' || url.protocol === 'javascript:';
+
+                        if (isCrossOrigin || isForbiddenScheme) {
+                          console.warn('Blocked dangerous script URL in Trusted Types policy:', s);
+                          return '/blocked-dangerous-script';
                         }
                         return url.href;
                       } catch (e) {

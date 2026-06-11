@@ -49,3 +49,8 @@
 **Vulnerability:** XSS bypasses in Trusted Types default policies due to incomplete regex patterns.
 **Learning:** A robust Trusted Types policy that blocks strings like '<script' will inevitably intercept its own source code when that code is injected into the DOM via sinks like `dangerouslySetInnerHTML`. This leads to "Blocked dangerous HTML pattern" warnings in the console even if no actual attack is occurring.
 **Prevention:** This behavior is expected in a secure-by-default environment. Developers should be aware that these console warnings during initialization are evidence that the policy is functioning correctly and self-testing its own enforcement logic.
+
+## 2026-06-15 - Hardening Trusted Types against mXSS and Exfiltration
+**Vulnerability:** Potential XSS bypasses via SVG animation tags and data exfiltration through injected style/link tags.
+**Learning:** A standard Trusted Types policy often focuses on <script>, but attackers can use SVG tags like <animate> or <use> to achieve XSS (mXSS). Furthermore, even without executing scripts, injecting <link> or <style> can be used for CSS-based data exfiltration.
+**Prevention:** Extend Trusted Types createHTML policies to include a broader set of dangerous tags and use the URL object's protocol property in createScriptURL for case-insensitive, normalized scheme validation.

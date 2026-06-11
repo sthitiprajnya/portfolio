@@ -158,7 +158,11 @@ export function Contact() {
   };
 
   return (
-    <section id="contact" className="py-24 bg-deep relative border-t border-border">
+    <section
+      id="contact"
+      tabIndex={-1}
+      className="py-24 bg-deep relative border-t border-border outline-none"
+    >
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <SectionTitle number="09" title="Let's Talk." />
 

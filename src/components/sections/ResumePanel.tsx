@@ -48,7 +48,11 @@ export function ResumePanel() {
   };
 
   return (
-    <section id="resume" className="py-24 bg-deep relative border-t border-border overflow-hidden">
+    <section
+      id="resume"
+      tabIndex={-1}
+      className="py-24 bg-deep relative border-t border-border overflow-hidden outline-none"
+    >
 
       {/* Faint diagonal lines background */}
       <div

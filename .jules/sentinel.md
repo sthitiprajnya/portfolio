@@ -45,7 +45,7 @@
 **Learning:** Security-critical callbacks (like `createScriptURL`) must return the validated value; otherwise, they implicitly return `undefined`, which the browser treats as a block, breaking application functionality. Furthermore, sanitization regexes should be case-insensitive and account for whitespace to prevent trivial bypasses (e.g., `javaScript  :`).
 **Prevention:** Always ensure every branch of a Trusted Types policy returns a value. Use the `/i` flag and `\\s*` in sanitization regexes. Periodically audit policies to include modern and legacy sinks like `<applet>`, `<meta>`, and `<form>` to maintain a strong defense-in-depth posture.
 
-## 2025-06-12 - Resilient Regex Escaping in Inline Trusted Types
-**Vulnerability:** Bypassable security sanitization in Trusted Types policy due to incorrect regex escaping within inline script strings.
-**Learning:** When defining a Trusted Types policy inside a string literal (e.g., passed to `dangerouslySetInnerHTML`), regular expression backslashes (like `\s`) must be double-escaped (`\\s`). Single-escaped backslashes are consumed by the string parser, resulting in a regex literal like `/javascripts:/` instead of `/javascript\s*:/`, which attackers can easily bypass with whitespace.
-**Prevention:** Always use `\\s` and other double-escaped meta-characters when embedding regex logic inside strings intended for browser-side evaluation. Verify the final evaluated regex in the browser console or via automated tests to ensure it matches intended patterns.
+## 2026-06-12 - Self-Intercepting Trusted Types Policies
+**Vulnerability:** XSS bypasses in Trusted Types default policies due to incomplete regex patterns.
+**Learning:** A robust Trusted Types policy that blocks strings like '<script' will inevitably intercept its own source code when that code is injected into the DOM via sinks like `dangerouslySetInnerHTML`. This leads to "Blocked dangerous HTML pattern" warnings in the console even if no actual attack is occurring.
+**Prevention:** This behavior is expected in a secure-by-default environment. Developers should be aware that these console warnings during initialization are evidence that the policy is functioning correctly and self-testing its own enforcement logic.

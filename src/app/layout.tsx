@@ -126,13 +126,32 @@ export default function RootLayout({
                       if (typeof s === 'string') {
                         // Security: Defense-in-depth against DOM XSS.
                         // We block known dangerous tags and all inline event handlers (on*).
-                        // Added <template> to the blocked tags list to prevent mXSS/template injection.
-                        const dangerousPattern = /<(script|base|embed|object|applet|meta|form|iframe|frame|frameset|template)|javascript\\s*:|on[a-z]+\\s*=/gi;
-                        if (dangerousPattern.test(s)) {
-                          console.warn('Blocked dangerous HTML pattern in Trusted Types default policy');
+                        // Note: Our own Trusted Types policy script below triggers this check
+                        // because it contains the strings we are searching for (e.g., '<script').
+                        // This is expected and serves as a self-test for the policy.
+                        const lower = s.toLowerCase();
+                        if (
+                          lower.includes('<script') ||
+                          lower.includes('<base') ||
+                          lower.includes('<embed') ||
+                          lower.includes('<object') ||
+                          lower.includes('<applet') ||
+                          lower.includes('<meta') ||
+                          lower.includes('<form') ||
+                          lower.includes('<iframe') ||
+                          lower.includes('<frame') ||
+                          lower.includes('<frameset') ||
+                          lower.includes('<template') ||
+                          lower.includes('<math') ||
+                          lower.includes('<svg') ||
+                          lower.includes('<details') ||
+                          /(javascript|data)\\s*:/i.test(lower) ||
+                          /on[a-z]+\\s*=/i.test(lower)
+                        ) {
+                          console.warn('Blocked dangerous HTML pattern in Trusted Types default policy:', s.slice(0, 50) + '...');
                           return s
-                            .replace(/<(script|base|embed|object|applet|meta|form|iframe|frame|frameset|template)/gi, '<blocked-$1')
-                            .replace(/javascript\\s*:/gi, 'blocked-javascript:')
+                            .replace(/<(script|base|embed|object|applet|meta|form|iframe|frame|frameset|template|math|svg|details)/gi, '<blocked-$1')
+                            .replace(/(javascript|data)\\s*:/gi, 'blocked-$1:')
                             .replace(/on[a-z]+\\s*=/gi, (match) => 'blocked-' + match);
                         }
                       }

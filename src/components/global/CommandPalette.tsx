@@ -90,7 +90,15 @@ export function CommandPalette() {
   const handleSelect = (id: string) => {
     setIsOpen(false);
     setTimeout(() => {
-      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+        // Accessibility: Transfer focus to target section. Using a nested timeout
+        // ensures the element is ready and scroll has initiated.
+        setTimeout(() => {
+          el.focus({ preventScroll: true });
+        }, 100);
+      }
     }, 100);
   };
 

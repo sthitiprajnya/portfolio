@@ -84,7 +84,15 @@ export function Navigation() {
 
   const scrollTo = (id: string) => {
     setMobileMenuOpen(false);
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+      // Accessibility: Transfer focus to the target section after a short delay
+      // to ensure the scroll has started. preventScroll: true avoids sudden jumps.
+      setTimeout(() => {
+        el.focus({ preventScroll: true });
+      }, 100);
+    }
   };
 
   const openSearch = () => {
@@ -147,7 +155,7 @@ export function Navigation() {
                         isActive ? 'text-cyan glass-pill rounded-pill border-b-2 border-cyan' : 'text-text-secondary hover:text-cyan rounded-pill border-b-2 border-transparent'
                       )}
                       aria-label={`Scroll to ${link.ariaLabel || link.label} section`}
-                      aria-current={isActive ? 'page' : undefined}
+                      aria-current={isActive ? 'true' : undefined}
                     >
                       {link.label}
                     </button>
@@ -230,7 +238,7 @@ export function Navigation() {
                         activeSection === link.id ? 'bg-cyan/10 text-cyan border border-cyan/20' : 'hover:bg-white/5 text-text-secondary hover:text-white border border-transparent'
                       )}
                       aria-label={`Scroll to ${link.ariaLabel || link.label} section`}
-                      aria-current={activeSection === link.id ? 'page' : undefined}
+                      aria-current={activeSection === link.id ? 'true' : undefined}
                     >
                       <span className="opacity-40 mr-4 text-xs w-8 group-hover:text-cyan transition-colors">
                         {activeSection === link.id ? '>>' : `$`}

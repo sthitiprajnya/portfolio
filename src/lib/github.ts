@@ -67,10 +67,15 @@ export async function fetchGitHubStats(): Promise<GitHubStats> {
   const headers = { 'Accept': 'application/vnd.github.v3+json' };
 
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
     const [userRes, reposRes] = await Promise.all([
-      fetch(`https://api.github.com/users/${GITHUB_USER}`, { headers }),
-      fetch(`https://api.github.com/users/${GITHUB_USER}/repos?per_page=100&sort=updated`, { headers }),
+      fetch(`https://api.github.com/users/${GITHUB_USER}`, { headers, signal: controller.signal }),
+      fetch(`https://api.github.com/users/${GITHUB_USER}/repos?per_page=100&sort=updated`, { headers, signal: controller.signal }),
     ]);
+
+    clearTimeout(timeoutId);
 
     if (!userRes.ok || !reposRes.ok) {
       return GITHUB_FALLBACK_DATA;
@@ -81,7 +86,7 @@ export async function fetchGitHubStats(): Promise<GitHubStats> {
 
     let totalStars = 0;
     let totalForks = 0;
-    const languages: Record<string, number> = {};
+    const languages: Record<string, number> = Object.create(null);
 
     let top1: GitHubApiRepo | null = null;
     let top2: GitHubApiRepo | null = null;

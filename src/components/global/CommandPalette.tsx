@@ -10,10 +10,12 @@ export function CommandPalette() {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const handleOpen = () => {
       if (!isOpen) {
+        triggerRef.current = document.activeElement as HTMLElement;
         setIsOpen(true);
         setQuery('');
         setSelectedIndex(0);
@@ -53,6 +55,11 @@ export function CommandPalette() {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
+      // Return focus to the trigger element when closed
+      if (triggerRef.current) {
+        triggerRef.current.focus();
+        triggerRef.current = null;
+      }
     }
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
@@ -84,10 +91,35 @@ export function CommandPalette() {
     } else if (e.key === 'Enter' && filteredLinks[selectedIndex]) {
       e.preventDefault();
       handleSelect(filteredLinks[selectedIndex].id);
+    } else if (e.key === 'Tab') {
+      // Focus trapping logic
+      const focusableElements = Array.from(
+        document.querySelectorAll(
+          '#command-palette-listbox button, #command-palette-input, #clear-search-button'
+        )
+      ) as HTMLElement[];
+
+      if (focusableElements.length === 0) return;
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement.focus();
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement.focus();
+        }
+      }
     }
   };
 
   const handleSelect = (id: string) => {
+    triggerRef.current = null; // Don't return focus if we are navigating
     setIsOpen(false);
     setTimeout(() => {
       const el = document.getElementById(id);
@@ -133,6 +165,7 @@ export function CommandPalette() {
               <span className="text-cyan font-mono mr-3">{'>'}</span>
               <input
                 ref={inputRef}
+                id="command-palette-input"
                 type="text"
                 role="combobox"
                 aria-expanded="true"
@@ -152,6 +185,7 @@ export function CommandPalette() {
               />
               {query && (
                 <button
+                  id="clear-search-button"
                   onClick={() => { setQuery(''); inputRef.current?.focus(); }}
                   className="p-1 mr-2 text-text-muted hover:text-cyan transition-colors outline-none focus-visible:ring-1 focus-visible:ring-cyan rounded-sm"
                   aria-label="Clear search"

@@ -49,3 +49,8 @@
 **Vulnerability:** XSS bypasses in Trusted Types default policies due to incomplete regex patterns.
 **Learning:** A robust Trusted Types policy that blocks strings like '<script' will inevitably intercept its own source code when that code is injected into the DOM via sinks like `dangerouslySetInnerHTML`. This leads to "Blocked dangerous HTML pattern" warnings in the console even if no actual attack is occurring.
 **Prevention:** This behavior is expected in a secure-by-default environment. Developers should be aware that these console warnings during initialization are evidence that the policy is functioning correctly and self-testing its own enforcement logic.
+
+## 2026-06-15 - Hardened Protocol Validation in Trusted Types
+**Vulnerability:** Bypass of same-origin checks in `createScriptURL` due to missing protocol enforcement, allowing dangerous schemes like `data:` or `blob:` to be treated as valid if they didn't trigger origin mismatch logic.
+**Learning:** Origin checks alone are insufficient for `createScriptURL`. Attackers can use protocol-relative URLs or non-standard schemes to bypass string-based prefix checks. Robust validation must combine `url.origin` comparison with explicit `url.protocol` enforcement (e.g., only allowing `http:` and `https:`).
+**Prevention:** Always use the `URL` constructor to parse sinks and verify both the origin and the protocol. Block all non-web schemes and enforce a strict same-origin policy for dynamically loaded scripts unless specifically exempted.

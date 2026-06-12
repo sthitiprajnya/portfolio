@@ -145,27 +145,37 @@ export default function RootLayout({
                           lower.includes('<math') ||
                           lower.includes('<svg') ||
                           lower.includes('<details') ||
+                          lower.includes('<link') ||
+                          lower.includes('<style') ||
+                          lower.includes('<audio') ||
+                          lower.includes('<video') ||
+                          lower.includes('<source') ||
+                          lower.includes('<track') ||
+                          lower.includes('<portal') ||
                           /(javascript|data)\\s*:/i.test(lower) ||
-                          /on[a-z]+\\s*=/i.test(lower)
+                          /(on[a-z]+|formaction)\\s*=/i.test(lower)
                         ) {
                           console.warn('Blocked dangerous HTML pattern in Trusted Types default policy:', s.slice(0, 50) + '...');
                           return s
-                            .replace(/<(script|base|embed|object|applet|meta|form|iframe|frame|frameset|template|math|svg|details)/gi, '<blocked-$1')
+                            .replace(/<(script|base|embed|object|applet|meta|form|iframe|frame|frameset|template|math|svg|details|link|style|audio|video|source|track|portal)/gi, '<blocked-$1')
                             .replace(/(javascript|data)\\s*:/gi, 'blocked-$1:')
-                            .replace(/on[a-z]+\\s*=/gi, (match) => 'blocked-' + match);
+                            .replace(/(on[a-z]+|formaction)\\s*=/gi, (match) => 'blocked-' + match);
                         }
                       }
                       return s;
                     },
                     createScript: (s) => s,
                     createScriptURL: (s) => {
-                      // Security: Robust origin validation using the URL constructor.
-                      // Prevents bypasses using userinfo (e.g., https://origin@evil.com).
+                      // Security: Robust origin and protocol validation using the URL constructor.
+                      // Enforces same-origin policy and blocks dangerous schemes like blob:, data:, and javascript:.
                       try {
                         const url = new URL(s, window.location.origin);
-                        if (url.origin !== window.location.origin && (s.startsWith('http') || s.startsWith('//'))) {
-                          console.warn('Blocked cross-origin script URL in Trusted Types policy:', s);
-                          return '/blocked-cross-origin-script';
+                        const isSameOrigin = url.origin === window.location.origin;
+                        const isHttpOrHttps = url.protocol === 'http:' || url.protocol === 'https:';
+
+                        if (!isSameOrigin || !isHttpOrHttps) {
+                          console.warn('Blocked dangerous or cross-origin script URL in Trusted Types policy:', s);
+                          return '/blocked-script-url';
                         }
                         return url.href;
                       } catch (e) {

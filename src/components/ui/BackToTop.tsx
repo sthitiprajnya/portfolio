@@ -11,7 +11,14 @@ export const BackToTop = () => {
     window.addEventListener('scroll', toggle);
     return () => window.removeEventListener('scroll', toggle);
   }, []);
-  const scroll = () => window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
+  const scroll = () => {
+    window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
+    // Accessibility: Transfer focus to the hero section after scrolling up
+    // to prevent focus loss when the button disappears.
+    setTimeout(() => {
+      document.getElementById('hero')?.focus({ preventScroll: true });
+    }, 100);
+  };
   return (
     <AnimatePresence>
       {isVisible && (

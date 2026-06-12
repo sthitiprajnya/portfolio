@@ -9,7 +9,7 @@ interface OrbState {
   xOffset: number; // Sinusoidal offset
   glow: number; // Glow multiplier based on proximity
   phase: number; // Sinusoidal phase
-  trail: { x: number; y: number }[]; // Circular buffer for trail positions
+  trail: Float32Array; // BOLT: Use TypedArray for memory efficiency
   trailIndex: number; // Index for circular buffer
 }
 
@@ -102,7 +102,7 @@ export default function Sentinel() {
     xOffset: 0,
     glow: BASE_GLOW,
     phase: 0,
-    trail: Array(8).fill({ x: 0, y: 0 }),
+    trail: new Float32Array(16), // 8 points (x,y)
     trailIndex: 0,
   });
 
@@ -130,6 +130,84 @@ export default function Sentinel() {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    // BOLT: Performance Optimization - Sprite Caching
+    // Pre-rendering the sentinel orb to an offscreen canvas avoids expensive
+    // radial gradient and arc calculations on every 60fps frame.
+    const SPRITE_SIZE = 256;
+    const spriteCanvas = typeof OffscreenCanvas !== 'undefined'
+      ? new OffscreenCanvas(SPRITE_SIZE, SPRITE_SIZE)
+      : document.createElement('canvas');
+
+    if (spriteCanvas instanceof HTMLCanvasElement) {
+      spriteCanvas.width = SPRITE_SIZE;
+      spriteCanvas.height = SPRITE_SIZE;
+    }
+
+    const spriteCtx = spriteCanvas.getContext('2d') as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
+    const lastSpriteColors = { r: -1, g: -1, b: -1 };
+
+    function updateSprite(r_core: number, g_core: number, b_core: number) {
+      if (!spriteCtx) return;
+
+      // BOLT: Only redraw the sprite when the base color changes significantly (threshold > 1 unit).
+      // This saves unnecessary CPU/GPU work on most frames.
+      const dr = Math.abs(r_core - lastSpriteColors.r);
+      const dg = Math.abs(g_core - lastSpriteColors.g);
+      const db = Math.abs(b_core - lastSpriteColors.b);
+
+      if (dr < 1 && dg < 1 && db < 1) return;
+
+      lastSpriteColors.r = r_core;
+      lastSpriteColors.g = g_core;
+      lastSpriteColors.b = b_core;
+
+      const center = SPRITE_SIZE / 2;
+      const baseR = 60; // BOLT: Increased base radius for better sprite resolution utilization
+
+      spriteCtx.clearRect(0, 0, SPRITE_SIZE, SPRITE_SIZE);
+
+      // ── Outer halo ───────────────────────────────────────────────
+      const halo = spriteCtx.createRadialGradient(center, center, baseR * 0.6, center, center, baseR * 1.8);
+      halo.addColorStop(0,   `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0.12)`);
+      halo.addColorStop(1,   `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0)`);
+      spriteCtx.fillStyle = halo;
+      spriteCtx.beginPath();
+      spriteCtx.arc(center, center, baseR * 1.8, 0, Math.PI * 2);
+      spriteCtx.fill();
+
+      // ── Mid glow ─────────────────────────────────────────────────
+      const mid = spriteCtx.createRadialGradient(center, center, 0, center, center, baseR);
+      mid.addColorStop(0.35, `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0.5)`);
+      mid.addColorStop(1,    `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0)`);
+      spriteCtx.fillStyle = mid;
+      spriteCtx.beginPath();
+      spriteCtx.arc(center, center, baseR, 0, Math.PI * 2);
+      spriteCtx.fill();
+
+      // ── Core sphere ──────────────────────────────────────────────
+      const core = spriteCtx.createRadialGradient(
+        center - baseR * 0.08, center - baseR * 0.08, 0,
+        center, center, baseR * 0.25
+      );
+      core.addColorStop(0,   `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 1)`);
+      core.addColorStop(1,   `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0)`);
+      spriteCtx.fillStyle = core;
+      spriteCtx.beginPath();
+      spriteCtx.arc(center, center, baseR * 0.25, 0, Math.PI * 2);
+      spriteCtx.fill();
+
+      // ── Specular highlight ───────────────────────────────────────
+      const specX = center - baseR * 0.06;
+      const specY = center - baseR * 0.09;
+      const spec = spriteCtx.createRadialGradient(specX, specY, 0, specX, specY, baseR * 0.08);
+      spec.addColorStop(0,   'rgba(255, 255, 255, 0.9)');
+      spec.addColorStop(1,   'rgba(255, 255, 255, 0)');
+      spriteCtx.fillStyle = spec;
+      spriteCtx.beginPath();
+      spriteCtx.arc(specX, specY, baseR * 0.25, 0, Math.PI * 2);
+      spriteCtx.fill();
+    }
 
     let width = window.innerWidth;
     let height = window.innerHeight;
@@ -256,8 +334,9 @@ export default function Sentinel() {
       const cx = width / 2 + s.xOffset;
       const cy = height / 2;
 
-      // Update trail buffer
-      s.trail[s.trailIndex] = { x: cx, y: cy + s.y - stateRef.current.targetY }; // Adjusted for visual motion
+      // Update trail buffer (Float32Array)
+      s.trail[s.trailIndex * 2] = cx;
+      s.trail[s.trailIndex * 2 + 1] = cy + s.y - stateRef.current.targetY;
       s.trailIndex = (s.trailIndex + 1) % 8;
 
       // BOLT: Use pre-parsed numeric color objects to avoid regex and string manipulation in the 60fps loop.
@@ -292,105 +371,46 @@ export default function Sentinel() {
 
       // Day 8: Apply violet override based on ctf proximity
       const vCore = VIOLET_THEME.core;
-      const vMid = VIOLET_THEME.mid;
-      const vHalo = VIOLET_THEME.halo;
-      const vSpec = VIOLET_THEME.specular;
       const p = colorProximityRef.current;
 
       const finalCoreR = lerpColor(cur.coreR, vCore.r, p);
       const finalCoreG = lerpColor(cur.coreG, vCore.g, p);
       const finalCoreB = lerpColor(cur.coreB, vCore.b, p);
-      const finalCoreA = lerpColor(cur.coreA, vCore.a, p);
-
-      const finalMidR = lerpColor(cur.midR, vMid.r, p);
-      const finalMidG = lerpColor(cur.midG, vMid.g, p);
-      const finalMidB = lerpColor(cur.midB, vMid.b, p);
-      const finalMidA = lerpColor(cur.midA, vMid.a, p);
-
-      const finalHaloR = lerpColor(cur.haloR, vHalo.r, p);
-      const finalHaloG = lerpColor(cur.haloG, vHalo.g, p);
-      const finalHaloB = lerpColor(cur.haloB, vHalo.b, p);
-      const finalHaloA = lerpColor(cur.haloA, vHalo.a, p);
-
-      const finalSpecR = lerpColor(cur.specR, vSpec.r, p);
-      const finalSpecG = lerpColor(cur.specG, vSpec.g, p);
-      const finalSpecB = lerpColor(cur.specB, vSpec.b, p);
-      const finalSpecA = lerpColor(cur.specA, vSpec.a, p);
-
-      const coreColor = `rgba(${Math.round(finalCoreR)},${Math.round(finalCoreG)},${Math.round(finalCoreB)},${finalCoreA})`;
-      const midColor = `rgba(${Math.round(finalMidR)},${Math.round(finalMidG)},${Math.round(finalMidB)},${finalMidA})`;
-      const haloColor = `rgba(${Math.round(finalHaloR)},${Math.round(finalHaloG)},${Math.round(finalHaloB)},${finalHaloA})`;
-      const specColor = `rgba(${Math.round(finalSpecR)},${Math.round(finalSpecG)},${Math.round(finalSpecB)},${finalSpecA})`;
 
       const pulse = 1 + 0.08 * Math.sin(Date.now() * 0.002);
       const r = (s.glow + pulse * 10) * 2; // Making it significantly larger as requested
 
-      // 0. Trail effect
-      const trailLen = s.trail.length;
+      // Update the sprite cache with current base colors
+      updateSprite(finalCoreR, finalCoreG, finalCoreB);
+
+      // 0. Trail effect using drawImage for consistency and performance
+      const trailLen = 8;
       for (let i = 0; i < trailLen; i++) {
         // Read buffer from newest to oldest
         const idx = (s.trailIndex - 1 - i + trailLen) % trailLen;
-        const pt = s.trail[idx];
+        const tx = s.trail[idx * 2];
+        const ty = s.trail[idx * 2 + 1];
 
         // Skip uninitialized points
-        if (pt.x === 0 && pt.y === 0) continue;
+        if (tx === 0 && ty === 0) continue;
 
         const opacity = 0.3 * (1 - i / trailLen);
         if (opacity <= 0) continue;
 
-        ctx.fillStyle = `rgba(0, 245, 255, ${opacity})`;
-        ctx.beginPath();
+        ctx.globalAlpha = opacity;
         // The trail is offset slightly based on the current orb movement to visually drag behind
         const trailY = cy - (s.targetY - s.y) * 0.5 * (i + 1);
-        ctx.arc(pt.x, trailY, r * 0.15 * (1 - i / trailLen), 0, Math.PI * 2);
-        ctx.fill();
+        // BOLT: Match original scale relative to main orb
+        const trailSize = r * 0.4 * (1 - i / trailLen);
+        ctx.drawImage(spriteCanvas as CanvasImageSource, tx - trailSize / 2, trailY - trailSize / 2, trailSize, trailSize);
       }
 
-      // 1. Outer halo
-      const halo = ctx.createRadialGradient(cx, cy, r * 0.6, cx, cy, r * 1.8);
-      halo.addColorStop(0, haloColor);
-      halo.addColorStop(1, `rgba(${Math.round(finalHaloR)},${Math.round(finalHaloG)},${Math.round(finalHaloB)},0)`);
-
-      ctx.fillStyle = halo;
-      ctx.beginPath();
-      ctx.arc(cx, cy, r * 1.8, 0, Math.PI * 2);
-      ctx.fill();
-
-      // 2. Mid glow
-      const mid = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-      mid.addColorStop(0.35, midColor);
-      mid.addColorStop(1, `rgba(${Math.round(finalMidR)},${Math.round(finalMidG)},${Math.round(finalMidB)},0)`);
-
-      ctx.fillStyle = mid;
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.fill();
-
-      // 3. Core sphere
-      const core = ctx.createRadialGradient(
-        cx - r * 0.08, cy - 0.08, 0,
-        cx, cy, r * 0.25
-      );
-      core.addColorStop(0, coreColor);
-      core.addColorStop(1, `rgba(${Math.round(finalCoreR)},${Math.round(finalCoreG)},${Math.round(finalCoreB)},0)`);
-
-      ctx.fillStyle = core;
-      ctx.beginPath();
-      ctx.arc(cx, cy, r * 0.25, 0, Math.PI * 2);
-      ctx.fill();
-
-      // 4. Specular highlight
-      const spec = ctx.createRadialGradient(
-        cx - r * 0.06, cy - r * 0.09, 0,
-        cx - r * 0.06, cy - r * 0.09, r * 0.08
-      );
-      spec.addColorStop(0, specColor);
-      spec.addColorStop(1, `rgba(${Math.round(finalSpecR)},${Math.round(finalSpecG)},${Math.round(finalSpecB)},0)`);
-
-      ctx.fillStyle = spec;
-      ctx.beginPath();
-      ctx.arc(cx, cy, r * 0.25, 0, Math.PI * 2);
-      ctx.fill();
+      // Draw Main Orb using hardware-accelerated drawImage
+      ctx.globalAlpha = 1.0;
+      // BOLT: Match original scale (outer radius was r * 1.8, so diameter is r * 3.6)
+      // Factor accounts for baseR/SPRITE_SIZE ratio in the sprite cache.
+      const mainSize = r * 4.3;
+      ctx.drawImage(spriteCanvas as CanvasImageSource, cx - mainSize / 2, cy - mainSize / 2, mainSize, mainSize);
 
       // Day 12: Ring ripple animation
       if (rippleRef.current.active) {

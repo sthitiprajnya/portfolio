@@ -88,3 +88,7 @@
 ## 2026-08-15 - [Sprite-based Caching for Expensive Orbs]
 **Learning:** In high-frequency (60fps) Canvas 2D animation loops, re-calculating multiple complex radial gradients every frame is extremely expensive and causes high CPU/GPU load. By pre-rendering the orb into a small, fixed-size "sprite" offscreen canvas, we can replace the expensive vector draw calls with a single hardware-accelerated `drawImage()` blit. Pulse and breathing effects can then be efficiently applied during the blit stage using scaling.
 **Action:** For complex, semi-static visual elements (like glow orbs or particles with gradients), implement sprite-based caching. Pre-render the element once and only update the cache when its visual properties (like color) change beyond a noticeable threshold.
+
+## 2026-06-12 - [Sprite-based Caching & TypedArray Buffers in Sentinel]
+**Learning:** High-frequency canvas animations (60fps) involving multiple radial gradients and trail effects create significant CPU/GPU overhead and GC pressure. Redrawing complex gradients every frame is unnecessary when the visual shift is gradual. Furthermore, using arrays of objects for trail buffers causes continuous allocation/deallocation churn.
+**Action:** Implement sprite-based caching using offscreen canvases for complex vector elements, only redrawing the cache when properties (like color) change beyond a perceptible threshold. Use TypedArrays (e.g., Float32Array) for circular buffers to ensure zero-allocation hot loops.

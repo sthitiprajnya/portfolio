@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { SectionTitle } from '@/components/ui/SectionTitle';
@@ -20,6 +20,35 @@ const FILTERS = [
 export function Projects() {
   const [activeFilter, setActiveFilter] = useState('all');
   const prefersReducedMotion = usePrefersReducedMotion();
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
+    let newIndex = -1;
+    const tabs = FILTERS;
+
+    switch (e.key) {
+      case 'ArrowRight':
+        newIndex = (index + 1) % tabs.length;
+        break;
+      case 'ArrowLeft':
+        newIndex = (index - 1 + tabs.length) % tabs.length;
+        break;
+      case 'Home':
+        newIndex = 0;
+        break;
+      case 'End':
+        newIndex = tabs.length - 1;
+        break;
+      default:
+        return;
+    }
+
+    if (newIndex !== -1) {
+      e.preventDefault();
+      setActiveFilter(tabs[newIndex].id);
+      tabRefs.current[newIndex]?.focus();
+    }
+  };
 
   const filteredProjects = useMemo(() => PROJECTS.filter(p =>
     activeFilter === 'all' ? true : p.category === activeFilter
@@ -50,22 +79,31 @@ export function Projects() {
         </div>
 
         {/* Filter Tabs */}
-        <ScrollReveal variants={fadeSlideUp} className="flex flex-wrap gap-3 mb-12">
-          {FILTERS.map(filter => {
+        <ScrollReveal
+          variants={fadeSlideUp}
+          className="flex flex-wrap gap-3 mb-12"
+          role="tablist"
+          aria-label="Project categories"
+        >
+          {FILTERS.map((filter, idx) => {
             const isActive = activeFilter === filter.id;
             const count = filterCounts[filter.id];
 
             return (
               <button
                 key={filter.id}
+                ref={(el) => { tabRefs.current[idx] = el; }}
                 onClick={() => setActiveFilter(filter.id)}
+                onKeyDown={(e) => handleKeyDown(e, idx)}
+                role="tab"
+                aria-selected={isActive}
+                tabIndex={isActive ? 0 : -1}
                 className={clsx(
                   "font-mono text-xs uppercase tracking-widest px-5 py-2 transition-all duration-300 rounded-card border outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black flex items-center gap-2 group",
                   isActive
                     ? "bg-cyan border-cyan text-black shadow-[var(--glow-cyan-sm)] font-bold"
                     : "bg-transparent border-border text-text-secondary hover:text-cyan hover:border-cyan/50"
                 )}
-                aria-pressed={isActive}
                 aria-label={`Filter by ${filter.label} (${count} projects)`}
               >
                 <span>{filter.label}</span>

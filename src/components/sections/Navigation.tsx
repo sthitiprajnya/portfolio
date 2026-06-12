@@ -17,6 +17,10 @@ export const NAV_LINKS = [
   { label: 'Contact',   id: 'contact'        },
 ];
 
+// BOLT: Hoist the observed sections array to the module level to avoid
+// redundant array creation and property access inside the useEffect.
+const OBSERVED_SECTIONS = ['hero', ...NAV_LINKS.map(l => l.id)];
+
 export function Navigation() {
   const [scrolled,       setScrolled]       = useState(false);
   const [activeSection,  setActiveSection]  = useState('hero');
@@ -47,8 +51,6 @@ export function Navigation() {
   useEffect(() => {
     // BOLT: Use IntersectionObserver instead of scroll listeners and getBoundingClientRect
     // for much better performance (avoids main-thread layout thrashing)
-    const sections = ['hero', ...NAV_LINKS.map(l => l.id)];
-
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -60,7 +62,7 @@ export function Navigation() {
       { rootMargin: '-30% 0px -60% 0px', threshold: 0 }
     );
 
-    sections.forEach((id) => {
+    OBSERVED_SECTIONS.forEach((id) => {
       const el = document.getElementById(id);
       if (el) observer.observe(el);
     });

@@ -23,6 +23,12 @@ const PRIMARY_ROLE = PERSONAL.title.split(' · ')[0];
 const NAME_CHARS = PERSONAL.nameShort.split('');
 const TYPEWRITER_SEQUENCE = HERO_ROLES.flatMap(role => [role, 2000]);
 
+// BOLT: Pre-parse numeric stat values to avoid redundant string manipulation and parsing during render
+const PROCESSED_HERO_STATS = HERO_STATS.map(stat => ({
+  ...stat,
+  numericValue: parseInt(stat.value.toString().replace(/[^0-9]/g, ''), 10)
+}));
+
 export function Hero() {
   const { ref: statsRef } = useInView({ triggerOnce: true, threshold: 0.5 });
   const [activeIntel, setActiveIntel] = React.useState<string | null>(null);
@@ -152,20 +158,17 @@ export function Hero() {
           transition={{ duration: 0.5, delay: 2.0 }}
           className="flex flex-wrap justify-center gap-x-8 gap-y-4 mb-12"
         >
-          {HERO_STATS.map((stat, i) => {
-            const numericValue = parseInt(stat.value.toString().replace(/[^0-9]/g, ''), 10);
-            return (
-              <div key={i} className="flex flex-col items-center xs:px-2">
-                <span className="font-display text-xl xs:text-2xl text-cyan mb-1 flex items-center">
-                  <CountUp end={numericValue} duration={2.5} separator="," enableScrollSpy={true} scrollSpyOnce={true} />
-                  {stat.suffix}
-                </span>
-                <span className="font-mono text-[0.55rem] xs:text-[0.6rem] uppercase tracking-widest text-text-muted text-center max-w-[80px] xs:max-w-none">
-                  {stat.label}
-                </span>
-              </div>
-            );
-          })}
+          {PROCESSED_HERO_STATS.map((stat, i) => (
+            <div key={i} className="flex flex-col items-center xs:px-2">
+              <span className="font-display text-xl xs:text-2xl text-cyan mb-1 flex items-center">
+                <CountUp end={stat.numericValue} duration={2.5} separator="," enableScrollSpy={true} scrollSpyOnce={true} />
+                {stat.suffix}
+              </span>
+              <span className="font-mono text-[0.55rem] xs:text-[0.6rem] uppercase tracking-widest text-text-muted text-center max-w-[80px] xs:max-w-none">
+                {stat.label}
+              </span>
+            </div>
+          ))}
         </motion.div>
 
         {/* CTAs */}

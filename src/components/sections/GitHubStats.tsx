@@ -8,7 +8,16 @@ import useSWR from 'swr';
 import Image from 'next/image';
 import { useState } from 'react';
 
-const fetcher = (url: string) => fetch(url).then(r => r.json());
+const fetcher = async (url: string) => {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), 5000);
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+    return await res.json();
+  } finally {
+    clearTimeout(id);
+  }
+};
 
 export function GitHubStats() {
   const [heatmapError, setHeatmapError] = useState(false);

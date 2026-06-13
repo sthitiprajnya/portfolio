@@ -1,4 +1,6 @@
-# Bolt's Performance Journal
+## 2026-05-31 - RequestAnimationFrame Battery Drain Anti-Pattern
+**Learning:** When migrating from `framer-motion` to a vanilla JS `requestAnimationFrame` loop (e.g. for scroll progress bars), it is critical to explicitly stop the `raf` loop when the animation reaches its resting state (`Math.abs(diff) <= 0.0001`). `framer-motion` handles this "sleeping" automatically. A continuous, unconditional `requestAnimationFrame` loop on an idle component will cause significant CPU overhead and drain mobile batteries.
+**Action:** Always include an `else { cancelAnimationFrame(rafId); rafId = null; }` condition in vanilla animation loops to sleep the thread once the target state is reached, and wake it back up only when new input (e.g., a scroll event) occurs.
 
 ## 2025-05-15 - [IntersectionObserver for Navigation Tracking]
 **Learning:** Using raw `scroll` event listeners with `getBoundingClientRect()` in a loop causes frequent layout thrashing and main-thread congestion. For navigation components that track active sections, `IntersectionObserver` is significantly more efficient as it offloads visibility calculations to the browser's compositor thread and only triggers callbacks when thresholds are crossed.

@@ -94,6 +94,8 @@ export function Preloader() {
           className="w-full max-w-3xl flex flex-col items-start space-y-4"
           animate={{ opacity: stage >= 10 ? 0 : 1 }}
           transition={{ duration: 0.3 }}
+          aria-live="polite"
+          aria-atomic="false"
         >
           {stage >= 0 && (
             <div className="flex">

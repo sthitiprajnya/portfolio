@@ -65,6 +65,7 @@ const SKILLS_TABS: ('ALL' | 'OFFENSIVE' | 'CLOUD' | 'AUTOMATION' | 'COMPLIANCE')
 export function Skills() {
   const [activeTab, setActiveTab] = useState<'ALL' | 'OFFENSIVE' | 'CLOUD' | 'AUTOMATION' | 'COMPLIANCE'>('ALL');
   const { ref: chartRef, inView: chartInView } = useInView({ triggerOnce: true, threshold: 0.5 });
+  const tabRefs = React.useRef<(HTMLButtonElement | null)[]>([]);
 
   const { totalFilteredSkills, filteredCategories } = useMemo(() => {
     let count = 0;
@@ -93,18 +94,34 @@ export function Skills() {
         {/* Filter Tabs & Radar Chart Row */}
         <div className="flex flex-col lg:flex-row justify-between items-start gap-12 mb-16">
           <div className="flex-1 w-full">
-             <div className="flex flex-wrap gap-2 mb-8 border-b border-border pb-4">
-              {SKILLS_TABS.map((tab) => (
+             <div className="flex flex-wrap gap-2 mb-8 border-b border-border pb-4" role="tablist" aria-label="Skill domains">
+              {SKILLS_TABS.map((tab, idx) => (
                 <button
                   key={tab}
+                  ref={(el) => { tabRefs.current[idx] = el; }}
+                  role="tab"
+                  aria-selected={activeTab === tab}
+                  tabIndex={activeTab === tab ? 0 : -1}
                   onClick={() => setActiveTab(tab)}
+                  onKeyDown={(e) => {
+                    let newIdx = -1;
+                    if (e.key === 'ArrowRight') newIdx = (idx + 1) % SKILLS_TABS.length;
+                    else if (e.key === 'ArrowLeft') newIdx = (idx - 1 + SKILLS_TABS.length) % SKILLS_TABS.length;
+                    else if (e.key === 'Home') newIdx = 0;
+                    else if (e.key === 'End') newIdx = SKILLS_TABS.length - 1;
+
+                    if (newIdx !== -1) {
+                      e.preventDefault();
+                      setActiveTab(SKILLS_TABS[newIdx]);
+                      tabRefs.current[newIdx]?.focus();
+                    }
+                  }}
                   className={clsx(
                     'px-4 py-2 font-mono text-[0.7rem] uppercase tracking-widest transition-all rounded-card border outline-none focus-visible:ring-2 focus-visible:ring-cyan',
                     activeTab === tab
                       ? 'border-cyan bg-cyan/10 text-cyan shadow-[var(--glow-cyan-sm)]'
                       : 'border-border text-text-secondary hover:border-cyan/50 hover:text-white'
                   )}
-                  aria-pressed={activeTab === tab}
                   aria-label={`Filter by ${tab}`}
                 >
                   {tab}

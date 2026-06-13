@@ -10,6 +10,43 @@ import { useState } from 'react';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
+const TOP_REPOS = [
+  {
+    name: 'VAPT-Automation',
+    description: 'Automated vulnerability scanning pipeline leveraging Burp Suite Pro REST API and custom Python scripts.',
+    language: 'Python',
+    url: 'https://github.com/sthitiprajnya/VAPT-Automation',
+    stars: 18,
+    forks: 5
+  },
+  {
+    name: 'GCP-Hardening-Scripts',
+    description: 'Collection of Bash scripts to automatically audit and harden GCP environments according to CIS benchmarks.',
+    language: 'Bash',
+    url: 'https://github.com/sthitiprajnya/GCP-Hardening-Scripts',
+    stars: 12,
+    forks: 4
+  },
+  {
+    name: 'Wazuh-SIEM-Rules',
+    description: 'Custom decoders and rules for Wazuh to detect advanced persistent threats and anomalous activity.',
+    language: 'XML',
+    url: 'https://github.com/sthitiprajnya/Wazuh-SIEM-Rules',
+    stars: 8,
+    forks: 3
+  },
+  {
+    name: 'DLP-Pipeline',
+    description: 'Data Loss Prevention (DLP) mechanism integrated into CI/CD to prevent sensitive data leaks.',
+    language: 'Python',
+    url: 'https://github.com/sthitiprajnya/DLP-Pipeline',
+    stars: 4,
+    forks: 2
+  }
+];
+
+const GITHUB_FALLBACK = { public_repos: 18, followers: 12, following: 0 };
+
 export function GitHubStats() {
   const [heatmapError, setHeatmapError] = useState(false);
   const { data: githubData } = useSWR(
@@ -18,53 +55,20 @@ export function GitHubStats() {
     {
       revalidateOnFocus: false,
       dedupingInterval: 3_600_000, // 1 hour
-      fallbackData: { public_repos: 18, followers: 12, following: 0 },
+      fallbackData: GITHUB_FALLBACK,
     }
   );
 
-  const stats = {
+  const stats = React.useMemo(() => ({
     publicRepos: githubData?.public_repos || 18,
-    totalStars: 42, // Would require additional API calls to sum up properly
+    totalStars: 42,
     totalForks: 14,
     followers: githubData?.followers || 12,
     commits: 852,
     prs: 43,
     issues: 12,
-    topRepos: [
-      {
-        name: 'VAPT-Automation',
-        description: 'Automated vulnerability scanning pipeline leveraging Burp Suite Pro REST API and custom Python scripts.',
-        language: 'Python',
-        url: 'https://github.com/sthitiprajnya/VAPT-Automation',
-        stars: 18,
-        forks: 5
-      },
-      {
-        name: 'GCP-Hardening-Scripts',
-        description: 'Collection of Bash scripts to automatically audit and harden GCP environments according to CIS benchmarks.',
-        language: 'Bash',
-        url: 'https://github.com/sthitiprajnya/GCP-Hardening-Scripts',
-        stars: 12,
-        forks: 4
-      },
-      {
-        name: 'Wazuh-SIEM-Rules',
-        description: 'Custom decoders and rules for Wazuh to detect advanced persistent threats and anomalous activity.',
-        language: 'XML',
-        url: 'https://github.com/sthitiprajnya/Wazuh-SIEM-Rules',
-        stars: 8,
-        forks: 3
-      },
-      {
-        name: 'DLP-Pipeline',
-        description: 'Data Loss Prevention (DLP) mechanism integrated into CI/CD to prevent sensitive data leaks.',
-        language: 'Python',
-        url: 'https://github.com/sthitiprajnya/DLP-Pipeline',
-        stars: 4,
-        forks: 2
-      }
-    ]
-  };
+    topRepos: TOP_REPOS
+  }), [githubData]);
 
   return (
     <section
@@ -89,7 +93,7 @@ export function GitHubStats() {
 
               {/* Left Column - Terminal Style Heatmap & Logs */}
               <ScrollReveal variants={fadeSlideUp} className="lg:col-span-7">
-                <div className="h-full p-0 flex flex-col overflow-hidden bg-[rgba(0,0,0,0.4)] glass rounded-card relative" data-orb-target="true">
+                <div className="h-full p-0 flex flex-col overflow-hidden bg-[rgba(0,0,0,0.4)] glass rounded-card relative" data-orb-target="github-heatmap">
                   <div className="flex items-center px-4 py-2 bg-[rgba(0,0,0,0.6)] border-b border-[var(--glass-border)] relative z-10">
                     <span className="w-3 h-3 rounded-full bg-red-500/80 mr-2"></span>
                     <span className="w-3 h-3 rounded-full bg-amber-500/80 mr-2"></span>
@@ -161,7 +165,7 @@ export function GitHubStats() {
                       <a
                         key={idx}
                         href={repo.url}
-                        target="_blank" rel="noopener noreferrer"
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="group block p-4 rounded-card glass bg-[rgba(0,0,0,0.4)] hover:border-[rgba(0,245,255,0.4)] hover:bg-[rgba(0,0,0,0.6)] transition-colors outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black"
                       >
@@ -201,7 +205,7 @@ export function GitHubStats() {
   );
 }
 
-function StatCard({ label, value }: { label: string, value: number }) {
+const StatCard = React.memo(function StatCard({ label, value }: { label: string, value: number }) {
   return (
     <div className="p-6 flex flex-col items-center justify-center text-center glass rounded-card relative overflow-hidden">
       <div className="font-display text-3xl text-cyan mb-2 relative z-10">
@@ -212,4 +216,4 @@ function StatCard({ label, value }: { label: string, value: number }) {
       </div>
     </div>
   );
-}
+});

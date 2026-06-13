@@ -20,6 +20,7 @@ const FILTERS = [
 export function Projects() {
   const [activeFilter, setActiveFilter] = useState('all');
   const prefersReducedMotion = usePrefersReducedMotion();
+  const tabRefs = React.useRef<(HTMLButtonElement | null)[]>([]);
 
   const filteredProjects = useMemo(() => PROJECTS.filter(p =>
     activeFilter === 'all' ? true : p.category === activeFilter
@@ -50,22 +51,38 @@ export function Projects() {
         </div>
 
         {/* Filter Tabs */}
-        <ScrollReveal variants={fadeSlideUp} className="flex flex-wrap gap-3 mb-12">
-          {FILTERS.map(filter => {
+        <ScrollReveal variants={fadeSlideUp} className="flex flex-wrap gap-3 mb-12" role="tablist" aria-label="Project categories">
+          {FILTERS.map((filter, idx) => {
             const isActive = activeFilter === filter.id;
             const count = filterCounts[filter.id];
 
             return (
               <button
                 key={filter.id}
+                ref={(el) => { tabRefs.current[idx] = el; }}
+                role="tab"
+                aria-selected={isActive}
+                tabIndex={isActive ? 0 : -1}
                 onClick={() => setActiveFilter(filter.id)}
+                onKeyDown={(e) => {
+                  let newIdx = -1;
+                  if (e.key === 'ArrowRight') newIdx = (idx + 1) % FILTERS.length;
+                  else if (e.key === 'ArrowLeft') newIdx = (idx - 1 + FILTERS.length) % FILTERS.length;
+                  else if (e.key === 'Home') newIdx = 0;
+                  else if (e.key === 'End') newIdx = FILTERS.length - 1;
+
+                  if (newIdx !== -1) {
+                    e.preventDefault();
+                    setActiveFilter(FILTERS[newIdx].id);
+                    tabRefs.current[newIdx]?.focus();
+                  }
+                }}
                 className={clsx(
                   "font-mono text-xs uppercase tracking-widest px-5 py-2 transition-all duration-300 rounded-card border outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black flex items-center gap-2 group",
                   isActive
                     ? "bg-cyan border-cyan text-black shadow-[var(--glow-cyan-sm)] font-bold"
                     : "bg-transparent border-border text-text-secondary hover:text-cyan hover:border-cyan/50"
                 )}
-                aria-pressed={isActive}
                 aria-label={`Filter by ${filter.label} (${count} projects)`}
               >
                 <span>{filter.label}</span>
@@ -119,7 +136,7 @@ const ProjectCard = React.memo(function ProjectCard({ project, index }: { projec
     >
       <div
         ref={ref as unknown as React.RefObject<HTMLDivElement>}
-        data-orb-target="project"
+        data-orb-target={`project-${index}`}
         className="w-full flex flex-col group glass rounded-card relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--glass-shadow-hover)] cursor-pointer"
         style={prefersReducedMotion ? {} : { transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`, transformStyle: 'preserve-3d' }}
       >
@@ -179,7 +196,7 @@ const ProjectCard = React.memo(function ProjectCard({ project, index }: { projec
             {project.githubUrl && project.githubUrl.startsWith('http') ? (
               <a
                 href={project.githubUrl}
-                target="_blank" rel="noopener noreferrer"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-text-muted hover:text-white transition-colors ml-4 flex-shrink-0"
                 aria-label={`View ${project.title} on GitHub`}

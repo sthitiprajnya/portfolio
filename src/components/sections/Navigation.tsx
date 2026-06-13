@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { CyberButton } from '@/components/ui/CyberButton';
 import { PERSONAL }    from '@/data/portfolio';
+import { useScrollTo } from '@/hooks/useScrollTo';
 
 export const NAV_LINKS = [
   { label: 'About',     id: 'about'          },
@@ -22,6 +23,7 @@ export function Navigation() {
   const [activeSection,  setActiveSection]  = useState('hero');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const scrollToInternal = useScrollTo();
 
   // UX Enhancement: Handle Escape key to close mobile menu & prevent body scroll
   useEffect(() => {
@@ -84,15 +86,7 @@ export function Navigation() {
 
   const scrollTo = (id: string) => {
     setMobileMenuOpen(false);
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-      // Accessibility: Transfer focus to the target section after a short delay
-      // to ensure the scroll has started. preventScroll: true avoids sudden jumps.
-      setTimeout(() => {
-        el.focus({ preventScroll: true });
-      }, 100);
-    }
+    scrollToInternal(id);
   };
 
   const openSearch = () => {

@@ -145,13 +145,23 @@ export default function RootLayout({
                           lower.includes('<math') ||
                           lower.includes('<svg') ||
                           lower.includes('<details') ||
-                          /(javascript|data)\\s*:/i.test(lower) ||
+                          lower.includes('<animate') ||
+                          lower.includes('<set') ||
+                          lower.includes('<use') ||
+                          lower.includes('<portal') ||
+                          lower.includes('<link') ||
+                          lower.includes('<style') ||
+                          lower.includes('<audio') ||
+                          lower.includes('<video') ||
+                          lower.includes('<source') ||
+                          lower.includes('<track') ||
+                          /(javascript|data|vbscript|file)\\s*:/i.test(lower) ||
                           /on[a-z]+\\s*=/i.test(lower)
                         ) {
                           console.warn('Blocked dangerous HTML pattern in Trusted Types default policy:', s.slice(0, 50) + '...');
                           return s
-                            .replace(/<(script|base|embed|object|applet|meta|form|iframe|frame|frameset|template|math|svg|details)/gi, '<blocked-$1')
-                            .replace(/(javascript|data)\\s*:/gi, 'blocked-$1:')
+                            .replace(/<(script|base|embed|object|applet|meta|form|iframe|frame|frameset|template|math|svg|details|animate|set|use|portal|link|style|audio|video|source|track)/gi, '<blocked-$1')
+                            .replace(/(javascript|data|vbscript|file)\\s*:/gi, 'blocked-$1:')
                             .replace(/on[a-z]+\\s*=/gi, (match) => 'blocked-' + match);
                         }
                       }

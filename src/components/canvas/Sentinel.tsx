@@ -220,6 +220,90 @@ export default function Sentinel() {
     // Initial targets update after a short delay to ensure elements are rendered
     const timer = setTimeout(updateTargetCache, 1000);
 
+
+    // BOLT: Sprite-based caching
+    // Pre-rendering the orb to a small offscreen canvas (sprite) avoids expensive
+    // radial gradient and arc calculations on every 60fps frame.
+    const SPRITE_SIZE = 256;
+    const spriteCanvas = typeof OffscreenCanvas !== 'undefined'
+      ? new OffscreenCanvas(SPRITE_SIZE, SPRITE_SIZE)
+      : document.createElement('canvas');
+
+    if (spriteCanvas instanceof HTMLCanvasElement) {
+      spriteCanvas.width = SPRITE_SIZE;
+      spriteCanvas.height = SPRITE_SIZE;
+    }
+    const spriteCtx = spriteCanvas.getContext('2d') as CanvasRenderingContext2D;
+
+    let lastRenderedColorHash = "";
+
+    function updateSprite(finalCoreR: number, finalCoreG: number, finalCoreB: number, finalCoreA: number,
+                          finalMidR: number, finalMidG: number, finalMidB: number, finalMidA: number,
+                          finalHaloR: number, finalHaloG: number, finalHaloB: number, finalHaloA: number,
+                          finalSpecR: number, finalSpecG: number, finalSpecB: number, finalSpecA: number) {
+      if (!spriteCtx) return;
+
+      const currentHash = `${finalCoreR.toFixed(1)}_${finalCoreG.toFixed(1)}_${finalCoreB.toFixed(1)}_${finalCoreA.toFixed(2)}_${finalMidR.toFixed(1)}_${finalMidG.toFixed(1)}_${finalMidB.toFixed(1)}_${finalMidA.toFixed(2)}_${finalHaloR.toFixed(1)}_${finalHaloG.toFixed(1)}_${finalHaloB.toFixed(1)}_${finalHaloA.toFixed(2)}_${finalSpecR.toFixed(1)}_${finalSpecG.toFixed(1)}_${finalSpecB.toFixed(1)}_${finalSpecA.toFixed(2)}`;
+      if (currentHash === lastRenderedColorHash) return;
+      lastRenderedColorHash = currentHash;
+
+      const center = SPRITE_SIZE / 2;
+      const r = 60; // Base radius for sprite
+
+      spriteCtx.clearRect(0, 0, SPRITE_SIZE, SPRITE_SIZE);
+
+      const coreColor = `rgba(${Math.round(finalCoreR)},${Math.round(finalCoreG)},${Math.round(finalCoreB)},${finalCoreA})`;
+      const midColor = `rgba(${Math.round(finalMidR)},${Math.round(finalMidG)},${Math.round(finalMidB)},${finalMidA})`;
+      const haloColor = `rgba(${Math.round(finalHaloR)},${Math.round(finalHaloG)},${Math.round(finalHaloB)},${finalHaloA})`;
+      const specColor = `rgba(${Math.round(finalSpecR)},${Math.round(finalSpecG)},${Math.round(finalSpecB)},${finalSpecA})`;
+
+      // 1. Outer halo
+      const halo = spriteCtx.createRadialGradient(center, center, r * 0.6, center, center, r * 1.8);
+      halo.addColorStop(0, haloColor);
+      halo.addColorStop(1, `rgba(${Math.round(finalHaloR)},${Math.round(finalHaloG)},${Math.round(finalHaloB)},0)`);
+
+      spriteCtx.fillStyle = halo;
+      spriteCtx.beginPath();
+      spriteCtx.arc(center, center, r * 1.8, 0, Math.PI * 2);
+      spriteCtx.fill();
+
+      // 2. Mid glow
+      const mid = spriteCtx.createRadialGradient(center, center, 0, center, center, r);
+      mid.addColorStop(0.35, midColor);
+      mid.addColorStop(1, `rgba(${Math.round(finalMidR)},${Math.round(finalMidG)},${Math.round(finalMidB)},0)`);
+
+      spriteCtx.fillStyle = mid;
+      spriteCtx.beginPath();
+      spriteCtx.arc(center, center, r, 0, Math.PI * 2);
+      spriteCtx.fill();
+
+      // 3. Core sphere
+      const core = spriteCtx.createRadialGradient(
+        center - r * 0.08, center - 0.08, 0,
+        center, center, r * 0.25
+      );
+      core.addColorStop(0, coreColor);
+      core.addColorStop(1, `rgba(${Math.round(finalCoreR)},${Math.round(finalCoreG)},${Math.round(finalCoreB)},0)`);
+
+      spriteCtx.fillStyle = core;
+      spriteCtx.beginPath();
+      spriteCtx.arc(center, center, r * 0.25, 0, Math.PI * 2);
+      spriteCtx.fill();
+
+      // 4. Specular highlight
+      const spec = spriteCtx.createRadialGradient(
+        center - r * 0.06, center - r * 0.09, 0,
+        center - r * 0.06, center - r * 0.09, r * 0.08
+      );
+      spec.addColorStop(0, specColor);
+      spec.addColorStop(1, `rgba(${Math.round(finalSpecR)},${Math.round(finalSpecG)},${Math.round(finalSpecB)},0)`);
+
+      spriteCtx.fillStyle = spec;
+      spriteCtx.beginPath();
+      spriteCtx.arc(center, center, r * 0.25, 0, Math.PI * 2);
+      spriteCtx.fill();
+    }
+
     const draw = () => {
       if (!ctx) return;
       ctx.clearRect(0, 0, width, height);
@@ -317,15 +401,16 @@ export default function Sentinel() {
       const finalSpecB = lerpColor(cur.specB, vSpec.b, p);
       const finalSpecA = lerpColor(cur.specA, vSpec.a, p);
 
-      const coreColor = `rgba(${Math.round(finalCoreR)},${Math.round(finalCoreG)},${Math.round(finalCoreB)},${finalCoreA})`;
-      const midColor = `rgba(${Math.round(finalMidR)},${Math.round(finalMidG)},${Math.round(finalMidB)},${finalMidA})`;
-      const haloColor = `rgba(${Math.round(finalHaloR)},${Math.round(finalHaloG)},${Math.round(finalHaloB)},${finalHaloA})`;
-      const specColor = `rgba(${Math.round(finalSpecR)},${Math.round(finalSpecG)},${Math.round(finalSpecB)},${finalSpecA})`;
 
       const pulse = 1 + 0.08 * Math.sin(Date.now() * 0.002);
       const r = (s.glow + pulse * 10) * 2; // Making it significantly larger as requested
 
-      // 0. Trail effect
+      updateSprite(finalCoreR, finalCoreG, finalCoreB, finalCoreA,
+                   finalMidR, finalMidG, finalMidB, finalMidA,
+                   finalHaloR, finalHaloG, finalHaloB, finalHaloA,
+                   finalSpecR, finalSpecG, finalSpecB, finalSpecA);
+
+// 0. Trail effect
       const trailLen = s.trail.length;
       for (let i = 0; i < trailLen; i++) {
         // Read buffer from newest to oldest
@@ -346,51 +431,20 @@ export default function Sentinel() {
         ctx.fill();
       }
 
-      // 1. Outer halo
-      const halo = ctx.createRadialGradient(cx, cy, r * 0.6, cx, cy, r * 1.8);
-      halo.addColorStop(0, haloColor);
-      halo.addColorStop(1, `rgba(${Math.round(finalHaloR)},${Math.round(finalHaloG)},${Math.round(finalHaloB)},0)`);
 
-      ctx.fillStyle = halo;
-      ctx.beginPath();
-      ctx.arc(cx, cy, r * 1.8, 0, Math.PI * 2);
-      ctx.fill();
+      // BOLT: Draw cached orb sprite
+      // drawImage() is hardware-accelerated and much faster than re-calculating gradients.
+      const baseRadius = 60; // same as in updateSprite
+      const scale = r / baseRadius;
+      const drawSize = SPRITE_SIZE * scale;
 
-      // 2. Mid glow
-      const mid = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-      mid.addColorStop(0.35, midColor);
-      mid.addColorStop(1, `rgba(${Math.round(finalMidR)},${Math.round(finalMidG)},${Math.round(finalMidB)},0)`);
-
-      ctx.fillStyle = mid;
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.fill();
-
-      // 3. Core sphere
-      const core = ctx.createRadialGradient(
-        cx - r * 0.08, cy - 0.08, 0,
-        cx, cy, r * 0.25
+      ctx.drawImage(
+        spriteCanvas as CanvasImageSource,
+        cx - drawSize / 2,
+        cy - drawSize / 2,
+        drawSize,
+        drawSize
       );
-      core.addColorStop(0, coreColor);
-      core.addColorStop(1, `rgba(${Math.round(finalCoreR)},${Math.round(finalCoreG)},${Math.round(finalCoreB)},0)`);
-
-      ctx.fillStyle = core;
-      ctx.beginPath();
-      ctx.arc(cx, cy, r * 0.25, 0, Math.PI * 2);
-      ctx.fill();
-
-      // 4. Specular highlight
-      const spec = ctx.createRadialGradient(
-        cx - r * 0.06, cy - r * 0.09, 0,
-        cx - r * 0.06, cy - r * 0.09, r * 0.08
-      );
-      spec.addColorStop(0, specColor);
-      spec.addColorStop(1, `rgba(${Math.round(finalSpecR)},${Math.round(finalSpecG)},${Math.round(finalSpecB)},0)`);
-
-      ctx.fillStyle = spec;
-      ctx.beginPath();
-      ctx.arc(cx, cy, r * 0.25, 0, Math.PI * 2);
-      ctx.fill();
 
       // Day 12: Ring ripple animation
       if (rippleRef.current.active) {

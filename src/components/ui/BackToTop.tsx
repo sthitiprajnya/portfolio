@@ -8,7 +8,8 @@ export const BackToTop = () => {
   const reducedMotion = usePrefersReducedMotion();
   useEffect(() => {
     const toggle = () => setIsVisible(window.scrollY > 400);
-    window.addEventListener('scroll', toggle);
+    // BOLT: Add passive listener to high-frequency scroll event to improve scroll performance
+    window.addEventListener('scroll', toggle, { passive: true });
     return () => window.removeEventListener('scroll', toggle);
   }, []);
   const scroll = () => window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });

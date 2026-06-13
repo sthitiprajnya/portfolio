@@ -133,6 +133,22 @@ export default function Sentinel() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // BOLT: Performance Optimization - Sprite Caching
+    // Pre-rendering the orb to a small offscreen canvas (sprite) avoids expensive
+    // radial gradient and arc calculations on every 60fps frame.
+    const SPRITE_SIZE = 256;
+    const spriteCanvas = typeof OffscreenCanvas !== 'undefined'
+      ? new OffscreenCanvas(SPRITE_SIZE, SPRITE_SIZE)
+      : document.createElement('canvas');
+
+    if (spriteCanvas instanceof HTMLCanvasElement) {
+      spriteCanvas.width = SPRITE_SIZE;
+      spriteCanvas.height = SPRITE_SIZE;
+    }
+
+    const spriteCtx = spriteCanvas.getContext('2d') as CanvasRenderingContext2D;
+    let lastCoreR = -1, lastCoreG = -1, lastCoreB = -1;
+
     let width = window.innerWidth;
     let height = window.innerHeight;
 

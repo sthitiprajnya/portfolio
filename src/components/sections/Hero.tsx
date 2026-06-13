@@ -67,7 +67,8 @@ export function Hero() {
   return (
     <section
       id="hero"
-      className="relative min-h-screen flex flex-col items-center justify-center pt-16 bg-[var(--gradient-hero)] overflow-hidden"
+      tabIndex={-1}
+      className="relative min-h-screen flex flex-col items-center justify-center pt-16 bg-[var(--gradient-hero)] overflow-hidden outline-none"
     >
       <HeroOrb />
       {/* Background effects */}

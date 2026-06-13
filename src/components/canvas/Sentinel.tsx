@@ -463,9 +463,6 @@ export default function Sentinel() {
 
       // Day 8: Apply violet override based on ctf proximity
       const vCore = VIOLET_THEME.core;
-      const vMid = VIOLET_THEME.mid;
-      const vHalo = VIOLET_THEME.halo;
-      const vSpec = VIOLET_THEME.specular;
       const p = colorProximityRef.current;
 
       const finalCoreR = lerpColor(cur.coreR, vCore.r, p);

@@ -8,10 +8,18 @@ export const BackToTop = () => {
   const reducedMotion = usePrefersReducedMotion();
   useEffect(() => {
     const toggle = () => setIsVisible(window.scrollY > 400);
-    window.addEventListener('scroll', toggle);
+    window.addEventListener('scroll', toggle, { passive: true });
     return () => window.removeEventListener('scroll', toggle);
   }, []);
-  const scroll = () => window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
+
+  const scroll = () => {
+    window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
+    // Accessibility: Transfer focus to the hero section after a short delay
+    // to ensure the scroll has initiated. This prevents focus loss for keyboard users.
+    setTimeout(() => {
+      document.getElementById('hero')?.focus({ preventScroll: true });
+    }, 100);
+  };
   return (
     <AnimatePresence>
       {isVisible && (

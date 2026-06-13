@@ -30,6 +30,13 @@ const B3_SQ = 5625;  // 75^2
 const B2_SQ = 10000; // 100^2
 const B1_SQ = 15625; // 125^2
 
+// BOLT: Pre-calculate squared thresholds for 6 discrete opacity buckets to eliminate Math.sqrt and Math.floor from the hot loop.
+const B1_SQ = Math.pow(MAX_DISTANCE * (1 / 6), 2);
+const B2_SQ = Math.pow(MAX_DISTANCE * (2 / 6), 2);
+const B3_SQ = Math.pow(MAX_DISTANCE * (3 / 6), 2);
+const B4_SQ = Math.pow(MAX_DISTANCE * (4 / 6), 2);
+const B5_SQ = Math.pow(MAX_DISTANCE * (5 / 6), 2);
+
 export default function NetworkConnector({ className }: NetworkConnectorProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const { ref: inViewRef, inView } = useInView({ threshold: 0 });

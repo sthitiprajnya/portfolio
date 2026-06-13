@@ -4,12 +4,6 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import React from 'react';
 
 // Mock dependencies
-vi.mock('@/components/providers/AudioProvider', () => ({
-  useAudio: () => ({
-    speak: vi.fn(),
-  }),
-}));
-
 vi.mock('@/components/sections/Navigation', () => ({
   NAV_LINKS: [
     { label: 'About', id: 'about' },

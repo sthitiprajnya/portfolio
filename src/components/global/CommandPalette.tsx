@@ -4,22 +4,21 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { NAV_LINKS } from '@/components/sections/Navigation'; // Will export this from Navigation.tsx
-import { useAudio } from '@/components/providers/AudioProvider';
 
 export function CommandPalette() {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
-  const { speak } = useAudio();
+  const triggerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const handleOpen = () => {
       if (!isOpen) {
+        triggerRef.current = document.activeElement as HTMLElement;
         setIsOpen(true);
         setQuery('');
         setSelectedIndex(0);
-        speak("Command terminal ready.");
       }
     };
 
@@ -47,7 +46,7 @@ export function CommandPalette() {
       document.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('open-command-palette', handleOpen);
     };
-  }, [isOpen, speak]);
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen) {
@@ -56,6 +55,11 @@ export function CommandPalette() {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
+      // Return focus to the trigger element when closed
+      if (triggerRef.current) {
+        triggerRef.current.focus();
+        triggerRef.current = null;
+      }
     }
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
@@ -86,17 +90,47 @@ export function CommandPalette() {
       setSelectedIndex(prev => (prev - 1 + filteredLinks.length) % filteredLinks.length);
     } else if (e.key === 'Enter' && filteredLinks[selectedIndex]) {
       e.preventDefault();
-      handleSelect(filteredLinks[selectedIndex].id, filteredLinks[selectedIndex].label);
+      handleSelect(filteredLinks[selectedIndex].id);
+    } else if (e.key === 'Tab') {
+      // Focus trapping logic
+      const focusableElements = Array.from(
+        document.querySelectorAll(
+          '#command-palette-listbox button, #command-palette-input, #clear-search-button'
+        )
+      ) as HTMLElement[];
+
+      if (focusableElements.length === 0) return;
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement.focus();
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement.focus();
+        }
+      }
     }
   };
 
-  const handleSelect = (id: string, label?: string) => {
+  const handleSelect = (id: string) => {
+    triggerRef.current = null; // Don't return focus if we are navigating
     setIsOpen(false);
-    if (label) {
-      speak(label);
-    }
     setTimeout(() => {
-      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+        // Accessibility: Transfer focus to target section. Using a nested timeout
+        // ensures the element is ready and scroll has initiated.
+        setTimeout(() => {
+          el.focus({ preventScroll: true });
+        }, 100);
+      }
     }, 100);
   };
 
@@ -131,6 +165,7 @@ export function CommandPalette() {
               <span className="text-cyan font-mono mr-3">{'>'}</span>
               <input
                 ref={inputRef}
+                id="command-palette-input"
                 type="text"
                 role="combobox"
                 aria-expanded="true"
@@ -150,6 +185,7 @@ export function CommandPalette() {
               />
               {query && (
                 <button
+                  id="clear-search-button"
                   onClick={() => { setQuery(''); inputRef.current?.focus(); }}
                   className="p-1 mr-2 text-text-muted hover:text-cyan transition-colors outline-none focus-visible:ring-1 focus-visible:ring-cyan rounded-sm"
                   aria-label="Clear search"
@@ -188,7 +224,7 @@ export function CommandPalette() {
                         'w-full text-left px-4 py-3 rounded-card flex items-center justify-between font-mono text-sm transition-colors',
                         isSelected ? 'bg-cyan/10 text-cyan border border-cyan/20 glass-pill rounded-pill' : 'text-text-secondary hover:bg-white/5 hover:text-white border border-transparent rounded-pill'
                       )}
-                      onClick={() => handleSelect(link.id, link.label)}
+                      onClick={() => handleSelect(link.id)}
                       onMouseEnter={() => setSelectedIndex(i)}
                     >
                       <span className="flex items-center gap-3">

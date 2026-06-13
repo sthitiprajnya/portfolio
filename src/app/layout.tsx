@@ -61,9 +61,7 @@ export const viewport: Viewport = {
 };
 
 import { FaviconBlinkProvider } from '@/components/providers/FaviconBlinkProvider';
-import { AudioProvider } from '@/components/providers/AudioProvider';
 import { VisibilityOptimiserProvider } from '@/components/providers/VisibilityOptimiserProvider';
-import LivieBot from '@/components/livie/LivieBot';
 import Sentinel from '@/components/canvas/Sentinel';
 
 export default function RootLayout({
@@ -128,6 +126,9 @@ export default function RootLayout({
                       if (typeof s === 'string') {
                         // Security: Defense-in-depth against DOM XSS.
                         // We block known dangerous tags and all inline event handlers (on*).
+                        // Note: Our own Trusted Types policy script below triggers this check
+                        // because it contains the strings we are searching for (e.g., '<script').
+                        // This is expected and serves as a self-test for the policy.
                         const lower = s.toLowerCase();
                         if (
                           lower.includes('<script') ||
@@ -140,13 +141,27 @@ export default function RootLayout({
                           lower.includes('<iframe') ||
                           lower.includes('<frame') ||
                           lower.includes('<frameset') ||
-                          /javascript\\s*:/i.test(lower) ||
+                          lower.includes('<template') ||
+                          lower.includes('<math') ||
+                          lower.includes('<svg') ||
+                          lower.includes('<details') ||
+                          lower.includes('<animate') ||
+                          lower.includes('<set') ||
+                          lower.includes('<use') ||
+                          lower.includes('<portal') ||
+                          lower.includes('<link') ||
+                          lower.includes('<style') ||
+                          lower.includes('<audio') ||
+                          lower.includes('<video') ||
+                          lower.includes('<source') ||
+                          lower.includes('<track') ||
+                          /(javascript|data|vbscript|file)\\s*:/i.test(lower) ||
                           /on[a-z]+\\s*=/i.test(lower)
                         ) {
-                          console.warn('Blocked dangerous HTML pattern in Trusted Types default policy');
+                          console.warn('Blocked dangerous HTML pattern in Trusted Types default policy:', s.slice(0, 50) + '...');
                           return s
-                            .replace(/<(script|base|embed|object|applet|meta|form|iframe|frame|frameset)/gi, '<blocked-$1')
-                            .replace(/javascript\\s*:/gi, 'blocked-javascript:')
+                            .replace(/<(script|base|embed|object|applet|meta|form|iframe|frame|frameset|template|math|svg|details|animate|set|use|portal|link|style|audio|video|source|track)/gi, '<blocked-$1')
+                            .replace(/(javascript|data|vbscript|file)\\s*:/gi, 'blocked-$1:')
                             .replace(/on[a-z]+\\s*=/gi, (match) => 'blocked-' + match);
                         }
                       }
@@ -190,13 +205,10 @@ export default function RootLayout({
         </a>
         <div id="root">
           <VisibilityOptimiserProvider>
-            <AudioProvider>
-              <FaviconBlinkProvider>
-                <Sentinel />
-                {children}
-                <LivieBot />
-              </FaviconBlinkProvider>
-            </AudioProvider>
+            <FaviconBlinkProvider>
+              <Sentinel />
+              {children}
+            </FaviconBlinkProvider>
           </VisibilityOptimiserProvider>
         </div>
       </body>

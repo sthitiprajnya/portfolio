@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useRef } from 'react';
+import toast from 'react-hot-toast';
 import clsx from 'clsx';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { CyberButton }  from '@/components/ui/CyberButton';
@@ -8,12 +9,10 @@ import { PERSONAL } from '@/data/portfolio';
 
 type Status = 'idle' | 'transmitting' | 'sent' | 'error';
 
-import { useAudio } from '@/components/providers/AudioProvider';
-
 // This form uses EmailJS to send emails directly from the browser.
 export function Contact() {
   const formRef = useRef<HTMLFormElement>(null);
-  const { speak } = useAudio();
+  const successButtonRef = useRef<HTMLButtonElement>(null);
 
   const [form, setForm] = useState({
     from_name:  '',
@@ -147,14 +146,15 @@ export function Contact() {
       );
 
       setStatus('sent');
-      speak("Message transmitted. Awaiting response.");
       try {
         localStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
       } catch (e) {
         console.warn('Failed to set rate-limit timestamp in storage.', e);
       }
       setForm({ from_name: '', from_email: '', subject: '', message: '', hp_field: '' });
-      setTimeout(() => setStatus('idle'), 6000);
+      // SUCCESS_STATE_AUTOFOCUS: Move focus to the success message button for screen readers
+      setTimeout(() => successButtonRef.current?.focus(), 100);
+      setTimeout(() => setStatus('idle'), 10000); // Extended idle reset for better readability
     } catch (error) {
       console.error("EmailJS Error:", error);
       setStatus('error');
@@ -162,7 +162,11 @@ export function Contact() {
   };
 
   return (
-    <section id="contact" className="py-24 bg-deep relative border-t border-border">
+    <section
+      id="contact"
+      tabIndex={-1}
+      className="py-24 bg-deep relative border-t border-border outline-none"
+    >
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <SectionTitle number="09" title="Let's Talk." />
 
@@ -189,21 +193,40 @@ export function Contact() {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <a
-                href={`mailto:${PERSONAL.email}`}
-                className="group flex flex-col items-center justify-center p-6 rounded-card glass hover:border-cyan hover:shadow-[var(--glow-cyan-sm)] hover:-translate-y-1 transition-all outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black"
-              >
-                 <div className="w-12 h-12 rounded-pill bg-cyan/10 flex items-center justify-center text-cyan mb-4 group-hover:scale-110 transition-transform">
-                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                   </svg>
-                 </div>
-                 <span className="font-mono text-xs uppercase tracking-widest text-text-muted group-hover:text-cyan">Email</span>
-              </a>
+              <div className="group relative flex flex-col items-center justify-center p-6 rounded-card glass hover:border-cyan hover:shadow-[var(--glow-cyan-sm)] hover:-translate-y-1 transition-all">
+                <a
+                  href={`mailto:${PERSONAL.email}`}
+                  className="flex flex-col items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card w-full h-full"
+                  aria-label={`Send email to ${PERSONAL.email}`}
+                  title={`Send email to ${PERSONAL.email}`}
+                >
+                  <div className="w-12 h-12 rounded-pill bg-cyan/10 flex items-center justify-center text-cyan mb-4 group-hover:scale-110 transition-transform">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                  </div>
+                  <span className="font-mono text-xs uppercase tracking-widest text-text-muted group-hover:text-cyan">Email</span>
+                </a>
+
+                {/* Micro-UX: Quick copy button for accessibility/convenience */}
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(PERSONAL.email);
+                    toast.success('EMAIL_COPIED_TO_CLIPBOARD');
+                  }}
+                  className="absolute top-2 right-2 p-1.5 rounded-card bg-cyan/5 border border-cyan/10 text-cyan opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-all hover:bg-cyan hover:text-black outline-none focus-visible:ring-2 focus-visible:ring-cyan"
+                  aria-label="Copy email address to clipboard"
+                  title="Copy email address"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                  </svg>
+                </button>
+              </div>
 
               <a
                 href={PERSONAL.linkedin}
-                target="_blank"
+                target="_blank" rel="noopener noreferrer"
                 rel="noopener noreferrer"
                 className="group flex flex-col items-center justify-center p-6 rounded-card glass hover:border-violet hover:shadow-[var(--glow-violet-sm)] hover:-translate-y-1 transition-all outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2 focus-visible:ring-offset-black"
               >
@@ -217,7 +240,7 @@ export function Contact() {
 
               <a
                 href={PERSONAL.github}
-                target="_blank"
+                target="_blank" rel="noopener noreferrer"
                 rel="noopener noreferrer"
                 className="group flex flex-col items-center justify-center p-6 rounded-card glass hover:border-white hover:shadow-[0_0_15px_rgba(255,255,255,0.2)] hover:-translate-y-1 transition-all col-span-2 sm:col-span-1 outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
               >
@@ -274,6 +297,7 @@ export function Contact() {
                      <div className="text-amber mt-2 animate-pulse">AWAITING_RESPONSE...</div>
                      <div className="pt-4">
                        <button
+                         ref={successButtonRef}
                          type="button"
                          onClick={() => setStatus('idle')}
                          className="text-[0.6rem] text-cyan hover:text-white underline tracking-widest uppercase outline-none focus-visible:ring-1 focus-visible:ring-cyan"

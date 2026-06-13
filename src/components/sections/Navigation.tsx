@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { CyberButton } from '@/components/ui/CyberButton';
 import { PERSONAL }    from '@/data/portfolio';
-import { useAudio }    from '@/components/providers/AudioProvider';
 
 export const NAV_LINKS = [
   { label: 'About',     id: 'about'          },
@@ -85,7 +84,15 @@ export function Navigation() {
 
   const scrollTo = (id: string) => {
     setMobileMenuOpen(false);
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+      // Accessibility: Transfer focus to the target section after a short delay
+      // to ensure the scroll has started. preventScroll: true avoids sudden jumps.
+      setTimeout(() => {
+        el.focus({ preventScroll: true });
+      }, 100);
+    }
   };
 
   const openSearch = () => {
@@ -121,7 +128,6 @@ export function Navigation() {
 
           {/* Desktop nav */}
           <div className="hidden lg:flex items-center space-x-6 xl:space-x-8">
-            <AudioToggle />
 
             <button
               onClick={openSearch}
@@ -129,6 +135,7 @@ export function Navigation() {
               aria-label="Search site sections"
               title="Search site sections"
               aria-keyshortcuts="/ ?"
+              aria-haspopup="dialog"
             >
               <svg className="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -149,7 +156,7 @@ export function Navigation() {
                         isActive ? 'text-cyan glass-pill rounded-pill border-b-2 border-cyan' : 'text-text-secondary hover:text-cyan rounded-pill border-b-2 border-transparent'
                       )}
                       aria-label={`Scroll to ${link.ariaLabel || link.label} section`}
-                      aria-current={isActive ? 'page' : undefined}
+                      aria-current={isActive ? 'true' : undefined}
                     >
                       {link.label}
                     </button>
@@ -171,13 +178,13 @@ export function Navigation() {
 
           {/* Mobile actions */}
           <div className="flex items-center gap-2 lg:hidden">
-            <AudioToggle mobile />
 
             <button
               onClick={openSearch}
               className="text-text-secondary p-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card"
               aria-label="Search site sections"
               title="Search site sections"
+              aria-haspopup="dialog"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -191,6 +198,7 @@ export function Navigation() {
               aria-controls="mobile-menu"
               aria-label="Open navigation menu"
               title="Open navigation menu"
+              aria-haspopup="dialog"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"/>
@@ -233,7 +241,7 @@ export function Navigation() {
                         activeSection === link.id ? 'bg-cyan/10 text-cyan border border-cyan/20' : 'hover:bg-white/5 text-text-secondary hover:text-white border border-transparent'
                       )}
                       aria-label={`Scroll to ${link.ariaLabel || link.label} section`}
-                      aria-current={activeSection === link.id ? 'page' : undefined}
+                      aria-current={activeSection === link.id ? 'true' : undefined}
                     >
                       <span className="opacity-40 mr-4 text-xs w-8 group-hover:text-cyan transition-colors">
                         {activeSection === link.id ? '>>' : `$`}
@@ -254,39 +262,5 @@ export function Navigation() {
         )}
       </AnimatePresence>
     </>
-  );
-}
-
-function AudioToggle({ mobile = false }: { mobile?: boolean }) {
-  const { audioEnabled, setAudioEnabled, isSpeaking } = useAudio();
-
-  return (
-    <button
-      onClick={() => setAudioEnabled(!audioEnabled)}
-      className={clsx(
-        "relative flex items-center justify-center transition-all outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card",
-        mobile ? "p-2 text-text-secondary" : "p-2 border border-border text-text-secondary hover:text-cyan hover:border-cyan hover:shadow-[var(--glow-cyan-sm)]"
-      )}
-      aria-label={audioEnabled ? "Mute audio" : "Unmute audio"}
-      title={audioEnabled ? "Mute audio" : "Unmute audio"}
-      aria-pressed={audioEnabled}
-    >
-      {isSpeaking && audioEnabled && (
-        <span className="absolute -top-1 -right-1 flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan"></span>
-        </span>
-      )}
-      {audioEnabled ? (
-        <svg className={mobile ? "w-6 h-6" : "w-4 h-4"} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-        </svg>
-      ) : (
-        <svg className={mobile ? "w-6 h-6" : "w-4 h-4"} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
-        </svg>
-      )}
-    </button>
   );
 }

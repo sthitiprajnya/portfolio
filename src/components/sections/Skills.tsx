@@ -77,7 +77,11 @@ export function Skills() {
   }, [activeTab]);
 
   return (
-    <section id="skills" className="py-24 bg-black overflow-hidden relative">
+    <section
+      id="skills"
+      tabIndex={-1}
+      className="py-24 bg-black overflow-hidden relative outline-none"
+    >
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <SectionTitle number="02" title="Tech Arsenal." />
 

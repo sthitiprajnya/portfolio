@@ -64,7 +64,11 @@ function RadarChartWrapper({ data, options }: { data: ChartData<'radar'>, option
 
 export function CTFStats() {
   return (
-    <section id="ctf" className="py-24 bg-black relative border-t border-border overflow-hidden">
+    <section
+      id="ctf"
+      tabIndex={-1}
+      className="py-24 bg-black relative border-t border-border overflow-hidden outline-none"
+    >
 
       {/* Subtle hex-grid background */}
       <div
@@ -129,7 +133,7 @@ export function CTFStats() {
               {/* HTB profile link */}
               <a
                 href={`https://profile.hackthebox.com/profile/019db8ae-9364-73ed-bb47-1336835663a7`}
-                target="_blank"
+                target="_blank" rel="noopener noreferrer"
                 rel="noopener noreferrer"
                 aria-label="View HackTheBox Profile in a new tab"
                 className="mt-6 flex items-center justify-center space-x-2 w-full py-2.5 border border-cyan/30 text-cyan font-mono text-xs uppercase tracking-widest rounded-pill hover:bg-cyan hover:text-black transition-all hover:shadow-[var(--glow-cyan-sm)]"

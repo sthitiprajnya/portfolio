@@ -104,6 +104,11 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
     resize();
 
     const draw = () => {
+      if (!inView) {
+        animationFrameId = requestAnimationFrame(draw);
+        return;
+      }
+
       // Semi-transparent black to create fade effect
       ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
       ctx.fillRect(0, 0, width, height);

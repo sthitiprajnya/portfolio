@@ -39,6 +39,7 @@ export function Projects() {
     <section
       id="projects"
       tabIndex={-1}
+      aria-labelledby="section-title-things-i-built"
       className="py-32 bg-black relative border-t border-border overflow-hidden outline-none"
     >
       <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -179,7 +180,7 @@ const ProjectCard = React.memo(function ProjectCard({ project, index }: { projec
             {project.githubUrl && project.githubUrl.startsWith('http') ? (
               <a
                 href={project.githubUrl}
-                target="_blank" rel="noopener noreferrer"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-text-muted hover:text-white transition-colors ml-4 flex-shrink-0"
                 aria-label={`View ${project.title} on GitHub`}

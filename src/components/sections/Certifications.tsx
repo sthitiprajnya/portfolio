@@ -19,6 +19,7 @@ export function Certifications() {
     <section
       id="certifications"
       tabIndex={-1}
+      aria-labelledby="section-title-credentials"
       className="py-24 bg-deep relative border-t border-border outline-none"
     >
       <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -133,7 +134,7 @@ const CertCard = React.memo(function CertCard({ cert }: { cert: typeof CERTIFICA
             {cert.verifyUrl && cert.verifyUrl !== '#' ? (
               <a
                 href={cert.verifyUrl}
-                target="_blank" rel="noopener noreferrer"
+                target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`Verify ${cert.name} certification`}
                 className={clsx(

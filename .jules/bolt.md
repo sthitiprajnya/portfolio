@@ -93,3 +93,11 @@
 ## 2026-08-15 - [Sprite-based Caching for Expensive Orbs]
 **Learning:** In high-frequency (60fps) Canvas 2D animation loops, re-calculating multiple complex radial gradients every frame is extremely expensive and causes high CPU/GPU load. By pre-rendering the orb into a small, fixed-size "sprite" offscreen canvas, we can replace the expensive vector draw calls with a single hardware-accelerated `drawImage()` blit. Pulse and breathing effects can then be efficiently applied during the blit stage using scaling. A key lesson here is cache invalidation: ensure the "hash" or check function used to decide if the sprite needs redrawing includes *all* visual variables (like core, mid, halo, and specular colors), not just a subset, to avoid subtle visual bugs during state transitions.
 **Action:** For complex, semi-static visual elements (like glow orbs or particles with gradients), implement sprite-based caching. Pre-render the element once and only update the cache when its visual properties (like color) change beyond a noticeable threshold. Hash all properties when determining if the cache is dirty.
+
+## 2025-06-06 - [Conditional Path Optimization for Multi-Stage Lerping]
+**Learning:** In complex color-shifting components like `Sentinel.tsx`, performing Stage-2 color lerping (e.g., violet theme overrides) on every frame is redundant when the target element is far away. By gating these calculations behind a proximity threshold check (`p > 0.001`), we can skip multiple `lerpColor` calls per frame for the majority of the user's scroll journey.
+**Action:** Always gate secondary or conditional animation logic behind a threshold check to minimize math execution in 60fps loops.
+
+## 2025-06-06 - [Scroll Stability Early-Exit]
+**Learning:** High-frequency proximity checks and state updates (like glow intensity) in scroll-following components are unnecessary when the page is stationary. Implementing a scroll delta check (`Math.abs(s.y - lastYRef.current) > 0.1`) allows for skipping the most expensive parts of the `draw` loop during idle frames.
+**Action:** Use a `lastValueRef` to track input changes in animation loops and implement early-exits for calculations that depend solely on moving inputs.

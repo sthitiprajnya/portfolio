@@ -156,13 +156,15 @@ export default function RootLayout({
                           lower.includes('<source') ||
                           lower.includes('<track') ||
                           /(javascript|data|vbscript|file)\\s*:/i.test(lower) ||
-                          /on[a-z]+\\s*=/i.test(lower)
+                          /on[a-z]+\\s*=/i.test(lower) ||
+                          /formaction\\s*=/i.test(lower)
                         ) {
                           console.warn('Blocked dangerous HTML pattern in Trusted Types default policy:', s.slice(0, 50) + '...');
                           return s
                             .replace(/<(script|base|embed|object|applet|meta|form|iframe|frame|frameset|template|math|svg|details|animate|set|use|portal|link|style|audio|video|source|track)/gi, '<blocked-$1')
                             .replace(/(javascript|data|vbscript|file)\\s*:/gi, 'blocked-$1:')
-                            .replace(/on[a-z]+\\s*=/gi, (match) => 'blocked-' + match);
+                            .replace(/on[a-z]+\\s*=/gi, (match) => 'blocked-' + match)
+                            .replace(/formaction\\s*=/gi, (match) => 'blocked-' + match);
                         }
                       }
                       return s;
@@ -173,6 +175,13 @@ export default function RootLayout({
                       // Prevents bypasses using userinfo (e.g., https://origin@evil.com).
                       try {
                         const url = new URL(s, window.location.origin);
+
+                        // Security: Block dangerous schemes in script URLs.
+                        if (/(javascript|data|vbscript|file|blob)\\s*:/i.test(url.protocol)) {
+                          console.warn('Blocked dangerous script URL scheme in Trusted Types policy:', s);
+                          return '/blocked-dangerous-scheme';
+                        }
+
                         if (url.origin !== window.location.origin && (s.startsWith('http') || s.startsWith('//'))) {
                           console.warn('Blocked cross-origin script URL in Trusted Types policy:', s);
                           return '/blocked-cross-origin-script';

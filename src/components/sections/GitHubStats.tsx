@@ -73,7 +73,7 @@ export function GitHubStats() {
       className="py-24 bg-black relative border-t border-border outline-none"
     >
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <SectionTitle number="07" title="Open Source Activity." />
+        <SectionTitle number="07" title="Open Source Activity." id="github" />
 
           <div className="space-y-8">
 
@@ -161,8 +161,7 @@ export function GitHubStats() {
                       <a
                         key={idx}
                         href={repo.url}
-                        target="_blank" rel="noopener noreferrer"
-                        rel="noopener noreferrer"
+                        target="_blank"
                         className="group block p-4 rounded-card glass bg-[rgba(0,0,0,0.4)] hover:border-[rgba(0,245,255,0.4)] hover:bg-[rgba(0,0,0,0.6)] transition-colors outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black"
                       >
                         <div className="flex justify-between items-start mb-2">

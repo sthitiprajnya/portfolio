@@ -71,7 +71,7 @@ export function Experience() {
       className="py-24 bg-deep relative border-t border-border outline-none"
     >
       <div className="max-w-5xl mx-auto px-6 relative z-10" ref={containerRef}>
-        <SectionTitle number="03" title="Battle Log." />
+        <SectionTitle number="03" title="Battle Log." id="experience" />
 
         <div className="relative mt-16 ml-4 md:ml-8">
           {/* Animated Timeline Line */}

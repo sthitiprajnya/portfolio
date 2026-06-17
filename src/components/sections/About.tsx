@@ -30,7 +30,7 @@ export function About() {
       />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <SectionTitle number="01" title="Who I Am." />
+        <SectionTitle number="01" title="Who I Am." id="about" />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
 

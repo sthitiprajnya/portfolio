@@ -168,7 +168,7 @@ export function Contact() {
       className="py-24 bg-deep relative border-t border-border outline-none"
     >
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <SectionTitle number="09" title="Let's Talk." />
+        <SectionTitle number="09" title="Let's Talk." id="contact" />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
 
@@ -226,8 +226,7 @@ export function Contact() {
 
               <a
                 href={PERSONAL.linkedin}
-                target="_blank" rel="noopener noreferrer"
-                rel="noopener noreferrer"
+                target="_blank"
                 className="group flex flex-col items-center justify-center p-6 rounded-card glass hover:border-violet hover:shadow-[var(--glow-violet-sm)] hover:-translate-y-1 transition-all outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2 focus-visible:ring-offset-black"
               >
                  <div className="w-12 h-12 rounded-pill bg-violet/10 flex items-center justify-center text-violet mb-4 group-hover:scale-110 transition-transform">
@@ -240,8 +239,7 @@ export function Contact() {
 
               <a
                 href={PERSONAL.github}
-                target="_blank" rel="noopener noreferrer"
-                rel="noopener noreferrer"
+                target="_blank"
                 className="group flex flex-col items-center justify-center p-6 rounded-card glass hover:border-white hover:shadow-[0_0_15px_rgba(255,255,255,0.2)] hover:-translate-y-1 transition-all col-span-2 sm:col-span-1 outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
               >
                  <div className="w-12 h-12 rounded-pill bg-white/5 flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform">

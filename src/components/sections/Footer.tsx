@@ -1,4 +1,5 @@
 "use client";
+import { motion, AnimatePresence } from "framer-motion";
 import React, { lazy, Suspense } from 'react';
 import { PERSONAL } from '@/data/portfolio';
 import { LogoBadge } from '@/components/ui/LogoBadge';

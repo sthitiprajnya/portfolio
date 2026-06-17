@@ -133,22 +133,6 @@ export default function Sentinel() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // BOLT: Performance Optimization - Sprite Caching
-    // Pre-rendering the orb to a small offscreen canvas (sprite) avoids expensive
-    // radial gradient and arc calculations on every 60fps frame.
-    const SPRITE_SIZE = 256;
-    const spriteCanvas = typeof OffscreenCanvas !== 'undefined'
-      ? new OffscreenCanvas(SPRITE_SIZE, SPRITE_SIZE)
-      : document.createElement('canvas');
-
-    if (spriteCanvas instanceof HTMLCanvasElement) {
-      spriteCanvas.width = SPRITE_SIZE;
-      spriteCanvas.height = SPRITE_SIZE;
-    }
-
-    const spriteCtx = spriteCanvas.getContext('2d') as CanvasRenderingContext2D;
-    let lastCoreR = -1, lastCoreG = -1, lastCoreB = -1;
-
     let width = window.innerWidth;
     let height = window.innerHeight;
 
@@ -203,8 +187,8 @@ export default function Sentinel() {
     });
 
     // BOLT: Performance Optimization - Sprite Caching
-    // Pre-rendering the complex Sentinel orb to an offscreen canvas avoids 4 expensive
-    // radial gradient calculations per frame in the 60fps loop.
+    // Pre-rendering the sentinel orb to an offscreen canvas avoids expensive
+    // radial gradient and arc calculations on every 60fps frame.
     const SPRITE_SIZE = 256;
     const spriteCanvas = typeof OffscreenCanvas !== 'undefined'
       ? new OffscreenCanvas(SPRITE_SIZE, SPRITE_SIZE)
@@ -214,9 +198,9 @@ export default function Sentinel() {
       spriteCanvas.width = SPRITE_SIZE;
       spriteCanvas.height = SPRITE_SIZE;
     }
-    const spriteCtx = spriteCanvas.getContext('2d') as CanvasRenderingContext2D;
 
-    let lastR = -1, lastG = -1, lastB = -1;
+    const spriteCtx = spriteCanvas.getContext('2d') as CanvasRenderingContext2D;
+    let lastCoreR = -1, lastCoreG = -1, lastCoreB = -1;
 
     const updateSprite = (
       fCR: number, fCG: number, fCB: number, fCA: number,
@@ -226,8 +210,8 @@ export default function Sentinel() {
     ) => {
       // BOLT: Only update the sprite when core RGB values change by more than 1 unit.
       // This is a reliable proxy for overall theme changes.
-      if (Math.abs(fCR - lastR) < 1 && Math.abs(fCG - lastG) < 1 && Math.abs(fCB - lastB) < 1) return;
-      lastR = fCR; lastG = fCG; lastB = fCB;
+      if (Math.abs(fCR - lastCoreR) < 1 && Math.abs(fCG - lastCoreG) < 1 && Math.abs(fCB - lastCoreB) < 1) return;
+      lastCoreR = fCR; lastCoreG = fCG; lastCoreB = fCB;
 
       const center = SPRITE_SIZE / 2;
       const r_base = 60; // Base reference radius for the sprite
@@ -309,87 +293,6 @@ export default function Sentinel() {
     // Initial targets update after a short delay to ensure elements are rendered
     const timer = setTimeout(updateTargetCache, 1000);
 
-    // BOLT: Performance Optimization - Sprite Caching
-    // Pre-rendering the sentinel orb to an offscreen canvas avoids expensive
-    // radial gradient and arc calculations on every 60fps frame.
-    const SPRITE_SIZE = 256;
-    const spriteCanvas = typeof OffscreenCanvas !== 'undefined'
-      ? new OffscreenCanvas(SPRITE_SIZE, SPRITE_SIZE)
-      : document.createElement('canvas');
-
-    if (spriteCanvas instanceof HTMLCanvasElement) {
-      spriteCanvas.width = SPRITE_SIZE;
-      spriteCanvas.height = SPRITE_SIZE;
-    }
-
-    const spriteCtx = spriteCanvas.getContext('2d') as CanvasRenderingContext2D;
-    let lastRenderedColor = { r: -1, g: -1, b: -1, a: -1 };
-
-    const updateSprite = (
-      core: RgbaColor,
-      midCol: RgbaColor,
-      haloCol: RgbaColor,
-      specCol: RgbaColor
-    ) => {
-      // BOLT: Only redraw the sprite if core colors have changed by at least 1 unit.
-      // This eliminates redundant gradient calculations on frames where color lerping is near-zero.
-      if (
-        Math.abs(core.r - lastRenderedColor.r) < 1 &&
-        Math.abs(core.g - lastRenderedColor.g) < 1 &&
-        Math.abs(core.b - lastRenderedColor.b) < 1 &&
-        Math.abs(core.a - lastRenderedColor.a) < 0.01
-      ) return;
-
-      lastRenderedColor = { ...core };
-
-      const center = SPRITE_SIZE / 2;
-      const r = 60; // BOLT: Increased reference radius to fill more of the 256x256 sprite canvas
-
-      spriteCtx.clearRect(0, 0, SPRITE_SIZE, SPRITE_SIZE);
-
-      // 1. Outer halo
-      const halo = spriteCtx.createRadialGradient(center, center, r * 0.6, center, center, r * 1.8);
-      halo.addColorStop(0, `rgba(${Math.round(haloCol.r)}, ${Math.round(haloCol.g)}, ${Math.round(haloCol.b)}, ${haloCol.a})`);
-      halo.addColorStop(1, `rgba(${Math.round(haloCol.r)}, ${Math.round(haloCol.g)}, ${Math.round(haloCol.b)}, 0)`);
-      spriteCtx.fillStyle = halo;
-      spriteCtx.beginPath();
-      spriteCtx.arc(center, center, r * 1.8, 0, Math.PI * 2);
-      spriteCtx.fill();
-
-      // 2. Mid glow
-      const mid = spriteCtx.createRadialGradient(center, center, 0, center, center, r);
-      mid.addColorStop(0.35, `rgba(${Math.round(midCol.r)}, ${Math.round(midCol.g)}, ${Math.round(midCol.b)}, ${midCol.a})`);
-      mid.addColorStop(1, `rgba(${Math.round(midCol.r)}, ${Math.round(midCol.g)}, ${Math.round(midCol.b)}, 0)`);
-      spriteCtx.fillStyle = mid;
-      spriteCtx.beginPath();
-      spriteCtx.arc(center, center, r, 0, Math.PI * 2);
-      spriteCtx.fill();
-
-      // 3. Core sphere
-      const coreGrad = spriteCtx.createRadialGradient(
-        center - r * 0.08, center - r * 0.08, 0,
-        center, center, r * 0.25
-      );
-      coreGrad.addColorStop(0, `rgba(${Math.round(core.r)}, ${Math.round(core.g)}, ${Math.round(core.b)}, ${core.a})`);
-      coreGrad.addColorStop(1, `rgba(${Math.round(core.r)}, ${Math.round(core.g)}, ${Math.round(core.b)}, 0)`);
-      spriteCtx.fillStyle = coreGrad;
-      spriteCtx.beginPath();
-      spriteCtx.arc(center, center, r * 0.25, 0, Math.PI * 2);
-      spriteCtx.fill();
-
-      // 4. Specular highlight
-      const spec = spriteCtx.createRadialGradient(
-        center - r * 0.06, center - r * 0.09, 0,
-        center - r * 0.06, center - r * 0.09, r * 0.08
-      );
-      spec.addColorStop(0, `rgba(${Math.round(specCol.r)}, ${Math.round(specCol.g)}, ${Math.round(specCol.b)}, ${specCol.a})`);
-      spec.addColorStop(1, `rgba(${Math.round(specCol.r)}, ${Math.round(specCol.g)}, ${Math.round(specCol.b)}, 0)`);
-      spriteCtx.fillStyle = spec;
-      spriteCtx.beginPath();
-      spriteCtx.arc(center, center, r * 0.25, 0, Math.PI * 2);
-      spriteCtx.fill();
-    };
-
     const draw = () => {
       if (!ctx) return;
       ctx.clearRect(0, 0, width, height);
@@ -463,6 +366,9 @@ export default function Sentinel() {
 
       // Day 8: Apply violet override based on ctf proximity
       const vCore = VIOLET_THEME.core;
+      const vMid = VIOLET_THEME.mid;
+      const vHalo = VIOLET_THEME.halo;
+      const vSpec = VIOLET_THEME.specular;
       const p = colorProximityRef.current;
 
       const finalCoreR = lerpColor(cur.coreR, vCore.r, p);

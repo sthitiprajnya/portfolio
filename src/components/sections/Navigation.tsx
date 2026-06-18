@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { CyberButton } from '@/components/ui/CyberButton';
 import { PERSONAL }    from '@/data/portfolio';
+import { useScrollTo } from '@/hooks/useScrollTo';
 
 export const NAV_LINKS = [
   { label: 'About',     id: 'about'          },
@@ -17,11 +18,16 @@ export const NAV_LINKS = [
   { label: 'Contact',   id: 'contact'        },
 ];
 
+// BOLT: Hoist the observed sections array to the module level to avoid
+// redundant array creation and property access inside the useEffect.
+const OBSERVED_SECTIONS = ['hero', ...NAV_LINKS.map(l => l.id)];
+
 export function Navigation() {
   const [scrolled,       setScrolled]       = useState(false);
   const [activeSection,  setActiveSection]  = useState('hero');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const scrollToInternal = useScrollTo();
 
   // UX Enhancement: Handle Escape key to close mobile menu & prevent body scroll
   useEffect(() => {
@@ -47,8 +53,6 @@ export function Navigation() {
   useEffect(() => {
     // BOLT: Use IntersectionObserver instead of scroll listeners and getBoundingClientRect
     // for much better performance (avoids main-thread layout thrashing)
-    const sections = ['hero', ...NAV_LINKS.map(l => l.id)];
-
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -60,7 +64,7 @@ export function Navigation() {
       { rootMargin: '-30% 0px -60% 0px', threshold: 0 }
     );
 
-    sections.forEach((id) => {
+    OBSERVED_SECTIONS.forEach((id) => {
       const el = document.getElementById(id);
       if (el) observer.observe(el);
     });
@@ -84,15 +88,7 @@ export function Navigation() {
 
   const scrollTo = (id: string) => {
     setMobileMenuOpen(false);
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-      // Accessibility: Transfer focus to the target section after a short delay
-      // to ensure the scroll has started. preventScroll: true avoids sudden jumps.
-      setTimeout(() => {
-        el.focus({ preventScroll: true });
-      }, 100);
-    }
+    scrollToInternal(id);
   };
 
   const openSearch = () => {
@@ -165,7 +161,7 @@ export function Navigation() {
               })}
             </ul>
 
-            <CyberButton as="a" href={PERSONAL.resumeUrl} download color="green" className="py-2 px-4 text-[0.7rem]" aria-label="Download Resume (CV)">
+            <CyberButton as="a" href={PERSONAL.resumeUrl} download color="green" className="py-2 px-4 text-[0.7rem]" aria-label="Download Resume (CV)" title="Download Resume (CV)">
               <span className="flex items-center gap-2">
                 CV
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

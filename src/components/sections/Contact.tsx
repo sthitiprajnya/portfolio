@@ -9,6 +9,10 @@ import { PERSONAL } from '@/data/portfolio';
 
 type Status = 'idle' | 'transmitting' | 'sent' | 'error';
 
+// BOLT: Hoist the email validation regex to the module level to avoid
+// redundant Regular Expression compilation on every render cycle.
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 // This form uses EmailJS to send emails directly from the browser.
 export function Contact() {
   const formRef = useRef<HTMLFormElement>(null);
@@ -39,7 +43,7 @@ export function Contact() {
       errs.from_email = 'Email is required';
     } else if (form.from_email.length > 100) {
       errs.from_email = 'Email must be under 100 characters';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.from_email)) {
+    } else if (!EMAIL_REGEX.test(form.from_email)) {
       errs.from_email = 'Invalid email format';
     }
 
@@ -165,6 +169,7 @@ export function Contact() {
     <section
       id="contact"
       tabIndex={-1}
+      aria-labelledby="section-title-lets-talk"
       className="py-24 bg-deep relative border-t border-border outline-none"
     >
       <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -227,7 +232,7 @@ export function Contact() {
               <a
                 href={PERSONAL.linkedin}
                 target="_blank" rel="noopener noreferrer"
-                rel="noopener noreferrer"
+was
                 className="group flex flex-col items-center justify-center p-6 rounded-card glass hover:border-violet hover:shadow-[var(--glow-violet-sm)] hover:-translate-y-1 transition-all outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2 focus-visible:ring-offset-black"
               >
                  <div className="w-12 h-12 rounded-pill bg-violet/10 flex items-center justify-center text-violet mb-4 group-hover:scale-110 transition-transform">
@@ -241,7 +246,7 @@ export function Contact() {
               <a
                 href={PERSONAL.github}
                 target="_blank" rel="noopener noreferrer"
-                rel="noopener noreferrer"
+
                 className="group flex flex-col items-center justify-center p-6 rounded-card glass hover:border-white hover:shadow-[0_0_15px_rgba(255,255,255,0.2)] hover:-translate-y-1 transition-all col-span-2 sm:col-span-1 outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
               >
                  <div className="w-12 h-12 rounded-pill bg-white/5 flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform">
@@ -252,7 +257,7 @@ export function Contact() {
                  <span className="font-mono text-xs uppercase tracking-widest text-text-muted group-hover:text-white">GitHub</span>
               </a>
 
-              <div className="group flex flex-col items-center justify-center p-6 rounded-card glass col-span-2 sm:col-span-1" >
+              <div className="group flex flex-col items-center justify-center p-6 rounded-card glass col-span-2 sm:col-span-1">
                  <div className="w-12 h-12 rounded-pill bg-[rgba(255,255,255,0.02)] border border-[var(--glass-border)] flex items-center justify-center text-text-muted mb-4">
                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
@@ -266,7 +271,7 @@ export function Contact() {
           </ScrollReveal>
 
           {/* ── Right: form ── */}
-          <ScrollReveal variants={fadeSlideLeft} className="p-8 glass-heavy rounded-card relative overflow-hidden" data-orb-target="true">
+          <ScrollReveal variants={fadeSlideLeft} className="p-8 glass-heavy rounded-card relative overflow-hidden" data-orb-target="contact-form">
             <form ref={formRef} onSubmit={handleSubmit} noValidate aria-busy={status === 'transmitting'} className="space-y-6 relative z-10">
 
               {/* Honeypot field - hidden from human users */}

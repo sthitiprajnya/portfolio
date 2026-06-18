@@ -87,6 +87,7 @@ export const SkillBadge = React.memo(function SkillBadge({
       ref={ref}
       tabIndex={0}
       aria-label={`Skill: ${name}`}
+      title={`Skill: ${name}`}
       aria-describedby={tooltipId}
       className={`relative flex flex-col items-center justify-center p-2 group skill-tag outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card transition-all ${badgeClassName}`}
       style={badgeStyle}

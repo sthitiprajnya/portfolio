@@ -29,7 +29,7 @@ const nextConfig = {
   reactStrictMode: true,
 
   experimental: {
-    optimizePackageImports: ['framer-motion', 'chart.js', 'react-chartjs-2'],
+    optimizePackageImports: ['framer-motion', 'chart.js', 'react-chartjs-2', 'clsx', 'tailwind-merge'],
   },
 };
 

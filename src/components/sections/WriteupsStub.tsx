@@ -1,7 +1,8 @@
 "use client";
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScrollReveal, fadeSlideUp } from '@/components/ui/ScrollReveal';
 import { SectionTitle } from '@/components/ui/SectionTitle';
+import { useInView } from 'react-intersection-observer';
 
 const MOCK_WRITEUPS = [
   { title: "CVE-2024-XXXX: Exploiting Deserialization in Java Enterprise", type: "CVE Breakdown", date: "TBD" },
@@ -10,8 +11,10 @@ const MOCK_WRITEUPS = [
 ];
 
 export function WriteupsStub() {
+  const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
+
   return (
-    <section id="writeups" className="py-24 bg-deep relative border-t border-border overflow-hidden">
+    <section id="writeups" ref={ref} className="py-24 bg-deep relative border-t border-border overflow-hidden">
       <div className="absolute inset-0 pointer-events-none opacity-[0.02]" style={{ backgroundImage: 'repeating-linear-gradient(45deg, var(--color-amber) 0, var(--color-amber) 2px, transparent 2px, transparent 10px)' }} />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -38,9 +41,7 @@ export function WriteupsStub() {
                     <span className="w-1.5 h-1.5 rounded-full bg-amber animate-pulse" />
                     {wu.type}
                   </div>
-                  <h3 className="font-heading font-bold text-text-secondary group-hover:text-white transition-colors text-lg leading-tight mb-4 blur-[2px] group-hover:blur-0 transition-all duration-300 select-none">
-                    {wu.title}
-                  </h3>
+                  <DecryptingTitle text={wu.title} trigger={inView} delay={idx * 200 + 500} />
                 </div>
 
                 <div className="relative z-10 mt-auto pt-4 border-t border-border/50 flex justify-between items-center">
@@ -54,5 +55,55 @@ export function WriteupsStub() {
 
       </div>
     </section>
+  );
+}
+
+// ── Sub-components ─────────────────────────────────────────────
+
+function DecryptingTitle({ text, trigger, delay }: { text: string; trigger: boolean; delay: number }) {
+  const [displayText, setDisplayText] = useState('');
+  const [isDecrypted, setIsDecrypted] = useState(false);
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#@&$%!<>?';
+
+  useEffect(() => {
+    if (!trigger) return;
+
+    const timeoutId: NodeJS.Timeout = setTimeout(() => {
+      let iteration = 0;
+    const maxIterations = 15;
+
+      const interval = setInterval(() => {
+        setDisplayText(
+          text
+            .split('')
+            .map((char, index) => {
+              if (index < (iteration / maxIterations) * text.length) {
+                return text[index];
+              }
+              return chars[Math.floor(Math.random() * chars.length)];
+            })
+            .join('')
+        );
+
+        if (iteration >= maxIterations) {
+          clearInterval(interval);
+          setDisplayText(text);
+          setIsDecrypted(true);
+        }
+        iteration += 1;
+      }, 50);
+    }, delay);
+
+    return () => clearTimeout(timeoutId);
+  }, [trigger, text, delay]);
+
+  return (
+    <h3
+      className={`font-heading font-bold text-lg leading-tight mb-4 transition-all duration-500 select-none ${
+        isDecrypted ? 'text-white blur-0' : 'text-text-secondary blur-[2px] font-mono'
+      } group-hover:blur-0 group-hover:text-white`}
+    >
+      {displayText || text.replace(/./g, () => chars[Math.floor(Math.random() * chars.length)])}
+    </h3>
   );
 }

@@ -1,4 +1,7 @@
+"use client";
+import React, { useState } from 'react';
 import Image from 'next/image';
+import { useState } from 'react';
 
 interface LogoBadgeProps {
   src?: string;
@@ -12,7 +15,9 @@ interface LogoBadgeProps {
 export function LogoBadge({
   src, alt, monogram = '??', width = 28, height = 28, className = ''
 }: LogoBadgeProps) {
-  if (src) {
+  const [error, setError] = useState(false);
+
+  if (src && !error) {
     // If it's a PNG that is black (like nmap.png or zabbix.png), we'll let the user add `invert dark:invert-0` in className
     return (
       <Image
@@ -21,11 +26,13 @@ export function LogoBadge({
         width={width}
         height={height}
         className={`object-contain ${className}`}
+        onError={() => setError(true)}
       />
     );
   }
   return (
     <span
+      role="img"
       aria-label={alt}
       title={alt}
       className={`inline-flex items-center justify-center rounded-card font-mono text-xs font-bold

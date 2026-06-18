@@ -24,7 +24,7 @@ const MAX_DISTANCE_SQ = MAX_DISTANCE * MAX_DISTANCE;
 const NODE_COLOR = 'rgba(0, 245, 255, 0.3)';
 
 // BOLT: Pre-calculate squared thresholds for 6 discrete opacity buckets to eliminate Math.sqrt and Math.floor from the hot loop.
-// Ordering: B5_SQ is the closest distance (highest opacity bucket index), B1_SQ is the furthest.
+// ⚡ Optimization: thresholds are ordered by distance (B1 is furthest, B5 is closest to match bIdx logic)
 const B1_SQ = Math.pow(MAX_DISTANCE * (5 / 6), 2);
 const B2_SQ = Math.pow(MAX_DISTANCE * (4 / 6), 2);
 const B3_SQ = Math.pow(MAX_DISTANCE * (3 / 6), 2);
@@ -176,11 +176,11 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
           if (d2 < MAX_DISTANCE_SQ) {
             // Determine bucket using hoisted squared thresholds instead of Math.sqrt()
             let bIdx = 0;
-            if (d2 < B5_SQ) bIdx = 5;
-            else if (d2 < B4_SQ) bIdx = 4;
-            else if (d2 < B3_SQ) bIdx = 3;
-            else if (d2 < B2_SQ) bIdx = 2;
-            else if (d2 < B1_SQ) bIdx = 1;
+            if (d2 < B5_SQ_VAL) bIdx = 5;
+            else if (d2 < B4_SQ_VAL) bIdx = 4;
+            else if (d2 < B3_SQ_VAL) bIdx = 3;
+            else if (d2 < B2_SQ_VAL) bIdx = 2;
+            else if (d2 < B1_SQ_VAL) bIdx = 1;
 
             buckets[bIdx].push(nodeA.x, nodeA.y, nodeB.x, nodeB.y);
           }

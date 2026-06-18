@@ -6,6 +6,7 @@ import { Navigation }           from '@/components/sections/Navigation';
 import { BackToTop }            from '@/components/ui/BackToTop';
 import { CommandPalette }       from '@/components/global/CommandPalette';
 import { ScrollProgress }       from '@/components/global/ScrollProgress';
+import { BackToTop }            from '@/components/ui/BackToTop';
 import { Hero }                 from '@/components/sections/Hero';
 import { SmoothScrollProvider } from '@/components/providers/SmoothScrollProvider';
 import { CursorProvider }       from '@/components/providers/CursorProvider';

@@ -134,8 +134,8 @@ export default function Sentinel() {
     if (!ctx) return;
 
     // BOLT: Performance Optimization - Sprite Caching
-    // Pre-rendering the orb to a small offscreen canvas (sprite) avoids expensive
-    // radial gradient and arc calculations on every 60fps frame.
+    // Pre-rendering the sentinel orb to an offscreen canvas avoids 4 expensive
+    // radial gradient calculations per frame in the 60fps loop.
     const SPRITE_SIZE = 256;
     const spriteCanvas = typeof OffscreenCanvas !== 'undefined'
       ? new OffscreenCanvas(SPRITE_SIZE, SPRITE_SIZE)
@@ -145,7 +145,6 @@ export default function Sentinel() {
       spriteCanvas.width = SPRITE_SIZE;
       spriteCanvas.height = SPRITE_SIZE;
     }
-
     const spriteCtx = spriteCanvas.getContext('2d') as CanvasRenderingContext2D;
     let lastRenderedColor = { r: -1, g: -1, b: -1, a: -1 };
 
@@ -406,6 +405,7 @@ export default function Sentinel() {
       const finalSpecA = lerpColor(cur.specA, vSpec.a, p);
 
       // BOLT: Hardware-accelerated drawImage() with sprite caching replaces 4 expensive per-frame radial gradient draws.
+      // Reusing static objects to avoid per-frame allocations if needed, but here simple literals are fine for RgbaColor
       updateSprite(
         { r: finalCoreR, g: finalCoreG, b: finalCoreB, a: finalCoreA },
         { r: finalMidR, g: finalMidG, b: finalMidB, a: finalMidA },

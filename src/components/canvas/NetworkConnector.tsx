@@ -175,6 +175,7 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
 
           if (d2 < MAX_DISTANCE_SQ) {
             // Determine bucket using hoisted squared thresholds instead of Math.sqrt()
+            // Closer nodes (smaller d2) go into higher index buckets for more opacity.
             let bIdx = 0;
             if (d2 < B5_SQ_VAL) bIdx = 5;
             else if (d2 < B4_SQ_VAL) bIdx = 4;

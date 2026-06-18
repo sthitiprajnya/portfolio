@@ -259,6 +259,59 @@ export default function Sentinel() {
       spriteCtx.fill();
     };
 
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+
+    // BOLT: Centralized cache update to keep the animation loop layout-free
+    const updateTargetCache = () => {
+      const scrollY = window.scrollY;
+
+      const targets = document.querySelectorAll('[data-orb-target]');
+      targetCacheRef.current = Array.from(targets).map(target => {
+        const rect = target.getBoundingClientRect();
+        return {
+          centerY: rect.top + scrollY + rect.height / 2
+        };
+      });
+
+      const ctfElement = document.getElementById('ctf');
+      if (ctfElement) {
+        const rect = ctfElement.getBoundingClientRect();
+        ctfCenterYRef.current = rect.top + scrollY + rect.height / 2;
+      }
+    };
+
+    const resize = () => {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+      updateTargetCache();
+    };
+    window.addEventListener('resize', resize, { passive: true });
+    resize();
+
+    const onScroll = () => {
+      stateRef.current.targetY = window.scrollY;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll(); // initial sync
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && entry.intersectionRatio > 0.3) {
+          const id = entry.target.id;
+          if (PARSED_SECTION_THEMES[id]) {
+            targetThemeRef.current = PARSED_SECTION_THEMES[id];
+          }
+        }
+      });
+    }, { threshold: [0.3, 0.6] });
+
+    document.querySelectorAll('section[id], main[id]').forEach(el => {
+      sectionObserver.observe(el);
+    });
+
     const checkProximity = (currentY: number) => {
       let maxProximity = 0;
       const viewportCenterY = currentY + height / 2;

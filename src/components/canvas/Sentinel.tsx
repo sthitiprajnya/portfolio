@@ -92,7 +92,7 @@ const LERP_FACTOR = 0.1; // Smoothness of scroll follow
 
 export default function Sentinel() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rafRef = useRef<number>();
+  const rafRef = useRef<number>(undefined);
   const prefersReducedMotion = usePrefersReducedMotion();
   // BOLT: Cache target positions to avoid layout thrashing (getBoundingClientRect) in the 60fps loop
   const targetCacheRef = useRef<TargetCache[]>([]);

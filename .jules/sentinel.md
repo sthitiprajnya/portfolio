@@ -54,3 +54,8 @@
 **Vulnerability:** Potential XSS/injection via overlooked HTML tags like `<animate>`, `<set>`, `<use>`, or `<style>` in a "default" Trusted Types policy.
 **Learning:** A "default" Trusted Types policy must go beyond just blocking `<script>` and `<iframe>`. Advanced injection vectors leverage SVG animation tags and style-related tags to execute code or exfiltrate data (e.g., via CSS injection). Blocking these at the policy level provides a critical last line of defense.
 **Prevention:** Regularly audit the Trusted Types `createHTML` callback to include all tags that can serve as XSS sinks or facilitate unauthorized side-channel attacks. Include tags like `<portal>`, `<audio>`, `<video>`, `<source>`, and `<track>` to maintain a comprehensive defense-in-depth posture.
+
+## 2026-06-14 - Data Integrity and Asset Hardening
+**Vulnerability:** Inclusion of "fake" image assets (HTML 404 pages) in the public directory, potentially containing tracking scripts or facilitating XSS if rendered incorrectly.
+**Learning:** External assets can sometimes be mis-saved as HTML error pages during automated downloads. These assets not only break the UI but can introduce security and privacy risks (e.g., Google Tag Manager scripts in the 404 pages).
+**Prevention:** Always verify the MIME type and content of downloaded assets. Implement robust error handling in UI components (like `onError` in React) to gracefully fallback to safe, locally-generated content (like monograms) if an asset fails to load or is corrupted.

@@ -3,7 +3,7 @@ import React from 'react';
 import clsx from 'clsx';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { ScrollReveal, fadeSlideUp, containerStagger } from '@/components/ui/ScrollReveal';
-import { CERTIFICATIONS, UPCOMING_CERTIFICATIONS } from '@/data/portfolio';
+import { CERTIFICATIONS, UPCOMING_CERTIFICATIONS, CERT_ISSUER_LOGOS } from '@/data/portfolio';
 import { LogoBadge } from '@/components/ui/LogoBadge';
 
 // BOLT: Hoist static configurations to module level to avoid redundant allocations on every render
@@ -19,6 +19,7 @@ export function Certifications() {
     <section
       id="certifications"
       tabIndex={-1}
+      aria-labelledby="section-title-credentials"
       className="py-24 bg-deep relative border-t border-border outline-none"
     >
       <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -73,7 +74,7 @@ const CertCard = React.memo(function CertCard({ cert }: { cert: typeof CERTIFICA
   const style = CERT_COLOR_MAP[cert.color];
 
   return (
-    <div className={clsx("relative rounded-card overflow-hidden group h-full glass transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--glass-shadow-hover)]", style.glow)} >
+    <div className={clsx("relative rounded-card overflow-hidden group h-full glass transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--glass-shadow-hover)]", style.glow)}>
       <div className={clsx("absolute inset-0 opacity-20 group-hover:opacity-100 transition-opacity duration-500 z-0", style.bg)} />
       <div className="relative h-full border border-[var(--glass-border)] rounded-card p-5 flex flex-col z-10">
 
@@ -84,22 +85,12 @@ const CertCard = React.memo(function CertCard({ cert }: { cert: typeof CERTIFICA
         <div className="flex justify-between items-start mb-6 h-14">
           <div className="relative h-full flex items-center justify-center" role="img" aria-label={`${cert.issuer} logo`}>
             <LogoBadge
-              src={`${
-                cert.issuer === 'Cisco Systems' || cert.issuer === 'Cisco' ? '/portfolio/logos/certs/cisco.svg' :
-                cert.issuer === 'eLearnSecurity' || cert.issuer === 'INE Security' ? '/portfolio/logos/certs/cisco.svg' :
-                cert.issuer === 'TCM Security' ? '/portfolio/logos/certs/tcm.png' :
-                cert.issuer === 'EC-Council' ? '/portfolio/logos/certs/eccouncil.svg' :
-                cert.issuer === 'OpenEDG Python Institute' ? '/portfolio/logos/certs/openedg.png' :
-                cert.issuer === 'CRAW Security' ? '/portfolio/logos/certs/craw.png' :
-                cert.issuer === 'ISC2' ? '/portfolio/logos/certs/isc2.png' :
-                cert.issuer === 'KodeKloud' ? '/portfolio/logos/cloud/docker.svg' :
-                ''
-              }`}
+              src={CERT_ISSUER_LOGOS[cert.issuer] || ''}
               alt={cert.issuer}
               width={80}
               height={28}
               monogram={cert.issuer.substring(0, 2).toUpperCase()}
-              className={`${['certs/tcm.png', 'certs/openedg.png', 'certs/craw.png', 'certs/isc2.png'].includes(cert.issuer) ? '' : 'invert dark:invert-0'} object-left w-auto h-full max-w-[100px]`}
+              className={`${['TCM Security', 'OpenEDG Python Institute', 'CRAW Security', 'ISC2'].includes(cert.issuer) ? '' : 'invert dark:invert-0'} object-left w-auto h-full max-w-[100px]`}
             />
           </div>
 
@@ -134,7 +125,7 @@ const CertCard = React.memo(function CertCard({ cert }: { cert: typeof CERTIFICA
               <a
                 href={cert.verifyUrl}
                 target="_blank" rel="noopener noreferrer"
-                rel="noopener noreferrer"
+
                 aria-label={`Verify ${cert.name} certification`}
                 className={clsx(
                   "font-mono text-[0.65rem] uppercase tracking-widest flex items-center transition-colors outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card px-3 py-1.5 border",

@@ -73,13 +73,50 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
     let xCoords: Float32Array;
     let glitchMask: Uint8Array; // BOLT: Bitmask for O(1) glitch column lookup
 
+    // BOLT: Performance Optimization - Glyph Cache
+    // Pre-rendering the character set across all colors into an OffscreenCanvas
+    // replaces expensive fillText() calls with hardware-accelerated drawImage().
+    const glyphCache = typeof OffscreenCanvas !== 'undefined'
+      ? new OffscreenCanvas(MATRIX_CHAR_LEN * 20, (TRAIL_LENGTH + 1) * 40)
+      : document.createElement('canvas');
+    const glyphCtx = glyphCache.getContext('2d') as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
+
     const resize = () => {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
 
       // Day 2: Responsive font size
       fontSize = Math.max(12, Math.min(18, window.innerWidth / 80));
-      ctx.font = `${fontSize}px "JetBrains Mono", monospace`;
+
+      // BOLT: Update glyph cache on resize as font size might change
+      if (glyphCache instanceof HTMLCanvasElement) {
+        glyphCache.width = MATRIX_CHAR_LEN * fontSize;
+        glyphCache.height = (TRAIL_LENGTH + 1) * fontSize * 2; // Room for normal and glitch sets
+      } else {
+        // OffscreenCanvas
+        (glyphCache as OffscreenCanvas).width = MATRIX_CHAR_LEN * fontSize;
+        (glyphCache as OffscreenCanvas).height = (TRAIL_LENGTH + 1) * fontSize * 2;
+      }
+
+      glyphCtx.font = `${fontSize}px "JetBrains Mono", monospace`;
+      glyphCtx.textBaseline = 'top';
+      glyphCtx.clearRect(0, 0, glyphCache.width, glyphCache.height);
+
+      // Render normal trail colors
+      for (let j = 0; j <= TRAIL_LENGTH; j++) {
+        glyphCtx.fillStyle = TRAIL_COLORS[j];
+        for (let i = 0; i < MATRIX_CHAR_LEN; i++) {
+          glyphCtx.fillText(MATRIX_CHARS[i], i * fontSize, j * fontSize);
+        }
+      }
+
+      // Render glitch trail colors
+      for (let j = 0; j <= TRAIL_LENGTH; j++) {
+        glyphCtx.fillStyle = GLITCH_TRAIL_COLORS[j];
+        for (let i = 0; i < MATRIX_CHAR_LEN; i++) {
+          glyphCtx.fillText(MATRIX_CHARS[i], i * fontSize, (TRAIL_LENGTH + 1 + j) * fontSize);
+        }
+      }
 
       columns = Math.floor(width / fontSize);
 
@@ -111,33 +148,38 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
       const dropsLen = drops.length;
       const charCount = MATRIX_CHAR_LEN;
 
-      // BOLT: Batch rendering by trail level.
+      // BOLT: Performance Optimization - Glyph Cache Drawing
       // Iterating backwards from trail to lead ensures the bright white lead is drawn on top.
-      // This reduces ctx.fillStyle state changes from O(N * T) to O(T), where T is trail length (~13).
+      // drawImage() is significantly faster than fillText() in a 60fps loop.
       for (let j = TRAIL_LENGTH; j >= 0; j--) {
-        const normalColor = TRAIL_COLORS[j];
-        const glitchColor = GLITCH_TRAIL_COLORS[j];
-
         // BOLT: Process glitching columns first for this trail level.
-        // Complexity: O(G * T) instead of O(N * T) by using tracked indices.
         if (isGlitching) {
-          ctx.fillStyle = glitchColor;
+          const sy = (TRAIL_LENGTH + 1 + j) * fontSize;
           for (let i = 0; i < glitchIndices.length; i++) {
             const idx = glitchIndices[i];
             const y = (drops[idx] - j) * fontSize;
-            if (y < 0 || y > height + fontSize) continue;
-            ctx.fillText(MATRIX_CHARS[Math.floor(fastRand() * charCount)], xCoords[idx], y);
+            if (y < 0 || y > height) continue;
+            const charIdx = Math.floor(fastRand() * charCount);
+            ctx.drawImage(
+              glyphCache as CanvasImageSource,
+              charIdx * fontSize, sy, fontSize, fontSize,
+              xCoords[idx], y, fontSize, fontSize
+            );
           }
         }
 
         // Process normal columns for this trail level.
-        // Complexity: O(N * T) baseline for Matrix Rain.
-        ctx.fillStyle = normalColor;
+        const sy = j * fontSize;
         for (let i = 0; i < dropsLen; i++) {
           if (isGlitching && glitchMask[i] === 1) continue;
           const y = (drops[i] - j) * fontSize;
-          if (y < 0 || y > height + fontSize) continue;
-          ctx.fillText(MATRIX_CHARS[Math.floor(fastRand() * charCount)], xCoords[i], y);
+          if (y < 0 || y > height) continue;
+          const charIdx = Math.floor(fastRand() * charCount);
+          ctx.drawImage(
+            glyphCache as CanvasImageSource,
+            charIdx * fontSize, sy, fontSize, fontSize,
+            xCoords[i], y, fontSize, fontSize
+          );
         }
       }
 
@@ -155,9 +197,6 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
 
       animationFrameId = requestAnimationFrame(draw);
     };
-
-    // BOLT: Regenerating the random pool is unnecessary for visual effects and adds periodic CPU work.
-    // We stick with the initial pool established at module level.
 
     const glitchIndices: number[] = [];
 

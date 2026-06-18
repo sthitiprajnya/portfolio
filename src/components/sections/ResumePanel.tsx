@@ -64,7 +64,7 @@ export function ResumePanel() {
       />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <SectionTitle number="08" title="Classified File." />
+        <SectionTitle number="08" title="Classified File." id="resume" />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
 

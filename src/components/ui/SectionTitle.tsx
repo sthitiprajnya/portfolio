@@ -10,6 +10,8 @@ interface SectionTitleProps {
 }
 
 export function SectionTitle({ number, title, className }: SectionTitleProps) {
+  const id = title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+
   return (
     <ScrollReveal
       variants={fadeSlideLeft}
@@ -20,7 +22,7 @@ export function SectionTitle({ number, title, className }: SectionTitleProps) {
         <span className="font-mono text-label text-cyan mb-3 px-3 py-1 inline-block glass-pill rounded-pill">
           // {number}
         </span>
-        <h2 className="font-heading text-section font-bold text-white tracking-tight">
+        <h2 id={`section-title-${id}`} className="font-heading text-section font-bold text-white tracking-tight">
           {title}
         </h2>
       </div>

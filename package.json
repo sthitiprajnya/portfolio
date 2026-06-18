@@ -36,8 +36,7 @@
       "postcss": "^8.5.15",
       "glob": "^10.5.0",
       "@eslint/plugin-kit": "^0.3.4",
-      "vite": "^8.0.16",
-      "js-yaml": "^4.2.0"
+      "esbuild": "^0.28.1"
     }
   },
   "devDependencies": {

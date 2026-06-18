@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { useState } from 'react';
 
 interface LogoBadgeProps {
   src?: string;
@@ -16,8 +17,8 @@ export function LogoBadge({
 }: LogoBadgeProps) {
   const [error, setError] = useState(false);
 
-  // Security: Fallback to monogram if image fails to load (prevents broken image icon and potential injection)
   if (src && !error) {
+    // If it's a PNG that is black (like nmap.png or zabbix.png), we'll let the user add `invert dark:invert-0` in className
     return (
       <Image
         src={src}

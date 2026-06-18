@@ -86,7 +86,7 @@ export function CTFStats() {
 
           {/* ── Left: HackTheBox profile card ── */}
           <ScrollReveal variants={fadeSlideUp} className="lg:col-span-4">
-            <div className="p-6 h-full border-cyan/20 hover:shadow-[var(--glow-cyan-sm)] glass rounded-card relative overflow-hidden" data-orb-target="true">
+            <div className="p-6 h-full border-cyan/20 hover:shadow-[var(--glow-cyan-sm)] glass rounded-card relative overflow-hidden" data-orb-target="htb-card">
 
               {/* HTB logo row */}
               <div className="flex items-center justify-between mb-6">
@@ -113,7 +113,7 @@ export function CTFStats() {
               </div>
 
               {/* Stats grid */}
-              <div className="grid grid-cols-2 gap-3 mb-6" >
+              <div className="grid grid-cols-2 gap-3 mb-6">
                 {HTB_STATS.map(({ label, value }) => (
                   <div key={label} className="p-3 glass rounded-card bg-[rgba(0,0,0,0.4)]">
                     <div className="font-display text-xl text-cyan font-bold">{value}</div>

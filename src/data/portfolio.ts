@@ -307,6 +307,23 @@ export const CERTIFICATIONS: Certification[] = [
   { id: 'kali',     name: 'Basic to Advanced Kali Linux',       issuer: 'CRAW Security',            year: 2023, color: 'green',  status: 'active', verifyUrl: '#', expiry: 'No expiry' },
 ];
 
+/**
+ * Mapping of certification issuers to their logo asset paths.
+ * Centralized here to decouple logo logic from UI components.
+ */
+export const CERT_ISSUER_LOGOS: Record<string, string> = {
+  'Cisco Systems':              '/portfolio/logos/certs/cisco.svg',
+  'Cisco':                      '/portfolio/logos/certs/cisco.svg',
+  'eLearnSecurity':             '/portfolio/logos/certs/cisco.svg',
+  'INE Security':               '/portfolio/logos/certs/cisco.svg',
+  'TCM Security':               '/portfolio/logos/certs/tcm.png',
+  'EC-Council':                 '/portfolio/logos/certs/eccouncil.svg',
+  'OpenEDG Python Institute':   '/portfolio/logos/certs/openedg.png',
+  'CRAW Security':              '/portfolio/logos/certs/craw.png',
+  'ISC2':                       '/portfolio/logos/certs/isc2.png',
+  'KodeKloud':                  '/portfolio/logos/cloud/docker.svg',
+};
+
 export const UPCOMING_CERTIFICATIONS: Certification[] = [
   { id: 'oscp', name: 'Offensive Security Certified Professional (OSCP)', issuer: 'OffSec', year: 2025, color: 'amber', status: 'in-progress', verifyUrl: '' },
   { id: 'crtp', name: 'Certified Red Team Professional (CRTP)', issuer: 'Altered Security', year: 2025, color: 'green', status: 'in-progress', verifyUrl: '' },

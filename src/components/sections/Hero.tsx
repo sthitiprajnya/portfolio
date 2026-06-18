@@ -9,6 +9,7 @@ import CountUp from 'react-countup';
 import { useInView } from 'react-intersection-observer';
 import { AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
+import { useScrollTo } from '@/hooks/useScrollTo';
 
 const MatrixRain = lazy(() => import('@/components/canvas/MatrixRain'));
 const NetworkConnector = lazy(() => import('@/components/canvas/NetworkConnector'));
@@ -36,18 +37,7 @@ export function Hero() {
   const triggerRef = React.useRef<HTMLElement | null>(null);
   const methodologyModalRef = React.useRef<HTMLDivElement>(null);
   const intelModalRef = React.useRef<HTMLDivElement>(null);
-
-  const scrollTo = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-      // Accessibility: Transfer focus to the target section after a short delay
-      // preventScroll: true ensures the browser doesn't hijack the smooth scroll.
-      setTimeout(() => {
-        el.focus({ preventScroll: true });
-      }, 100);
-    }
-  };
+  const scrollTo = useScrollTo();
 
   // BOLT: Performance Optimization - Consolidated Redundant Effects
   // Consolidating redundant effects for Escape key handling, body scroll locking,

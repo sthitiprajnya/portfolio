@@ -386,6 +386,10 @@ export default function Sentinel() {
       const finalCoreB = lerpColor(cur.coreB, vCore.b, p);
       const finalCoreA = lerpColor(cur.coreA, vCore.a, p);
 
+      const vMid = VIOLET_THEME.mid;
+      const vHalo = VIOLET_THEME.halo;
+      const vSpec = VIOLET_THEME.specular;
+
       const finalMidR = lerpColor(cur.midR, vMid.r, p);
       const finalMidG = lerpColor(cur.midG, vMid.g, p);
       const finalMidB = lerpColor(cur.midB, vMid.b, p);

@@ -17,6 +17,16 @@ const FILTERS = [
   { id: 'automation', label: 'AUTOMATION' },
 ];
 
+// BOLT: Hoist static filter counts calculation to the module level.
+// This avoids redundant O(N*M) calculations on every render or useMemo cycle,
+// reducing GC pressure especially during interaction.
+const FILTER_COUNTS = FILTERS.reduce((acc, filter) => {
+  acc[filter.id] = filter.id === 'all'
+    ? PROJECTS.length
+    : PROJECTS.filter(p => p.category === filter.id).length;
+  return acc;
+}, {} as Record<string, number>);
+
 export function Projects() {
   const [activeFilter, setActiveFilter] = useState('all');
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -54,16 +64,6 @@ export function Projects() {
     activeFilter === 'all' ? true : p.category === activeFilter
   ), [activeFilter]);
 
-  // Palette: Calculate project counts for each category to provide immediate user feedback
-  const filterCounts = useMemo(() => {
-    return FILTERS.reduce((acc, filter) => {
-      acc[filter.id] = filter.id === 'all'
-        ? PROJECTS.length
-        : PROJECTS.filter(p => p.category === filter.id).length;
-      return acc;
-    }, {} as Record<string, number>);
-  }, []);
-
   return (
     <section
       id="projects"
@@ -87,7 +87,7 @@ export function Projects() {
         >
           {FILTERS.map((filter, idx) => {
             const isActive = activeFilter === filter.id;
-            const count = filterCounts[filter.id];
+            const count = FILTER_COUNTS[filter.id];
 
             return (
               <button

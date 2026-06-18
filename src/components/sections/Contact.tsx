@@ -9,6 +9,10 @@ import { PERSONAL } from '@/data/portfolio';
 
 type Status = 'idle' | 'transmitting' | 'sent' | 'error';
 
+// BOLT: Hoist the email validation regex to the module level to avoid
+// redundant Regular Expression compilation on every render cycle.
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 // This form uses EmailJS to send emails directly from the browser.
 export function Contact() {
   const formRef = useRef<HTMLFormElement>(null);
@@ -39,7 +43,7 @@ export function Contact() {
       errs.from_email = 'Email is required';
     } else if (form.from_email.length > 100) {
       errs.from_email = 'Email must be under 100 characters';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.from_email)) {
+    } else if (!EMAIL_REGEX.test(form.from_email)) {
       errs.from_email = 'Invalid email format';
     }
 

@@ -24,7 +24,7 @@ const MAX_DISTANCE_SQ = MAX_DISTANCE * MAX_DISTANCE;
 const NODE_COLOR = 'rgba(0, 245, 255, 0.3)';
 
 // BOLT: Pre-calculate squared thresholds for 6 discrete opacity buckets to eliminate Math.sqrt and Math.floor from the hot loop.
-// These thresholds are mapped where B1_SQ is the furthest distance and B5_SQ is the closest, matching the opacity bucket index logic.
+// ⚡ Optimization: thresholds are ordered by distance (B1 is furthest, B5 is closest to match bIdx logic)
 const B1_SQ = Math.pow(MAX_DISTANCE * (5 / 6), 2);
 const B2_SQ = Math.pow(MAX_DISTANCE * (4 / 6), 2);
 const B3_SQ = Math.pow(MAX_DISTANCE * (3 / 6), 2);
@@ -100,7 +100,6 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
       // BOLT: Clear bucket arrays at the start of each frame to prevent coordinate accumulation and memory leaks.
-      // Reusing the same arrays minimizes GC pressure.
       clearBuckets();
 
       // BOLT: Replace forEach with for-loop and batch arc drawing into a single fill() call
@@ -110,7 +109,7 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       for (let i = 0; i < numNodes; i++) {
         const node = nodes[i];
 
-        // Day 7: Mouse repulsion
+        // Mouse repulsion
         if (mouseRef.current.active) {
           const dx = node.x - mouseRef.current.x;
           const dy = node.y - mouseRef.current.y;
@@ -123,7 +122,7 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
           }
         }
 
-        // Day 7: Cap speed to 3px/frame
+        // Cap speed to 3px/frame
         const speedSq = node.vx * node.vx + node.vy * node.vy;
         if (speedSq > 9) {
           const speed = Math.sqrt(speedSq);
@@ -138,7 +137,7 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
         if (node.x < 0 || node.x > width) node.vx *= -1;
         if (node.y < 0 || node.y > height) node.vy *= -1;
 
-        // Day 11: Dynamic pulsing radius
+        // Dynamic pulsing radius
         const radius = 2 + 1.5 * Math.sin(now * 0.002 + node.phase);
 
         ctx.moveTo(node.x + radius, node.y);
@@ -146,15 +145,6 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       }
       ctx.fill();
 
-      // BOLT: Use globalAlpha for connection opacity and squared distance thresholding to avoid Math.sqrt() in the 60fps loop.
-      // String template allocations for colors are eliminated.
-      // ⚡ Optimization: Added axial distance early-exit checks to skip unnecessary d2 calculations.
-      // ⚡ Optimization: Replaced Math.sqrt() with pre-calculated squared threshold comparisons.
-      //
-      // Expected Performance Impact:
-      // - Complexity: Remains O(N^2) worst-case, but reduces average operations by ~85% due to early-exits.
-      // - Math: Eliminates ~140,000 Math.sqrt() calls/sec and ~250,000 multiplications/sec on desktop (70 nodes @ 60fps).
-      // - GC: Zero allocations in the drawing loop by reusing pre-allocated coordinate buckets.
       ctx.lineWidth = 1;
       ctx.strokeStyle = '#00F5FF';
       for (let i = 0; i < numNodes; i++) {
@@ -175,12 +165,13 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
 
           if (d2 < MAX_DISTANCE_SQ) {
             // Determine bucket using hoisted squared thresholds instead of Math.sqrt()
+            // Closer nodes (smaller d2) go into higher index buckets for more opacity.
             let bIdx = 0;
-            if (d2 < B5_SQ) bIdx = 5;
-            else if (d2 < B4_SQ) bIdx = 4;
-            else if (d2 < B3_SQ) bIdx = 3;
-            else if (d2 < B2_SQ) bIdx = 2;
-            else if (d2 < B1_SQ) bIdx = 1;
+            if (d2 < B5_SQ_VAL) bIdx = 5;
+            else if (d2 < B4_SQ_VAL) bIdx = 4;
+            else if (d2 < B3_SQ_VAL) bIdx = 3;
+            else if (d2 < B2_SQ_VAL) bIdx = 2;
+            else if (d2 < B1_SQ_VAL) bIdx = 1;
 
             buckets[bIdx].push(nodeA.x, nodeA.y, nodeB.x, nodeB.y);
           }

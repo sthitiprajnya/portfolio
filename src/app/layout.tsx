@@ -155,30 +155,30 @@ export default function RootLayout({
                           lower.includes('<video') ||
                           lower.includes('<source') ||
                           lower.includes('<track') ||
-                          lower.includes('formaction') ||
-                          /(javascript|data)\\s*:/i.test(lower) ||
+                          /(javascript|data|vbscript|file)\\s*:/i.test(lower) ||
                           /on[a-z]+\\s*=/i.test(lower)
                         ) {
                           console.warn('Blocked dangerous HTML pattern in Trusted Types default policy:', s.slice(0, 50) + '...');
                           return s
                             .replace(/<(script|base|embed|object|applet|meta|form|iframe|frame|frameset|template|math|svg|details|animate|set|use|portal|link|style|audio|video|source|track)/gi, '<blocked-$1')
-                            .replace(/(javascript|data)\\s*:/gi, 'blocked-$1:')
-                            .replace(/on[a-z]+\\s*=/gi, (match) => 'blocked-' + match)
-                            .replace(/formaction/gi, 'blocked-formaction');
+                            .replace(/(javascript|data|vbscript|file)\\s*:/gi, 'blocked-$1:')
+                            .replace(/on[a-z]+\\s*=/gi, (match) => 'blocked-' + match);
                         }
                       }
                       return s;
                     },
                     createScript: (s) => s,
                     createScriptURL: (s) => {
-                      // Security: Robust origin validation using the URL constructor.
+                      // Security: Robust origin and protocol validation using the URL constructor.
+                      // Enforces same-origin policy and blocks dangerous schemes like blob:, data:, and javascript:.
                       try {
                         const url = new URL(s, window.location.origin);
-                        const protocol = url.protocol.toLowerCase();
-                        // Security: Enforce same-origin and block dangerous schemes (blob, data, javascript).
-                        if (url.origin !== window.location.origin || (protocol !== 'http:' && protocol !== 'https:')) {
+                        const isSameOrigin = url.origin === window.location.origin;
+                        const isHttpOrHttps = url.protocol === 'http:' || url.protocol === 'https:';
+
+                        if (!isSameOrigin || !isHttpOrHttps) {
                           console.warn('Blocked dangerous or cross-origin script URL in Trusted Types policy:', s);
-                          return '/blocked-script';
+                          return '/blocked-script-url';
                         }
                         return url.href;
                       } catch (e) {

@@ -50,7 +50,7 @@
 **Learning:** A robust Trusted Types policy that blocks strings like '<script' will inevitably intercept its own source code when that code is injected into the DOM via sinks like `dangerouslySetInnerHTML`. This leads to "Blocked dangerous HTML pattern" warnings in the console even if no actual attack is occurring.
 **Prevention:** This behavior is expected in a secure-by-default environment. Developers should be aware that these console warnings during initialization are evidence that the policy is functioning correctly and self-testing its own enforcement logic.
 
-## 2026-06-12 - Masquerading HTML as Image Assets
-**Vulnerability:** XSS vector via HTML documents (some containing script tags) served with .png or .svg extensions in the `public/logos/` directory.
-**Learning:** Static asset directories can contain "poisoned" files that appear to be images but are actually HTML. If these are served with incorrect MIME types or if a browser's content-sniffing logic treats them as HTML, they can execute script in the origin of the application.
-**Prevention:** Always validate the magic numbers/headers of uploaded or included static assets. Enforce strict Content-Type headers at the origin or CDN level, and use `X-Content-Type-Options: nosniff` to prevent browsers from interpreting non-HTML files as HTML.
+## 2026-06-14 - Exhaustive Tag Blocking in Trusted Types
+**Vulnerability:** Potential XSS/injection via overlooked HTML tags like `<animate>`, `<set>`, `<use>`, or `<style>` in a "default" Trusted Types policy.
+**Learning:** A "default" Trusted Types policy must go beyond just blocking `<script>` and `<iframe>`. Advanced injection vectors leverage SVG animation tags and style-related tags to execute code or exfiltrate data (e.g., via CSS injection). Blocking these at the policy level provides a critical last line of defense.
+**Prevention:** Regularly audit the Trusted Types `createHTML` callback to include all tags that can serve as XSS sinks or facilitate unauthorized side-channel attacks. Include tags like `<portal>`, `<audio>`, `<video>`, `<source>`, and `<track>` to maintain a comprehensive defense-in-depth posture.

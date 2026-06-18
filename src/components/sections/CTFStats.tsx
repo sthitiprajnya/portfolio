@@ -87,7 +87,7 @@ export function CTFStats() {
 
           {/* ── Left: HackTheBox profile card ── */}
           <ScrollReveal variants={fadeSlideUp} className="lg:col-span-4">
-            <div className="p-6 h-full border-cyan/20 hover:shadow-[var(--glow-cyan-sm)] glass rounded-card relative overflow-hidden" data-orb-target="true">
+            <div className="p-6 h-full border-cyan/20 hover:shadow-[var(--glow-cyan-sm)] glass rounded-card relative overflow-hidden" data-orb-target="htb-card">
 
               {/* HTB logo row */}
               <div className="flex items-center justify-between mb-6">
@@ -114,7 +114,7 @@ export function CTFStats() {
               </div>
 
               {/* Stats grid */}
-              <div className="grid grid-cols-2 gap-3 mb-6" >
+              <div className="grid grid-cols-2 gap-3 mb-6">
                 {HTB_STATS.map(({ label, value }) => (
                   <div key={label} className="p-3 glass rounded-card bg-[rgba(0,0,0,0.4)]">
                     <div className="font-display text-xl text-cyan font-bold">{value}</div>
@@ -134,9 +134,10 @@ export function CTFStats() {
               {/* HTB profile link */}
               <a
                 href={`https://profile.hackthebox.com/profile/019db8ae-9364-73ed-bb47-1336835663a7`}
-                target="_blank"
-                rel="noopener noreferrer"
+                target="_blank" rel="noopener noreferrer"
+
                 aria-label="View HackTheBox Profile in a new tab"
+                title="View HackTheBox Profile in a new tab"
                 className="mt-6 flex items-center justify-center space-x-2 w-full py-2.5 border border-cyan/30 text-cyan font-mono text-xs uppercase tracking-widest rounded-pill hover:bg-cyan hover:text-black transition-all hover:shadow-[var(--glow-cyan-sm)]"
               >
                 <span>VIEW HTB PROFILE</span>

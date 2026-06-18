@@ -83,6 +83,7 @@ export function GitHubStats() {
     <section
       id="github"
       tabIndex={-1}
+      aria-labelledby="section-title-open-source-activity"
       className="py-24 bg-black relative border-t border-border outline-none"
     >
       <div className="max-w-7xl mx-auto px-6 relative z-10">

@@ -112,6 +112,7 @@ export function Hero() {
     <section
       id="hero"
       tabIndex={-1}
+      aria-label="Hero Section"
       className="relative min-h-screen flex flex-col items-center justify-center pt-16 bg-[var(--gradient-hero)] overflow-hidden outline-none"
     >
       <HeroOrb />

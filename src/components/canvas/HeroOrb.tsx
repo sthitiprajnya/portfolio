@@ -210,6 +210,11 @@ export default function HeroOrb() {
     let lastTime = 0;
 
     function tick(now: number) {
+      if (!inView) {
+        rafRef.current = requestAnimationFrame(tick);
+        return;
+      }
+
       const dt = Math.min(now - lastTime, 32); // cap at ~30fps min
       lastTime  = now;
 

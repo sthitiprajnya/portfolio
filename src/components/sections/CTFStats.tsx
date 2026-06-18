@@ -67,6 +67,7 @@ export function CTFStats() {
     <section
       id="ctf"
       tabIndex={-1}
+      aria-labelledby="section-title-war-games"
       className="py-24 bg-black relative border-t border-border overflow-hidden outline-none"
     >
 

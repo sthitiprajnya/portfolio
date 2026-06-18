@@ -86,6 +86,33 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
 
       // Day 2: Responsive font size
       fontSize = Math.max(12, Math.min(18, window.innerWidth / 80));
+
+      if (glyphCache instanceof HTMLCanvasElement) {
+        glyphCache.width = fontSize * MATRIX_CHAR_LEN;
+        glyphCache.height = fontSize * (TRAIL_LENGTH + 1) * 2;
+      } else {
+        // OffscreenCanvas
+        glyphCache.width = fontSize * MATRIX_CHAR_LEN;
+        glyphCache.height = fontSize * (TRAIL_LENGTH + 1) * 2;
+      }
+
+      glyphCtx.font = `${fontSize}px "JetBrains Mono", monospace`;
+      glyphCtx.textBaseline = 'top';
+
+      // Pre-render glyphs
+      for (let j = 0; j <= TRAIL_LENGTH; j++) {
+        // Normal colors row
+        glyphCtx.fillStyle = TRAIL_COLORS[j];
+        for (let i = 0; i < MATRIX_CHAR_LEN; i++) {
+          glyphCtx.fillText(MATRIX_CHARS[i], i * fontSize, j * fontSize);
+        }
+        // Glitch colors row (offset by TRAIL_LENGTH + 1 rows)
+        glyphCtx.fillStyle = GLITCH_TRAIL_COLORS[j];
+        for (let i = 0; i < MATRIX_CHAR_LEN; i++) {
+          glyphCtx.fillText(MATRIX_CHARS[i], i * fontSize, (j + TRAIL_LENGTH + 1) * fontSize);
+        }
+      }
+
       ctx.font = `${fontSize}px "JetBrains Mono", monospace`;
 
       cacheMeta = updateGlyphCache();

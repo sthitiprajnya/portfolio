@@ -94,7 +94,6 @@ export default function Sentinel() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number>(undefined);
   const prefersReducedMotion = usePrefersReducedMotion();
-  // BOLT: Cache target positions to avoid layout thrashing (getBoundingClientRect) in the 60fps loop
   const targetCacheRef = useRef<TargetCache[]>([]);
   const ctfCenterYRef = useRef<number | null>(null);
   const lastYRef = useRef(0);
@@ -112,11 +111,10 @@ export default function Sentinel() {
   const targetThemeRef = useRef<ParsedTheme>(DEFAULT_THEME);
   const colorProximityRef = useRef(0);
 
-  // Day 12: Ring ripple state
   const rippleRef = useRef({
     active: false,
     startTime: 0,
-    triggered: false, // Prevents multiple rapid triggers
+    triggered: false,
   });
 
   const currentColorRef = useRef({
@@ -152,16 +150,12 @@ export default function Sentinel() {
     let width = window.innerWidth;
     let height = window.innerHeight;
 
-    // BOLT: Centralized cache update to keep the animation loop layout-free
     const updateTargetCache = () => {
       const scrollY = window.scrollY;
-
       const targets = document.querySelectorAll('[data-orb-target]');
       targetCacheRef.current = Array.from(targets).map(target => {
         const rect = target.getBoundingClientRect();
-        return {
-          centerY: rect.top + scrollY + rect.height / 2
-        };
+        return { centerY: rect.top + scrollY + rect.height / 2 };
       });
 
       const ctfElement = document.getElementById('ctf');
@@ -185,7 +179,7 @@ export default function Sentinel() {
       stateRef.current.targetY = window.scrollY;
     };
     window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll(); // initial sync
+    onScroll();
 
     const sectionObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -371,28 +365,23 @@ export default function Sentinel() {
       const cur = currentColorRef.current;
       const COLOR_LERP = 0.04;
 
-      // Lerp current colors
       cur.coreR = lerpColor(cur.coreR, tCore.r, COLOR_LERP);
       cur.coreG = lerpColor(cur.coreG, tCore.g, COLOR_LERP);
       cur.coreB = lerpColor(cur.coreB, tCore.b, COLOR_LERP);
       cur.coreA = lerpColor(cur.coreA, tCore.a, COLOR_LERP);
-
       cur.midR = lerpColor(cur.midR, tMid.r, COLOR_LERP);
       cur.midG = lerpColor(cur.midG, tMid.g, COLOR_LERP);
       cur.midB = lerpColor(cur.midB, tMid.b, COLOR_LERP);
       cur.midA = lerpColor(cur.midA, tMid.a, COLOR_LERP);
-
       cur.haloR = lerpColor(cur.haloR, tHalo.r, COLOR_LERP);
       cur.haloG = lerpColor(cur.haloG, tHalo.g, COLOR_LERP);
       cur.haloB = lerpColor(cur.haloB, tHalo.b, COLOR_LERP);
       cur.haloA = lerpColor(cur.haloA, tHalo.a, COLOR_LERP);
-
       cur.specR = lerpColor(cur.specR, tSpec.r, COLOR_LERP);
       cur.specG = lerpColor(cur.specG, tSpec.g, COLOR_LERP);
       cur.specB = lerpColor(cur.specB, tSpec.b, COLOR_LERP);
       cur.specA = lerpColor(cur.specA, tSpec.a, COLOR_LERP);
 
-      // Day 8: Apply violet override based on ctf proximity
       const vCore = VIOLET_THEME.core;
       const vMid = VIOLET_THEME.mid;
       const vHalo = VIOLET_THEME.halo;
@@ -473,7 +462,6 @@ export default function Sentinel() {
           rippleRef.current.active = false;
         }
       }
-
       rafRef.current = requestAnimationFrame(draw);
     };
 

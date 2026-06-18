@@ -100,7 +100,6 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
       // BOLT: Clear bucket arrays at the start of each frame to prevent coordinate accumulation and memory leaks.
-      // Reusing the same arrays minimizes GC pressure.
       clearBuckets();
 
       // BOLT: Replace forEach with for-loop and batch arc drawing into a single fill() call
@@ -110,7 +109,7 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       for (let i = 0; i < numNodes; i++) {
         const node = nodes[i];
 
-        // Day 7: Mouse repulsion
+        // Mouse repulsion
         if (mouseRef.current.active) {
           const dx = node.x - mouseRef.current.x;
           const dy = node.y - mouseRef.current.y;
@@ -123,7 +122,7 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
           }
         }
 
-        // Day 7: Cap speed to 3px/frame
+        // Cap speed to 3px/frame
         const speedSq = node.vx * node.vx + node.vy * node.vy;
         if (speedSq > 9) {
           const speed = Math.sqrt(speedSq);
@@ -138,7 +137,7 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
         if (node.x < 0 || node.x > width) node.vx *= -1;
         if (node.y < 0 || node.y > height) node.vy *= -1;
 
-        // Day 11: Dynamic pulsing radius
+        // Dynamic pulsing radius
         const radius = 2 + 1.5 * Math.sin(now * 0.002 + node.phase);
 
         ctx.moveTo(node.x + radius, node.y);
@@ -146,15 +145,6 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       }
       ctx.fill();
 
-      // BOLT: Use globalAlpha for connection opacity and squared distance thresholding to avoid Math.sqrt() in the 60fps loop.
-      // String template allocations for colors are eliminated.
-      // ⚡ Optimization: Added axial distance early-exit checks to skip unnecessary d2 calculations.
-      // ⚡ Optimization: Replaced Math.sqrt() with pre-calculated squared threshold comparisons.
-      //
-      // Expected Performance Impact:
-      // - Complexity: Remains O(N^2) worst-case, but reduces average operations by ~85% due to early-exits.
-      // - Math: Eliminates ~140,000 Math.sqrt() calls/sec and ~250,000 multiplications/sec on desktop (70 nodes @ 60fps).
-      // - GC: Zero allocations in the drawing loop by reusing pre-allocated coordinate buckets.
       ctx.lineWidth = 1;
       ctx.strokeStyle = '#00F5FF';
       for (let i = 0; i < numNodes; i++) {

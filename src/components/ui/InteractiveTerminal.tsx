@@ -218,7 +218,8 @@ export function InteractiveTerminal({ className }: { className?: string }) {
               value={currentInput}
               onChange={(e) => setCurrentInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="bg-transparent outline-none flex-grow text-green caret-green"
+              className="bg-transparent outline-none flex-grow text-green caret-green placeholder:text-green/30"
+              placeholder="Type 'help' for available commands..."
               autoComplete="off"
               spellCheck="false"
               autoFocus

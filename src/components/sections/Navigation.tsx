@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { CyberButton } from '@/components/ui/CyberButton';
 import { PERSONAL }    from '@/data/portfolio';
+import { useScrollTo } from '@/hooks/useScrollTo';
 
 export const NAV_LINKS = [
   { label: 'About',     id: 'about'          },
@@ -17,11 +18,16 @@ export const NAV_LINKS = [
   { label: 'Contact',   id: 'contact'        },
 ];
 
+// BOLT: Hoist the observed sections array to the module level to avoid
+// redundant array creation and property access inside the useEffect.
+const OBSERVED_SECTIONS = ['hero', ...NAV_LINKS.map(l => l.id)];
+
 export function Navigation() {
   const [scrolled,       setScrolled]       = useState(false);
   const [activeSection,  setActiveSection]  = useState('hero');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const scrollToInternal = useScrollTo();
 
   // UX Enhancement: Handle Escape key to close mobile menu & prevent body scroll
   useEffect(() => {
@@ -47,8 +53,6 @@ export function Navigation() {
   useEffect(() => {
     // BOLT: Use IntersectionObserver instead of scroll listeners and getBoundingClientRect
     // for much better performance (avoids main-thread layout thrashing)
-    const sections = ['hero', ...NAV_LINKS.map(l => l.id)];
-
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -60,7 +64,7 @@ export function Navigation() {
       { rootMargin: '-30% 0px -60% 0px', threshold: 0 }
     );
 
-    sections.forEach((id) => {
+    OBSERVED_SECTIONS.forEach((id) => {
       const el = document.getElementById(id);
       if (el) observer.observe(el);
     });
@@ -84,7 +88,7 @@ export function Navigation() {
 
   const scrollTo = (id: string) => {
     setMobileMenuOpen(false);
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    scrollToInternal(id);
   };
 
   const openSearch = () => {
@@ -127,6 +131,7 @@ export function Navigation() {
               aria-label="Search site sections"
               title="Search site sections"
               aria-keyshortcuts="/ ?"
+              aria-haspopup="dialog"
             >
               <svg className="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -147,7 +152,7 @@ export function Navigation() {
                         isActive ? 'text-cyan glass-pill rounded-pill border-b-2 border-cyan' : 'text-text-secondary hover:text-cyan rounded-pill border-b-2 border-transparent'
                       )}
                       aria-label={`Scroll to ${link.ariaLabel || link.label} section`}
-                      aria-current={isActive ? 'page' : undefined}
+                      aria-current={isActive ? 'true' : undefined}
                     >
                       {link.label}
                     </button>
@@ -156,7 +161,7 @@ export function Navigation() {
               })}
             </ul>
 
-            <CyberButton as="a" href={PERSONAL.resumeUrl} download color="green" className="py-2 px-4 text-[0.7rem]" aria-label="Download Resume (CV)">
+            <CyberButton as="a" href={PERSONAL.resumeUrl} download color="green" className="py-2 px-4 text-[0.7rem]" aria-label="Download Resume (CV)" title="Download Resume (CV)">
               <span className="flex items-center gap-2">
                 CV
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -175,6 +180,7 @@ export function Navigation() {
               className="text-text-secondary p-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card"
               aria-label="Search site sections"
               title="Search site sections"
+              aria-haspopup="dialog"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -188,6 +194,7 @@ export function Navigation() {
               aria-controls="mobile-menu"
               aria-label="Open navigation menu"
               title="Open navigation menu"
+              aria-haspopup="dialog"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"/>
@@ -230,7 +237,7 @@ export function Navigation() {
                         activeSection === link.id ? 'bg-cyan/10 text-cyan border border-cyan/20' : 'hover:bg-white/5 text-text-secondary hover:text-white border border-transparent'
                       )}
                       aria-label={`Scroll to ${link.ariaLabel || link.label} section`}
-                      aria-current={activeSection === link.id ? 'page' : undefined}
+                      aria-current={activeSection === link.id ? 'true' : undefined}
                     >
                       <span className="opacity-40 mr-4 text-xs w-8 group-hover:text-cyan transition-colors">
                         {activeSection === link.id ? '>>' : `$`}

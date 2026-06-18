@@ -1,4 +1,5 @@
 "use client";
+import { motion, AnimatePresence } from "framer-motion";
 import React, { lazy, Suspense } from 'react';
 import { PERSONAL } from '@/data/portfolio';
 import { LogoBadge } from '@/components/ui/LogoBadge';
@@ -9,6 +10,13 @@ export function Footer() {
   const year = new Date().getFullYear();
   // Using a mock session logged value or random number generator between 1000 and 5000 for aesthetics
   const [visitorCount, setVisitorCount] = React.useState(0);
+  const [copied, setCopied] = React.useState(false);
+
+  const handleCopyEmail = () => {
+    navigator.clipboard.writeText(PERSONAL.email);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   React.useEffect(() => {
     // Generate a stable-ish random number based on today's date so it doesn't jump crazily on every refresh, but grows slowly
@@ -38,10 +46,34 @@ export function Footer() {
           </span>
 
           <div className="flex items-center space-x-4">
-            <a href={`mailto:${PERSONAL.email}`} className="text-text-secondary hover:text-cyan transition-colors outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card" aria-label="Send email" title="Send email">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-              </svg>
+            <div className="relative group/email">
+              <button
+                onClick={handleCopyEmail}
+                className="text-text-secondary hover:text-cyan transition-colors outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card p-1"
+                aria-label="Copy email address"
+                title="Copy email address"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+              </button>
+              <AnimatePresence>
+                {copied && (
+                  <motion.span
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-cyan text-black font-mono text-[0.6rem] rounded-card font-bold shadow-[var(--glow-cyan-sm)] z-20 pointer-events-none"
+                  >
+                    COPIED!
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </div>
+            <a href={`mailto:${PERSONAL.email}`} className="text-text-secondary hover:text-cyan transition-colors outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card p-1" aria-label="Send direct email" title="Send direct email">
+               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+               </svg>
             </a>
             <a href={PERSONAL.linkedin} target="_blank" rel="noopener noreferrer" className="text-text-secondary hover:text-violet transition-colors outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card" aria-label="Visit LinkedIn profile" title="Visit LinkedIn profile">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">

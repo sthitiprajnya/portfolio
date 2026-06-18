@@ -133,9 +133,10 @@ export function CTFStats() {
               {/* HTB profile link */}
               <a
                 href={`https://profile.hackthebox.com/profile/019db8ae-9364-73ed-bb47-1336835663a7`}
-                target="_blank"
-                rel="noopener noreferrer"
+                target="_blank" rel="noopener noreferrer"
+
                 aria-label="View HackTheBox Profile in a new tab"
+                title="View HackTheBox Profile in a new tab"
                 className="mt-6 flex items-center justify-center space-x-2 w-full py-2.5 border border-cyan/30 text-cyan font-mono text-xs uppercase tracking-widest rounded-pill hover:bg-cyan hover:text-black transition-all hover:shadow-[var(--glow-cyan-sm)]"
               >
                 <span>VIEW HTB PROFILE</span>

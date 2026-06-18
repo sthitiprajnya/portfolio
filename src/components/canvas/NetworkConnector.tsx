@@ -24,12 +24,12 @@ const MAX_DISTANCE_SQ = MAX_DISTANCE * MAX_DISTANCE;
 const NODE_COLOR = 'rgba(0, 245, 255, 0.3)';
 
 // BOLT: Pre-calculate squared thresholds for 6 discrete opacity buckets to eliminate Math.sqrt and Math.floor from the hot loop.
-// Ordered by distance: B1 is furthest, B5 is closest to match bucket index logic.
-const B1_SQ = Math.pow(MAX_DISTANCE * (1 / 6), 2);
-const B2_SQ = Math.pow(MAX_DISTANCE * (2 / 6), 2);
+// ⚡ Optimization: thresholds are ordered by distance (B1 is furthest, B5 is closest to match bIdx logic)
+const B1_SQ = Math.pow(MAX_DISTANCE * (5 / 6), 2);
+const B2_SQ = Math.pow(MAX_DISTANCE * (4 / 6), 2);
 const B3_SQ = Math.pow(MAX_DISTANCE * (3 / 6), 2);
-const B4_SQ = Math.pow(MAX_DISTANCE * (4 / 6), 2);
-const B5_SQ = Math.pow(MAX_DISTANCE * (5 / 6), 2);
+const B4_SQ = Math.pow(MAX_DISTANCE * (2 / 6), 2);
+const B5_SQ = Math.pow(MAX_DISTANCE * (1 / 6), 2);
 
 export default function NetworkConnector({ className }: NetworkConnectorProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);

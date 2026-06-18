@@ -92,7 +92,7 @@ const LERP_FACTOR = 0.1; // Smoothness of scroll follow
 
 export default function Sentinel() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rafRef = useRef<number>();
+  const rafRef = useRef<number>(undefined);
   const prefersReducedMotion = usePrefersReducedMotion();
   // BOLT: Cache target positions to avoid layout thrashing (getBoundingClientRect) in the 60fps loop
   const targetCacheRef = useRef<TargetCache[]>([]);
@@ -134,8 +134,8 @@ export default function Sentinel() {
     if (!ctx) return;
 
     // BOLT: Performance Optimization - Sprite Caching
-    // Pre-rendering the orb to a small offscreen canvas (sprite) avoids expensive
-    // radial gradient and arc calculations on every 60fps frame.
+    // Pre-rendering the sentinel orb to an offscreen canvas avoids 4 expensive
+    // radial gradient calculations per frame in the 60fps loop.
     const SPRITE_SIZE = 256;
     const spriteCanvas = typeof OffscreenCanvas !== 'undefined'
       ? new OffscreenCanvas(SPRITE_SIZE, SPRITE_SIZE)
@@ -145,9 +145,8 @@ export default function Sentinel() {
       spriteCanvas.width = SPRITE_SIZE;
       spriteCanvas.height = SPRITE_SIZE;
     }
-
     const spriteCtx = spriteCanvas.getContext('2d') as CanvasRenderingContext2D;
-    let lastR = -1, lastG = -1, lastB = -1;
+    let lastRenderedColor = { r: -1, g: -1, b: -1, a: -1 };
 
     let width = window.innerWidth;
     let height = window.innerHeight;
@@ -201,42 +200,6 @@ export default function Sentinel() {
     document.querySelectorAll('section[id], main[id]').forEach(el => {
       sectionObserver.observe(el);
     });
-
-    const checkProximity = (currentY: number) => {
-      let maxProximity = 0;
-      const viewportCenterY = currentY + height / 2;
-
-      // BOLT: Iterate over cached positions instead of querying the DOM every frame
-      const cache = targetCacheRef.current;
-      for (let i = 0; i < cache.length; i++) {
-        const dist = Math.abs(cache[i].centerY - viewportCenterY);
-
-        // If within 300px, increase glow
-        if (dist < 300) {
-          const proximity = 1 - (dist / 300);
-          if (proximity > maxProximity) maxProximity = proximity;
-        }
-      }
-
-      return maxProximity;
-    };
-
-    // Day 8: Proximity for #ctf element specifically to shift color to violet
-    // BOLT: Optimized to use cached document-relative Y position, eliminating per-frame layout thrashing.
-    const checkCtfProximity = (currentY: number) => {
-      if (ctfCenterYRef.current === null) return 0;
-
-      const viewportCenterY = currentY + height / 2;
-      const dist = Math.abs(ctfCenterYRef.current - viewportCenterY);
-
-      if (dist < 400) {
-        return 1 - (dist / 400);
-      }
-      return 0;
-    };
-
-    // Initial targets update after a short delay to ensure elements are rendered
-    const timer = setTimeout(updateTargetCache, 1000);
 
     const updateSprite = (
       fCR: number, fCG: number, fCB: number, fCA: number,
@@ -292,6 +255,42 @@ export default function Sentinel() {
       spriteCtx.arc(specX, specY, r_base * 0.08, 0, Math.PI * 2); // Corrected radius
       spriteCtx.fill();
     };
+
+    const checkProximity = (currentY: number) => {
+      let maxProximity = 0;
+      const viewportCenterY = currentY + height / 2;
+
+      // BOLT: Iterate over cached positions instead of querying the DOM every frame
+      const cache = targetCacheRef.current;
+      for (let i = 0; i < cache.length; i++) {
+        const dist = Math.abs(cache[i].centerY - viewportCenterY);
+
+        // If within 300px, increase glow
+        if (dist < 300) {
+          const proximity = 1 - (dist / 300);
+          if (proximity > maxProximity) maxProximity = proximity;
+        }
+      }
+
+      return maxProximity;
+    };
+
+    // Day 8: Proximity for #ctf element specifically to shift color to violet
+    // BOLT: Optimized to use cached document-relative Y position, eliminating per-frame layout thrashing.
+    const checkCtfProximity = (currentY: number) => {
+      if (ctfCenterYRef.current === null) return 0;
+
+      const viewportCenterY = currentY + height / 2;
+      const dist = Math.abs(ctfCenterYRef.current - viewportCenterY);
+
+      if (dist < 400) {
+        return 1 - (dist / 400);
+      }
+      return 0;
+    };
+
+    // Initial targets update after a short delay to ensure elements are rendered
+    const timer = setTimeout(updateTargetCache, 1000);
 
     const draw = () => {
       if (!ctx) return;
@@ -374,31 +373,34 @@ export default function Sentinel() {
       const finalCoreR = lerpColor(cur.coreR, vCore.r, p);
       const finalCoreG = lerpColor(cur.coreG, vCore.g, p);
       const finalCoreB = lerpColor(cur.coreB, vCore.b, p);
-      // a is not overridden by ctfProx as it's the same
+      const finalCoreA = lerpColor(cur.coreA, vCore.a, p);
+
+      const vMid = VIOLET_THEME.mid;
+      const vHalo = VIOLET_THEME.halo;
+      const vSpec = VIOLET_THEME.specular;
 
       const finalMidR = lerpColor(cur.midR, vMid.r, p);
       const finalMidG = lerpColor(cur.midG, vMid.g, p);
       const finalMidB = lerpColor(cur.midB, vMid.b, p);
+      const finalMidA = lerpColor(cur.midA, vMid.a, p);
 
       const finalHaloR = lerpColor(cur.haloR, vHalo.r, p);
       const finalHaloG = lerpColor(cur.haloG, vHalo.g, p);
       const finalHaloB = lerpColor(cur.haloB, vHalo.b, p);
+      const finalHaloA = lerpColor(cur.haloA, vHalo.a, p);
 
       const finalSpecR = lerpColor(cur.specR, vSpec.r, p);
       const finalSpecG = lerpColor(cur.specG, vSpec.g, p);
       const finalSpecB = lerpColor(cur.specB, vSpec.b, p);
       const finalSpecA = lerpColor(cur.specA, vSpec.a, p);
 
-      const finalMidA = lerpColor(cur.midA, vMid.a, p);
-      const finalHaloA = lerpColor(cur.haloA, vHalo.a, p);
-      const finalCoreA = lerpColor(cur.coreA, vCore.a, p);
-
       // BOLT: Hardware-accelerated drawImage() with sprite caching replaces 4 expensive per-frame radial gradient draws.
+      // Reusing static objects to avoid per-frame allocations if needed, but here simple literals are fine for RgbaColor
       updateSprite(
-        finalCoreR, finalCoreG, finalCoreB, finalCoreA,
-        finalMidR, finalMidG, finalMidB, finalMidA,
-        finalHaloR, finalHaloG, finalHaloB, finalHaloA,
-        finalSpecR, finalSpecG, finalSpecB, finalSpecA
+        { r: finalCoreR, g: finalCoreG, b: finalCoreB, a: finalCoreA },
+        { r: finalMidR, g: finalMidG, b: finalMidB, a: finalMidA },
+        { r: finalHaloR, g: finalHaloG, b: finalHaloB, a: finalHaloA },
+        { r: finalSpecR, g: finalSpecG, b: finalSpecB, a: finalSpecA }
       );
 
       const pulse = 1 + 0.08 * Math.sin(Date.now() * 0.002);

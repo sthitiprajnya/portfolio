@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { SkillBadge } from '@/components/ui/SkillBadge';
 import { ScrollReveal, fadeSlideUp, containerStagger } from '@/components/ui/ScrollReveal';
@@ -65,6 +65,35 @@ const SKILLS_TABS: ('ALL' | 'OFFENSIVE' | 'CLOUD' | 'AUTOMATION' | 'COMPLIANCE')
 export function Skills() {
   const [activeTab, setActiveTab] = useState<'ALL' | 'OFFENSIVE' | 'CLOUD' | 'AUTOMATION' | 'COMPLIANCE'>('ALL');
   const { ref: chartRef, inView: chartInView } = useInView({ triggerOnce: true, threshold: 0.5 });
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
+    let newIndex = -1;
+    const tabs = SKILLS_TABS;
+
+    switch (e.key) {
+      case 'ArrowRight':
+        newIndex = (index + 1) % tabs.length;
+        break;
+      case 'ArrowLeft':
+        newIndex = (index - 1 + tabs.length) % tabs.length;
+        break;
+      case 'Home':
+        newIndex = 0;
+        break;
+      case 'End':
+        newIndex = tabs.length - 1;
+        break;
+      default:
+        return;
+    }
+
+    if (newIndex !== -1) {
+      e.preventDefault();
+      setActiveTab(tabs[newIndex]);
+      tabRefs.current[newIndex]?.focus();
+    }
+  };
 
   const { totalFilteredSkills, filteredCategories } = useMemo(() => {
     let count = 0;
@@ -80,6 +109,7 @@ export function Skills() {
     <section
       id="skills"
       tabIndex={-1}
+      aria-labelledby="section-title-tech-arsenal"
       className="py-24 bg-black overflow-hidden relative outline-none"
     >
       <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -93,18 +123,22 @@ export function Skills() {
         {/* Filter Tabs & Radar Chart Row */}
         <div className="flex flex-col lg:flex-row justify-between items-start gap-12 mb-16">
           <div className="flex-1 w-full">
-             <div className="flex flex-wrap gap-2 mb-8 border-b border-border pb-4">
-              {SKILLS_TABS.map((tab) => (
+             <div className="flex flex-wrap gap-2 mb-8 border-b border-border pb-4" role="tablist" aria-label="Skill categories">
+              {SKILLS_TABS.map((tab, idx) => (
                 <button
                   key={tab}
+                  ref={(el) => { tabRefs.current[idx] = el; }}
                   onClick={() => setActiveTab(tab)}
+                  onKeyDown={(e) => handleKeyDown(e, idx)}
+                  role="tab"
+                  aria-selected={activeTab === tab}
+                  tabIndex={activeTab === tab ? 0 : -1}
                   className={clsx(
                     'px-4 py-2 font-mono text-[0.7rem] uppercase tracking-widest transition-all rounded-card border outline-none focus-visible:ring-2 focus-visible:ring-cyan',
                     activeTab === tab
                       ? 'border-cyan bg-cyan/10 text-cyan shadow-[var(--glow-cyan-sm)]'
                       : 'border-border text-text-secondary hover:border-cyan/50 hover:text-white'
                   )}
-                  aria-pressed={activeTab === tab}
                   aria-label={`Filter by ${tab}`}
                 >
                   {tab}

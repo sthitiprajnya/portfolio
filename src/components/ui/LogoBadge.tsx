@@ -30,6 +30,7 @@ export function LogoBadge({
       />
     );
   }
+
   return (
     <span
       role="img"

@@ -133,22 +133,6 @@ export default function Sentinel() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // BOLT: Performance Optimization - Sprite Caching
-    // Pre-rendering the orb to a small offscreen canvas (sprite) avoids expensive
-    // radial gradient and arc calculations on every 60fps frame.
-    const SPRITE_SIZE = 256;
-    const spriteCanvas = typeof OffscreenCanvas !== 'undefined'
-      ? new OffscreenCanvas(SPRITE_SIZE, SPRITE_SIZE)
-      : document.createElement('canvas');
-
-    if (spriteCanvas instanceof HTMLCanvasElement) {
-      spriteCanvas.width = SPRITE_SIZE;
-      spriteCanvas.height = SPRITE_SIZE;
-    }
-
-    const spriteCtx = spriteCanvas.getContext('2d') as CanvasRenderingContext2D;
-    let lastCoreR = -1, lastCoreG = -1, lastCoreB = -1;
-
     let width = window.innerWidth;
     let height = window.innerHeight;
 
@@ -202,76 +186,6 @@ export default function Sentinel() {
       sectionObserver.observe(el);
     });
 
-    // BOLT: Performance Optimization - Sprite Caching
-    // Pre-rendering the complex Sentinel orb to an offscreen canvas avoids 4 expensive
-    // radial gradient calculations per frame in the 60fps loop.
-    const SPRITE_SIZE = 256;
-    const spriteCanvas = typeof OffscreenCanvas !== 'undefined'
-      ? new OffscreenCanvas(SPRITE_SIZE, SPRITE_SIZE)
-      : document.createElement('canvas');
-
-    if (spriteCanvas instanceof HTMLCanvasElement) {
-      spriteCanvas.width = SPRITE_SIZE;
-      spriteCanvas.height = SPRITE_SIZE;
-    }
-    const spriteCtx = spriteCanvas.getContext('2d') as CanvasRenderingContext2D;
-
-    let lastR = -1, lastG = -1, lastB = -1;
-
-    const updateSprite = (
-      fCR: number, fCG: number, fCB: number, fCA: number,
-      fMR: number, fMG: number, fMB: number, fMA: number,
-      fHR: number, fHG: number, fHB: number, fHA: number,
-      fSR: number, fSG: number, fSB: number, fSA: number
-    ) => {
-      // BOLT: Only update the sprite when core RGB values change by more than 1 unit.
-      // This is a reliable proxy for overall theme changes.
-      if (Math.abs(fCR - lastR) < 1 && Math.abs(fCG - lastG) < 1 && Math.abs(fCB - lastB) < 1) return;
-      lastR = fCR; lastG = fCG; lastB = fCB;
-
-      const center = SPRITE_SIZE / 2;
-      const r_base = 60; // Base reference radius for the sprite
-
-      spriteCtx.clearRect(0, 0, SPRITE_SIZE, SPRITE_SIZE);
-
-      // 1. Outer halo
-      const halo = spriteCtx.createRadialGradient(center, center, r_base * 0.6, center, center, r_base * 1.8);
-      halo.addColorStop(0, `rgba(${Math.round(fHR)},${Math.round(fHG)},${Math.round(fHB)},${fHA})`);
-      halo.addColorStop(1, `rgba(${Math.round(fHR)},${Math.round(fHG)},${Math.round(fHB)},0)`);
-      spriteCtx.fillStyle = halo;
-      spriteCtx.beginPath();
-      spriteCtx.arc(center, center, r_base * 1.8, 0, Math.PI * 2);
-      spriteCtx.fill();
-
-      // 2. Mid glow
-      const mid = spriteCtx.createRadialGradient(center, center, 0, center, center, r_base);
-      mid.addColorStop(0.35, `rgba(${Math.round(fMR)},${Math.round(fMG)},${Math.round(fMB)},${fMA})`);
-      mid.addColorStop(1, `rgba(${Math.round(fMR)},${Math.round(fMG)},${Math.round(fMB)},0)`);
-      spriteCtx.fillStyle = mid;
-      spriteCtx.beginPath();
-      spriteCtx.arc(center, center, r_base, 0, Math.PI * 2);
-      spriteCtx.fill();
-
-      // 3. Core sphere
-      const core = spriteCtx.createRadialGradient(center - r_base * 0.08, center - r_base * 0.08, 0, center, center, r_base * 0.25);
-      core.addColorStop(0, `rgba(${Math.round(fCR)},${Math.round(fCG)},${Math.round(fCB)},${fCA})`);
-      core.addColorStop(1, `rgba(${Math.round(fCR)},${Math.round(fCG)},${Math.round(fCB)},0)`);
-      spriteCtx.fillStyle = core;
-      spriteCtx.beginPath();
-      spriteCtx.arc(center, center, r_base * 0.25, 0, Math.PI * 2);
-      spriteCtx.fill();
-
-      // 4. Specular highlight
-      const specX = center - r_base * 0.06;
-      const specY = center - r_base * 0.09;
-      const spec = spriteCtx.createRadialGradient(specX, specY, 0, specX, specY, r_base * 0.08);
-      spec.addColorStop(0, `rgba(${Math.round(fSR)},${Math.round(fSG)},${Math.round(fSB)},${fSA})`);
-      spec.addColorStop(1, `rgba(${Math.round(fSR)},${Math.round(fSG)},${Math.round(fSB)},0)`);
-      spriteCtx.fillStyle = spec;
-      spriteCtx.beginPath();
-      spriteCtx.arc(specX, specY, r_base * 0.25, 0, Math.PI * 2);
-      spriteCtx.fill();
-    };
 
     const checkProximity = (currentY: number) => {
       let maxProximity = 0;
@@ -463,6 +377,9 @@ export default function Sentinel() {
 
       // Day 8: Apply violet override based on ctf proximity
       const vCore = VIOLET_THEME.core;
+      const vMid  = VIOLET_THEME.mid;
+      const vHalo = VIOLET_THEME.halo;
+      const vSpec = VIOLET_THEME.specular;
       const p = colorProximityRef.current;
 
       const finalCoreR = lerpColor(cur.coreR, vCore.r, p);
@@ -489,10 +406,10 @@ export default function Sentinel() {
 
       // BOLT: Hardware-accelerated drawImage() with sprite caching replaces 4 expensive per-frame radial gradient draws.
       updateSprite(
-        finalCoreR, finalCoreG, finalCoreB, finalCoreA,
-        finalMidR, finalMidG, finalMidB, finalMidA,
-        finalHaloR, finalHaloG, finalHaloB, finalHaloA,
-        finalSpecR, finalSpecG, finalSpecB, finalSpecA
+        { r: finalCoreR, g: finalCoreG, b: finalCoreB, a: finalCoreA },
+        { r: finalMidR, g: finalMidG, b: finalMidB, a: finalMidA },
+        { r: finalHaloR, g: finalHaloG, b: finalHaloB, a: finalHaloA },
+        { r: finalSpecR, g: finalSpecG, b: finalSpecB, a: finalSpecA }
       );
 
       const pulse = 1 + 0.08 * Math.sin(Date.now() * 0.002);

@@ -92,10 +92,11 @@ const LERP_FACTOR = 0.1; // Smoothness of scroll follow
 
 export default function Sentinel() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rafRef = useRef<number>();
+  const rafRef = useRef<number>(undefined);
   const prefersReducedMotion = usePrefersReducedMotion();
   const targetCacheRef = useRef<TargetCache[]>([]);
   const ctfCenterYRef = useRef<number | null>(null);
+  const lastYRef = useRef(0);
 
   const stateRef = useRef<OrbState>({
     y: 0,
@@ -132,7 +133,7 @@ export default function Sentinel() {
     if (!ctx) return;
 
     // BOLT: Performance Optimization - Sprite Caching
-    // Pre-rendering the complex Sentinel orb to an offscreen canvas avoids 4 expensive
+    // Pre-rendering the sentinel orb to an offscreen canvas avoids 4 expensive
     // radial gradient calculations per frame in the 60fps loop.
     const SPRITE_SIZE = 256;
     const spriteCanvas = typeof OffscreenCanvas !== 'undefined'
@@ -143,9 +144,8 @@ export default function Sentinel() {
       spriteCanvas.width = SPRITE_SIZE;
       spriteCanvas.height = SPRITE_SIZE;
     }
-
     const spriteCtx = spriteCanvas.getContext('2d') as CanvasRenderingContext2D;
-    let lastR = -1, lastG = -1, lastB = -1;
+    let lastRenderedColor = { r: -1, g: -1, b: -1, a: -1 };
 
     let width = window.innerWidth;
     let height = window.innerHeight;
@@ -202,9 +202,8 @@ export default function Sentinel() {
       fHR: number, fHG: number, fHB: number, fHA: number,
       fSR: number, fSG: number, fSB: number, fSA: number
     ) => {
-      // BOLT: Only update the sprite when core RGB values change by more than 1 unit.
-      if (Math.abs(fCR - lastR) < 1 && Math.abs(fCG - lastG) < 1 && Math.abs(fCB - lastB) < 1) return;
-      lastR = fCR; lastG = fCG; lastB = fCB;
+      if (Math.abs(fCR - lastR) < 1 && Math.abs(fCG - lastG) < 1 && Math.abs(fCB - lastB) < 1 && Math.abs(fCA - lastA) < 0.01) return;
+      lastR = fCR; lastG = fCG; lastB = fCB; lastA = fCA;
 
       const center = SPRITE_SIZE / 2;
       const r_base = 60;
@@ -212,43 +211,100 @@ export default function Sentinel() {
       spriteCtx.clearRect(0, 0, SPRITE_SIZE, SPRITE_SIZE);
 
       // 1. Outer halo
-      const halo = spriteCtx.createRadialGradient(center, center, r_base * 0.6, center, center, r_base * 1.8);
-      halo.addColorStop(0, `rgba(${Math.round(fHR)},${Math.round(fHG)},${Math.round(fHB)},${fHA})`);
-      halo.addColorStop(1, `rgba(${Math.round(fHR)},${Math.round(fHG)},${Math.round(fHB)},0)`);
+      const halo = spriteCtx.createRadialGradient(center, center, r * 0.6, center, center, r * 1.8);
+      halo.addColorStop(0, `rgba(${Math.round(fHR)}, ${Math.round(fHG)}, ${Math.round(fHB)}, ${fHA})`);
+      halo.addColorStop(1, `rgba(${Math.round(fHR)}, ${Math.round(fHG)}, ${Math.round(fHB)}, 0)`);
       spriteCtx.fillStyle = halo;
       spriteCtx.beginPath();
-      spriteCtx.arc(center, center, r_base * 1.8, 0, Math.PI * 2);
+      spriteCtx.arc(center, center, r * 1.8, 0, Math.PI * 2);
       spriteCtx.fill();
 
       // 2. Mid glow
-      const mid = spriteCtx.createRadialGradient(center, center, 0, center, center, r_base);
-      mid.addColorStop(0.35, `rgba(${Math.round(fMR)},${Math.round(fMG)},${Math.round(fMB)},${fMA})`);
-      mid.addColorStop(1, `rgba(${Math.round(fMR)},${Math.round(fMG)},${Math.round(fMB)},0)`);
+      const mid = spriteCtx.createRadialGradient(center, center, 0, center, center, r);
+      mid.addColorStop(0.35, `rgba(${Math.round(fMR)}, ${Math.round(fMG)}, ${Math.round(fMB)}, ${fMA})`);
+      mid.addColorStop(1, `rgba(${Math.round(fMR)}, ${Math.round(fMG)}, ${Math.round(fMB)}, 0)`);
       spriteCtx.fillStyle = mid;
       spriteCtx.beginPath();
-      spriteCtx.arc(center, center, r_base, 0, Math.PI * 2);
+      spriteCtx.arc(center, center, r, 0, Math.PI * 2);
       spriteCtx.fill();
 
       // 3. Core sphere
-      const core = spriteCtx.createRadialGradient(center - r_base * 0.08, center - r_base * 0.08, 0, center, center, r_base * 0.25);
-      core.addColorStop(0, `rgba(${Math.round(fCR)},${Math.round(fCG)},${Math.round(fCB)},${fCA})`);
-      core.addColorStop(1, `rgba(${Math.round(fCR)},${Math.round(fCG)},${Math.round(fCB)},0)`);
-      spriteCtx.fillStyle = core;
+      const coreGrad = spriteCtx.createRadialGradient(
+        center - r * 0.08, center - r * 0.08, 0,
+        center, center, r * 0.25
+      );
+      coreGrad.addColorStop(0, `rgba(${Math.round(fCR)}, ${Math.round(fCG)}, ${Math.round(fCB)}, ${fCA})`);
+      coreGrad.addColorStop(1, `rgba(${Math.round(fCR)}, ${Math.round(fCG)}, ${Math.round(fCB)}, 0)`);
+      spriteCtx.fillStyle = coreGrad;
       spriteCtx.beginPath();
-      spriteCtx.arc(center, center, r_base * 0.25, 0, Math.PI * 2);
+      spriteCtx.arc(center, center, r * 0.25, 0, Math.PI * 2);
       spriteCtx.fill();
 
       // 4. Specular highlight
-      const specX = center - r_base * 0.06;
-      const specY = center - r_base * 0.09;
-      const spec = spriteCtx.createRadialGradient(specX, specY, 0, specX, specY, r_base * 0.08);
-      spec.addColorStop(0, `rgba(${Math.round(fSR)},${Math.round(fSG)},${Math.round(fSB)},${fSA})`);
-      spec.addColorStop(1, `rgba(${Math.round(fSR)},${Math.round(fSG)},${Math.round(fSB)},0)`);
+      const spec = spriteCtx.createRadialGradient(
+        center - r * 0.06, center - r * 0.09, 0,
+        center - r * 0.06, center - r * 0.09, r * 0.08
+      );
+      spec.addColorStop(0, `rgba(${Math.round(fSR)}, ${Math.round(fSG)}, ${Math.round(fSB)}, ${fSA})`);
+      spec.addColorStop(1, `rgba(${Math.round(fSR)}, ${Math.round(fSG)}, ${Math.round(fSB)}, 0)`);
       spriteCtx.fillStyle = spec;
       spriteCtx.beginPath();
-      spriteCtx.arc(specX, specY, r_base * 0.08, 0, Math.PI * 2);
+      spriteCtx.arc(specX, specY, r_base * 0.08, 0, Math.PI * 2); // Corrected radius
       spriteCtx.fill();
     };
+
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+
+    // BOLT: Centralized cache update to keep the animation loop layout-free
+    const updateTargetCache = () => {
+      const scrollY = window.scrollY;
+
+      const targets = document.querySelectorAll('[data-orb-target]');
+      targetCacheRef.current = Array.from(targets).map(target => {
+        const rect = target.getBoundingClientRect();
+        return {
+          centerY: rect.top + scrollY + rect.height / 2
+        };
+      });
+
+      const ctfElement = document.getElementById('ctf');
+      if (ctfElement) {
+        const rect = ctfElement.getBoundingClientRect();
+        ctfCenterYRef.current = rect.top + scrollY + rect.height / 2;
+      }
+    };
+
+    const resize = () => {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+      updateTargetCache();
+    };
+    window.addEventListener('resize', resize, { passive: true });
+    resize();
+
+    const onScroll = () => {
+      stateRef.current.targetY = window.scrollY;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll(); // initial sync
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && entry.intersectionRatio > 0.3) {
+          const id = entry.target.id;
+          if (PARSED_SECTION_THEMES[id]) {
+            targetThemeRef.current = PARSED_SECTION_THEMES[id];
+          }
+        }
+      });
+    }, { threshold: [0.3, 0.6] });
+
+    document.querySelectorAll('section[id], main[id]').forEach(el => {
+      sectionObserver.observe(el);
+    });
 
     const checkProximity = (currentY: number) => {
       let maxProximity = 0;
@@ -268,7 +324,8 @@ export default function Sentinel() {
       if (ctfCenterYRef.current === null) return 0;
       const viewportCenterY = currentY + height / 2;
       const dist = Math.abs(ctfCenterYRef.current - viewportCenterY);
-      return dist < 400 ? 1 - (dist / 400) : 0;
+      if (dist < 400) return 1 - (dist / 400);
+      return 0;
     };
 
     const timer = setTimeout(updateTargetCache, 1000);
@@ -276,8 +333,8 @@ export default function Sentinel() {
     const draw = () => {
       if (!ctx) return;
       ctx.clearRect(0, 0, width, height);
-
       const s = stateRef.current;
+
       s.y += (s.targetY - s.y) * LERP_FACTOR;
       s.phase = s.y * SWEEP_FREQUENCY;
       s.xOffset = Math.sin(s.phase) * SWEEP_AMPLITUDE;
@@ -304,11 +361,7 @@ export default function Sentinel() {
       s.trail[s.trailIndex * 2 + 1] = cy + s.y - stateRef.current.targetY;
       s.trailIndex = (s.trailIndex + 1) % 8;
 
-      const tCore = targetThemeRef.current.core;
-      const tMid = targetThemeRef.current.mid;
-      const tHalo = targetThemeRef.current.halo;
-      const tSpec = targetThemeRef.current.specular;
-
+      const tTheme = targetThemeRef.current;
       const cur = currentColorRef.current;
       const COLOR_LERP = 0.04;
 
@@ -339,24 +392,33 @@ export default function Sentinel() {
       const finalCoreG = lerpColor(cur.coreG, vCore.g, p);
       const finalCoreB = lerpColor(cur.coreB, vCore.b, p);
       const finalCoreA = lerpColor(cur.coreA, vCore.a, p);
+
+      const vMid = VIOLET_THEME.mid;
+      const vHalo = VIOLET_THEME.halo;
+      const vSpec = VIOLET_THEME.specular;
+
       const finalMidR = lerpColor(cur.midR, vMid.r, p);
       const finalMidG = lerpColor(cur.midG, vMid.g, p);
       const finalMidB = lerpColor(cur.midB, vMid.b, p);
       const finalMidA = lerpColor(cur.midA, vMid.a, p);
+
       const finalHaloR = lerpColor(cur.haloR, vHalo.r, p);
       const finalHaloG = lerpColor(cur.haloG, vHalo.g, p);
       const finalHaloB = lerpColor(cur.haloB, vHalo.b, p);
       const finalHaloA = lerpColor(cur.haloA, vHalo.a, p);
-      const finalSpecR = lerpColor(cur.specR, vSpec.r, p);
-      const finalSpecG = lerpColor(cur.specG, vSpec.g, p);
-      const finalSpecB = lerpColor(cur.specB, vSpec.b, p);
-      const finalSpecA = lerpColor(cur.specA, vSpec.a, p);
 
+      cur.specR = lerpColor(cur.specR, tTheme.specular.r, COLOR_LERP);
+      cur.specG = lerpColor(cur.specG, tTheme.specular.g, COLOR_LERP);
+      cur.specB = lerpColor(cur.specB, tTheme.specular.b, COLOR_LERP);
+      cur.specA = lerpColor(cur.specA, tTheme.specular.a, COLOR_LERP);
+
+      // BOLT: Hardware-accelerated drawImage() with sprite caching replaces 4 expensive per-frame radial gradient draws.
+      // Reusing static objects to avoid per-frame allocations if needed, but here simple literals are fine for RgbaColor
       updateSprite(
-        finalCoreR, finalCoreG, finalCoreB, finalCoreA,
-        finalMidR, finalMidG, finalMidB, finalMidA,
-        finalHaloR, finalHaloG, finalHaloB, finalHaloA,
-        finalSpecR, finalSpecG, finalSpecB, finalSpecA
+        { r: finalCoreR, g: finalCoreG, b: finalCoreB, a: finalCoreA },
+        { r: finalMidR, g: finalMidG, b: finalMidB, a: finalMidA },
+        { r: finalHaloR, g: finalHaloG, b: finalHaloB, a: finalHaloA },
+        { r: finalSpecR, g: finalSpecG, b: finalSpecB, a: finalSpecA }
       );
 
       const pulse = 1 + 0.08 * Math.sin(Date.now() * 0.002);
@@ -374,7 +436,8 @@ export default function Sentinel() {
         ctx.globalAlpha = opacity;
         const trailScale = spriteScale * 0.15 * (1 - i / trailLen);
         const trailSize = SPRITE_SIZE * trailScale;
-        const trailYOffset = cy - (s.targetY - s.y) * 0.5 * (i + 1);
+        // BOLT: Use correctly tracked vertical position for trail
+        const trailYOffset = ty;
         ctx.drawImage(spriteCanvas as CanvasImageSource, tx - trailSize / 2, trailYOffset - trailSize / 2, trailSize, trailSize);
       }
       ctx.globalAlpha = 1.0;
@@ -385,17 +448,18 @@ export default function Sentinel() {
       if (rippleRef.current.active) {
         const elapsed = Date.now() - rippleRef.current.startTime;
         const duration = 800;
-        if (elapsed >= duration) rippleRef.current.active = false;
-        else {
+        if (elapsed < duration) {
           const progress = elapsed / duration;
           const easeOut = 1 - Math.pow(1 - progress, 3);
           const rippleRadius = (BASE_GLOW * 2) + ((MAX_GLOW * 2) - (BASE_GLOW * 2)) * easeOut;
           const rippleOpacity = 1 - easeOut;
-          ctx.strokeStyle = `rgba(${Math.round(finalCoreR)},${Math.round(finalCoreG)},${Math.round(finalCoreB)},${rippleOpacity * 0.8})`;
+          ctx.strokeStyle = `rgba(${Math.round(fCoreR)},${Math.round(fCoreG)},${Math.round(fCoreB)},${rippleOpacity * 0.8})`;
           ctx.lineWidth = 2;
           ctx.beginPath();
           ctx.arc(cx, cy, rippleRadius, 0, Math.PI * 2);
           ctx.stroke();
+        } else {
+          rippleRef.current.active = false;
         }
       }
       rafRef.current = requestAnimationFrame(draw);

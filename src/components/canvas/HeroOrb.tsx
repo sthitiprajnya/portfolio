@@ -38,6 +38,11 @@ const MOUSE_FORCE = 0.025;   // mouse attraction/repulsion multiplier
 const MOUSE_RANGE = 300;     // px radius of mouse influence
 const MOUSE_RANGE_SQ = MOUSE_RANGE * MOUSE_RANGE;
 
+// ── Sprite constants ─────────────────────────────────────────────
+const SPRITE_SIZE = 256;
+const SPRITE_CENTER = SPRITE_SIZE / 2;
+const BASE_R = 60;
+
 export default function HeroOrb() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const orbRef    = useRef<OrbState>({
@@ -205,6 +210,11 @@ export default function HeroOrb() {
     let lastTime = 0;
 
     function tick(now: number) {
+      if (!inView) {
+        rafRef.current = requestAnimationFrame(tick);
+        return;
+      }
+
       const dt = Math.min(now - lastTime, 32); // cap at ~30fps min
       lastTime  = now;
 

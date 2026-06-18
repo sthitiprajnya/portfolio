@@ -9,6 +9,10 @@ import { PERSONAL } from '@/data/portfolio';
 
 type Status = 'idle' | 'transmitting' | 'sent' | 'error';
 
+// BOLT: Hoist the email validation regex to the module level to avoid
+// redundant Regular Expression compilation on every render cycle.
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 // This form uses EmailJS to send emails directly from the browser.
 export function Contact() {
   const formRef = useRef<HTMLFormElement>(null);
@@ -39,7 +43,7 @@ export function Contact() {
       errs.from_email = 'Email is required';
     } else if (form.from_email.length > 100) {
       errs.from_email = 'Email must be under 100 characters';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.from_email)) {
+    } else if (!EMAIL_REGEX.test(form.from_email)) {
       errs.from_email = 'Invalid email format';
     }
 
@@ -226,8 +230,8 @@ export function Contact() {
 
               <a
                 href={PERSONAL.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
+                target="_blank" rel="noopener noreferrer"
+
                 className="group flex flex-col items-center justify-center p-6 rounded-card glass hover:border-violet hover:shadow-[var(--glow-violet-sm)] hover:-translate-y-1 transition-all outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2 focus-visible:ring-offset-black"
               >
                  <div className="w-12 h-12 rounded-pill bg-violet/10 flex items-center justify-center text-violet mb-4 group-hover:scale-110 transition-transform">
@@ -240,8 +244,8 @@ export function Contact() {
 
               <a
                 href={PERSONAL.github}
-                target="_blank"
-                rel="noopener noreferrer"
+                target="_blank" rel="noopener noreferrer"
+
                 className="group flex flex-col items-center justify-center p-6 rounded-card glass hover:border-white hover:shadow-[0_0_15px_rgba(255,255,255,0.2)] hover:-translate-y-1 transition-all col-span-2 sm:col-span-1 outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
               >
                  <div className="w-12 h-12 rounded-pill bg-white/5 flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform">

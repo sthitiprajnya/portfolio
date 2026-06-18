@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { SectionTitle } from '@/components/ui/SectionTitle';
@@ -17,24 +17,52 @@ const FILTERS = [
   { id: 'automation', label: 'AUTOMATION' },
 ];
 
+// BOLT: Hoist static filter counts calculation to the module level.
+// This avoids redundant O(N*M) calculations on every render or useMemo cycle,
+// reducing GC pressure especially during interaction.
+const FILTER_COUNTS = FILTERS.reduce((acc, filter) => {
+  acc[filter.id] = filter.id === 'all'
+    ? PROJECTS.length
+    : PROJECTS.filter(p => p.category === filter.id).length;
+  return acc;
+}, {} as Record<string, number>);
+
 export function Projects() {
   const [activeFilter, setActiveFilter] = useState('all');
   const prefersReducedMotion = usePrefersReducedMotion();
-  const tabRefs = React.useRef<(HTMLButtonElement | null)[]>([]);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
+    let newIndex = -1;
+    const tabs = FILTERS;
+
+    switch (e.key) {
+      case 'ArrowRight':
+        newIndex = (index + 1) % tabs.length;
+        break;
+      case 'ArrowLeft':
+        newIndex = (index - 1 + tabs.length) % tabs.length;
+        break;
+      case 'Home':
+        newIndex = 0;
+        break;
+      case 'End':
+        newIndex = tabs.length - 1;
+        break;
+      default:
+        return;
+    }
+
+    if (newIndex !== -1) {
+      e.preventDefault();
+      setActiveFilter(tabs[newIndex].id);
+      tabRefs.current[newIndex]?.focus();
+    }
+  };
 
   const filteredProjects = useMemo(() => PROJECTS.filter(p =>
     activeFilter === 'all' ? true : p.category === activeFilter
   ), [activeFilter]);
-
-  // Palette: Calculate project counts for each category to provide immediate user feedback
-  const filterCounts = useMemo(() => {
-    return FILTERS.reduce((acc, filter) => {
-      acc[filter.id] = filter.id === 'all'
-        ? PROJECTS.length
-        : PROJECTS.filter(p => p.category === filter.id).length;
-      return acc;
-    }, {} as Record<string, number>);
-  }, []);
 
   return (
     <section
@@ -51,32 +79,25 @@ export function Projects() {
         </div>
 
         {/* Filter Tabs */}
-        <ScrollReveal variants={fadeSlideUp} className="flex flex-wrap gap-3 mb-12" role="tablist" aria-label="Project categories">
+        <ScrollReveal
+          variants={fadeSlideUp}
+          className="flex flex-wrap gap-3 mb-12"
+          role="tablist"
+          aria-label="Project categories"
+        >
           {FILTERS.map((filter, idx) => {
             const isActive = activeFilter === filter.id;
-            const count = filterCounts[filter.id];
+            const count = FILTER_COUNTS[filter.id];
 
             return (
               <button
                 key={filter.id}
                 ref={(el) => { tabRefs.current[idx] = el; }}
+                onClick={() => setActiveFilter(filter.id)}
+                onKeyDown={(e) => handleKeyDown(e, idx)}
                 role="tab"
                 aria-selected={isActive}
                 tabIndex={isActive ? 0 : -1}
-                onClick={() => setActiveFilter(filter.id)}
-                onKeyDown={(e) => {
-                  let newIdx = -1;
-                  if (e.key === 'ArrowRight') newIdx = (idx + 1) % FILTERS.length;
-                  else if (e.key === 'ArrowLeft') newIdx = (idx - 1 + FILTERS.length) % FILTERS.length;
-                  else if (e.key === 'Home') newIdx = 0;
-                  else if (e.key === 'End') newIdx = FILTERS.length - 1;
-
-                  if (newIdx !== -1) {
-                    e.preventDefault();
-                    setActiveFilter(FILTERS[newIdx].id);
-                    tabRefs.current[newIdx]?.focus();
-                  }
-                }}
                 className={clsx(
                   "font-mono text-xs uppercase tracking-widest px-5 py-2 transition-all duration-300 rounded-card border outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black flex items-center gap-2 group",
                   isActive
@@ -196,8 +217,8 @@ const ProjectCard = React.memo(function ProjectCard({ project, index }: { projec
             {project.githubUrl && project.githubUrl.startsWith('http') ? (
               <a
                 href={project.githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+                target="_blank" rel="noopener noreferrer"
+
                 className="text-text-muted hover:text-white transition-colors ml-4 flex-shrink-0"
                 aria-label={`View ${project.title} on GitHub`}
                 title={`View ${project.title} on GitHub`}

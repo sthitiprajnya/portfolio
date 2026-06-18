@@ -8,7 +8,16 @@ import useSWR from 'swr';
 import Image from 'next/image';
 import { useState } from 'react';
 
-const fetcher = (url: string) => fetch(url).then(r => r.json());
+const fetcher = async (url: string) => {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), 5000);
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+    return await res.json();
+  } finally {
+    clearTimeout(id);
+  }
+};
 
 const TOP_REPOS = [
   {
@@ -165,8 +174,8 @@ export function GitHubStats() {
                       <a
                         key={idx}
                         href={repo.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        target="_blank" rel="noopener noreferrer"
+
                         className="group block p-4 rounded-card glass bg-[rgba(0,0,0,0.4)] hover:border-[rgba(0,245,255,0.4)] hover:bg-[rgba(0,0,0,0.6)] transition-colors outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black"
                       >
                         <div className="flex justify-between items-start mb-2">

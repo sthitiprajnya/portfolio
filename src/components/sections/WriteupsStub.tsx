@@ -18,7 +18,7 @@ export function WriteupsStub() {
       <div className="absolute inset-0 pointer-events-none opacity-[0.02]" style={{ backgroundImage: 'repeating-linear-gradient(45deg, var(--color-amber) 0, var(--color-amber) 2px, transparent 2px, transparent 10px)' }} />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <SectionTitle number="04.5" title="Writeups." />
+        <SectionTitle number="04.5" title="Writeups." id="writeups" />
 
         <ScrollReveal variants={fadeSlideUp} className="mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber/10 border border-amber/30 text-amber font-mono text-[0.6rem] uppercase tracking-widest rounded-card shadow-[var(--glow-amber-sm)]">

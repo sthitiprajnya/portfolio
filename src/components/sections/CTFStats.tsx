@@ -81,7 +81,7 @@ export function CTFStats() {
       />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <SectionTitle number="06" title="War Games." />
+        <SectionTitle number="06" title="War Games." id="ctf" />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
 

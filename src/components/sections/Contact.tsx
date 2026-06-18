@@ -173,7 +173,7 @@ export function Contact() {
       className="py-24 bg-deep relative border-t border-border outline-none"
     >
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <SectionTitle number="09" title="Let's Talk." />
+        <SectionTitle number="09" title="Let's Talk." id="contact" />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
 

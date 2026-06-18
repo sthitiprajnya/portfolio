@@ -87,7 +87,7 @@ export function GitHubStats() {
       className="py-24 bg-black relative border-t border-border outline-none"
     >
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <SectionTitle number="07" title="Open Source Activity." />
+        <SectionTitle number="07" title="Open Source Activity." id="github" />
 
           <div className="space-y-8">
 

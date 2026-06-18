@@ -23,7 +23,7 @@ export function Certifications() {
       className="py-24 bg-deep relative border-t border-border outline-none"
     >
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <SectionTitle number="05" title="Credentials." />
+        <SectionTitle number="05" title="Credentials." id="certifications" />
 
         <ScrollReveal
           variants={containerStagger}

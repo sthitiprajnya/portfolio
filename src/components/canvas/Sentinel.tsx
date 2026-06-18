@@ -202,67 +202,57 @@ export default function Sentinel() {
     });
 
     const updateSprite = (
-      core: RgbaColor,
-      midCol: RgbaColor,
-      haloCol: RgbaColor,
-      specCol: RgbaColor
+      fCR: number, fCG: number, fCB: number, fCA: number,
+      fMR: number, fMG: number, fMB: number, fMA: number,
+      fHR: number, fHG: number, fHB: number, fHA: number,
+      fSR: number, fSG: number, fSB: number, fSA: number
     ) => {
-      // BOLT: Only redraw the sprite if core colors have changed by at least 1 unit.
-      // This eliminates redundant gradient calculations on frames where color lerping is near-zero.
-      if (
-        Math.abs(core.r - lastRenderedColor.r) < 1 &&
-        Math.abs(core.g - lastRenderedColor.g) < 1 &&
-        Math.abs(core.b - lastRenderedColor.b) < 1 &&
-        Math.abs(core.a - lastRenderedColor.a) < 0.01
-      ) return;
-
-      lastRenderedColor = { ...core };
+      // BOLT: Only update the sprite when core RGB values change by more than 1 unit.
+      // This is a reliable proxy for overall theme changes.
+      if (Math.abs(fCR - lastR) < 1 && Math.abs(fCG - lastG) < 1 && Math.abs(fCB - lastB) < 1) return;
+      lastR = fCR; lastG = fCG; lastB = fCB;
 
       const center = SPRITE_SIZE / 2;
-      const r = 60; // BOLT: Increased reference radius to fill more of the 256x256 sprite canvas
+      const r_base = 60; // Base reference radius for the sprite
 
       spriteCtx.clearRect(0, 0, SPRITE_SIZE, SPRITE_SIZE);
 
       // 1. Outer halo
-      const halo = spriteCtx.createRadialGradient(center, center, r * 0.6, center, center, r * 1.8);
-      halo.addColorStop(0, `rgba(${Math.round(haloCol.r)}, ${Math.round(haloCol.g)}, ${Math.round(haloCol.b)}, ${haloCol.a})`);
-      halo.addColorStop(1, `rgba(${Math.round(haloCol.r)}, ${Math.round(haloCol.g)}, ${Math.round(haloCol.b)}, 0)`);
+      const halo = spriteCtx.createRadialGradient(center, center, r_base * 0.6, center, center, r_base * 1.8);
+      halo.addColorStop(0, `rgba(${Math.round(fHR)},${Math.round(fHG)},${Math.round(fHB)},${fHA})`);
+      halo.addColorStop(1, `rgba(${Math.round(fHR)},${Math.round(fHG)},${Math.round(fHB)},0)`);
       spriteCtx.fillStyle = halo;
       spriteCtx.beginPath();
-      spriteCtx.arc(center, center, r * 1.8, 0, Math.PI * 2);
+      spriteCtx.arc(center, center, r_base * 1.8, 0, Math.PI * 2);
       spriteCtx.fill();
 
       // 2. Mid glow
-      const mid = spriteCtx.createRadialGradient(center, center, 0, center, center, r);
-      mid.addColorStop(0.35, `rgba(${Math.round(midCol.r)}, ${Math.round(midCol.g)}, ${Math.round(midCol.b)}, ${midCol.a})`);
-      mid.addColorStop(1, `rgba(${Math.round(midCol.r)}, ${Math.round(midCol.g)}, ${Math.round(midCol.b)}, 0)`);
+      const mid = spriteCtx.createRadialGradient(center, center, 0, center, center, r_base);
+      mid.addColorStop(0.35, `rgba(${Math.round(fMR)},${Math.round(fMG)},${Math.round(fMB)},${fMA})`);
+      mid.addColorStop(1, `rgba(${Math.round(fMR)},${Math.round(fMG)},${Math.round(fMB)},0)`);
       spriteCtx.fillStyle = mid;
       spriteCtx.beginPath();
-      spriteCtx.arc(center, center, r, 0, Math.PI * 2);
+      spriteCtx.arc(center, center, r_base, 0, Math.PI * 2);
       spriteCtx.fill();
 
       // 3. Core sphere
-      const coreGrad = spriteCtx.createRadialGradient(
-        center - r * 0.08, center - r * 0.08, 0,
-        center, center, r * 0.25
-      );
-      coreGrad.addColorStop(0, `rgba(${Math.round(core.r)}, ${Math.round(core.g)}, ${Math.round(core.b)}, ${core.a})`);
-      coreGrad.addColorStop(1, `rgba(${Math.round(core.r)}, ${Math.round(core.g)}, ${Math.round(core.b)}, 0)`);
-      spriteCtx.fillStyle = coreGrad;
+      const core = spriteCtx.createRadialGradient(center - r_base * 0.08, center - r_base * 0.08, 0, center, center, r_base * 0.25);
+      core.addColorStop(0, `rgba(${Math.round(fCR)},${Math.round(fCG)},${Math.round(fCB)},${fCA})`);
+      core.addColorStop(1, `rgba(${Math.round(fCR)},${Math.round(fCG)},${Math.round(fCB)},0)`);
+      spriteCtx.fillStyle = core;
       spriteCtx.beginPath();
-      spriteCtx.arc(center, center, r * 0.25, 0, Math.PI * 2);
+      spriteCtx.arc(center, center, r_base * 0.25, 0, Math.PI * 2);
       spriteCtx.fill();
 
       // 4. Specular highlight
-      const spec = spriteCtx.createRadialGradient(
-        center - r * 0.06, center - r * 0.09, 0,
-        center - r * 0.06, center - r * 0.09, r * 0.08
-      );
-      spec.addColorStop(0, `rgba(${Math.round(specCol.r)}, ${Math.round(specCol.g)}, ${Math.round(specCol.b)}, ${specCol.a})`);
-      spec.addColorStop(1, `rgba(${Math.round(specCol.r)}, ${Math.round(specCol.g)}, ${Math.round(specCol.b)}, 0)`);
+      const specX = center - r_base * 0.06;
+      const specY = center - r_base * 0.09;
+      const spec = spriteCtx.createRadialGradient(specX, specY, 0, specX, specY, r_base * 0.08);
+      spec.addColorStop(0, `rgba(${Math.round(fSR)},${Math.round(fSG)},${Math.round(fSB)},${fSA})`);
+      spec.addColorStop(1, `rgba(${Math.round(fSR)},${Math.round(fSG)},${Math.round(fSB)},0)`);
       spriteCtx.fillStyle = spec;
       spriteCtx.beginPath();
-      spriteCtx.arc(center, center, r * 0.25, 0, Math.PI * 2);
+      spriteCtx.arc(specX, specY, r_base * 0.08, 0, Math.PI * 2); // Corrected radius
       spriteCtx.fill();
     };
 

@@ -104,6 +104,10 @@ export function Hero() {
     }
   }, [showMethodology, activeIntel]);
 
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <section
       id="hero"

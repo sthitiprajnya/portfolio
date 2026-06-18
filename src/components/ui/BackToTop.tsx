@@ -8,23 +8,17 @@ export const BackToTop = () => {
   const reducedMotion = usePrefersReducedMotion();
   useEffect(() => {
     const toggle = () => setIsVisible(window.scrollY > 400);
-    window.addEventListener('scroll', toggle);
+    // BOLT: Add passive listener to high-frequency scroll event to improve scroll performance
+    window.addEventListener('scroll', toggle, { passive: true });
     return () => window.removeEventListener('scroll', toggle);
   }, []);
-
   const scroll = () => {
     window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
-
-    // UX: Transfer focus to hero after scroll to prevent focus loss for keyboard users
-    const hero = document.getElementById('hero');
-    if (hero) {
-      // Delay focus to allow scroll to initiate and avoid immediate jump
-      setTimeout(() => {
-        hero.focus({ preventScroll: true });
-      }, 100);
-    }
+    // Accessibility: Transfer focus back to the hero section after scroll completes
+    setTimeout(() => {
+      document.getElementById('hero')?.focus({ preventScroll: true });
+    }, 100);
   };
-
   return (
     <AnimatePresence>
       {isVisible && (

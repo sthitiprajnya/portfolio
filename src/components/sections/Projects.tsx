@@ -179,7 +179,7 @@ const ProjectCard = React.memo(function ProjectCard({ project, index }: { projec
             {project.githubUrl && project.githubUrl.startsWith('http') ? (
               <a
                 href={project.githubUrl}
-                target="_blank"
+                target="_blank" rel="noopener noreferrer"
                 rel="noopener noreferrer"
                 className="text-text-muted hover:text-white transition-colors ml-4 flex-shrink-0"
                 aria-label={`View ${project.title} on GitHub`}

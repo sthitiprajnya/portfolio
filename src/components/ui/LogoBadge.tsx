@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { useState } from 'react';
 
 interface LogoBadgeProps {
   src?: string;
@@ -14,11 +15,10 @@ interface LogoBadgeProps {
 export function LogoBadge({
   src, alt, monogram = '??', width = 28, height = 28, className = ''
 }: LogoBadgeProps) {
-  const [hasError, setHasError] = useState(false);
+  const [error, setError] = useState(false);
 
-  // Security & Resilience: If src is provided and no error occurred, attempt to render the image.
-  // We use an onError handler to detect broken or invalid (e.g. 404 HTML) images and fallback to monogram.
-  if (src && !hasError) {
+  if (src && !error) {
+    // If it's a PNG that is black (like nmap.png or zabbix.png), we'll let the user add `invert dark:invert-0` in className
     return (
       <Image
         src={src}
@@ -26,12 +26,11 @@ export function LogoBadge({
         width={width}
         height={height}
         className={`object-contain ${className}`}
-        onError={() => setHasError(true)}
+        onError={() => setError(true)}
       />
     );
   }
 
-  // Fallback to monogram for missing, broken, or insecurely loaded images.
   return (
     <span
       role="img"

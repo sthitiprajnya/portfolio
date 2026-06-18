@@ -232,7 +232,7 @@ export function Contact() {
               <a
                 href={PERSONAL.linkedin}
                 target="_blank" rel="noopener noreferrer"
-was
+
                 className="group flex flex-col items-center justify-center p-6 rounded-card glass hover:border-violet hover:shadow-[var(--glow-violet-sm)] hover:-translate-y-1 transition-all outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2 focus-visible:ring-offset-black"
               >
                  <div className="w-12 h-12 rounded-pill bg-violet/10 flex items-center justify-center text-violet mb-4 group-hover:scale-110 transition-transform">

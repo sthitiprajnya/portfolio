@@ -1,3 +1,5 @@
+"use client";
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { useState } from 'react';
 
@@ -30,6 +32,7 @@ export function LogoBadge({
   }
   return (
     <span
+      role="img"
       aria-label={alt}
       title={alt}
       className={`inline-flex items-center justify-center rounded-card font-mono text-xs font-bold

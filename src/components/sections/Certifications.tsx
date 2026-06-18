@@ -134,7 +134,7 @@ const CertCard = React.memo(function CertCard({ cert }: { cert: typeof CERTIFICA
               <a
                 href={cert.verifyUrl}
                 target="_blank" rel="noopener noreferrer"
-                rel="noopener noreferrer"
+
                 aria-label={`Verify ${cert.name} certification`}
                 className={clsx(
                   "font-mono text-[0.65rem] uppercase tracking-widest flex items-center transition-colors outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card px-3 py-1.5 border",

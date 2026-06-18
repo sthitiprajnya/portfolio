@@ -9,6 +9,7 @@ import CountUp from 'react-countup';
 import { useInView } from 'react-intersection-observer';
 import { AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
+import { useScrollTo } from '@/hooks/useScrollTo';
 
 const MatrixRain = lazy(() => import('@/components/canvas/MatrixRain'));
 const NetworkConnector = lazy(() => import('@/components/canvas/NetworkConnector'));
@@ -23,35 +24,84 @@ const PRIMARY_ROLE = PERSONAL.title.split(' · ')[0];
 const NAME_CHARS = PERSONAL.nameShort.split('');
 const TYPEWRITER_SEQUENCE = HERO_ROLES.flatMap(role => [role, 2000]);
 
+// BOLT: Pre-parse numeric stat values to avoid redundant string manipulation and parsing during render
+const PROCESSED_HERO_STATS = HERO_STATS.map(stat => ({
+  ...stat,
+  numericValue: parseInt(stat.value.toString().replace(/[^0-9]/g, ''), 10)
+}));
+
 export function Hero() {
   const { ref: statsRef } = useInView({ triggerOnce: true, threshold: 0.5 });
   const [activeIntel, setActiveIntel] = React.useState<string | null>(null);
   const [showMethodology, setShowMethodology] = React.useState(false);
+  const triggerRef = React.useRef<HTMLElement | null>(null);
+  const methodologyModalRef = React.useRef<HTMLDivElement>(null);
+  const intelModalRef = React.useRef<HTMLDivElement>(null);
+  const scrollTo = useScrollTo();
 
-  // BOLT: Consolidate redundant useEffect hooks and optimize listener attachment.
-  // The listener is only attached to 'window' when a modal is actually active,
-  // reducing background event overhead when the user is simply browsing.
+  // BOLT: Performance Optimization - Consolidated Redundant Effects
+  // Consolidating redundant effects for Escape key handling, body scroll locking,
+  // and accessibility focus management (focus trapping & restoration).
   React.useEffect(() => {
-    const isModalActive = showMethodology || activeIntel !== null;
+    const hasModalOpen = showMethodology || activeIntel !== null;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        setShowMethodology(false);
-        setActiveIntel(null);
+        if (showMethodology) setShowMethodology(false);
+        if (activeIntel) setActiveIntel(null);
+        return;
+      }
+
+      if (e.key === 'Tab' && hasModalOpen) {
+        const modalRef = showMethodology ? methodologyModalRef : intelModalRef;
+        if (!modalRef.current) return;
+
+        const focusableElements = Array.from(
+          modalRef.current.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          )
+        ) as HTMLElement[];
+
+        if (focusableElements.length === 0) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
       }
     };
 
-    if (isModalActive) {
-      document.body.style.overflow = 'hidden';
+    if (hasModalOpen) {
       window.addEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'hidden';
+      // Store trigger for focus restoration
+      if (!triggerRef.current) {
+        triggerRef.current = document.activeElement as HTMLElement;
+      }
+      // Focus the close button or first element in the modal
+      setTimeout(() => {
+        const modalRef = showMethodology ? methodologyModalRef : intelModalRef;
+        const firstFocusable = modalRef.current?.querySelector('button') as HTMLElement;
+        firstFocusable?.focus();
+      }, 100);
     } else {
+      // Restore focus
+      if (triggerRef.current) {
+        triggerRef.current.focus();
+        triggerRef.current = null;
+      }
       document.body.style.overflow = '';
     }
-
-    return () => {
-      document.body.style.overflow = '';
-      window.removeEventListener('keydown', handleKeyDown);
-    };
   }, [showMethodology, activeIntel]);
 
   const scrollTo = (id: string) => {
@@ -61,7 +111,8 @@ export function Hero() {
   return (
     <section
       id="hero"
-      className="relative min-h-screen flex flex-col items-center justify-center pt-16 bg-[var(--gradient-hero)] overflow-hidden"
+      tabIndex={-1}
+      className="relative min-h-screen flex flex-col items-center justify-center pt-16 bg-[var(--gradient-hero)] overflow-hidden outline-none"
     >
       <HeroOrb />
       {/* Background effects */}
@@ -146,20 +197,17 @@ export function Hero() {
           transition={{ duration: 0.5, delay: 2.0 }}
           className="flex flex-wrap justify-center gap-x-8 gap-y-4 mb-12"
         >
-          {HERO_STATS.map((stat, i) => {
-            const numericValue = parseInt(stat.value.toString().replace(/[^0-9]/g, ''), 10);
-            return (
-              <div key={i} className="flex flex-col items-center xs:px-2">
-                <span className="font-display text-xl xs:text-2xl text-cyan mb-1 flex items-center">
-                  <CountUp end={numericValue} duration={2.5} separator="," enableScrollSpy={true} scrollSpyOnce={true} />
-                  {stat.suffix}
-                </span>
-                <span className="font-mono text-[0.55rem] xs:text-[0.6rem] uppercase tracking-widest text-text-muted text-center max-w-[80px] xs:max-w-none">
-                  {stat.label}
-                </span>
-              </div>
-            );
-          })}
+          {PROCESSED_HERO_STATS.map((stat, i) => (
+            <div key={i} className="flex flex-col items-center xs:px-2">
+              <span className="font-display text-xl xs:text-2xl text-cyan mb-1 flex items-center">
+                <CountUp end={stat.numericValue} duration={2.5} separator="," enableScrollSpy={true} scrollSpyOnce={true} />
+                {stat.suffix}
+              </span>
+              <span className="font-mono text-[0.55rem] xs:text-[0.6rem] uppercase tracking-widest text-text-muted text-center max-w-[80px] xs:max-w-none">
+                {stat.label}
+              </span>
+            </div>
+          ))}
         </motion.div>
 
         {/* CTAs */}
@@ -170,7 +218,7 @@ export function Hero() {
           className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6"
         >
           <CyberButton onClick={() => scrollTo('projects')}>VIEW_PROJECTS</CyberButton>
-          <CyberButton color="amber" onClick={() => setShowMethodology(true)} aria-haspopup="dialog">VIEW_METHODOLOGY</CyberButton>
+          <CyberButton color="amber" onClick={() => { triggerRef.current = null; setShowMethodology(true); }} aria-haspopup="dialog">VIEW_METHODOLOGY</CyberButton>
           <CyberButton color="green" onClick={() => scrollTo('contact')}>CONTACT_ME</CyberButton>
 
           <div className="flex space-x-4 pt-4 sm:pt-0 sm:ml-4">
@@ -241,6 +289,7 @@ export function Hero() {
             onClick={() => setShowMethodology(false)}
           >
             <motion.div
+              ref={methodologyModalRef}
               role="dialog"
               aria-modal="true"
               aria-labelledby="methodology-modal-title"
@@ -259,6 +308,7 @@ export function Hero() {
                   onClick={() => setShowMethodology(false)}
                   className="text-text-secondary hover:text-white transition-colors outline-none focus-visible:ring-2 focus-visible:ring-amber focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card"
                   aria-label="Close methodology modal"
+                  title="Close methodology modal"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
@@ -327,6 +377,7 @@ export function Hero() {
             onClick={() => setActiveIntel(null)}
           >
             <motion.div
+              ref={intelModalRef}
               role="dialog"
               aria-modal="true"
               aria-labelledby="intel-modal-title"

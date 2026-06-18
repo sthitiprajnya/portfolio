@@ -76,27 +76,21 @@ export default function HeroOrb() {
     let cx = 0;
     let cy = 0;
 
-    // BOLT: Use a small, fixed-size OffscreenCanvas to cache the orb sprite.
-    // This allows hardware-accelerated scaling/blitting instead of per-frame gradient calculation.
+    // BOLT: Performance Optimization - Sprite Caching
+    // Pre-rendering the orb to a small offscreen canvas (sprite) avoids expensive
+    // radial gradient and arc calculations on every 60fps frame.
     const SPRITE_SIZE = 256;
-    let offscreenCanvas: OffscreenCanvas | HTMLCanvasElement;
-    let offscreenCtx: OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D | null = null;
+    const spriteCanvas = typeof OffscreenCanvas !== 'undefined'
+      ? new OffscreenCanvas(SPRITE_SIZE, SPRITE_SIZE)
+      : document.createElement('canvas');
 
-    try {
-      if (typeof OffscreenCanvas !== 'undefined') {
-        offscreenCanvas = new OffscreenCanvas(SPRITE_SIZE, SPRITE_SIZE);
-        offscreenCtx = offscreenCanvas.getContext('2d', { alpha: true }) as OffscreenCanvasRenderingContext2D;
-      } else {
-        offscreenCanvas = document.createElement('canvas');
-        offscreenCanvas.width = SPRITE_SIZE;
-        offscreenCanvas.height = SPRITE_SIZE;
-        offscreenCtx = offscreenCanvas.getContext('2d', { alpha: true });
-      }
-    } catch (e) {
-      console.warn("OffscreenCanvas failed to initialize, falling back to direct drawing.", e);
-      offscreenCanvas = canvas;
-      offscreenCtx = ctx;
+    if (spriteCanvas instanceof HTMLCanvasElement) {
+      spriteCanvas.width = SPRITE_SIZE;
+      spriteCanvas.height = SPRITE_SIZE;
     }
+
+    const spriteCtx = spriteCanvas.getContext('2d') as CanvasRenderingContext2D;
+    let lastShiftFactor = -1;
 
     // ── Resize ──────────────────────────────────────────────────────
     const resize = () => {
@@ -140,48 +134,47 @@ export default function HeroOrb() {
     window.addEventListener('touchend', onTouchEnd, { passive: true });
 
     // ── Drawing helpers ──────────────────────────────────────────────
-    let lastShiftFactor = -1;
-
-    function drawOrbSprite(t: number) {
-      if (!offscreenCtx) return;
+    function updateSprite(t: number) {
+      if (!spriteCtx) return;
 
       const shiftFactor = (Math.sin(t * 0.05) + 1) / 2;
-      // BOLT: Only redraw the sprite if the color shift is significant (> 0.005)
-      if (Math.abs(shiftFactor - lastShiftFactor) < 0.005) return;
+      // BOLT: Only redraw the sprite when the color shift changes more than 0.5%.
+      // This saves unnecessary CPU/GPU work on most frames.
+      if (Math.abs(shiftFactor - lastShiftFactor) < 0.005 && lastShiftFactor !== -1) return;
       lastShiftFactor = shiftFactor;
 
       const center = SPRITE_SIZE / 2;
       const r = 60; // Base radius for the sprite
 
-      offscreenCtx.clearRect(0, 0, SPRITE_SIZE, SPRITE_SIZE);
+      spriteCtx.clearRect(0, 0, SPRITE_SIZE, SPRITE_SIZE);
 
       const r_core = 0 + (191 - 0) * shiftFactor;
       const g_core = 245 + (0 - 245) * shiftFactor;
-      const b_core = 255;
+      const b_core = 255 + (255 - 255) * shiftFactor;
 
-      // ── Outer halo ─────────────────────────────────────────────
-      const halo = offscreenCtx.createRadialGradient(center, center, r * 0.6, center, center, r * 1.6);
+      // ── Outer halo ───────────────────────────────────────────────
+      const halo = spriteCtx.createRadialGradient(center, center, r * 0.6, center, center, r * 1.6);
       halo.addColorStop(0,   `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0.06)`);
-      halo.addColorStop(0.5, `rgba(${Math.round(r_core)}, ${Math.round(g_core*0.75)}, ${Math.round(b_core)}, 0.03)`);
+      halo.addColorStop(0.5, `rgba(${Math.round(r_core)}, ${Math.round(g_core * 0.75)}, ${Math.round(b_core)}, 0.03)`);
       halo.addColorStop(1,   `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0)`);
-      offscreenCtx.fillStyle = halo;
-      offscreenCtx.beginPath();
-      offscreenCtx.arc(center, center, r * 1.6, 0, Math.PI * 2);
-      offscreenCtx.fill();
+      spriteCtx.fillStyle = halo;
+      spriteCtx.beginPath();
+      spriteCtx.arc(center, center, r * 1.6, 0, Math.PI * 2);
+      spriteCtx.fill();
 
       // ── Mid glow ─────────────────────────────────────────────────
-      const mid = offscreenCtx.createRadialGradient(center, center, 0, center, center, r);
+      const mid = spriteCtx.createRadialGradient(center, center, 0, center, center, r);
       mid.addColorStop(0,   `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0.18)`);
-      mid.addColorStop(0.35,`rgba(${Math.round(r_core)}, ${Math.round(g_core*0.8)}, ${Math.round(b_core)}, 0.12)`);
-      mid.addColorStop(0.7, `rgba(${Math.round(r_core)}, ${Math.round(g_core*0.6)}, ${Math.round(b_core)}, 0.05)`);
+      mid.addColorStop(0.35,`rgba(${Math.round(r_core)}, ${Math.round(g_core * 0.8)}, ${Math.round(b_core)}, 0.12)`);
+      mid.addColorStop(0.7, `rgba(${Math.round(r_core)}, ${Math.round(g_core * 0.6)}, ${Math.round(b_core)}, 0.05)`);
       mid.addColorStop(1,   `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0)`);
-      offscreenCtx.fillStyle = mid;
-      offscreenCtx.beginPath();
-      offscreenCtx.arc(center, center, r, 0, Math.PI * 2);
-      offscreenCtx.fill();
+      spriteCtx.fillStyle = mid;
+      spriteCtx.beginPath();
+      spriteCtx.arc(center, center, r, 0, Math.PI * 2);
+      spriteCtx.fill();
 
       // ── Core sphere ──────────────────────────────────────────────
-      const core = offscreenCtx.createRadialGradient(
+      const core = spriteCtx.createRadialGradient(
         center - r * 0.08, center - r * 0.08, 0,
         center, center, r * 0.28
       );
@@ -190,22 +183,22 @@ export default function HeroOrb() {
       core.addColorStop(0.5, `rgba(${Math.round(r_core)}, ${Math.round(g_core)}, ${Math.round(b_core)}, 0.45)`);
       core.addColorStop(0.8, `rgba(${Math.round(r_core)}, ${Math.round(g_core*0.65)}, ${Math.round(b_core*0.8)}, 0.20)`);
       core.addColorStop(1,   `rgba(${Math.round(r_core)}, ${Math.round(g_core*0.3)}, ${Math.round(b_core*0.8)}, 0)`);
-      offscreenCtx.fillStyle = core;
-      offscreenCtx.beginPath();
-      offscreenCtx.arc(center, center, r * 0.28, 0, Math.PI * 2);
-      offscreenCtx.fill();
+      spriteCtx.fillStyle = core;
+      spriteCtx.beginPath();
+      spriteCtx.arc(center, center, r * 0.28, 0, Math.PI * 2);
+      spriteCtx.fill();
 
-      // ── Specular highlight ────────────────────────────────────────
+      // ── Specular highlight ───────────────────────────────────────
       const specX = center - r * 0.06;
       const specY = center - r * 0.09;
-      const spec = offscreenCtx.createRadialGradient(specX, specY, 0, specX, specY, r * 0.10);
+      const spec = spriteCtx.createRadialGradient(specX, specY, 0, specX, specY, r * 0.10);
       spec.addColorStop(0,   'rgba(255, 255, 255, 0.70)');
       spec.addColorStop(0.5, 'rgba(255, 255, 255, 0.20)');
       spec.addColorStop(1,   'rgba(255, 255, 255, 0)');
-      offscreenCtx.fillStyle = spec;
-      offscreenCtx.beginPath();
-      offscreenCtx.arc(specX, specY, r * 0.10, 0, Math.PI * 2);
-      offscreenCtx.fill();
+      spriteCtx.fillStyle = spec;
+      spriteCtx.beginPath();
+      spriteCtx.arc(specX, specY, r * 0.10, 0, Math.PI * 2);
+      spriteCtx.fill();
     }
 
     // ── Animation loop ───────────────────────────────────────────────
@@ -251,22 +244,16 @@ export default function HeroOrb() {
       o.x += o.vx;
       o.y += o.vy;
 
-      // BOLT: Blit the cached sprite to the main canvas.
-      // drawImage() is significantly faster than creating radial gradients every frame.
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawOrbSprite(o.t);
+      // BOLT: Use pre-rendered sprite for drawing.
+      // drawImage() is hardware-accelerated and much faster than re-calculating gradients.
+      updateSprite(o.t);
+      if (ctx && canvas) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      const pulse = 1 + 0.06 * Math.sin(o.t * 4);
-      const drawSize = SPRITE_SIZE * pulse;
-      const offset = drawSize / 2;
-
-      ctx.drawImage(
-        offscreenCanvas,
-        o.x - offset,
-        o.y - offset,
-        drawSize,
-        drawSize
-      );
+        const pulse = 1 + 0.06 * Math.sin(o.t * 4);
+        const drawSize = SPRITE_SIZE * pulse;
+        ctx.drawImage(spriteCanvas as CanvasImageSource, o.x - drawSize / 2, o.y - drawSize / 2, drawSize, drawSize);
+      }
 
       rafRef.current = requestAnimationFrame(tick);
     }

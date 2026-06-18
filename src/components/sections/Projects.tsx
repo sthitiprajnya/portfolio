@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { SectionTitle } from '@/components/ui/SectionTitle';
@@ -17,8 +17,9 @@ const FILTERS = [
   { id: 'automation', label: 'AUTOMATION' },
 ];
 
-// BOLT: Hoist static data transformations to the module level.
-// Pre-calculating filter counts avoids redundant O(N*F) work on every component mount.
+// BOLT: Hoist static filter counts calculation to the module level.
+// This avoids redundant O(N*M) calculations on every render or useMemo cycle,
+// reducing GC pressure especially during interaction.
 const FILTER_COUNTS = FILTERS.reduce((acc, filter) => {
   acc[filter.id] = filter.id === 'all'
     ? PROJECTS.length
@@ -29,13 +30,46 @@ const FILTER_COUNTS = FILTERS.reduce((acc, filter) => {
 export function Projects() {
   const [activeFilter, setActiveFilter] = useState('all');
   const prefersReducedMotion = usePrefersReducedMotion();
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
+    let newIndex = -1;
+    const tabs = FILTERS;
+
+    switch (e.key) {
+      case 'ArrowRight':
+        newIndex = (index + 1) % tabs.length;
+        break;
+      case 'ArrowLeft':
+        newIndex = (index - 1 + tabs.length) % tabs.length;
+        break;
+      case 'Home':
+        newIndex = 0;
+        break;
+      case 'End':
+        newIndex = tabs.length - 1;
+        break;
+      default:
+        return;
+    }
+
+    if (newIndex !== -1) {
+      e.preventDefault();
+      setActiveFilter(tabs[newIndex].id);
+      tabRefs.current[newIndex]?.focus();
+    }
+  };
 
   const filteredProjects = useMemo(() => PROJECTS.filter(p =>
     activeFilter === 'all' ? true : p.category === activeFilter
   ), [activeFilter]);
 
   return (
-    <section id="projects" className="py-32 bg-black relative border-t border-border overflow-hidden">
+    <section
+      id="projects"
+      tabIndex={-1}
+      className="py-32 bg-black relative border-t border-border overflow-hidden outline-none"
+    >
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <SectionTitle number="04" title="Things I Built." />
 
@@ -45,22 +79,31 @@ export function Projects() {
         </div>
 
         {/* Filter Tabs */}
-        <ScrollReveal variants={fadeSlideUp} className="flex flex-wrap gap-3 mb-12">
-          {FILTERS.map(filter => {
+        <ScrollReveal
+          variants={fadeSlideUp}
+          className="flex flex-wrap gap-3 mb-12"
+          role="tablist"
+          aria-label="Project categories"
+        >
+          {FILTERS.map((filter, idx) => {
             const isActive = activeFilter === filter.id;
             const count = FILTER_COUNTS[filter.id];
 
             return (
               <button
                 key={filter.id}
+                ref={(el) => { tabRefs.current[idx] = el; }}
                 onClick={() => setActiveFilter(filter.id)}
+                onKeyDown={(e) => handleKeyDown(e, idx)}
+                role="tab"
+                aria-selected={isActive}
+                tabIndex={isActive ? 0 : -1}
                 className={clsx(
                   "font-mono text-xs uppercase tracking-widest px-5 py-2 transition-all duration-300 rounded-card border outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black flex items-center gap-2 group",
                   isActive
                     ? "bg-cyan border-cyan text-black shadow-[var(--glow-cyan-sm)] font-bold"
                     : "bg-transparent border-border text-text-secondary hover:text-cyan hover:border-cyan/50"
                 )}
-                aria-pressed={isActive}
                 aria-label={`Filter by ${filter.label} (${count} projects)`}
               >
                 <span>{filter.label}</span>
@@ -114,7 +157,7 @@ const ProjectCard = React.memo(function ProjectCard({ project, index }: { projec
     >
       <div
         ref={ref as unknown as React.RefObject<HTMLDivElement>}
-        data-orb-target="project"
+        data-orb-target={`project-${index}`}
         className="w-full flex flex-col group glass rounded-card relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--glass-shadow-hover)] cursor-pointer"
         style={prefersReducedMotion ? {} : { transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`, transformStyle: 'preserve-3d' }}
       >
@@ -174,8 +217,8 @@ const ProjectCard = React.memo(function ProjectCard({ project, index }: { projec
             {project.githubUrl && project.githubUrl.startsWith('http') ? (
               <a
                 href={project.githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+                target="_blank" rel="noopener noreferrer"
+
                 className="text-text-muted hover:text-white transition-colors ml-4 flex-shrink-0"
                 aria-label={`View ${project.title} on GitHub`}
                 title={`View ${project.title} on GitHub`}

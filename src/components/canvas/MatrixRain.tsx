@@ -88,6 +88,8 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
       fontSize = Math.max(12, Math.min(18, window.innerWidth / 80));
       ctx.font = `${fontSize}px "JetBrains Mono", monospace`;
 
+      cacheMeta = updateGlyphCache();
+
       columns = Math.floor(width / fontSize);
 
       // BOLT: Use TypedArrays for better performance and memory efficiency in the hot loop.
@@ -148,6 +150,8 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
 
       const dropsLen = drops.length;
       const charCount = MATRIX_CHAR_LEN;
+      const { cellW, cellH } = cacheMeta;
+      const trailLen = TRAIL_LENGTH + 1;
 
       // BOLT: Performance Implementation - Glyph Caching
       // Replacing O(N * T) expensive vector text draws with hardware-accelerated drawImage() blits.

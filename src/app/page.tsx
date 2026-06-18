@@ -3,6 +3,7 @@
 import React from 'react';
 import { Preloader }            from '@/components/sections/Preloader';
 import { Navigation }           from '@/components/sections/Navigation';
+import { BackToTop }            from '@/components/ui/BackToTop';
 import { CommandPalette }       from '@/components/global/CommandPalette';
 import { ScrollProgress }       from '@/components/global/ScrollProgress';
 import { BackToTop }            from '@/components/ui/BackToTop';

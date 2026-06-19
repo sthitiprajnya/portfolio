@@ -11,3 +11,6 @@
 ## 2026-06-15 - Focus Management for Dynamic Terminal States
 **Learning:** In terminal-style UIs or forms with "success" states that replace the original interactive elements, keyboard users can easily lose their focus position. Programmatically moving focus to a "Reset" or "Next Action" button within the new state ensures a continuous and accessible user journey.
 **Action:** When an async operation completes and replaces the UI, use a React ref and useEffect to immediately transfer focus to the primary interactive element in the success state.
+## 2026-06-19 - [Added aria-pressed to AsciiAvatar toggle button]
+**Learning:** Found an accessibility issue where the 'isHuman' / 'isScan' toggle button lacked the `aria-pressed` attribute, missing a crucial state representation for screen reader users on this interactive element.
+**Action:** Always ensure toggle buttons that represent binary states use `aria-pressed` to semantically communicate their state to assistive technologies.

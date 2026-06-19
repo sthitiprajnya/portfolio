@@ -1,42 +1,55 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { BackToTop } from '../BackToTop';
-import { expect, test, vi, beforeEach } from 'vitest';
+import { expect, test, vi, beforeEach, describe } from 'vitest';
+import React, { ReactNode } from 'react';
 
-// Mock CyberButton since it might have complex logic/styles
-vi.mock('../CyberButton', () => ({
-  CyberButton: ({ children, onClick, ...props }: any) => (
-    <button onClick={onClick} {...props}>{children}</button>
-  )
-}));
+interface MockProps {
+  children?: ReactNode;
+  onClick?: () => void;
+  [key: string]: unknown;
+}
 
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+    div: ({ children, ...props }: MockProps) => <div {...props}>{children}</div>,
+    button: ({ children, onClick, ...props }: MockProps) => (
+      <button onClick={onClick} {...props}>
+        {children}
+      </button>
+    ),
   },
-  AnimatePresence: ({ children }: any) => <>{children}</>
+  AnimatePresence: ({ children }: { children: ReactNode }) => <>{children}</>
+}));
+
+// Mock the hook
+vi.mock('@/hooks/usePrefersReducedMotion', () => ({
+  usePrefersReducedMotion: () => false
 }));
 
 describe('BackToTop', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Reset window.scrollY
-    Object.defineProperty(window, 'scrollY', { value: 0, writable: true });
+    Object.defineProperty(window, 'scrollY', { value: 0, writable: true, configurable: true });
+    vi.useFakeTimers();
   });
 
   test('should not be visible initially', () => {
     render(<BackToTop />);
-    expect(screen.queryByLabelText('Scroll back to top')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Back to top')).not.toBeInTheDocument();
   });
 
   test('should become visible after scrolling down 400px', () => {
     render(<BackToTop />);
 
     // Simulate scroll
-    Object.defineProperty(window, 'scrollY', { value: 401, writable: true });
-    fireEvent.scroll(window);
+    act(() => {
+      Object.defineProperty(window, 'scrollY', { value: 401, writable: true, configurable: true });
+      window.dispatchEvent(new Event('scroll'));
+    });
 
-    expect(screen.getByLabelText('Scroll back to top')).toBeInTheDocument();
+    expect(screen.getByLabelText('Back to top')).toBeInTheDocument();
   });
 
   test('should scroll to top when clicked', () => {
@@ -46,10 +59,12 @@ describe('BackToTop', () => {
     render(<BackToTop />);
 
     // Make it visible
-    Object.defineProperty(window, 'scrollY', { value: 401, writable: true });
-    fireEvent.scroll(window);
+    act(() => {
+      Object.defineProperty(window, 'scrollY', { value: 401, writable: true, configurable: true });
+      window.dispatchEvent(new Event('scroll'));
+    });
 
-    const button = screen.getByLabelText('Scroll back to top');
+    const button = screen.getByLabelText('Back to top');
     fireEvent.click(button);
 
     expect(scrollToSpy).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' });

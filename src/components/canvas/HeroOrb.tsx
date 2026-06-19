@@ -40,8 +40,6 @@ const MOUSE_RANGE_SQ = MOUSE_RANGE * MOUSE_RANGE;
 
 // ── Sprite constants ─────────────────────────────────────────────
 const SPRITE_SIZE = 256;
-const SPRITE_CENTER = SPRITE_SIZE / 2;
-const BASE_R = 60;
 
 export default function HeroOrb() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -84,7 +82,6 @@ export default function HeroOrb() {
     // BOLT: Performance Optimization - Sprite Caching
     // Pre-rendering the orb to a small offscreen canvas (sprite) avoids expensive
     // radial gradient and arc calculations on every 60fps frame.
-    const SPRITE_SIZE = 256;
     const spriteCanvas = typeof OffscreenCanvas !== 'undefined'
       ? new OffscreenCanvas(SPRITE_SIZE, SPRITE_SIZE)
       : document.createElement('canvas');

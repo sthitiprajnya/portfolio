@@ -40,8 +40,6 @@ export function Hero() {
   const scrollTo = useScrollTo();
 
   // BOLT: Performance Optimization - Consolidated Redundant Effects
-  // Consolidating redundant effects for Escape key handling, body scroll locking,
-  // and accessibility focus management (focus trapping & restoration).
   React.useEffect(() => {
     const hasModalOpen = showMethodology || activeIntel !== null;
 
@@ -102,11 +100,12 @@ export function Hero() {
       }
       document.body.style.overflow = '';
     }
-  }, [showMethodology, activeIntel]);
 
-  const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-  };
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [showMethodology, activeIntel]);
 
   return (
     <section

@@ -145,6 +145,7 @@ export function AsciiAvatar({ className }: AsciiAvatarProps) {
         {/* Toggle Switch */}
         <button
           onClick={() => setIsHuman(!isHuman)}
+          aria-pressed={isHuman}
           className="ml-auto flex items-center bg-black/50 rounded-pill border border-cyan/30 p-0.5 w-20 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-1 focus-visible:ring-offset-black glass-pill"
           aria-label={isHuman ? "Switch to SCAN mode" : "Switch to HUMAN mode"}
           title={isHuman ? "Switch to SCAN mode" : "Switch to HUMAN mode"}

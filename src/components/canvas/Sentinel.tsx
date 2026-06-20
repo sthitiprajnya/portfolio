@@ -141,8 +141,8 @@ export default function Sentinel() {
       spriteCanvas.height = SPRITE_SIZE;
     }
     const spriteCtx = spriteCanvas.getContext('2d') as CanvasRenderingContext2D;
-
-    let lastR = -1, lastG = -1, lastB = -1, lastA = -1;
+    // eslint-disable-next-line prefer-const, @typescript-eslint/no-unused-vars
+      let lastRenderedColor = { r: -1, g: -1, b: -1, a: -1 };
 
     let width = window.innerWidth;
     let height = window.innerHeight;
@@ -193,6 +193,7 @@ export default function Sentinel() {
       sectionObserver.observe(el);
     });
 
+    let lastR = -1; let lastG = -1; let lastB = -1; let lastA = -1;
     const updateSprite = (
       fCR: number, fCG: number, fCB: number, fCA: number,
       fMR: number, fMG: number, fMB: number, fMA: number,
@@ -203,6 +204,7 @@ export default function Sentinel() {
       lastR = fCR; lastG = fCG; lastB = fCB; lastA = fCA;
 
       const center = SPRITE_SIZE / 2;
+      const r = 60;
       const r_base = 60;
 
       spriteCtx.clearRect(0, 0, SPRITE_SIZE, SPRITE_SIZE);
@@ -238,8 +240,8 @@ export default function Sentinel() {
       spriteCtx.fill();
 
       // 4. Specular highlight
-      const specX = center - r_base * 0.06;
-      const specY = center - r_base * 0.09;
+      const specX = center - r * 0.06;
+      const specY = center - r * 0.09;
       const spec = spriteCtx.createRadialGradient(
         specX, specY, 0,
         specX, specY, r_base * 0.08
@@ -308,6 +310,10 @@ export default function Sentinel() {
       s.trailIndex = (s.trailIndex + 1) % 8;
 
       const tTheme = targetThemeRef.current;
+      const tCore = tTheme.core;
+      const tMid = tTheme.mid;
+      const tHalo = tTheme.halo;
+      const tSpec = tTheme.specular;
       const cur = currentColorRef.current;
       const COLOR_LERP = 0.04;
 
@@ -328,16 +334,17 @@ export default function Sentinel() {
       cur.specB = lerpColor(cur.specB, tTheme.specular.b, COLOR_LERP);
       cur.specA = lerpColor(cur.specA, tTheme.specular.a, COLOR_LERP);
 
-      const vCore = VIOLET_THEME.core;
-      const vMid = VIOLET_THEME.mid;
-      const vHalo = VIOLET_THEME.halo;
-      const vSpec = VIOLET_THEME.specular;
-      const p = colorProximityRef.current;
+      const vCore = VIOLET_THEME.core;      const p = colorProximityRef.current;
 
       const finalCoreR = lerpColor(cur.coreR, vCore.r, p);
       const finalCoreG = lerpColor(cur.coreG, vCore.g, p);
       const finalCoreB = lerpColor(cur.coreB, vCore.b, p);
       const finalCoreA = lerpColor(cur.coreA, vCore.a, p);
+
+      const vMid = VIOLET_THEME.mid;
+      const vHalo = VIOLET_THEME.halo;
+
+      const vSpec = VIOLET_THEME.specular;
 
       const finalMidR = lerpColor(cur.midR, vMid.r, p);
       const finalMidG = lerpColor(cur.midG, vMid.g, p);
@@ -354,6 +361,13 @@ export default function Sentinel() {
       const finalSpecB = lerpColor(cur.specB, vSpec.b, p);
       const finalSpecA = lerpColor(cur.specA, vSpec.a, p);
 
+      const finalSpecR = lerpColor(cur.specR, vSpec.r, p);
+      const finalSpecG = lerpColor(cur.specG, vSpec.g, p);
+      const finalSpecB = lerpColor(cur.specB, vSpec.b, p);
+      const finalSpecA = lerpColor(cur.specA, vSpec.a, p);
+
+      // BOLT: Hardware-accelerated drawImage() with sprite caching replaces 4 expensive per-frame radial gradient draws.
+      // Reusing static objects to avoid per-frame allocations if needed, but here simple literals are fine for RgbaColor
       updateSprite(
         finalCoreR, finalCoreG, finalCoreB, finalCoreA,
         finalMidR, finalMidG, finalMidB, finalMidA,

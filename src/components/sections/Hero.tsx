@@ -100,13 +100,7 @@ export function Hero() {
       }
       document.body.style.overflow = '';
     }
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = '';
-    };
   }, [showMethodology, activeIntel]);
-
   return (
     <section
       id="hero"

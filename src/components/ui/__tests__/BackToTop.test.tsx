@@ -1,72 +1,66 @@
-import { render, screen, fireEvent, act } from '@testing-library/react';
-import { BackToTop } from '../BackToTop';
-import { expect, test, vi, beforeEach, describe } from 'vitest';
-import React, { ReactNode } from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 
-interface MockProps {
-  children?: ReactNode;
-  onClick?: () => void;
-  [key: string]: unknown;
-}
+vi.mock('@/hooks/usePrefersReducedMotion', () => ({
+  usePrefersReducedMotion: vi.fn(() => false),
+}));
 
-// Mock framer-motion to avoid animation issues in tests
+// Mock framer-motion properly using vi.mock with an inline factory
 vi.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, ...props }: MockProps) => <div {...props}>{children}</div>,
-    button: ({ children, onClick, ...props }: MockProps) => (
-      <button onClick={onClick} {...props}>
-        {children}
-      </button>
-    ),
+    button: (props: any) => {
+      const { initial, animate, exit, ...rest } = props;
+      return <button {...rest} />;
+    },
+    div: (props: any) => {
+      const { initial, animate, exit, ...rest } = props;
+      return <div {...rest} />;
+    },
   },
-  AnimatePresence: ({ children }: { children: ReactNode }) => <>{children}</>
+  AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
-// Mock the hook
-vi.mock('@/hooks/usePrefersReducedMotion', () => ({
-  usePrefersReducedMotion: () => false
-}));
+import { BackToTop } from '../BackToTop';
 
 describe('BackToTop', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-    // Reset window.scrollY
-    Object.defineProperty(window, 'scrollY', { value: 0, writable: true, configurable: true });
+    vi.stubGlobal('scrollTo', vi.fn());
+    // Start with scrollY at 0
+    Object.defineProperty(window, 'scrollY', { value: 0, writable: true });
     vi.useFakeTimers();
   });
 
-  test('should not be visible initially', () => {
-    render(<BackToTop />);
-    expect(screen.queryByLabelText('Back to top')).not.toBeInTheDocument();
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
-  test('should become visible after scrolling down 400px', () => {
+  it('should not be visible initially', () => {
     render(<BackToTop />);
-
-    // Simulate scroll
-    act(() => {
-      Object.defineProperty(window, 'scrollY', { value: 401, writable: true, configurable: true });
-      window.dispatchEvent(new Event('scroll'));
-    });
-
-    expect(screen.getByLabelText('Back to top')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /back to top/i })).not.toBeInTheDocument();
   });
 
-  test('should scroll to top when clicked', () => {
-    const scrollToSpy = vi.fn();
-    window.scrollTo = scrollToSpy;
-
+  it('should become visible after scrolling down 400px', () => {
     render(<BackToTop />);
+    expect(screen.queryByRole('button', { name: /back to top/i })).not.toBeInTheDocument();
 
-    // Make it visible
-    act(() => {
-      Object.defineProperty(window, 'scrollY', { value: 401, writable: true, configurable: true });
-      window.dispatchEvent(new Event('scroll'));
-    });
+    window.scrollY = 401;
+    fireEvent.scroll(window);
 
-    const button = screen.getByLabelText('Back to top');
+    expect(screen.getByRole('button', { name: /back to top/i })).toBeInTheDocument();
+  });
+
+  it('should scroll to top when clicked', () => {
+    window.scrollY = 401;
+    render(<BackToTop />);
+    fireEvent.scroll(window);
+
+    const button = screen.getByRole('button', { name: /back to top/i });
     fireEvent.click(button);
 
-    expect(scrollToSpy).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' });
+    expect(window.scrollTo).toHaveBeenCalledWith({
+      top: 0,
+      behavior: 'smooth',
+    });
   });
 });

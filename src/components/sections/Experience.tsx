@@ -1,7 +1,6 @@
 "use client";
 import React, { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useScroll, useTransform } from 'framer-motion';
 import clsx from 'clsx';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
@@ -57,12 +56,70 @@ export function Experience() {
   const containerRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
 
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start center", "end center"]
-  });
+  const timelineRef = useRef<HTMLDivElement>(null);
 
-  const scaleY = useTransform(scrollYProgress, [0, 1], [0, 1]);
+  // BOLT: Replaced heavy framer-motion useScroll with native vanilla JS scroll listener
+  // and cached layout metrics to eliminate React render cycle overhead and layout thrashing.
+  React.useEffect(() => {
+    if (prefersReducedMotion) return;
+    const container = containerRef.current;
+    const timeline = timelineRef.current;
+    if (!container || !timeline) return;
+
+    let rafId: number | null = null;
+    let cachedTop = 0;
+    let cachedHeight = 0;
+    let cachedWindowHeight = 0;
+
+    const updateMetrics = () => {
+      const rect = container.getBoundingClientRect();
+      cachedTop = rect.top + window.scrollY;
+      cachedHeight = rect.height;
+      cachedWindowHeight = window.innerHeight;
+      calculateTarget();
+    };
+
+    const calculateTarget = () => {
+      const scrollY = window.scrollY;
+      const center = cachedWindowHeight / 2;
+      const currentRectTop = cachedTop - scrollY;
+      const distanceScrolled = center - currentRectTop;
+
+      let progress = 0;
+      if (cachedHeight > 0) {
+        progress = distanceScrolled / cachedHeight;
+      }
+      progress = Math.min(1, Math.max(0, progress));
+
+      timeline.style.transform = `scaleY(${progress})`;
+      rafId = null;
+    };
+
+    const onScroll = () => {
+      if (!rafId) {
+        rafId = requestAnimationFrame(calculateTarget);
+      }
+    };
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateMetrics();
+    });
+
+    resizeObserver.observe(container);
+    resizeObserver.observe(document.body);
+
+    updateMetrics();
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', updateMetrics, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', updateMetrics);
+      resizeObserver.disconnect();
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, [prefersReducedMotion]);
 
   return (
     <section
@@ -78,11 +135,13 @@ export function Experience() {
           {/* Animated Timeline Line */}
           <div className="absolute top-0 left-0 bottom-0 w-[2px] bg-border z-0">
             {!prefersReducedMotion ? (
-              <motion.div
+              <div
+                ref={timelineRef}
                 className="absolute top-0 left-0 w-full h-full origin-top"
                 style={{
                   background: 'linear-gradient(to bottom, var(--color-cyan), var(--color-violet))',
-                  scaleY
+                  transform: 'scaleY(0)',
+                  willChange: 'transform'
                 }}
               />
             ) : (

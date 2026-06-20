@@ -74,9 +74,8 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
     let glitchMask: Uint8Array; // BOLT: Bitmask for O(1) glitch column lookup
 
     // BOLT: Glyph caching to avoid expensive ctx.fillText() in the 60fps loop.
-    // We pre-render all characters in all trail/glitch colors to an offscreen canvas.
     const glyphCacheCanvas = typeof OffscreenCanvas !== 'undefined'
-      ? new OffscreenCanvas(fontSize * MATRIX_CHAR_LEN, fontSize * (TRAIL_LENGTH + 1) * 2)
+      ? new OffscreenCanvas(0, 0)
       : document.createElement('canvas');
     const glyphCtx = glyphCacheCanvas.getContext('2d') as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
 
@@ -112,8 +111,11 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
           glyphCacheCanvas.getContext('2d')!.fillText(MATRIX_CHARS[i], i * fontSize, (j + TRAIL_LENGTH + 1) * fontSize);
         }
       }
+    };
 
-      ctx.font = `${fontSize}px "JetBrains Mono", monospace`;
+    const resize = () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
 
       updateGlyphCache();
 
@@ -130,37 +132,12 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
         speeds[i] = 0.3 + Math.random() * 0.6; // Speed between 0.3 and 0.9
         xCoords[i] = i * fontSize;
       }
-
-      // BOLT: Pre-render glyphs into the cache canvas
-      if (glyphCtx) {
-        if (glyphCacheCanvas instanceof HTMLCanvasElement) {
-          glyphCacheCanvas.width = fontSize * MATRIX_CHAR_LEN;
-          glyphCacheCanvas.height = fontSize * (TRAIL_LENGTH + 1) * 2;
-        }
-        glyphCtx.font = `${fontSize}px "JetBrains Mono", monospace`;
-        glyphCtx.textBaseline = 'top';
-        glyphCtx.textAlign = 'left';
-
-        // Row j: Trail level j colors
-        for (let j = 0; j <= TRAIL_LENGTH; j++) {
-          // Normal trail glyphs
-          glyphCtx.fillStyle = TRAIL_COLORS[j];
-          for (let i = 0; i < MATRIX_CHAR_LEN; i++) {
-            glyphCtx.fillText(MATRIX_CHARS[i], i * fontSize, j * fontSize);
-          }
-
-          // Glitch trail glyphs (offset by (TRAIL_LENGTH + 1) * fontSize vertically)
-          glyphCtx.fillStyle = GLITCH_TRAIL_COLORS[j];
-          for (let i = 0; i < MATRIX_CHAR_LEN; i++) {
-            glyphCtx.fillText(MATRIX_CHARS[i], i * fontSize, (j + TRAIL_LENGTH + 1) * fontSize);
-          }
-        }
-      }
     };
 
-    // Day 6: Glitch Burst state
+    // Glitch Burst state
     let isGlitching = false;
     let glitchTimeoutId: ReturnType<typeof setTimeout>;
+    const glitchIndices: number[] = [];
 
     // BOLT: Performance Optimization - Glyph Caching
     // Pre-rendering the entire character set into an offscreen canvas (glyph cache)
@@ -192,7 +169,6 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
       updateGlyphCache();
     }, { passive: true });
     resize();
-    updateGlyphCache();
 
     const draw = () => {
       if (!inView) {
@@ -210,9 +186,6 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
       const trailLen = TRAIL_LENGTH + 1;
 
       // BOLT: Performance Implementation - Glyph Caching
-      // Replacing O(N * T) expensive vector text draws with hardware-accelerated drawImage() blits.
-      // Expected impact: ~40% reduction in CPU time for MatrixRain draw loop.
-
       for (let j = TRAIL_LENGTH; j >= 0; j--) {
         // Process glitching columns first for this trail level.
         if (isGlitching) {
@@ -220,7 +193,7 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
           for (let i = 0; i < glitchIndices.length; i++) {
             const idx = glitchIndices[i];
             const y = (drops[idx] - j) * fontSize;
-            if (y < 0 || y > height + fontSize) continue;
+            if (y < -fontSize || y > height) continue;
 
             const charIdx = Math.floor(fastRand() * charCount);
             ctx.drawImage(
@@ -236,7 +209,7 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
         for (let i = 0; i < dropsLen; i++) {
           if (isGlitching && glitchMask[i] === 1) continue;
           const y = (drops[i] - j) * fontSize;
-          if (y < 0 || y > height + fontSize) continue;
+          if (y < -fontSize || y > height) continue;
 
           const charIdx = Math.floor(fastRand() * charCount);
           ctx.drawImage(
@@ -247,7 +220,7 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
         }
       }
 
-      // BOLT: Single pass for drop updates to maintain logic integrity while separating from batched render calls
+      // BOLT: Single pass for drop updates
       for (let i = 0; i < dropsLen; i++) {
         const y = drops[i] * fontSize;
         // Reset drop if at bottom or randomly
@@ -261,8 +234,6 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
 
       animationFrameId = requestAnimationFrame(draw);
     };
-
-    const glitchIndices: number[] = [];
 
     // Day 6: Glitch burst scheduler
     const scheduleGlitch = () => {
@@ -289,7 +260,6 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
     };
 
     scheduleGlitch();
-
     draw();
 
     return () => {

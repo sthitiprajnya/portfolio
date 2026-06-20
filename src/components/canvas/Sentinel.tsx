@@ -70,7 +70,6 @@ const SECTION_THEMES: Record<string, {
   contact:        { core: 'rgba(0,245,255,1)',   mid: 'rgba(0,220,255,0.5)', halo: 'rgba(0,245,255,0.12)', specular: 'rgba(255,255,255,0.9)' },
 };
 
-// BOLT: Pre-parse color themes into numeric objects at the module level to avoid regex and string parsing in 60fps loop.
 const PARSED_SECTION_THEMES = Object.fromEntries(
   Object.entries(SECTION_THEMES).map(([key, theme]) => [
     key,
@@ -81,7 +80,7 @@ const PARSED_SECTION_THEMES = Object.fromEntries(
       specular: parseRgba(theme.specular),
     }
   ])
-);
+) as Record<string, ParsedTheme>;
 
 const DEFAULT_THEME = PARSED_SECTION_THEMES.hero;
 const VIOLET_THEME = PARSED_SECTION_THEMES.about;
@@ -117,10 +116,10 @@ export default function Sentinel() {
   });
 
   const currentColorRef = useRef({
-    coreR: 0, coreG: 245, coreB: 255, coreA: 1,
-    midR:  0, midG:  200, midB:  255, midA: 0.4,
-    haloR: 0, haloG: 245, haloB: 255, haloA: 0.08,
-    specR: 255, specG: 255, specB: 255, specA: 0.9,
+    coreR: DEFAULT_THEME.core.r, coreG: DEFAULT_THEME.core.g, coreB: DEFAULT_THEME.core.b, coreA: DEFAULT_THEME.core.a,
+    midR:  DEFAULT_THEME.mid.r,  midG:  DEFAULT_THEME.mid.g,  midB:  DEFAULT_THEME.mid.b,  midA:  DEFAULT_THEME.mid.a,
+    haloR: DEFAULT_THEME.halo.r, haloG: DEFAULT_THEME.halo.g, haloB: DEFAULT_THEME.halo.b, haloA: DEFAULT_THEME.halo.a,
+    specR: DEFAULT_THEME.specular.r, specG: DEFAULT_THEME.specular.g, specB: DEFAULT_THEME.specular.b, specA: DEFAULT_THEME.specular.a,
   });
 
   useEffect(() => {
@@ -132,8 +131,6 @@ export default function Sentinel() {
     if (!ctx) return;
 
     // BOLT: Performance Optimization - Sprite Caching
-    // Pre-rendering the sentinel orb to an offscreen canvas avoids 4 expensive
-    // radial gradient calculations per frame in the 60fps loop.
     const SPRITE_SIZE = 256;
     const spriteCanvas = typeof OffscreenCanvas !== 'undefined'
       ? new OffscreenCanvas(SPRITE_SIZE, SPRITE_SIZE)
@@ -213,47 +210,47 @@ export default function Sentinel() {
       spriteCtx.clearRect(0, 0, SPRITE_SIZE, SPRITE_SIZE);
 
       // 1. Outer halo
-      const halo = spriteCtx.createRadialGradient(center, center, r * 0.6, center, center, r * 1.8);
+      const halo = spriteCtx.createRadialGradient(center, center, r_base * 0.6, center, center, r_base * 1.8);
       halo.addColorStop(0, `rgba(${Math.round(fHR)}, ${Math.round(fHG)}, ${Math.round(fHB)}, ${fHA})`);
       halo.addColorStop(1, `rgba(${Math.round(fHR)}, ${Math.round(fHG)}, ${Math.round(fHB)}, 0)`);
       spriteCtx.fillStyle = halo;
       spriteCtx.beginPath();
-      spriteCtx.arc(center, center, r * 1.8, 0, Math.PI * 2);
+      spriteCtx.arc(center, center, r_base * 1.8, 0, Math.PI * 2);
       spriteCtx.fill();
 
       // 2. Mid glow
-      const mid = spriteCtx.createRadialGradient(center, center, 0, center, center, r);
+      const mid = spriteCtx.createRadialGradient(center, center, 0, center, center, r_base);
       mid.addColorStop(0.35, `rgba(${Math.round(fMR)}, ${Math.round(fMG)}, ${Math.round(fMB)}, ${fMA})`);
       mid.addColorStop(1, `rgba(${Math.round(fMR)}, ${Math.round(fMG)}, ${Math.round(fMB)}, 0)`);
       spriteCtx.fillStyle = mid;
       spriteCtx.beginPath();
-      spriteCtx.arc(center, center, r, 0, Math.PI * 2);
+      spriteCtx.arc(center, center, r_base, 0, Math.PI * 2);
       spriteCtx.fill();
 
       // 3. Core sphere
       const coreGrad = spriteCtx.createRadialGradient(
-        center - r * 0.08, center - r * 0.08, 0,
-        center, center, r * 0.25
+        center - r_base * 0.08, center - r_base * 0.08, 0,
+        center, center, r_base * 0.25
       );
       coreGrad.addColorStop(0, `rgba(${Math.round(fCR)}, ${Math.round(fCG)}, ${Math.round(fCB)}, ${fCA})`);
       coreGrad.addColorStop(1, `rgba(${Math.round(fCR)}, ${Math.round(fCG)}, ${Math.round(fCB)}, 0)`);
       spriteCtx.fillStyle = coreGrad;
       spriteCtx.beginPath();
-      spriteCtx.arc(center, center, r * 0.25, 0, Math.PI * 2);
+      spriteCtx.arc(center, center, r_base * 0.25, 0, Math.PI * 2);
       spriteCtx.fill();
 
       // 4. Specular highlight
       const specX = center - r * 0.06;
       const specY = center - r * 0.09;
       const spec = spriteCtx.createRadialGradient(
-        center - r * 0.06, center - r * 0.09, 0,
-        center - r * 0.06, center - r * 0.09, r * 0.08
+        specX, specY, 0,
+        specX, specY, r_base * 0.08
       );
       spec.addColorStop(0, `rgba(${Math.round(fSR)}, ${Math.round(fSG)}, ${Math.round(fSB)}, ${fSA})`);
       spec.addColorStop(1, `rgba(${Math.round(fSR)}, ${Math.round(fSG)}, ${Math.round(fSB)}, 0)`);
       spriteCtx.fillStyle = spec;
       spriteCtx.beginPath();
-      spriteCtx.arc(specX, specY, r_base * 0.08, 0, Math.PI * 2); // Corrected radius
+      spriteCtx.arc(specX, specY, r_base * 0.08, 0, Math.PI * 2);
       spriteCtx.fill();
     };
 
@@ -320,22 +317,22 @@ export default function Sentinel() {
       const cur = currentColorRef.current;
       const COLOR_LERP = 0.04;
 
-      cur.coreR = lerpColor(cur.coreR, tCore.r, COLOR_LERP);
-      cur.coreG = lerpColor(cur.coreG, tCore.g, COLOR_LERP);
-      cur.coreB = lerpColor(cur.coreB, tCore.b, COLOR_LERP);
-      cur.coreA = lerpColor(cur.coreA, tCore.a, COLOR_LERP);
-      cur.midR = lerpColor(cur.midR, tMid.r, COLOR_LERP);
-      cur.midG = lerpColor(cur.midG, tMid.g, COLOR_LERP);
-      cur.midB = lerpColor(cur.midB, tMid.b, COLOR_LERP);
-      cur.midA = lerpColor(cur.midA, tMid.a, COLOR_LERP);
-      cur.haloR = lerpColor(cur.haloR, tHalo.r, COLOR_LERP);
-      cur.haloG = lerpColor(cur.haloG, tHalo.g, COLOR_LERP);
-      cur.haloB = lerpColor(cur.haloB, tHalo.b, COLOR_LERP);
-      cur.haloA = lerpColor(cur.haloA, tHalo.a, COLOR_LERP);
-      cur.specR = lerpColor(cur.specR, tSpec.r, COLOR_LERP);
-      cur.specG = lerpColor(cur.specG, tSpec.g, COLOR_LERP);
-      cur.specB = lerpColor(cur.specB, tSpec.b, COLOR_LERP);
-      cur.specA = lerpColor(cur.specA, tSpec.a, COLOR_LERP);
+      cur.coreR = lerpColor(cur.coreR, tTheme.core.r, COLOR_LERP);
+      cur.coreG = lerpColor(cur.coreG, tTheme.core.g, COLOR_LERP);
+      cur.coreB = lerpColor(cur.coreB, tTheme.core.b, COLOR_LERP);
+      cur.coreA = lerpColor(cur.coreA, tTheme.core.a, COLOR_LERP);
+      cur.midR = lerpColor(cur.midR, tTheme.mid.r, COLOR_LERP);
+      cur.midG = lerpColor(cur.midG, tTheme.mid.g, COLOR_LERP);
+      cur.midB = lerpColor(cur.midB, tTheme.mid.b, COLOR_LERP);
+      cur.midA = lerpColor(cur.midA, tTheme.mid.a, COLOR_LERP);
+      cur.haloR = lerpColor(cur.haloR, tTheme.halo.r, COLOR_LERP);
+      cur.haloG = lerpColor(cur.haloG, tTheme.halo.g, COLOR_LERP);
+      cur.haloB = lerpColor(cur.haloB, tTheme.halo.b, COLOR_LERP);
+      cur.haloA = lerpColor(cur.haloA, tTheme.halo.a, COLOR_LERP);
+      cur.specR = lerpColor(cur.specR, tTheme.specular.r, COLOR_LERP);
+      cur.specG = lerpColor(cur.specG, tTheme.specular.g, COLOR_LERP);
+      cur.specB = lerpColor(cur.specB, tTheme.specular.b, COLOR_LERP);
+      cur.specA = lerpColor(cur.specA, tTheme.specular.a, COLOR_LERP);
 
       const vCore = VIOLET_THEME.core;      const p = colorProximityRef.current;
 
@@ -359,10 +356,10 @@ export default function Sentinel() {
       const finalHaloB = lerpColor(cur.haloB, vHalo.b, p);
       const finalHaloA = lerpColor(cur.haloA, vHalo.a, p);
 
-      cur.specR = lerpColor(cur.specR, tTheme.specular.r, COLOR_LERP);
-      cur.specG = lerpColor(cur.specG, tTheme.specular.g, COLOR_LERP);
-      cur.specB = lerpColor(cur.specB, tTheme.specular.b, COLOR_LERP);
-      cur.specA = lerpColor(cur.specA, tTheme.specular.a, COLOR_LERP);
+      const finalSpecR = lerpColor(cur.specR, vSpec.r, p);
+      const finalSpecG = lerpColor(cur.specG, vSpec.g, p);
+      const finalSpecB = lerpColor(cur.specB, vSpec.b, p);
+      const finalSpecA = lerpColor(cur.specA, vSpec.a, p);
 
       const finalSpecR = lerpColor(cur.specR, vSpec.r, p);
       const finalSpecG = lerpColor(cur.specG, vSpec.g, p);
@@ -393,9 +390,7 @@ export default function Sentinel() {
         ctx.globalAlpha = opacity;
         const trailScale = spriteScale * 0.15 * (1 - i / trailLen);
         const trailSize = SPRITE_SIZE * trailScale;
-        // BOLT: Use correctly tracked vertical position for trail
-        const trailYOffset = ty;
-        ctx.drawImage(spriteCanvas as CanvasImageSource, tx - trailSize / 2, trailYOffset - trailSize / 2, trailSize, trailSize);
+        ctx.drawImage(spriteCanvas as CanvasImageSource, tx - trailSize / 2, ty - trailSize / 2, trailSize, trailSize);
       }
       ctx.globalAlpha = 1.0;
 
@@ -406,8 +401,8 @@ export default function Sentinel() {
         const elapsed = Date.now() - rippleRef.current.startTime;
         const duration = 800;
         if (elapsed < duration) {
-          const progress = elapsed / duration;
-          const easeOut = 1 - Math.pow(1 - progress, 3);
+          const rippleProgress = elapsed / duration;
+          const easeOut = 1 - Math.pow(1 - rippleProgress, 3);
           const rippleRadius = (BASE_GLOW * 2) + ((MAX_GLOW * 2) - (BASE_GLOW * 2)) * easeOut;
           const rippleOpacity = 1 - easeOut;
           ctx.strokeStyle = `rgba(${Math.round(finalCoreR)},${Math.round(finalCoreG)},${Math.round(finalCoreB)},${rippleOpacity * 0.8})`;
@@ -429,6 +424,7 @@ export default function Sentinel() {
       window.removeEventListener('scroll', onScroll);
       clearTimeout(timer);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      sectionObserver.disconnect();
     };
   }, [prefersReducedMotion]);
 

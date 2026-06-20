@@ -8,16 +8,18 @@ vi.mock('@/hooks/usePrefersReducedMotion', () => ({
 // Mock framer-motion properly using vi.mock with an inline factory
 vi.mock('framer-motion', () => ({
   motion: {
-    button: (props: any) => {
+    button: (props: Record<string, unknown>) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { initial, animate, exit, ...rest } = props;
       return <button {...rest} />;
     },
-    div: (props: any) => {
+    div: (props: Record<string, unknown>) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { initial, animate, exit, ...rest } = props;
       return <div {...rest} />;
     },
   },
-  AnimatePresence: ({ children }: any) => <>{children}</>,
+  AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 import { BackToTop } from '../BackToTop';

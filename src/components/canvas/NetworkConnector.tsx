@@ -165,11 +165,11 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
             // Determine bucket using hoisted squared thresholds instead of Math.sqrt()
             // Closer nodes (smaller d2) go into higher index buckets for more opacity.
             let bIdx = 0;
-            if (d2 < B5_SQ) bIdx = 5;
-            else if (d2 < B4_SQ) bIdx = 4;
-            else if (d2 < B3_SQ) bIdx = 3;
-            else if (d2 < B2_SQ) bIdx = 2;
-            else if (d2 < B1_SQ) bIdx = 1;
+            if (d2 < B5_SQ_VAL) bIdx = 5;
+            else if (d2 < B4_SQ_VAL) bIdx = 4;
+            else if (d2 < B3_SQ_VAL) bIdx = 3;
+            else if (d2 < B2_SQ_VAL) bIdx = 2;
+            else if (d2 < B1_SQ_VAL) bIdx = 1;
 
             buckets[bIdx].push(nodeA.x, nodeA.y, nodeB.x, nodeB.y);
           }

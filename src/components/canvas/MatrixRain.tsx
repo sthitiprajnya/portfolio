@@ -95,28 +95,6 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
         glyphCacheCanvas.height = fontSize * (TRAIL_LENGTH + 1) * 2;
       }
 
-      glyphCacheCanvas.getContext('2d')!.font = `${fontSize}px "JetBrains Mono", monospace`;
-      glyphCacheCanvas.getContext('2d')!.textBaseline = 'top';
-
-      // Pre-render glyphs
-      for (let j = 0; j <= TRAIL_LENGTH; j++) {
-        // Normal colors row
-        glyphCacheCanvas.getContext('2d')!.fillStyle = TRAIL_COLORS[j];
-        for (let i = 0; i < MATRIX_CHAR_LEN; i++) {
-          glyphCacheCanvas.getContext('2d')!.fillText(MATRIX_CHARS[i], i * fontSize, j * fontSize);
-        }
-        // Glitch colors row (offset by TRAIL_LENGTH + 1 rows)
-        glyphCacheCanvas.getContext('2d')!.fillStyle = GLITCH_TRAIL_COLORS[j];
-        for (let i = 0; i < MATRIX_CHAR_LEN; i++) {
-          glyphCacheCanvas.getContext('2d')!.fillText(MATRIX_CHARS[i], i * fontSize, (j + TRAIL_LENGTH + 1) * fontSize);
-        }
-      }
-    };
-
-    const resize = () => {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-
       updateGlyphCache();
 
       columns = Math.floor(width / fontSize);

@@ -106,6 +106,7 @@ export default function Sentinel() {
     trailIndex: 0,
   });
 
+  const lastYRef = useRef(0);
   const targetThemeRef = useRef<ParsedTheme>(DEFAULT_THEME);
   const colorProximityRef = useRef(0);
 
@@ -284,23 +285,31 @@ export default function Sentinel() {
       const s = stateRef.current;
 
       s.y += (s.targetY - s.y) * LERP_FACTOR;
-      s.phase = s.y * SWEEP_FREQUENCY;
-      s.xOffset = Math.sin(s.phase) * SWEEP_AMPLITUDE;
 
-      const proximity = checkProximity(s.y);
-      const targetGlow = BASE_GLOW + (MAX_GLOW - BASE_GLOW) * proximity;
-      s.glow += (targetGlow - s.glow) * LERP_FACTOR;
+      // BOLT: Scroll Stability Check - Skip expensive proximity and physics calculations
+      // when the orb is stationary (difference < 0.1px), saving CPU cycles in the 60fps loop.
+      const isStationary = Math.abs(s.y - lastYRef.current) < 0.1;
+      lastYRef.current = s.y;
 
-      if (proximity > 0.85 && !rippleRef.current.triggered && !rippleRef.current.active) {
-        rippleRef.current.active = true;
-        rippleRef.current.startTime = Date.now();
-        rippleRef.current.triggered = true;
-      } else if (proximity < 0.5) {
-        rippleRef.current.triggered = false;
+      if (!isStationary) {
+        s.phase = s.y * SWEEP_FREQUENCY;
+        s.xOffset = Math.sin(s.phase) * SWEEP_AMPLITUDE;
+
+        const proximity = checkProximity(s.y);
+        const targetGlow = BASE_GLOW + (MAX_GLOW - BASE_GLOW) * proximity;
+        s.glow += (targetGlow - s.glow) * LERP_FACTOR;
+
+        if (proximity > 0.85 && !rippleRef.current.triggered && !rippleRef.current.active) {
+          rippleRef.current.active = true;
+          rippleRef.current.startTime = Date.now();
+          rippleRef.current.triggered = true;
+        } else if (proximity < 0.5) {
+          rippleRef.current.triggered = false;
+        }
+
+        const ctfProx = checkCtfProximity(s.y);
+        colorProximityRef.current += (ctfProx - colorProximityRef.current) * LERP_FACTOR;
       }
-
-      const ctfProx = checkCtfProximity(s.y);
-      colorProximityRef.current += (ctfProx - colorProximityRef.current) * LERP_FACTOR;
 
       const cx = width / 2 + s.xOffset;
       const cy = height / 2;
@@ -310,10 +319,6 @@ export default function Sentinel() {
       s.trailIndex = (s.trailIndex + 1) % 8;
 
       const tTheme = targetThemeRef.current;
-      const tCore = tTheme.core;
-      const tMid = tTheme.mid;
-      const tHalo = tTheme.halo;
-      const tSpec = tTheme.specular;
       const cur = currentColorRef.current;
       const COLOR_LERP = 0.04;
 
@@ -334,37 +339,40 @@ export default function Sentinel() {
       cur.specB = lerpColor(cur.specB, tTheme.specular.b, COLOR_LERP);
       cur.specA = lerpColor(cur.specA, tTheme.specular.a, COLOR_LERP);
 
-      const vCore = VIOLET_THEME.core;      const p = colorProximityRef.current;
+      const p = colorProximityRef.current;
 
-      const finalCoreR = lerpColor(cur.coreR, vCore.r, p);
-      const finalCoreG = lerpColor(cur.coreG, vCore.g, p);
-      const finalCoreB = lerpColor(cur.coreB, vCore.b, p);
-      const finalCoreA = lerpColor(cur.coreA, vCore.a, p);
+      // BOLT: Color Lerp Early-Exit
+      // Skip Stage-2 color blending (lerp toward Violet theme) when the proximity is effectively zero.
+      let finalCoreR = cur.coreR, finalCoreG = cur.coreG, finalCoreB = cur.coreB, finalCoreA = cur.coreA;
+      let finalMidR = cur.midR, finalMidG = cur.midG, finalMidB = cur.midB, finalMidA = cur.midA;
+      let finalHaloR = cur.haloR, finalHaloG = cur.haloG, finalHaloB = cur.haloB, finalHaloA = cur.haloA;
+      let finalSpecR = cur.specR, finalSpecG = cur.specG, finalSpecB = cur.specB, finalSpecA = cur.specA;
 
-      const vMid = VIOLET_THEME.mid;
-      const vHalo = VIOLET_THEME.halo;
+      if (p > 0.001) {
+        const vCore = VIOLET_THEME.core;
+        finalCoreR = lerpColor(cur.coreR, vCore.r, p);
+        finalCoreG = lerpColor(cur.coreG, vCore.g, p);
+        finalCoreB = lerpColor(cur.coreB, vCore.b, p);
+        finalCoreA = lerpColor(cur.coreA, vCore.a, p);
 
-      const vSpec = VIOLET_THEME.specular;
+        const vMid = VIOLET_THEME.mid;
+        finalMidR = lerpColor(cur.midR, vMid.r, p);
+        finalMidG = lerpColor(cur.midG, vMid.g, p);
+        finalMidB = lerpColor(cur.midB, vMid.b, p);
+        finalMidA = lerpColor(cur.midA, vMid.a, p);
 
-      const finalMidR = lerpColor(cur.midR, vMid.r, p);
-      const finalMidG = lerpColor(cur.midG, vMid.g, p);
-      const finalMidB = lerpColor(cur.midB, vMid.b, p);
-      const finalMidA = lerpColor(cur.midA, vMid.a, p);
+        const vHalo = VIOLET_THEME.halo;
+        finalHaloR = lerpColor(cur.haloR, vHalo.r, p);
+        finalHaloG = lerpColor(cur.haloG, vHalo.g, p);
+        finalHaloB = lerpColor(cur.haloB, vHalo.b, p);
+        finalHaloA = lerpColor(cur.haloA, vHalo.a, p);
 
-      const finalHaloR = lerpColor(cur.haloR, vHalo.r, p);
-      const finalHaloG = lerpColor(cur.haloG, vHalo.g, p);
-      const finalHaloB = lerpColor(cur.haloB, vHalo.b, p);
-      const finalHaloA = lerpColor(cur.haloA, vHalo.a, p);
-
-      const finalSpecR = lerpColor(cur.specR, vSpec.r, p);
-      const finalSpecG = lerpColor(cur.specG, vSpec.g, p);
-      const finalSpecB = lerpColor(cur.specB, vSpec.b, p);
-      const finalSpecA = lerpColor(cur.specA, vSpec.a, p);
-
-      const finalSpecR = lerpColor(cur.specR, vSpec.r, p);
-      const finalSpecG = lerpColor(cur.specG, vSpec.g, p);
-      const finalSpecB = lerpColor(cur.specB, vSpec.b, p);
-      const finalSpecA = lerpColor(cur.specA, vSpec.a, p);
+        const vSpec = VIOLET_THEME.specular;
+        finalSpecR = lerpColor(cur.specR, vSpec.r, p);
+        finalSpecG = lerpColor(cur.specG, vSpec.g, p);
+        finalSpecB = lerpColor(cur.specB, vSpec.b, p);
+        finalSpecA = lerpColor(cur.specA, vSpec.a, p);
+      }
 
       // BOLT: Hardware-accelerated drawImage() with sprite caching replaces 4 expensive per-frame radial gradient draws.
       // Reusing static objects to avoid per-frame allocations if needed, but here simple literals are fine for RgbaColor

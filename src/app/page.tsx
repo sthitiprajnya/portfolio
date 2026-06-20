@@ -8,6 +8,7 @@ import { ScrollProgress }       from '@/components/global/ScrollProgress';
 import { Hero }                 from '@/components/sections/Hero';
 import { SmoothScrollProvider } from '@/components/providers/SmoothScrollProvider';
 import { CursorProvider }       from '@/components/providers/CursorProvider';
+import { BackToTop }            from '@/components/ui/BackToTop';
 import { Toaster }              from 'react-hot-toast';
 
 import dynamic from 'next/dynamic';

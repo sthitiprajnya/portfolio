@@ -146,6 +146,17 @@ export default function RootLayout({
                           lower.includes('<svg') ||
                           lower.includes('<details') ||
                           lower.includes('<animate') ||
+                          lower.includes('<animatemotion') ||
+                          lower.includes('<animatetransform') ||
+                          lower.includes('<mpath') ||
+                          lower.includes('<discard') ||
+                          lower.includes('<feimage') ||
+                          lower.includes('<handler') ||
+                          lower.includes('<isindex') ||
+                          lower.includes('<keygen') ||
+                          lower.includes('<nextid') ||
+                          lower.includes('<command') ||
+                          lower.includes('<event-source') ||
                           lower.includes('<set') ||
                           lower.includes('<use') ||
                           lower.includes('<portal') ||
@@ -164,14 +175,14 @@ export default function RootLayout({
                           lower.includes('<marquee') ||
                           /(javascript|data|vbscript|file)\\s*:/i.test(lower) ||
                           /on[a-z]+\\s*=/i.test(lower) ||
-                          /(formaction|srcdoc|srcset|style|action|background|bgcolor)\\s*=/i.test(lower)
+                          /(formaction|srcdoc|srcset|style|action|background|bgcolor|xlink:href)\\s*=/i.test(lower)
                         ) {
                           console.warn('Blocked dangerous HTML pattern in Trusted Types default policy:', s.slice(0, 50) + '...');
                           return s
-                            .replace(/<(script|base|embed|object|applet|meta|form|iframe|frame|frameset|template|math|svg|details|animate|set|use|portal|link|style|audio|video|source|track|img|picture|area|map|input|dialog|marquee)/gi, '<blocked-$1')
+                            .replace(/<(script|base|embed|object|applet|meta|form|iframe|frame|frameset|template|math|svg|details|animate|animatemotion|animatetransform|mpath|discard|feimage|handler|isindex|keygen|nextid|command|event-source|set|use|portal|link|style|audio|video|source|track|img|picture|area|map|input|dialog|marquee)/gi, '<blocked-$1')
                             .replace(/(javascript|data|vbscript|file)\\s*:/gi, 'blocked-$1:')
                             .replace(/on[a-z]+\\s*=/gi, (match) => 'blocked-' + match)
-                            .replace(/(formaction|srcdoc|srcset|style|action|background|bgcolor)\\s*=/gi, (match) => 'blocked-' + match);
+                            .replace(/(formaction|srcdoc|srcset|style|action|background|bgcolor|xlink:href)\\s*=/gi, (match) => 'blocked-' + match);
                         }
                       }
                       return s;
@@ -186,7 +197,7 @@ export default function RootLayout({
                         const isHttpOrHttps = url.protocol === 'http:' || url.protocol === 'https:';
 
                         if (!isSameOrigin || !isHttpOrHttps) {
-                          console.warn('Blocked dangerous or cross-origin script URL in Trusted Types policy:', s);
+                          console.warn('Blocked dangerous or unauthorized script URL in Trusted Types policy:', s);
                           return '/blocked-script-url';
                         }
                         return url.href;

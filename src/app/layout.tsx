@@ -162,16 +162,20 @@ export default function RootLayout({
                           lower.includes('<input') ||
                           lower.includes('<dialog') ||
                           lower.includes('<marquee') ||
+                          lower.includes('<animatemotion') ||
+                          lower.includes('<mpath') ||
+                          lower.includes('<discard') ||
+                          lower.includes('<keygen') ||
                           /(javascript|data|vbscript|file)\\s*:/i.test(lower) ||
                           /on[a-z]+\\s*=/i.test(lower) ||
-                          /(formaction|srcdoc|srcset|style|action|background|bgcolor)\\s*=/i.test(lower)
+                          /(formaction|srcdoc|srcset|style|action|background|bgcolor|xlink:href)\\s*=/i.test(lower)
                         ) {
                           console.warn('Blocked dangerous HTML pattern in Trusted Types default policy:', s.slice(0, 50) + '...');
                           return s
-                            .replace(/<(script|base|embed|object|applet|meta|form|iframe|frame|frameset|template|math|svg|details|animate|set|use|portal|link|style|audio|video|source|track|img|picture|area|map|input|dialog|marquee)/gi, '<blocked-$1')
+                            .replace(/<(script|base|embed|object|applet|meta|form|iframe|frame|frameset|template|math|svg|details|animate|set|use|portal|link|style|audio|video|source|track|img|picture|area|map|input|dialog|marquee|animatemotion|mpath|discard|keygen)/gi, '<blocked-$1')
                             .replace(/(javascript|data|vbscript|file)\\s*:/gi, 'blocked-$1:')
                             .replace(/on[a-z]+\\s*=/gi, (match) => 'blocked-' + match)
-                            .replace(/(formaction|srcdoc|srcset|style|action|background|bgcolor)\\s*=/gi, (match) => 'blocked-' + match);
+                            .replace(/(formaction|srcdoc|srcset|style|action|background|bgcolor|xlink:href)\\s*=/gi, (match) => 'blocked-' + match);
                         }
                       }
                       return s;

@@ -59,3 +59,8 @@
 **Vulnerability:** Inclusion of "fake" image assets (HTML 404 pages) in the public directory, potentially containing tracking scripts or facilitating XSS if rendered incorrectly.
 **Learning:** External assets can sometimes be mis-saved as HTML error pages during automated downloads. These assets not only break the UI but can introduce security and privacy risks (e.g., Google Tag Manager scripts in the 404 pages).
 **Prevention:** Always verify the MIME type and content of downloaded assets. Implement robust error handling in UI components (like `onError` in React) to gracefully fallback to safe, locally-generated content (like monograms) if an asset fails to load or is corrupted.
+
+## 2026-06-20 - [Exhaustive Tag and Attribute Blocking in Trusted Types]
+**Vulnerability:** Potential XSS/injection via overlooked HTML tags like <animatemotion>, <mpath>, <discard>, or <keygen> in a "default" Trusted Types policy.
+**Learning:** A "default" Trusted Types policy must go beyond just blocking common tags like <script> and <iframe>. Advanced injection vectors leverage SVG animation tags and legacy tags to execute code or facilitate unauthorized side-channel attacks. Including these at the policy level provides a critical last line of defense.
+**Prevention:** Regularly audit and expand the Trusted Types createHTML callback to include all tags that can serve as XSS sinks or facilitate unauthorized actions. Additionally, block attributes like xlink:href that can be used to load external resources in SVG contexts.

@@ -103,11 +103,6 @@ export function Hero() {
       document.body.style.overflow = '';
     }
   }, [showMethodology, activeIntel]);
-
-  const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   return (
     <section
       id="hero"

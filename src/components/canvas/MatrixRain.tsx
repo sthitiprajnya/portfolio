@@ -79,6 +79,26 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
       : document.createElement('canvas');
     const glyphCtx = glyphCacheCanvas.getContext('2d') as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
 
+    const updateGlyphCache = () => {
+      glyphCtx.clearRect(0, 0, glyphCacheCanvas.width, glyphCacheCanvas.height);
+      glyphCtx.font = `${fontSize}px "JetBrains Mono", monospace`;
+      glyphCtx.textAlign = 'left';
+      glyphCtx.textBaseline = 'top';
+
+      for (let j = 0; j <= TRAIL_LENGTH; j++) {
+        // Normal Trail
+        glyphCtx.fillStyle = TRAIL_COLORS[j];
+        for (let i = 0; i < MATRIX_CHAR_LEN; i++) {
+          glyphCtx.fillText(MATRIX_CHARS[i], i * fontSize, j * fontSize);
+        }
+        // Glitch Trail
+        glyphCtx.fillStyle = GLITCH_TRAIL_COLORS[j];
+        for (let i = 0; i < MATRIX_CHAR_LEN; i++) {
+          glyphCtx.fillText(MATRIX_CHARS[i], i * fontSize, (TRAIL_LENGTH + 1 + j) * fontSize);
+        }
+      }
+    };
+
     const resize = () => {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
@@ -94,28 +114,6 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
         glyphCacheCanvas.width = fontSize * MATRIX_CHAR_LEN;
         glyphCacheCanvas.height = fontSize * (TRAIL_LENGTH + 1) * 2;
       }
-
-      glyphCacheCanvas.getContext('2d')!.font = `${fontSize}px "JetBrains Mono", monospace`;
-      glyphCacheCanvas.getContext('2d')!.textBaseline = 'top';
-
-      // Pre-render glyphs
-      for (let j = 0; j <= TRAIL_LENGTH; j++) {
-        // Normal colors row
-        glyphCacheCanvas.getContext('2d')!.fillStyle = TRAIL_COLORS[j];
-        for (let i = 0; i < MATRIX_CHAR_LEN; i++) {
-          glyphCacheCanvas.getContext('2d')!.fillText(MATRIX_CHARS[i], i * fontSize, j * fontSize);
-        }
-        // Glitch colors row (offset by TRAIL_LENGTH + 1 rows)
-        glyphCacheCanvas.getContext('2d')!.fillStyle = GLITCH_TRAIL_COLORS[j];
-        for (let i = 0; i < MATRIX_CHAR_LEN; i++) {
-          glyphCacheCanvas.getContext('2d')!.fillText(MATRIX_CHARS[i], i * fontSize, (j + TRAIL_LENGTH + 1) * fontSize);
-        }
-      }
-    };
-
-    const resize = () => {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
 
       updateGlyphCache();
 
@@ -138,31 +136,6 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
     let isGlitching = false;
     let glitchTimeoutId: ReturnType<typeof setTimeout>;
     const glitchIndices: number[] = [];
-
-    // BOLT: Performance Optimization - Glyph Caching
-    // Pre-rendering the entire character set into an offscreen canvas (glyph cache)
-    // allows us to use hardware-accelerated drawImage() instead of expensive fillText().
-
-
-    const updateGlyphCache = () => {
-      glyphCtx.clearRect(0, 0, glyphCacheCanvas.width, glyphCacheCanvas.height);
-      glyphCtx.font = `${fontSize}px "JetBrains Mono", monospace`;
-      glyphCtx.textAlign = 'left';
-      glyphCtx.textBaseline = 'top';
-
-      for (let j = 0; j <= TRAIL_LENGTH; j++) {
-        // Normal Trail
-        glyphCtx.fillStyle = TRAIL_COLORS[j];
-        for (let i = 0; i < MATRIX_CHAR_LEN; i++) {
-          glyphCtx.fillText(MATRIX_CHARS[i], i * fontSize, j * fontSize);
-        }
-        // Glitch Trail
-        glyphCtx.fillStyle = GLITCH_TRAIL_COLORS[j];
-        for (let i = 0; i < MATRIX_CHAR_LEN; i++) {
-          glyphCtx.fillText(MATRIX_CHARS[i], i * fontSize, (TRAIL_LENGTH + 1 + j) * fontSize);
-        }
-      }
-    };
 
     window.addEventListener('resize', () => {
       resize();

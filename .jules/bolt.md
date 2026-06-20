@@ -97,3 +97,7 @@
 ## 2025-06-06 - [Layered Animation Early-Exits]
 **Learning:** In complex visual components like the Sentinel orb that feature layered state transitions (e.g., base scroll following vs. proximity-based color overrides), unconditional execution of Stage-2 logic adds unnecessary CPU overhead. By gating secondary lerp operations behind a proximity threshold check (e.g. `if (p > 0.001)`), we can skip dozens of floating-point operations per frame when the effect is not visible.
 **Action:** Always implement early-exits for secondary or "override" animation states in hot loops. Only execute math and state updates when the trigger condition (proximity, interaction, or timer) is active.
+
+## 2025-06-07 - [Scroll Stability and Lerp Early-Exits in Sentinel]
+**Learning:** High-frequency (60fps) physics and proximity calculations that depend on scroll position often perform redundant work in frames where the scroll has not changed or changed negligibly. Additionally, complex color lerps for secondary animation layers (like the Sentinel's CTF overlay) contribute to CPU overhead even when the effect's alpha is effectively zero.
+**Action:** Implement a **Scroll Stability Check** to skip expensive proximity checks (which often trigger layout-reading functions like getBoundingClientRect) when stationary. Use **Lerp Early-Exits** to skip Stage-2 color processing and property lookups when transition factors are below a threshold (e.g., < 0.001).

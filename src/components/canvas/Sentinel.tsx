@@ -108,6 +108,9 @@ export default function Sentinel() {
 
   const targetThemeRef = useRef<ParsedTheme>(DEFAULT_THEME);
   const colorProximityRef = useRef(0);
+  const lastYRef = useRef(0);
+  const proximityRef = useRef(0);
+  const ctfProxRef = useRef(0);
 
   const rippleRef = useRef({
     active: false,
@@ -177,6 +180,11 @@ export default function Sentinel() {
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
+
+    // BOLT: Initial proximity check to avoid "pop" on mount
+    proximityRef.current = checkProximity(window.scrollY);
+    ctfProxRef.current = checkCtfProximity(window.scrollY);
+    lastYRef.current = window.scrollY;
 
     const sectionObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -287,7 +295,15 @@ export default function Sentinel() {
       s.phase = s.y * SWEEP_FREQUENCY;
       s.xOffset = Math.sin(s.phase) * SWEEP_AMPLITUDE;
 
-      const proximity = checkProximity(s.y);
+      // BOLT: Scroll Stability Check - Only recalculate proximity when scroll has moved meaningfully.
+      // This saves dozen of getBoundingClientRect lookups in stationary or slow-scroll frames.
+      if (Math.abs(s.y - lastYRef.current) > 0.1) {
+        proximityRef.current = checkProximity(s.y);
+        ctfProxRef.current = checkCtfProximity(s.y);
+        lastYRef.current = s.y;
+      }
+
+      const proximity = proximityRef.current;
       const targetGlow = BASE_GLOW + (MAX_GLOW - BASE_GLOW) * proximity;
       s.glow += (targetGlow - s.glow) * LERP_FACTOR;
 
@@ -299,7 +315,7 @@ export default function Sentinel() {
         rippleRef.current.triggered = false;
       }
 
-      const ctfProx = checkCtfProximity(s.y);
+      const ctfProx = ctfProxRef.current;
       colorProximityRef.current += (ctfProx - colorProximityRef.current) * LERP_FACTOR;
 
       const cx = width / 2 + s.xOffset;
@@ -310,10 +326,6 @@ export default function Sentinel() {
       s.trailIndex = (s.trailIndex + 1) % 8;
 
       const tTheme = targetThemeRef.current;
-      const tCore = tTheme.core;
-      const tMid = tTheme.mid;
-      const tHalo = tTheme.halo;
-      const tSpec = tTheme.specular;
       const cur = currentColorRef.current;
       const COLOR_LERP = 0.04;
 
@@ -334,37 +346,42 @@ export default function Sentinel() {
       cur.specB = lerpColor(cur.specB, tTheme.specular.b, COLOR_LERP);
       cur.specA = lerpColor(cur.specA, tTheme.specular.a, COLOR_LERP);
 
-      const vCore = VIOLET_THEME.core;      const p = colorProximityRef.current;
+      const p = colorProximityRef.current;
 
-      const finalCoreR = lerpColor(cur.coreR, vCore.r, p);
-      const finalCoreG = lerpColor(cur.coreG, vCore.g, p);
-      const finalCoreB = lerpColor(cur.coreB, vCore.b, p);
-      const finalCoreA = lerpColor(cur.coreA, vCore.a, p);
+      // Stage-2 final colors: Base theme lerped with secondary (Violet) theme based on CTF proximity.
+      let finalCoreR = cur.coreR, finalCoreG = cur.coreG, finalCoreB = cur.coreB, finalCoreA = cur.coreA;
+      let finalMidR = cur.midR, finalMidG = cur.midG, finalMidB = cur.midB, finalMidA = cur.midA;
+      let finalHaloR = cur.haloR, finalHaloG = cur.haloG, finalHaloB = cur.haloB, finalHaloA = cur.haloA;
+      let finalSpecR = cur.specR, finalSpecG = cur.specG, finalSpecB = cur.specB, finalSpecA = cur.specA;
 
-      const vMid = VIOLET_THEME.mid;
-      const vHalo = VIOLET_THEME.halo;
+      // BOLT: Lerp Early-Exit - Skip Stage-2 color lerping when the effect is effectively zero (< 0.001).
+      // This saves dozens of floating-point operations and property lookups on every frame where the orb is not near the CTF section.
+      if (p > 0.001) {
+        const vCore = VIOLET_THEME.core;
+        const vMid = VIOLET_THEME.mid;
+        const vHalo = VIOLET_THEME.halo;
+        const vSpec = VIOLET_THEME.specular;
 
-      const vSpec = VIOLET_THEME.specular;
+        finalCoreR = lerpColor(cur.coreR, vCore.r, p);
+        finalCoreG = lerpColor(cur.coreG, vCore.g, p);
+        finalCoreB = lerpColor(cur.coreB, vCore.b, p);
+        finalCoreA = lerpColor(cur.coreA, vCore.a, p);
 
-      const finalMidR = lerpColor(cur.midR, vMid.r, p);
-      const finalMidG = lerpColor(cur.midG, vMid.g, p);
-      const finalMidB = lerpColor(cur.midB, vMid.b, p);
-      const finalMidA = lerpColor(cur.midA, vMid.a, p);
+        finalMidR = lerpColor(cur.midR, vMid.r, p);
+        finalMidG = lerpColor(cur.midG, vMid.g, p);
+        finalMidB = lerpColor(cur.midB, vMid.b, p);
+        finalMidA = lerpColor(cur.midA, vMid.a, p);
 
-      const finalHaloR = lerpColor(cur.haloR, vHalo.r, p);
-      const finalHaloG = lerpColor(cur.haloG, vHalo.g, p);
-      const finalHaloB = lerpColor(cur.haloB, vHalo.b, p);
-      const finalHaloA = lerpColor(cur.haloA, vHalo.a, p);
+        finalHaloR = lerpColor(cur.haloR, vHalo.r, p);
+        finalHaloG = lerpColor(cur.haloG, vHalo.g, p);
+        finalHaloB = lerpColor(cur.haloB, vHalo.b, p);
+        finalHaloA = lerpColor(cur.haloA, vHalo.a, p);
 
-      const finalSpecR = lerpColor(cur.specR, vSpec.r, p);
-      const finalSpecG = lerpColor(cur.specG, vSpec.g, p);
-      const finalSpecB = lerpColor(cur.specB, vSpec.b, p);
-      const finalSpecA = lerpColor(cur.specA, vSpec.a, p);
-
-      const finalSpecR = lerpColor(cur.specR, vSpec.r, p);
-      const finalSpecG = lerpColor(cur.specG, vSpec.g, p);
-      const finalSpecB = lerpColor(cur.specB, vSpec.b, p);
-      const finalSpecA = lerpColor(cur.specA, vSpec.a, p);
+        finalSpecR = lerpColor(cur.specR, vSpec.r, p);
+        finalSpecG = lerpColor(cur.specG, vSpec.g, p);
+        finalSpecB = lerpColor(cur.specB, vSpec.b, p);
+        finalSpecA = lerpColor(cur.specA, vSpec.a, p);
+      }
 
       // BOLT: Hardware-accelerated drawImage() with sprite caching replaces 4 expensive per-frame radial gradient draws.
       // Reusing static objects to avoid per-frame allocations if needed, but here simple literals are fine for RgbaColor

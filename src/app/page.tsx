@@ -9,6 +9,7 @@ import { Hero }                 from '@/components/sections/Hero';
 import { SmoothScrollProvider } from '@/components/providers/SmoothScrollProvider';
 import { CursorProvider }       from '@/components/providers/CursorProvider';
 import { Toaster }              from 'react-hot-toast';
+import { BackToTop }            from '@/components/ui/BackToTop';
 
 import dynamic from 'next/dynamic';
 

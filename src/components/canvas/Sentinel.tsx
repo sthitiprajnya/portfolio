@@ -361,11 +361,6 @@ export default function Sentinel() {
       const finalSpecB = lerpColor(cur.specB, vSpec.b, p);
       const finalSpecA = lerpColor(cur.specA, vSpec.a, p);
 
-      const finalSpecR = lerpColor(cur.specR, vSpec.r, p);
-      const finalSpecG = lerpColor(cur.specG, vSpec.g, p);
-      const finalSpecB = lerpColor(cur.specB, vSpec.b, p);
-      const finalSpecA = lerpColor(cur.specA, vSpec.a, p);
-
       // BOLT: Hardware-accelerated drawImage() with sprite caching replaces 4 expensive per-frame radial gradient draws.
       // Reusing static objects to avoid per-frame allocations if needed, but here simple literals are fine for RgbaColor
       updateSprite(

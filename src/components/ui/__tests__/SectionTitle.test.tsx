@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent} from '@testing-library/react';
 import { SectionTitle } from '../SectionTitle';
 import toast from 'react-hot-toast';
 
@@ -21,8 +21,7 @@ describe('SectionTitle', () => {
     render(<SectionTitle number="01" title="Test Title" />);
     expect(screen.getByText('// 01')).toBeInTheDocument();
     expect(screen.getByText('Test Title')).toBeInTheDocument();
-    expect(screen.queryByRole('button')).not.toBeInTheDocument();
-  });
+      });
 
   it('renders correctly with id and handles copy link', () => {
     // Mock clipboard

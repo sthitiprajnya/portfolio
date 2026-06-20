@@ -40,8 +40,8 @@ const MOUSE_RANGE_SQ = MOUSE_RANGE * MOUSE_RANGE;
 
 // ── Sprite constants ─────────────────────────────────────────────
 const SPRITE_SIZE = 256;
-const SPRITE_CENTER = SPRITE_SIZE / 2;
-const BASE_R = 60;
+export const SPRITE_CENTER = SPRITE_SIZE / 2;
+export const BASE_R = 60;
 
 export default function HeroOrb() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);

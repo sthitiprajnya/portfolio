@@ -200,10 +200,12 @@ export default function RootLayout({
               }
             `
           }}
+          suppressHydrationWarning
         />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLdString }}
+          suppressHydrationWarning
         />
         <link rel="security" href="/portfolio/.well-known/security.txt" />
         <link rel="preload" href="/portfolio/og-image.webp" as="image" />

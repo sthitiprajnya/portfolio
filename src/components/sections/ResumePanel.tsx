@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { useInView } from 'react-intersection-observer';
+import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import clsx from 'clsx';
 import { SectionTitle } from '@/components/ui/SectionTitle';
@@ -30,21 +31,16 @@ export function ResumePanel() {
     setTimeout(() => setDownloadStarted(false), 3000);
   };
 
-  const handleCopy = async (text: string, label: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      toast.success(`${label} copied to clipboard! 📋`);
-    } catch (err) {
-      console.error('Failed to copy:', err);
-      toast.error('Failed to copy. Please try again.');
-    }
-  };
-
   const handleCopyLink = () => {
-    const fullUrl = `${window.location.origin}${PERSONAL.resumeUrl}`;
-    handleCopy(fullUrl, 'Direct link');
-    setLinkCopied(true);
-    setTimeout(() => setLinkCopied(false), 2000);
+    try {
+      const fullUrl = `${window.location.origin}${PERSONAL.resumeUrl}`;
+      navigator.clipboard.writeText(fullUrl);
+      toast.success(`Direct link copied to clipboard! 📋`);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy link:', err);
+    }
   };
 
   return (
@@ -126,44 +122,9 @@ export function ResumePanel() {
               {/* Footer stamp */}
               <div className="px-6 py-4 border-t border-[var(--glass-border)] flex flex-col md:flex-row justify-between items-center bg-[rgba(0,0,0,0.6)] gap-4 relative z-10">
                 <span className="text-[0.6rem] text-text-muted font-mono text-center md:text-left">
-                  DOC_ID: <span
-                    className="redacted group/doc"
-                    tabIndex={0}
-                    role="button"
-                    aria-label="Reveal and copy document ID"
-                    title="Reveal and copy document ID"
-                    onClick={() => handleCopy('SB-RESUME-2025-v3', 'Document ID')}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleCopy('SB-RESUME-2025-v3', 'Document ID');
-                      }
-                    }}
-                  >
-                    SB-RESUME-2025-v3
-                    <span className="absolute -top-6 left-1/2 -translate-x-1/2 bg-black border border-amber text-amber px-2 py-0.5 rounded-card opacity-0 invisible group-focus/doc:opacity-100 group-focus/doc:visible group-hover/doc:opacity-100 group-hover/doc:visible transition-all text-[0.5rem] w-max z-50 pointer-events-none">
-                      Click to copy
-                    </span>
-                  </span><br className="md:hidden" />
-                  <span className="hidden md:inline"> · </span>SHA256: <span
-                    className="redacted group/hash"
-                    tabIndex={0}
-                    role="button"
-                    aria-label="Reveal and copy SHA256 hash"
-                    title="Reveal and copy SHA256 hash"
-                    onClick={() => handleCopy(RESUME_SHA256, 'SHA256 hash')}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleCopy(RESUME_SHA256, 'SHA256 hash');
-                      }
-                    }}
-                  >
-                    {RESUME_SHA256}
-                    <span className="absolute -top-6 left-1/2 -translate-x-1/2 bg-black border border-amber text-amber px-2 py-0.5 rounded-card opacity-0 invisible group-focus/hash:opacity-100 group-focus/hash:visible group-hover/hash:opacity-100 group-hover/hash:visible transition-all text-[0.5rem] w-max z-50 pointer-events-none">
-                      Click to copy
-                    </span>
-                  </span>
+                  DOC_ID: <RedactedText text="SB-RESUME-2025-v3" label="Document ID" />
+                  <br className="md:hidden" />
+                  <span className="hidden md:inline"> · </span>SHA256: <RedactedText text={RESUME_SHA256} label="SHA256 hash" />
                 </span>
                 <span className="text-[0.6rem] text-green font-bold font-mono uppercase tracking-widest flex items-center gap-1.5 shrink-0">
                   <span className="w-1.5 h-1.5 rounded-full bg-green animate-pulse" />
@@ -273,5 +234,57 @@ export function ResumePanel() {
         </div>
       </div>
     </section>
+  );
+}
+
+function RedactedText({ text, label }: { text: string; label: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
+  return (
+    <span className="relative inline-block group">
+      <span
+        className="redacted group"
+        tabIndex={0}
+        role="button"
+        aria-label={`Reveal and copy ${label}`}
+        title={`Reveal and copy ${label}`}
+        onClick={handleCopy}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleCopy();
+          }
+        }}
+      >
+        {text}
+        <span className="absolute -top-6 left-1/2 -translate-x-1/2 bg-black border border-amber text-amber px-2 py-0.5 rounded-card opacity-0 invisible group-focus:opacity-100 group-focus:visible group-hover:opacity-100 group-hover:visible transition-all text-[0.5rem] w-max z-50 pointer-events-none">
+          Click to copy
+        </span>
+      </span>
+      <AnimatePresence>
+        {copied && (
+          <motion.span
+            initial={{ opacity: 0, y: 5, x: '-50%' }}
+            animate={{ opacity: 1, y: -15, x: '-50%' }}
+            exit={{ opacity: 0, y: -25, x: '-50%' }}
+            className="absolute left-1/2 -translate-x-1/2 px-2 py-0.5 bg-amber text-black font-mono text-[0.5rem] rounded-card font-bold shadow-[var(--glow-amber-sm)] z-[60] pointer-events-none whitespace-nowrap"
+            role="status"
+            aria-live="polite"
+          >
+            COPIED!
+          </motion.span>
+        )}
+      </AnimatePresence>
+    </span>
   );
 }

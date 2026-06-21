@@ -310,9 +310,13 @@ export default function Sentinel() {
       s.trailIndex = (s.trailIndex + 1) % 8;
 
       const tTheme = targetThemeRef.current;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const tCore = tTheme.core;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const tMid = tTheme.mid;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const tHalo = tTheme.halo;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const tSpec = tTheme.specular;
       const cur = currentColorRef.current;
       const COLOR_LERP = 0.04;
@@ -355,11 +359,6 @@ export default function Sentinel() {
       const finalHaloG = lerpColor(cur.haloG, vHalo.g, p);
       const finalHaloB = lerpColor(cur.haloB, vHalo.b, p);
       const finalHaloA = lerpColor(cur.haloA, vHalo.a, p);
-
-      const finalSpecR = lerpColor(cur.specR, vSpec.r, p);
-      const finalSpecG = lerpColor(cur.specG, vSpec.g, p);
-      const finalSpecB = lerpColor(cur.specB, vSpec.b, p);
-      const finalSpecA = lerpColor(cur.specA, vSpec.a, p);
 
       const finalSpecR = lerpColor(cur.specR, vSpec.r, p);
       const finalSpecG = lerpColor(cur.specG, vSpec.g, p);

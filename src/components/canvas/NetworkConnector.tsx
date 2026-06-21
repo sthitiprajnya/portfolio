@@ -25,10 +25,15 @@ const NODE_COLOR = 'rgba(0, 245, 255, 0.3)';
 
 // BOLT: Pre-calculate squared thresholds for 6 discrete opacity buckets to eliminate Math.sqrt and Math.floor from the hot loop.
 // ⚡ Optimization: thresholds are ordered by distance (B1 is furthest, B5 is closest to match bIdx logic)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const B1_SQ_VAL = Math.pow(MAX_DISTANCE * (5 / 6), 2);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const B2_SQ_VAL = Math.pow(MAX_DISTANCE * (4 / 6), 2);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const B3_SQ_VAL = Math.pow(MAX_DISTANCE * (3 / 6), 2);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const B4_SQ_VAL = Math.pow(MAX_DISTANCE * (2 / 6), 2);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const B5_SQ_VAL = Math.pow(MAX_DISTANCE * (1 / 6), 2);
 
 export default function NetworkConnector({ className }: NetworkConnectorProps) {

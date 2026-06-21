@@ -59,3 +59,8 @@
 **Vulnerability:** Inclusion of "fake" image assets (HTML 404 pages) in the public directory, potentially containing tracking scripts or facilitating XSS if rendered incorrectly.
 **Learning:** External assets can sometimes be mis-saved as HTML error pages during automated downloads. These assets not only break the UI but can introduce security and privacy risks (e.g., Google Tag Manager scripts in the 404 pages).
 **Prevention:** Always verify the MIME type and content of downloaded assets. Implement robust error handling in UI components (like `onError` in React) to gracefully fallback to safe, locally-generated content (like monograms) if an asset fails to load or is corrupted.
+
+## 2026-06-21 - Advanced Trusted Types and Robust Deep-Linking
+**Vulnerability:** XSS via SVG-specific attributes (like `xlink:href`) and potential injection vectors in string-based URL construction for deep-links.
+**Learning:** A standard Trusted Types policy may miss SVG-specific sinks like `xlink:href` which can be used for XSS. Additionally, constructing URLs via simple string concatenation (e.g., `origin + path + "#" + id`) is brittle and potentially exploitable if input is not strictly controlled.
+**Prevention:** Expand Trusted Types `createHTML` policies to include `xlink:href` in the attribute blocklist. Use the native `URL` API for all link construction to ensure robust parsing and prevent injection via malformed URI components.

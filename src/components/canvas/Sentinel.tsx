@@ -310,10 +310,6 @@ export default function Sentinel() {
       s.trailIndex = (s.trailIndex + 1) % 8;
 
       const tTheme = targetThemeRef.current;
-      const tCore = tTheme.core;
-      const tMid = tTheme.mid;
-      const tHalo = tTheme.halo;
-      const tSpec = tTheme.specular;
       const cur = currentColorRef.current;
       const COLOR_LERP = 0.04;
 

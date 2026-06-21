@@ -125,7 +125,7 @@ export function Experience() {
     <section
       id="experience"
       tabIndex={-1}
-      aria-labelledby="section-title-battle-log"
+      aria-labelledby="section-title-experience"
       className="py-24 bg-deep relative border-t border-border outline-none"
     >
       <div className="max-w-5xl mx-auto px-6 relative z-10" ref={containerRef}>

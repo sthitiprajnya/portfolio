@@ -51,6 +51,7 @@ export function ResumePanel() {
     <section
       id="resume"
       tabIndex={-1}
+      aria-labelledby="section-title-resume"
       className="py-24 bg-deep relative border-t border-border overflow-hidden outline-none"
     >
 

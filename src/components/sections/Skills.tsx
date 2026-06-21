@@ -109,7 +109,7 @@ export function Skills() {
     <section
       id="skills"
       tabIndex={-1}
-      aria-labelledby="section-title-tech-arsenal"
+      aria-labelledby="section-title-skills"
       className="py-24 bg-black overflow-hidden relative outline-none"
     >
       <div className="max-w-7xl mx-auto px-6 relative z-10">

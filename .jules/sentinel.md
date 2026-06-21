@@ -64,3 +64,8 @@
 **Vulnerability:** XSS via SVG-specific attributes (like `xlink:href`) and potential injection vectors in string-based URL construction for deep-links.
 **Learning:** A standard Trusted Types policy may miss SVG-specific sinks like `xlink:href` which can be used for XSS. Additionally, constructing URLs via simple string concatenation (e.g., `origin + path + "#" + id`) is brittle and potentially exploitable if input is not strictly controlled.
 **Prevention:** Expand Trusted Types `createHTML` policies to include `xlink:href` in the attribute blocklist. Use the native `URL` API for all link construction to ensure robust parsing and prevent injection via malformed URI components.
+
+## 2026-06-25 - Attribute Hardening in Trusted Types
+**Vulnerability:** Potential UI redressing or defacement via "safe" attributes like `autofocus` or `contenteditable`.
+**Learning:** While most CSPs focus on script injection, a robust Trusted Types policy should also restrict attributes that can be used for social engineering or UI manipulation. `autofocus` can be used to steal focus and redirect user input, while `contenteditable` can lead to DOM-based defacement.
+**Prevention:** Include `autofocus` and `contenteditable` in the Trusted Types attribute blocklist. Additionally, ensure component stability by resolving duplicate state and function declarations which can lead to brittle security logic and build failures.

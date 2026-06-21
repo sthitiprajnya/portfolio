@@ -1,5 +1,4 @@
 "use client";
-import toast from 'react-hot-toast';
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
@@ -12,39 +11,22 @@ interface SectionTitleProps {
   className?: string;
 }
 
+/**
+ * SectionTitle component for standard section headings.
+ * Includes a localized 'COPIED!' notification and robust deep-linking.
+ */
 export function SectionTitle({ number, title, id, className }: SectionTitleProps) {
   const [copied, setCopied] = useState(false);
   const sectionId = id || title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = () => {
-    const url = new URL(window.location.href);
-    url.hash = `section-title-${sectionId}`;
-    navigator.clipboard.writeText(url.toString());
-    setCopied(true);
-    toast.success('SECTION_LINK_COPIED');
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const handleCopyLink = async () => {
-    try {
-      const url = new URL(window.location.href);
-      url.hash = sectionId; // Link to the section container ID for better deep-linking
-      await navigator.clipboard.writeText(url.toString());
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy section link:', err);
-    }
-  };
 
   const handleCopy = () => {
     try {
-      // Security: Use the URL API for robust link construction instead of string concatenation.
-      // We link to the section container ID (e.g., #about) instead of the heading ID
-      // to ensure consistent scroll behavior and deep-linking reliability.
+      // Security: Use the native URL API for robust link construction.
+      // We link specifically to the heading ID to ensure consistency with the
+      // target element referenced by the section's aria-labelledby attribute.
       const url = new URL(window.location.href);
-      url.hash = `#${sectionId}`;
+      url.hash = `section-title-${sectionId}`;
+
       navigator.clipboard.writeText(url.toString());
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -63,7 +45,7 @@ export function SectionTitle({ number, title, id, className }: SectionTitleProps
         <span className="font-mono text-label text-cyan mb-3 px-3 py-1 inline-block glass-pill rounded-pill">
           // {number}
         </span>
-        <div className="flex items-center relative">
+        <div className="flex items-center relative group">
           <h2 id={`section-title-${sectionId}`} className="font-heading text-section font-bold text-white tracking-tight">
             {title}
           </h2>
@@ -85,6 +67,8 @@ export function SectionTitle({ number, title, id, className }: SectionTitleProps
                   animate={{ opacity: 1, y: 0, x: '-50%' }}
                   exit={{ opacity: 0, y: 10, x: '-50%' }}
                   className="absolute bottom-full left-1/2 mb-2 px-2 py-1 bg-cyan text-black font-mono text-[0.6rem] rounded-card font-bold shadow-[var(--glow-cyan-sm)] z-20 pointer-events-none whitespace-nowrap"
+                  role="status"
+                  aria-live="polite"
                 >
                   COPIED!
                 </motion.span>

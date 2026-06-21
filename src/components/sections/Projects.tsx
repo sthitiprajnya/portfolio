@@ -68,7 +68,7 @@ export function Projects() {
     <section
       id="projects"
       tabIndex={-1}
-      aria-labelledby="section-title-things-i-built"
+      aria-labelledby="section-title-projects"
       className="py-32 bg-black relative border-t border-border overflow-hidden outline-none"
     >
       <div className="max-w-7xl mx-auto px-6 relative z-10">

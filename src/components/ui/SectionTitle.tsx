@@ -13,6 +13,7 @@ interface SectionTitleProps {
 }
 
 export function SectionTitle({ number, title, id, className }: SectionTitleProps) {
+  const [copied, setCopied] = useState(false);
   const sectionId = id || title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
   const [copied, setCopied] = useState(false);
 
@@ -25,13 +26,25 @@ export function SectionTitle({ number, title, id, className }: SectionTitleProps
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleCopyLink = async () => {
+    try {
+      const url = new URL(window.location.href);
+      url.hash = sectionId; // Link to the section container ID for better deep-linking
+      await navigator.clipboard.writeText(url.toString());
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy section link:', err);
+    }
+  };
+
   return (
     <ScrollReveal
       variants={fadeSlideLeft}
       className={clsx("mb-12 md:mb-16", className)}
       data-orb-target="true"
     >
-      <div className="flex flex-col items-start group">
+      <div className="flex flex-col items-start">
         <span className="font-mono text-label text-cyan mb-3 px-3 py-1 inline-block glass-pill rounded-pill">
           // {number}
         </span>

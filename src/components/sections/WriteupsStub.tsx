@@ -14,7 +14,13 @@ export function WriteupsStub() {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
 
   return (
-    <section id="writeups" ref={ref} className="py-24 bg-deep relative border-t border-border overflow-hidden">
+    <section
+      id="writeups"
+      ref={ref}
+      tabIndex={-1}
+      aria-labelledby="section-title-writeups"
+      className="py-24 bg-deep relative border-t border-border overflow-hidden outline-none"
+    >
       <div className="absolute inset-0 pointer-events-none opacity-[0.02]" style={{ backgroundImage: 'repeating-linear-gradient(45deg, var(--color-amber) 0, var(--color-amber) 2px, transparent 2px, transparent 10px)' }} />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">

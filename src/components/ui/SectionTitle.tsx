@@ -38,6 +38,21 @@ export function SectionTitle({ number, title, id, className }: SectionTitleProps
     }
   };
 
+  const handleCopy = () => {
+    try {
+      // Security: Use the URL API for robust link construction instead of string concatenation.
+      // We link to the section container ID (e.g., #about) instead of the heading ID
+      // to ensure consistent scroll behavior and deep-linking reliability.
+      const url = new URL(window.location.href);
+      url.hash = `#${sectionId}`;
+      navigator.clipboard.writeText(url.toString());
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (e) {
+      console.warn('Failed to copy section link:', e);
+    }
+  };
+
   return (
     <ScrollReveal
       variants={fadeSlideLeft}

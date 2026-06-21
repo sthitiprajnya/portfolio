@@ -14,3 +14,7 @@
 ## 2026-06-19 - [Added aria-pressed to AsciiAvatar toggle button]
 **Learning:** Found an accessibility issue where the 'isHuman' / 'isScan' toggle button lacked the `aria-pressed` attribute, missing a crucial state representation for screen reader users on this interactive element.
 **Action:** Always ensure toggle buttons that represent binary states use `aria-pressed` to semantically communicate their state to assistive technologies.
+
+## 2024-05-18 - [Icon-Only Button Accessibility and Alignment]
+**Learning:** Decorative SVGs inside icon-only buttons (like section link copiers) must have `aria-hidden="true"` to prevent redundant screen reader announcements. Additionally, grouping a block-level element (like an `<h2>`) and an inline-level action button requires a standard flex container (`flex items-center`) to ensure proper visual alignment.
+**Action:** Always wrap heading-action combinations in a flex container and always verify nested SVG `aria-hidden` attributes inside elements that already declare an `aria-label`.

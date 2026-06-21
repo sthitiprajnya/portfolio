@@ -131,51 +131,17 @@ export default function RootLayout({
                         // This is expected and serves as a self-test for the policy.
                         const lower = s.toLowerCase();
                         if (
-                          lower.includes('<script') ||
-                          lower.includes('<base') ||
-                          lower.includes('<embed') ||
-                          lower.includes('<object') ||
-                          lower.includes('<applet') ||
-                          lower.includes('<meta') ||
-                          lower.includes('<form') ||
-                          lower.includes('<iframe') ||
-                          lower.includes('<frame') ||
-                          lower.includes('<frameset') ||
-                          lower.includes('<template') ||
-                          lower.includes('<math') ||
-                          lower.includes('<svg') ||
-                          lower.includes('<details') ||
-                          lower.includes('<animate') ||
-                          lower.includes('<animatemotion') ||
-                          lower.includes('<mpath') ||
-                          lower.includes('<discard') ||
-                          lower.includes('<set') ||
-                          lower.includes('<use') ||
-                          lower.includes('<portal') ||
-                          lower.includes('<link') ||
-                          lower.includes('<style') ||
-                          lower.includes('<audio') ||
-                          lower.includes('<video') ||
-                          lower.includes('<source') ||
-                          lower.includes('<track') ||
-                          lower.includes('<img') ||
-                          lower.includes('<picture') ||
-                          lower.includes('<area') ||
-                          lower.includes('<map') ||
-                          lower.includes('<input') ||
-                          lower.includes('<keygen') ||
-                          lower.includes('<dialog') ||
-                          lower.includes('<marquee') ||
+                          /<(script|base|embed|object|applet|meta|form|iframe|frame|frameset|template|math|svg|details|animate|animatemotion|mpath|discard|set|use|portal|link|style|audio|video|source|track|img|picture|area|map|input|keygen|dialog|marquee|isindex|layer|basefont|blink)/i.test(lower) ||
                           /(javascript|data|vbscript|file)\\s*:/i.test(lower) ||
                           /on[a-z]+\\s*=/i.test(lower) ||
-                          /(formaction|srcdoc|srcset|style|action|background|bgcolor|xlink:href)\\s*=/i.test(lower)
+                          /(formaction|srcdoc|srcset|style|action|background|bgcolor|xlink:href|autofocus|contenteditable)\\s*=/i.test(lower)
                         ) {
                           console.warn('Blocked dangerous HTML pattern in Trusted Types default policy:', s.slice(0, 50) + '...');
                           return s
-                            .replace(/<(script|base|embed|object|applet|meta|form|iframe|frame|frameset|template|math|svg|details|animate|animatemotion|mpath|discard|set|use|portal|link|style|audio|video|source|track|img|picture|area|map|input|keygen|dialog|marquee)/gi, '<blocked-$1')
+                            .replace(/<(script|base|embed|object|applet|meta|form|iframe|frame|frameset|template|math|svg|details|animate|animatemotion|mpath|discard|set|use|portal|link|style|audio|video|source|track|img|picture|area|map|input|keygen|dialog|marquee|isindex|layer|basefont|blink)/gi, '<blocked-$1')
                             .replace(/(javascript|data|vbscript|file)\\s*:/gi, 'blocked-$1:')
                             .replace(/on[a-z]+\\s*=/gi, (match) => 'blocked-' + match)
-                            .replace(/(formaction|srcdoc|srcset|style|action|background|bgcolor|xlink:href)\\s*=/gi, (match) => 'blocked-' + match);
+                            .replace(/(formaction|srcdoc|srcset|style|action|background|bgcolor|xlink:href|autofocus|contenteditable)\\s*=/gi, (match) => 'blocked-' + match);
                         }
                       }
                       return s;

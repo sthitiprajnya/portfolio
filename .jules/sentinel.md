@@ -64,3 +64,8 @@
 **Vulnerability:** XSS via SVG-specific attributes (like `xlink:href`) and potential injection vectors in string-based URL construction for deep-links.
 **Learning:** A standard Trusted Types policy may miss SVG-specific sinks like `xlink:href` which can be used for XSS. Additionally, constructing URLs via simple string concatenation (e.g., `origin + path + "#" + id`) is brittle and potentially exploitable if input is not strictly controlled.
 **Prevention:** Expand Trusted Types `createHTML` policies to include `xlink:href` in the attribute blocklist. Use the native `URL` API for all link construction to ensure robust parsing and prevent injection via malformed URI components.
+
+## 2026-06-23 - Hardened Trusted Types and Build Stability
+**Vulnerability:** XSS via legacy/obscure tags (isindex, layer, blink) and attributes (autofocus, contenteditable) missed by string-based 'includes' checks.
+**Learning:** Using multiple `.includes()` calls for tag detection in a Trusted Types policy is brittle and can lead to build regressions (e.g., duplicate logic if not properly merged). Regex-based detection is more robust and easier to maintain. Furthermore, some attributes like `autofocus` can be used for UI redress or exfiltration in specific contexts.
+**Prevention:** Prefer regex-based tag and attribute detection in Trusted Types policies. Always verify build stability (`pnpm build`) after merging security enhancements to catch duplicate declaration errors that might arise from automated merging.

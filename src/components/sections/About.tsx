@@ -17,7 +17,7 @@ export function About() {
     <section
       id="about"
       tabIndex={-1}
-      aria-labelledby="section-title-who-i-am"
+      aria-labelledby="section-title-about"
       className="py-24 bg-deep relative border-t border-border outline-none"
     >
 

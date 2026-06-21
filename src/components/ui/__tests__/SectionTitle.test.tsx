@@ -35,10 +35,7 @@ describe('SectionTitle', () => {
     fireEvent.click(copyButton);
 
     expect(writeTextMock).toHaveBeenCalled();
-    // Verification: Success feedback is now localized (framer-motion animation)
-    // instead of a global react-hot-toast notification.
-    await waitFor(() => {
-      expect(screen.getByText('COPIED!')).toBeInTheDocument();
-    });
+    // Verify that "COPIED!" text appears (localized feedback)
+    expect(await screen.findByText('COPIED!')).toBeInTheDocument();
   });
 });

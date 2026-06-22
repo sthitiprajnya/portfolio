@@ -164,18 +164,22 @@ export default function RootLayout({
                           lower.includes('<map') ||
                           lower.includes('<input') ||
                           lower.includes('<keygen') ||
+                          lower.includes('<isindex') ||
+                          lower.includes('<layer') ||
+                          lower.includes('<basefont') ||
+                          lower.includes('<blink') ||
                           lower.includes('<dialog') ||
                           lower.includes('<marquee') ||
                           /(javascript|data|vbscript|file)\\s*:/i.test(lower) ||
                           /on[a-z]+\\s*=/i.test(lower) ||
-                          /(formaction|srcdoc|srcset|style|action|background|bgcolor|xlink:href)\\s*=/i.test(lower)
+                          /(formaction|srcdoc|srcset|style|action|background|bgcolor|xlink:href|autofocus|contenteditable)\\s*=/i.test(lower)
                         ) {
                           console.warn('Blocked dangerous HTML pattern in Trusted Types default policy:', s.slice(0, 50) + '...');
                           return s
-                            .replace(/<(script|base|embed|object|applet|meta|form|iframe|frame|frameset|template|math|svg|details|animate|animatemotion|mpath|discard|set|use|portal|link|style|audio|video|source|track|img|picture|area|map|input|keygen|dialog|marquee)/gi, '<blocked-$1')
+                            .replace(/<(script|base|embed|object|applet|meta|form|iframe|frame|frameset|template|math|svg|details|animate|animatemotion|mpath|discard|set|use|portal|link|style|audio|video|source|track|img|picture|area|map|input|keygen|isindex|layer|basefont|blink|dialog|marquee)/gi, '<blocked-$1')
                             .replace(/(javascript|data|vbscript|file)\\s*:/gi, 'blocked-$1:')
                             .replace(/on[a-z]+\\s*=/gi, (match) => 'blocked-' + match)
-                            .replace(/(formaction|srcdoc|srcset|style|action|background|bgcolor|xlink:href)\\s*=/gi, (match) => 'blocked-' + match);
+                            .replace(/(formaction|srcdoc|srcset|style|action|background|bgcolor|xlink:href|autofocus|contenteditable)\\s*=/gi, (match) => 'blocked-' + match);
                         }
                       }
                       return s;

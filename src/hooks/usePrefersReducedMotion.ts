@@ -6,15 +6,37 @@ const QUERY = '(prefers-reduced-motion: reduce)';
 // across all 27 components consuming this hook, minimizing per-component overhead.
 // This replaces two useEffects and one useState per component with a single
 // optimized synchronization point, reducing memory footprint and effect churn.
+// BOLT: Cache the MediaQueryList instance to prevent evaluating the query
+// and instantiating a new object on every getSnapshot call during React renders.
+let mqlCache: MediaQueryList | null = null;
+
+const getMql = () => {
+  if (typeof window === 'undefined') return null;
+  if (!mqlCache) {
+    mqlCache = window.matchMedia(QUERY);
+  }
+  return mqlCache;
+};
+
 const subscribe = (callback: () => void) => {
-  const mql = window.matchMedia(QUERY);
+  const mql = getMql();
+  if (!mql) return () => {};
+
   mql.addEventListener('change', callback);
   return () => mql.removeEventListener('change', callback);
 };
 
-const getSnapshot = () => window.matchMedia(QUERY).matches;
+const getSnapshot = () => {
+  const mql = getMql();
+  return mql ? mql.matches : false;
+};
 
 const getServerSnapshot = () => false;
+
+// Exported for testing purposes only
+export const __resetMqlCacheForTesting = () => {
+  mqlCache = null;
+};
 
 export function usePrefersReducedMotion() {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);

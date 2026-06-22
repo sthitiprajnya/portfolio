@@ -1,5 +1,4 @@
 "use client";
-import toast from 'react-hot-toast';
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
@@ -15,28 +14,6 @@ interface SectionTitleProps {
 export function SectionTitle({ number, title, id, className }: SectionTitleProps) {
   const [copied, setCopied] = useState(false);
   const sectionId = id || title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = () => {
-    const url = new URL(window.location.href);
-    url.hash = `section-title-${sectionId}`;
-    navigator.clipboard.writeText(url.toString());
-    setCopied(true);
-    toast.success('SECTION_LINK_COPIED');
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const handleCopyLink = async () => {
-    try {
-      const url = new URL(window.location.href);
-      url.hash = sectionId; // Link to the section container ID for better deep-linking
-      await navigator.clipboard.writeText(url.toString());
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy section link:', err);
-    }
-  };
 
   const handleCopy = () => {
     try {
@@ -44,7 +21,7 @@ export function SectionTitle({ number, title, id, className }: SectionTitleProps
       // We link to the section container ID (e.g., #about) instead of the heading ID
       // to ensure consistent scroll behavior and deep-linking reliability.
       const url = new URL(window.location.href);
-      url.hash = `#${sectionId}`;
+      url.hash = sectionId;
       navigator.clipboard.writeText(url.toString());
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -56,7 +33,7 @@ export function SectionTitle({ number, title, id, className }: SectionTitleProps
   return (
     <ScrollReveal
       variants={fadeSlideLeft}
-      className={clsx("mb-12 md:mb-16", className)}
+      className={clsx("mb-12 md:mb-16 group", className)}
       data-orb-target="true"
     >
       <div className="flex flex-col items-start">
@@ -84,6 +61,8 @@ export function SectionTitle({ number, title, id, className }: SectionTitleProps
                   initial={{ opacity: 0, y: 10, x: '-50%' }}
                   animate={{ opacity: 1, y: 0, x: '-50%' }}
                   exit={{ opacity: 0, y: 10, x: '-50%' }}
+                  role="status"
+                  aria-live="polite"
                   className="absolute bottom-full left-1/2 mb-2 px-2 py-1 bg-cyan text-black font-mono text-[0.6rem] rounded-card font-bold shadow-[var(--glow-cyan-sm)] z-20 pointer-events-none whitespace-nowrap"
                 >
                   COPIED!

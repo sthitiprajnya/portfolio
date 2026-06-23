@@ -15,41 +15,20 @@ interface SectionTitleProps {
 export function SectionTitle({ number, title, id, className }: SectionTitleProps) {
   const [copied, setCopied] = useState(false);
   const sectionId = id || title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
-  const [copied, setCopied] = useState(false);
 
-  const handleCopy = () => {
-    const url = new URL(window.location.href);
-    url.hash = `section-title-${sectionId}`;
-    navigator.clipboard.writeText(url.toString());
-    setCopied(true);
-    toast.success('SECTION_LINK_COPIED');
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const handleCopyLink = async () => {
-    try {
-      const url = new URL(window.location.href);
-      url.hash = sectionId; // Link to the section container ID for better deep-linking
-      await navigator.clipboard.writeText(url.toString());
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy section link:', err);
-    }
-  };
-
-  const handleCopy = () => {
+  const handleCopy = async () => {
     try {
       // Security: Use the URL API for robust link construction instead of string concatenation.
       // We link to the section container ID (e.g., #about) instead of the heading ID
       // to ensure consistent scroll behavior and deep-linking reliability.
       const url = new URL(window.location.href);
       url.hash = `#${sectionId}`;
-      navigator.clipboard.writeText(url.toString());
+      await navigator.clipboard.writeText(url.toString());
       setCopied(true);
+      toast.success('SECTION_LINK_COPIED');
       setTimeout(() => setCopied(false), 2000);
-    } catch (e) {
-      console.warn('Failed to copy section link:', e);
+    } catch (err) {
+      console.error('Failed to copy section link:', err);
     }
   };
 

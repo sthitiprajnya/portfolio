@@ -97,3 +97,7 @@
 ## 2025-06-06 - [Layered Animation Early-Exits]
 **Learning:** In complex visual components like the Sentinel orb that feature layered state transitions (e.g., base scroll following vs. proximity-based color overrides), unconditional execution of Stage-2 logic adds unnecessary CPU overhead. By gating secondary lerp operations behind a proximity threshold check (e.g. `if (p > 0.001)`), we can skip dozens of floating-point operations per frame when the effect is not visible.
 **Action:** Always implement early-exits for secondary or "override" animation states in hot loops. Only execute math and state updates when the trigger condition (proximity, interaction, or timer) is active.
+
+## 2026-08-20 - [Sleepy Loop Pattern for Custom Cursors]
+**Learning:** Custom cursors typically use an unconditional `requestAnimationFrame` loop to handle "lag" or "smoothing" effects. When the mouse is stationary, this loop continues to run at 60fps, consuming CPU/GPU and draining battery. By implementing a "sleepy" pattern—halting the loop when the ring position is within a small epsilon (e.g. 0.1px) of the mouse position and restarting it only on interaction (`wake()` helper)—idle power consumption is drastically reduced.
+**Action:** Audit all global UI animation providers for continuous loops. Implement stability checks and a `wake()` mechanism triggered by relevant DOM events (`mousemove`, `scroll`, etc.) to sleep the thread when idle.

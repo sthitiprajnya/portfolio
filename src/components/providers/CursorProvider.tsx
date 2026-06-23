@@ -28,6 +28,16 @@ export function CursorProvider({ children }: CursorProviderProps) {
   useEffect(() => {
     if (isTouchDevice || prefersReducedMotion) return;
 
+    let animationFrameId: number | null = null;
+
+    // BOLT: "Sleepy" animation pattern - only run the loop when the cursor is moving or interacting.
+    // This significantly reduces idle CPU usage and saves battery on mobile/laptops.
+    const wake = () => {
+      if (animationFrameId === null) {
+        animationFrameId = requestAnimationFrame(render);
+      }
+    };
+
     const handleMouseMove = (e: MouseEvent) => {
       mousePos.current = { x: e.clientX, y: e.clientY };
       if (isInitial.current) {
@@ -35,83 +45,79 @@ export function CursorProvider({ children }: CursorProviderProps) {
         if (ringRef.current) ringRef.current.style.opacity = '1';
         isInitial.current = false;
       }
+      wake();
     };
 
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      const isInteractive = !!(
-        target.tagName.toLowerCase() === 'a' ||
-        target.tagName.toLowerCase() === 'button' ||
-        target.closest('a') ||
-        target.closest('button') ||
-        target.closest('[role="button"]') ||
-        target.closest('input') ||
-        target.closest('textarea')
-      );
+      // BOLT: Optimized interactive element detection utilizing a single closest() call
+      // which is more efficient than multiple iterative tagName and manual closest checks.
+      const isInteractive = !!target.closest('a, button, [role="button"], input, textarea');
 
-      isHovering.current = isInteractive;
-      if (ringRef.current) {
-        if (isInteractive) {
-          ringRef.current.classList.add('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]');
-        } else {
-          ringRef.current.classList.remove('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]');
-        }
-      }
-    };
-
-    const handleMouseDown = () => {
-      isClicking.current = true;
-    };
-    const handleMouseUp = () => {
-      isClicking.current = false;
-    };
-
-    // BOLT: Adding { passive: true } to high-frequency event listeners to prevent main-thread blocking and layout jank
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    window.addEventListener('mouseover', handleMouseOver, { passive: true });
-    window.addEventListener('mousedown', handleMouseDown, { passive: true });
-    window.addEventListener('mouseup', handleMouseUp, { passive: true });
-
-    let animationFrameId: number;
-
-    const render = () => {
-      // Lerp for smooth follow (lag)
-      ringPos.current.x += (mousePos.current.x - ringPos.current.x) * 0.15;
-      ringPos.current.y += (mousePos.current.y - ringPos.current.y) * 0.15;
-
-      if (dotRef.current) {
-        const dotScale = isClicking.current ? 0.75 : 1;
-        dotRef.current.style.transform = `translate(calc(${mousePos.current.x}px - 50%), calc(${mousePos.current.y}px - 50%)) scale(${dotScale})`;
-        // Ensure opacity is 1 after initial movement
-        if (!isInitial.current) dotRef.current.style.opacity = '1';
-      }
-
-      if (ringRef.current) {
-        const scale = isClicking.current ? 0.5 : isHovering.current ? 1.5 : 1;
-        ringRef.current.style.transform = `translate(calc(${ringPos.current.x}px - 50%), calc(${ringPos.current.y}px - 50%)) scale(${scale})`;
-
-        // Ensure opacity and classes are correct after potential React re-renders
-        if (!isInitial.current) {
-          ringRef.current.style.opacity = '1';
-          if (isHovering.current) {
+      if (isHovering.current !== isInteractive) {
+        isHovering.current = isInteractive;
+        if (ringRef.current) {
+          if (isInteractive) {
             ringRef.current.classList.add('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]');
           } else {
             ringRef.current.classList.remove('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]');
           }
         }
       }
-
-      animationFrameId = requestAnimationFrame(render);
+      wake();
     };
 
-    render();
+    const handleMouseDown = () => {
+      isClicking.current = true;
+      wake();
+    };
+    const handleMouseUp = () => {
+      isClicking.current = false;
+      wake();
+    };
+
+    const render = () => {
+      const dx = mousePos.current.x - ringPos.current.x;
+      const dy = mousePos.current.y - ringPos.current.y;
+
+      // Lerp for smooth follow (lag)
+      ringPos.current.x += dx * 0.15;
+      ringPos.current.y += dy * 0.15;
+
+      if (dotRef.current) {
+        const dotScale = isClicking.current ? 0.75 : 1;
+        // BOLT: Use translate3d for hardware acceleration and layer promotion
+        dotRef.current.style.transform = `translate3d(calc(${mousePos.current.x}px - 50%), calc(${mousePos.current.y}px - 50%), 0) scale(${dotScale})`;
+      }
+
+      if (ringRef.current) {
+        const scale = isClicking.current ? 0.5 : isHovering.current ? 1.5 : 1;
+        // BOLT: Use translate3d for hardware acceleration and layer promotion
+        ringRef.current.style.transform = `translate3d(calc(${ringPos.current.x}px - 50%), calc(${ringPos.current.y}px - 50%), 0) scale(${scale})`;
+      }
+
+      // Check if settled: positions are close enough AND no active clicking state
+      if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1 && !isClicking.current) {
+        animationFrameId = null;
+      } else {
+        animationFrameId = requestAnimationFrame(render);
+      }
+    };
+
+    // BOLT: Adding { passive: true } to high-frequency event listeners to prevent main-thread blocking and layout jank
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    window.addEventListener('mouseover', handleMouseOver, { passive: true });
+    window.addEventListener('mousedown', handleMouseDown, { passive: true });
+    window.addEventListener('mouseup',   handleMouseUp,   { passive: true });
+
+    wake();
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseover', handleMouseOver);
       window.removeEventListener('mousedown', handleMouseDown);
       window.removeEventListener('mouseup', handleMouseUp);
-      cancelAnimationFrame(animationFrameId);
+      if (animationFrameId !== null) cancelAnimationFrame(animationFrameId);
     };
   }, [isTouchDevice, prefersReducedMotion]);
 

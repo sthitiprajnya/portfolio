@@ -168,14 +168,14 @@ export default function RootLayout({
                           lower.includes('<marquee') ||
                           /(javascript|data|vbscript|file)\\s*:/i.test(lower) ||
                           /on[a-z]+\\s*=/i.test(lower) ||
-                          /(formaction|srcdoc|srcset|style|action|background|bgcolor|xlink:href)\\s*=/i.test(lower)
+                          /(formaction|srcdoc|srcset|style|action|background|bgcolor|xlink:href|autofocus|contenteditable)\\s*[=>\\s]/i.test(lower)
                         ) {
                           console.warn('Blocked dangerous HTML pattern in Trusted Types default policy:', s.slice(0, 50) + '...');
                           return s
                             .replace(/<(script|base|embed|object|applet|meta|form|iframe|frame|frameset|template|math|svg|details|animate|animatemotion|mpath|discard|set|use|portal|link|style|audio|video|source|track|img|picture|area|map|input|keygen|dialog|marquee)/gi, '<blocked-$1')
                             .replace(/(javascript|data|vbscript|file)\\s*:/gi, 'blocked-$1:')
                             .replace(/on[a-z]+\\s*=/gi, (match) => 'blocked-' + match)
-                            .replace(/(formaction|srcdoc|srcset|style|action|background|bgcolor|xlink:href)\\s*=/gi, (match) => 'blocked-' + match);
+                            .replace(/(formaction|srcdoc|srcset|style|action|background|bgcolor|xlink:href|autofocus|contenteditable)\\s*(=|>|\\s)/gi, (match, p1, p2) => 'blocked-' + p1 + p2);
                         }
                       }
                       return s;

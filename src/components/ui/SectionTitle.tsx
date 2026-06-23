@@ -1,5 +1,4 @@
 "use client";
-import toast from 'react-hot-toast';
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
@@ -25,7 +24,6 @@ export function SectionTitle({ number, title, id, className }: SectionTitleProps
       url.hash = `#${sectionId}`;
       await navigator.clipboard.writeText(url.toString());
       setCopied(true);
-      toast.success('SECTION_LINK_COPIED');
       setTimeout(() => setCopied(false), 2000);
     } catch (e) {
       console.warn('Failed to copy section link:', e);

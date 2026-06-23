@@ -97,3 +97,7 @@
 ## 2025-06-06 - [Layered Animation Early-Exits]
 **Learning:** In complex visual components like the Sentinel orb that feature layered state transitions (e.g., base scroll following vs. proximity-based color overrides), unconditional execution of Stage-2 logic adds unnecessary CPU overhead. By gating secondary lerp operations behind a proximity threshold check (e.g. `if (p > 0.001)`), we can skip dozens of floating-point operations per frame when the effect is not visible.
 **Action:** Always implement early-exits for secondary or "override" animation states in hot loops. Only execute math and state updates when the trigger condition (proximity, interaction, or timer) is active.
+
+## 2026-05-31 - Sleepy RAF Pattern for Custom Cursors
+**Learning:** Custom cursor implementations often use a continuous `requestAnimationFrame` loop to handle lerping, which consumes CPU cycles even when the mouse is stationary. By implementing a "Sleepy" pattern—where the loop is only active when movement occurs and automatically sleeps once the target state is reached (e.g., `distSq < 0.01`)—we can significantly reduce idle CPU overhead. Additionally, moving DOM mutations like `classList` and `opacity` changes into event handlers instead of the hot loop avoids redundant per-frame writes.
+**Action:** Implement `wake()` and `sleep` logic for all high-frequency animation loops that depend on user input. Gate DOM mutations behind state-change checks in event handlers to keep the RAF loop as lightweight as possible.

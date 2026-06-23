@@ -83,6 +83,10 @@
 **Learning:** High-frequency global event listeners (like `mousemove`, `mouseover`, `mousedown`, `mouseup`, `touchstart`, `touchmove`, `scroll`) can block the main thread and cause layout jank, especially during scroll or animations, because the browser waits to see if `preventDefault()` will be called.
 **Action:** Always add `{ passive: true }` to these listeners when `preventDefault()` is not needed, so the browser can continue rendering/scrolling without waiting for the JavaScript event handler to finish.
 
+## 2025-06-04 - [Sleepy Animation Loop Pattern]
+**Learning:** High-frequency animation loops (like custom cursors) that run perpetually at 60fps consume significant CPU and battery even when the UI is stationary. Implementing a "Sleepy" loop that only runs during active interaction (moving, clicking) and sleeps when the interpolated state settles drastically reduces idle overhead.
+**Action:** Always implement a `wake()` mechanism for non-essential animation loops. Halts the `requestAnimationFrame` once the delta between current and target state falls below a threshold (e.g., `< 0.1`).
+
 ## 2025-06-05 - [Active Set Optimization for Sparse Animations]
 **Learning:** In high-frequency effects like the Matrix Rain glitch burst, iterating through the entire column set ( \approx 100$) for every trail level (=13$) to render a few active glitch columns (=3$) results in significant redundant work ((N \times T)$). By maintaining an "active set" array of glitch indices, we can reduce complexity to (G \times T)$, saving over 1,200 iterations per frame during bursts.
 **Action:** For animations that target a sparse subset of elements, maintain an array of active indices or objects instead of scanning the full state space with conditional checks in hot loops.

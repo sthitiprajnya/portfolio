@@ -17,9 +17,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export function Contact() {
   const formRef = useRef<HTMLFormElement>(null);
   const successButtonRef = useRef<HTMLButtonElement>(null);
-  const [emailCopied, setEmailCopied] = useState(false);
 
-  const [emailCopied, setEmailCopied] = useState(false);
   const [form, setForm] = useState({
     from_name:  '',
     from_email: '',
@@ -168,10 +166,11 @@ export function Contact() {
     }
   };
 
-  const handleCopyEmail = () => {
+  const handleCopyEmail = (e: React.MouseEvent) => {
+    e.preventDefault();
     navigator.clipboard.writeText(PERSONAL.email);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setEmailCopied(true);
+    setTimeout(() => setEmailCopied(false), 2000);
   };
 
   return (
@@ -225,12 +224,7 @@ export function Contact() {
                 {/* Micro-UX: Quick copy button for accessibility/convenience */}
                 <div className="absolute top-2 right-2">
                   <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      navigator.clipboard.writeText(PERSONAL.email);
-                      setEmailCopied(true);
-                      setTimeout(() => setEmailCopied(false), 2000);
-                    }}
+                    onClick={handleCopyEmail}
                     className="p-1.5 rounded-card bg-cyan/5 border border-cyan/10 text-cyan opacity-20 group-hover:opacity-100 focus-visible:opacity-100 transition-all hover:bg-cyan hover:text-black outline-none focus-visible:ring-2 focus-visible:ring-cyan"
                     aria-label="Copy email address to clipboard"
                     title="Copy email address"

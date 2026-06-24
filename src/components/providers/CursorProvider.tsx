@@ -72,8 +72,6 @@ export function CursorProvider({ children }: CursorProviderProps) {
   useEffect(() => {
     if (isTouchDevice || prefersReducedMotion) return;
 
-    let animationFrameId: number;
-
     const render = () => {
       const targetX = mousePos.current.x;
       const targetY = mousePos.current.y;
@@ -85,6 +83,7 @@ export function CursorProvider({ children }: CursorProviderProps) {
       ringPos.current.x += dx * 0.15;
       ringPos.current.y += dy * 0.15;
 
+      // BOLT: Use translate3d to ensure GPU acceleration and prevent sub-pixel layout shifts
       if (dotRef.current) {
         const dotScale = isClicking.current ? 0.75 : 1;
         dotRef.current.style.transform = `translate(calc(${mousePos.current.x}px - 50%), calc(${mousePos.current.y}px - 50%)) scale(${dotScale})`;

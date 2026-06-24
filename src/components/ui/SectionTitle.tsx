@@ -17,23 +17,21 @@ interface SectionTitleProps {
  */
 export function SectionTitle({ number, title, id, className }: SectionTitleProps) {
   const [copied, setCopied] = useState(false);
-
-  // Use the provided ID or generate a slugified fallback from the title.
-  // Note: Most sections already have IDs that are used for aria-labelledby.
   const sectionId = id || title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
 
   const handleCopy = async () => {
     try {
-      // Security: Use the native URL API for robust parsing and reconstruction.
-      // We link to the section container ID (e.g., #about) for consistent deep-linking behavior.
+      // Security: Use the URL API for robust link construction instead of string concatenation.
+      // We link to the section container ID (e.g., #about) instead of the heading ID
+      // to ensure consistent scroll behavior and deep-linking reliability.
       const url = new URL(window.location.href);
-      url.hash = sectionId;
-
+      url.hash = `#${sectionId}`;
       await navigator.clipboard.writeText(url.toString());
       setCopied(true);
+      toast.success('SECTION_LINK_COPIED');
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.warn('Failed to copy section link:', err);
+    } catch (e) {
+      console.warn('Failed to copy section link:', e);
     }
   };
 

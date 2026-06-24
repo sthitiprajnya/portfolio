@@ -69,6 +69,8 @@ export function SectionTitle({ number, title, id, className }: SectionTitleProps
                   role="status"
                   aria-live="polite"
                   className="absolute bottom-full left-1/2 mb-2 px-2 py-1 bg-cyan text-black font-mono text-[0.6rem] rounded-card font-bold shadow-[var(--glow-cyan-sm)] z-20 pointer-events-none whitespace-nowrap"
+                  role="status"
+                  aria-live="polite"
                 >
                   COPIED!
                 </motion.span>

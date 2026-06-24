@@ -168,14 +168,14 @@ export default function RootLayout({
                           lower.includes('<marquee') ||
                           /(javascript|data|vbscript|file)\\s*:/i.test(lower) ||
                           /on[a-z]+\\s*=/i.test(lower) ||
-                          /(formaction|srcdoc|srcset|style|action|background|bgcolor|xlink:href)\\s*=/i.test(lower)
+                          /(formaction|srcdoc|srcset|style|action|background|bgcolor|xlink:href|contenteditable|codebase|archive|poster)\\s*=/i.test(lower)
                         ) {
                           console.warn('Blocked dangerous HTML pattern in Trusted Types default policy:', s.slice(0, 50) + '...');
                           return s
                             .replace(/<(script|base|embed|object|applet|meta|form|iframe|frame|frameset|template|math|svg|details|animate|animatemotion|mpath|discard|set|use|portal|link|style|audio|video|source|track|img|picture|area|map|input|keygen|dialog|marquee)/gi, '<blocked-$1')
                             .replace(/(javascript|data|vbscript|file)\\s*:/gi, 'blocked-$1:')
                             .replace(/on[a-z]+\\s*=/gi, (match) => 'blocked-' + match)
-                            .replace(/(formaction|srcdoc|srcset|style|action|background|bgcolor|xlink:href)\\s*=/gi, (match) => 'blocked-' + match);
+                            .replace(/(formaction|srcdoc|srcset|style|action|background|bgcolor|xlink:href|contenteditable|codebase|archive|poster)\\s*=/gi, (match) => 'blocked-' + match);
                         }
                       }
                       return s;
@@ -188,8 +188,9 @@ export default function RootLayout({
                         const url = new URL(s, window.location.origin);
                         const isSameOrigin = url.origin === window.location.origin;
                         const isHttpOrHttps = url.protocol === 'http:' || url.protocol === 'https:';
+                        const isBlockedScheme = url.protocol === 'blob:' || url.protocol === 'data:' || url.protocol === 'javascript:';
 
-                        if (!isSameOrigin || !isHttpOrHttps) {
+                        if (!isSameOrigin || !isHttpOrHttps || isBlockedScheme) {
                           console.warn('Blocked dangerous or cross-origin script URL in Trusted Types policy:', s);
                           return '/blocked-script-url';
                         }

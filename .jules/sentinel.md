@@ -64,3 +64,8 @@
 **Vulnerability:** XSS via SVG-specific attributes (like `xlink:href`) and potential injection vectors in string-based URL construction for deep-links.
 **Learning:** A standard Trusted Types policy may miss SVG-specific sinks like `xlink:href` which can be used for XSS. Additionally, constructing URLs via simple string concatenation (e.g., `origin + path + "#" + id`) is brittle and potentially exploitable if input is not strictly controlled.
 **Prevention:** Expand Trusted Types `createHTML` policies to include `xlink:href` in the attribute blocklist. Use the native `URL` API for all link construction to ensure robust parsing and prevent injection via malformed URI components.
+
+## 2026-06-24 - Production Auditability and Surface Reduction
+**Vulnerability:** Loss of security auditability in production due to aggressive console log stripping, and unnecessary attack surface from third-party notification libraries.
+**Learning:** Default production build configurations that strip all console logs prevent the monitoring of Trusted Types violations and other runtime security events. Furthermore, using external libraries for simple UI feedback (like "COPIED" notifications) adds unnecessary transitive dependencies and DOM complexity.
+**Prevention:** Configure `removeConsole` to explicitly exclude `warn` and `error` levels. Replace global, provider-based notification systems with localized, framework-native feedback components to reduce the application's dependency footprint and improve security posture.

@@ -13,3 +13,7 @@
 ## 2026-06-12 - Roving Tabindex for Filter Groups
 **Learning:** Filter buttons that act as tabs should follow the WAI-ARIA Tabs pattern to be truly accessible to keyboard and screen reader users. Implementing a roving tabindex (where only the active item is focusable via Tab, and others are reached via Arrow keys) reduces keyboard noise and matches OS-level tab behaviors.
 **Action:** When implementing a group of toggle/filter buttons, use `role="tablist"` on the container and `role="tab"` on the buttons. Use a `useRef` array to manage focus programmatically during arrow key navigation and sync `tabIndex` with the active state.
+
+## 2026-06-24 - Contextual Feedback for Clipboard Actions
+**Learning:** Global toast notifications for clipboard actions ("Copied to clipboard") can be physically distant from the user's point of interaction, causing a disconnect in feedback. Replacing them with localized 'COPIED!' badges using `AnimatePresence` provides immediate, contextual confirmation. Adding `role="status"` and `aria-live="polite"` ensures this feedback is accessible to screen readers.
+**Action:** Use localized, contextual feedback badges with `framer-motion` for repeatable interactive actions instead of global provider-based notifications. Ensure all clipboard operations are `awaited` before triggering feedback states to avoid false positives.

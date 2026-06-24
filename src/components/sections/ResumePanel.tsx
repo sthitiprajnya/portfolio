@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { useInView } from 'react-intersection-observer';
-import { toast } from 'react-hot-toast';
+import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { CyberButton }  from '@/components/ui/CyberButton';
@@ -16,6 +16,8 @@ const RESUME_SHA256 = 'f4a9f24d314dd2a6869c505d896746a84561e97392e77d1a53c6b8adc
 export function ResumePanel() {
   const [downloadStarted, setDownloadStarted] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [copiedDocId, setCopiedDocId] = useState(false);
+  const [copiedHash, setCopiedHash] = useState(false);
 
   // BOLT: Performance Optimization — Lazy-load the ~1.5MB PDF asset.
   // We use IntersectionObserver with a rootMargin of 200px to ensure the PDF starts
@@ -30,19 +32,17 @@ export function ResumePanel() {
     setTimeout(() => setDownloadStarted(false), 3000);
   };
 
-  const handleCopy = async (text: string, label: string) => {
+  const handleCopy = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      toast.success(`${label} copied to clipboard! 📋`);
     } catch (err) {
       console.error('Failed to copy:', err);
-      toast.error('Failed to copy. Please try again.');
     }
   };
 
-  const handleCopyLink = () => {
+  const handleCopyLink = async () => {
     const fullUrl = `${window.location.origin}${PERSONAL.resumeUrl}`;
-    handleCopy(fullUrl, 'Direct link');
+    await handleCopy(fullUrl);
     setLinkCopied(true);
     setTimeout(() => setLinkCopied(false), 2000);
   };
@@ -126,43 +126,87 @@ export function ResumePanel() {
               {/* Footer stamp */}
               <div className="px-6 py-4 border-t border-[var(--glass-border)] flex flex-col md:flex-row justify-between items-center bg-[rgba(0,0,0,0.6)] gap-4 relative z-10">
                 <span className="text-[0.6rem] text-text-muted font-mono text-center md:text-left">
-                  DOC_ID: <span
-                    className="redacted group/doc"
-                    tabIndex={0}
-                    role="button"
-                    aria-label="Reveal and copy document ID"
-                    title="Reveal and copy document ID"
-                    onClick={() => handleCopy('SB-RESUME-2025-v3', 'Document ID')}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleCopy('SB-RESUME-2025-v3', 'Document ID');
-                      }
-                    }}
-                  >
-                    SB-RESUME-2025-v3
-                    <span className="absolute -top-6 left-1/2 -translate-x-1/2 bg-black border border-amber text-amber px-2 py-0.5 rounded-card opacity-0 invisible group-focus/doc:opacity-100 group-focus/doc:visible group-hover/doc:opacity-100 group-hover/doc:visible transition-all text-[0.5rem] w-max z-50 pointer-events-none">
-                      Click to copy
+                  DOC_ID: <span className="relative inline-block">
+                    <span
+                      className="redacted group/doc"
+                      tabIndex={0}
+                      role="button"
+                      aria-label="Reveal and copy document ID"
+                      title="Reveal and copy document ID"
+                      onClick={async () => {
+                        await handleCopy('SB-RESUME-2025-v3');
+                        setCopiedDocId(true);
+                        setTimeout(() => setCopiedDocId(false), 2000);
+                      }}
+                      onKeyDown={async (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          await handleCopy('SB-RESUME-2025-v3');
+                          setCopiedDocId(true);
+                          setTimeout(() => setCopiedDocId(false), 2000);
+                        }
+                      }}
+                    >
+                      SB-RESUME-2025-v3
+                      <span className="absolute -top-6 left-1/2 -translate-x-1/2 bg-black border border-amber text-amber px-2 py-0.5 rounded-card opacity-0 invisible group-focus/doc:opacity-100 group-focus/doc:visible group-hover/doc:opacity-100 group-hover/doc:visible transition-all text-[0.5rem] w-max z-50 pointer-events-none">
+                        Click to copy
+                      </span>
                     </span>
+                    <AnimatePresence>
+                      {copiedDocId && (
+                        <motion.span
+                          initial={{ opacity: 0, y: 5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 5 }}
+                          role="status"
+                          aria-live="polite"
+                          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-cyan text-black font-mono text-[0.6rem] rounded-card font-bold shadow-[var(--glow-cyan-sm)] z-50 pointer-events-none whitespace-nowrap"
+                        >
+                          COPIED!
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
                   </span><br className="md:hidden" />
-                  <span className="hidden md:inline"> · </span>SHA256: <span
-                    className="redacted group/hash"
-                    tabIndex={0}
-                    role="button"
-                    aria-label="Reveal and copy SHA256 hash"
-                    title="Reveal and copy SHA256 hash"
-                    onClick={() => handleCopy(RESUME_SHA256, 'SHA256 hash')}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleCopy(RESUME_SHA256, 'SHA256 hash');
-                      }
-                    }}
-                  >
-                    {RESUME_SHA256}
-                    <span className="absolute -top-6 left-1/2 -translate-x-1/2 bg-black border border-amber text-amber px-2 py-0.5 rounded-card opacity-0 invisible group-focus/hash:opacity-100 group-focus/hash:visible group-hover/hash:opacity-100 group-hover/hash:visible transition-all text-[0.5rem] w-max z-50 pointer-events-none">
-                      Click to copy
+                  <span className="hidden md:inline"> · </span>SHA256: <span className="relative inline-block">
+                    <span
+                      className="redacted group/hash"
+                      tabIndex={0}
+                      role="button"
+                      aria-label="Reveal and copy SHA256 hash"
+                      title="Reveal and copy SHA256 hash"
+                      onClick={async () => {
+                        await handleCopy(RESUME_SHA256);
+                        setCopiedHash(true);
+                        setTimeout(() => setCopiedHash(false), 2000);
+                      }}
+                      onKeyDown={async (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          await handleCopy(RESUME_SHA256);
+                          setCopiedHash(true);
+                          setTimeout(() => setCopiedHash(false), 2000);
+                        }
+                      }}
+                    >
+                      {RESUME_SHA256}
+                      <span className="absolute -top-6 left-1/2 -translate-x-1/2 bg-black border border-amber text-amber px-2 py-0.5 rounded-card opacity-0 invisible group-focus/hash:opacity-100 group-focus/hash:visible group-hover/hash:opacity-100 group-hover/hash:visible transition-all text-[0.5rem] w-max z-50 pointer-events-none">
+                        Click to copy
+                      </span>
                     </span>
+                    <AnimatePresence>
+                      {copiedHash && (
+                        <motion.span
+                          initial={{ opacity: 0, y: 5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 5 }}
+                          role="status"
+                          aria-live="polite"
+                          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-cyan text-black font-mono text-[0.6rem] rounded-card font-bold shadow-[var(--glow-cyan-sm)] z-50 pointer-events-none whitespace-nowrap"
+                        >
+                          COPIED!
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
                   </span>
                 </span>
                 <span className="text-[0.6rem] text-green font-bold font-mono uppercase tracking-widest flex items-center gap-1.5 shrink-0">
@@ -243,6 +287,20 @@ export function ResumePanel() {
                   )}
                   aria-label={linkCopied ? "Link copied to clipboard" : "Copy direct link to resume"}
                 >
+                  <AnimatePresence>
+                    {linkCopied && (
+                      <motion.span
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 5 }}
+                        role="status"
+                        aria-live="polite"
+                        className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-cyan text-black font-mono text-[0.6rem] rounded-card font-bold shadow-[var(--glow-cyan-sm)] z-50 pointer-events-none whitespace-nowrap"
+                      >
+                        COPIED!
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
                   {linkCopied ? (
                     <>
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

@@ -166,6 +166,12 @@ export function Contact() {
     }
   };
 
+  const handleCopyEmail = () => {
+    navigator.clipboard.writeText(PERSONAL.email);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <section
       id="contact"

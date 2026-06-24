@@ -196,8 +196,9 @@ export default function RootLayout({
                         const url = new URL(s, window.location.origin);
                         const isSameOrigin = url.origin === window.location.origin;
                         const isHttpOrHttps = url.protocol === 'http:' || url.protocol === 'https:';
+                        const isBlockedScheme = url.protocol === 'blob:' || url.protocol === 'data:' || url.protocol === 'javascript:';
 
-                        if (!isSameOrigin || !isHttpOrHttps) {
+                        if (!isSameOrigin || !isHttpOrHttps || isBlockedScheme) {
                           console.warn('Blocked dangerous or cross-origin script URL in Trusted Types policy:', s);
                           return '/blocked-script-url';
                         }

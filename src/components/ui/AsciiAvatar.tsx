@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import clsx from 'clsx';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import Image from 'next/image';
@@ -42,13 +42,29 @@ interface AsciiAvatarProps {
 
 // BOLT: Extracting the face animation to a sub-component to prevent re-rendering the entire Avatar card every 120ms.
 function AsciiFace({ inView }: { inView: boolean }) {
-  const [scanPos, setScanPos] = useState(0);
   const prefersReducedMotion = usePrefersReducedMotion();
+  // BOLT: Optimize AsciiFace animation by using refs and direct DOM manipulation
+  // instead of React state. This prevents React from continuously reconciling
+  // and re-rendering the component every 120ms.
+  const linesRef = useRef<(HTMLDivElement | null)[]>([]);
 
+  const currentPosRef = useRef(0);
   useEffect(() => {
     if (prefersReducedMotion || !inView) return;
     const timer = setInterval(() => {
-      setScanPos(prev => (prev >= AVATAR_LINES.length - 1 ? 0 : prev + 1));
+      let currentPos = currentPosRef.current;
+      const prevLine = linesRef.current[currentPos];
+      if (prevLine) {
+        prevLine.classList.remove('text-cyan', 'bg-cyan/10');
+        prevLine.classList.add('text-cyan/70');
+      }
+      currentPos = currentPos >= AVATAR_LINES.length - 1 ? 0 : currentPos + 1;
+      currentPosRef.current = currentPos;
+      const nextLine = linesRef.current[currentPos];
+      if (nextLine) {
+        nextLine.classList.remove('text-cyan/70');
+        nextLine.classList.add('text-cyan', 'bg-cyan/10');
+      }
     }, 120);
     return () => clearInterval(timer);
   }, [prefersReducedMotion, inView]);
@@ -58,11 +74,12 @@ function AsciiFace({ inView }: { inView: boolean }) {
       {AVATAR_LINES.map((line, idx) => (
         <div
           key={idx}
+          ref={(el) => {
+            linesRef.current[idx] = el;
+          }}
           className={clsx(
             'relative font-mono text-[0.68rem] leading-[1.45] whitespace-pre transition-colors duration-100',
-            !prefersReducedMotion && idx === scanPos
-              ? 'text-cyan bg-cyan/10'
-              : 'text-cyan/70'
+            !prefersReducedMotion && idx === 0 ? 'text-cyan bg-cyan/10' : 'text-cyan/70'
           )}
         >
           {line}
@@ -80,22 +97,35 @@ function AsciiFace({ inView }: { inView: boolean }) {
 
 // BOLT: Extracting the metadata animation to a sub-component to prevent re-rendering the entire Avatar card every 300ms.
 function MetadataPanel({ inView }: { inView: boolean }) {
-  const [visibleMeta, setVisibleMeta] = useState(0);
   const prefersReducedMotion = usePrefersReducedMotion();
+  const metaLinesRef = useRef<(HTMLDivElement | null)[]>([]);
+  const currentVisibleRef = useRef(0);
 
   useEffect(() => {
     if (prefersReducedMotion || !inView) {
-      if (prefersReducedMotion) setVisibleMeta(META_LINES.length);
+      if (prefersReducedMotion) {
+         metaLinesRef.current.forEach(el => {
+           if(el) {
+              el.classList.remove('opacity-0', '-translate-x-2');
+              el.classList.add('opacity-100', 'translate-x-0', 'text-green/90');
+           }
+         });
+      }
       return;
     }
     const timer = setInterval(() => {
-      setVisibleMeta(prev => {
-        if (prev >= META_LINES.length) {
-          clearInterval(timer);
-          return prev;
-        }
-        return prev + 1;
-      });
+      let currentVisible = currentVisibleRef.current;
+      if (currentVisible >= META_LINES.length) {
+        clearInterval(timer);
+        return;
+      }
+      const line = metaLinesRef.current[currentVisible];
+      if (line) {
+        line.classList.remove('opacity-0', '-translate-x-2');
+        line.classList.add('opacity-100', 'translate-x-0', 'text-green/90');
+      }
+      currentVisible++;
+      currentVisibleRef.current = currentVisible;
     }, 300);
     return () => clearInterval(timer);
   }, [prefersReducedMotion, inView]);
@@ -105,11 +135,11 @@ function MetadataPanel({ inView }: { inView: boolean }) {
       {META_LINES.map((line, idx) => (
         <div
           key={idx}
+          ref={(el) => {
+            metaLinesRef.current[idx] = el;
+          }}
           className={clsx(
-            'font-mono text-[0.65rem] leading-relaxed transition-all duration-300',
-            idx < visibleMeta
-              ? 'opacity-100 translate-x-0 text-green/90'
-              : 'opacity-0 -translate-x-2'
+            'font-mono text-[0.65rem] leading-relaxed transition-all duration-300 opacity-0 -translate-x-2'
           )}
         >
           {line}

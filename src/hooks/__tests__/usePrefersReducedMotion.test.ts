@@ -1,16 +1,20 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { usePrefersReducedMotion } from '../usePrefersReducedMotion';
+import { usePrefersReducedMotion, _resetMqlCache } from '../usePrefersReducedMotion';
+
+const QUERY = '(prefers-reduced-motion: reduce)';
 
 describe('usePrefersReducedMotion', () => {
   let originalMatchMedia: typeof window.matchMedia;
 
   beforeEach(() => {
     originalMatchMedia = window.matchMedia;
+    _resetMqlCache();
   });
 
   afterEach(() => {
     window.matchMedia = originalMatchMedia;
+    _resetMqlCache();
   });
 
   it('should return false if reduced motion is not preferred', () => {
@@ -44,9 +48,9 @@ describe('usePrefersReducedMotion', () => {
   it('should update value when media query change event occurs', () => {
     let changeCallback: ((event: { matches: boolean }) => void) | null = null;
 
-    window.matchMedia = vi.fn().mockImplementation((query) => ({
+    const mqlMock = {
       matches: false,
-      media: query,
+      media: QUERY,
       onchange: null,
       addEventListener: vi.fn().mockImplementation((event, callback) => {
         if (event === 'change') {
@@ -55,7 +59,9 @@ describe('usePrefersReducedMotion', () => {
       }),
       removeEventListener: vi.fn(),
       dispatchEvent: vi.fn(),
-    }));
+    };
+
+    window.matchMedia = vi.fn().mockImplementation(() => mqlMock);
 
     const { result } = renderHook(() => usePrefersReducedMotion());
     expect(result.current).toBe(false);
@@ -63,16 +69,9 @@ describe('usePrefersReducedMotion', () => {
     // Simulate change event
     act(() => {
       if (changeCallback) {
-        // Change matches to true in the mock before triggering event
-        // because getSnapshot will call matchMedia again
-        window.matchMedia = vi.fn().mockImplementation((query) => ({
-          matches: true,
-          media: query,
-          onchange: null,
-          addEventListener: vi.fn(), // Already added
-          removeEventListener: vi.fn(),
-          dispatchEvent: vi.fn(),
-        }));
+        // Change matches to true in the mocked instance before triggering event
+        // because getSnapshot will use the cached instance
+        mqlMock.matches = true;
 
         changeCallback({ matches: true });
       }

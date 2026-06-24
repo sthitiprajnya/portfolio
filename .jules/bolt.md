@@ -97,3 +97,7 @@
 ## 2025-06-06 - [Layered Animation Early-Exits]
 **Learning:** In complex visual components like the Sentinel orb that feature layered state transitions (e.g., base scroll following vs. proximity-based color overrides), unconditional execution of Stage-2 logic adds unnecessary CPU overhead. By gating secondary lerp operations behind a proximity threshold check (e.g. `if (p > 0.001)`), we can skip dozens of floating-point operations per frame when the effect is not visible.
 **Action:** Always implement early-exits for secondary or "override" animation states in hot loops. Only execute math and state updates when the trigger condition (proximity, interaction, or timer) is active.
+
+## 2024-03-24 - [Optimize useSyncExternalStore by Caching MediaQueryList]
+**Learning:** Calling window.matchMedia() repeatedly inside a getSnapshot function for useSyncExternalStore creates excessive garbage collection and CPU overhead because getSnapshot is called extremely frequently (often multiple times per render cycle) by React 18+.
+**Action:** Always cache the MediaQueryList instance at the module level when using it with useSyncExternalStore. Export a cache reset function to prevent test state leakage in Vitest beforeEach blocks.

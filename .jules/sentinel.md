@@ -65,7 +65,7 @@
 **Learning:** A standard Trusted Types policy may miss SVG-specific sinks like `xlink:href` which can be used for XSS. Additionally, constructing URLs via simple string concatenation (e.g., `origin + path + "#" + id`) is brittle and potentially exploitable if input is not strictly controlled.
 **Prevention:** Expand Trusted Types `createHTML` policies to include `xlink:href` in the attribute blocklist. Use the native `URL` API for all link construction to ensure robust parsing and prevent injection via malformed URI components.
 
-## 2026-06-23 - Hardened Trusted Types Attribute Sanitization
-**Vulnerability:** Potential XSS bypasses in Trusted Types default policies due to regex patterns that only target standard `attr=value` assignments, missing boolean attributes or those followed immediately by a tag closer (`>`).
-**Learning:** Many dangerous attributes like `autofocus` or `contenteditable` can be used without an explicit value to facilitate UI redressing or focus-stealing attacks. A security policy must account for these variations and ensure sanitization triggers regardless of the character immediately following the attribute name (e.g., whitespace, `=`, or `>`).
-**Prevention:** Utilize hardened regex patterns (e.g., `/(attr1|attr2)\\s*[=>\\s]/i`) in Trusted Types policies to capture both valued and boolean attribute declarations. Always include `autofocus` and `contenteditable` in the attribute blocklist to maintain a strong defense-in-depth posture against modern injection vectors.
+## 2026-06-25 - Robust Trusted Types for Boolean Attributes and Obfuscation
+**Vulnerability:** XSS bypasses in Trusted Types policies due to missing boolean attributes (e.g., `autofocus`) or protocol obfuscation using non-printable control characters.
+**Learning:** Modern browsers support boolean attributes that can be used for focus hijacking or data exfiltration. Furthermore, attackers may use null bytes or other control characters to bypass simple protocol string matches (e.g., `java\x00script:`).
+**Prevention:** Harden Trusted Types `createHTML` regex to include boolean attributes like `autofocus` and `contenteditable`. Use character class ranges like `[\\s\\x00-\\x1f]*` in protocol and attribute matchers to prevent obfuscation-based bypasses.

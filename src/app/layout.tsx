@@ -131,7 +131,7 @@ export default function RootLayout({
                         // This is expected and serves as a self-test for the policy.
                         const lower = s.toLowerCase();
                         if (
-                          lower.includes('<script') ||
+                      lower.includes('<script') ||
                           lower.includes('<base') ||
                           lower.includes('<embed') ||
                           lower.includes('<object') ||
@@ -164,18 +164,26 @@ export default function RootLayout({
                           lower.includes('<map') ||
                           lower.includes('<input') ||
                           lower.includes('<keygen') ||
+                          lower.includes('<isindex') ||
+                          lower.includes('<layer') ||
+                          lower.includes('<basefont') ||
+                          lower.includes('<blink') ||
                           lower.includes('<dialog') ||
                           lower.includes('<marquee') ||
-                          /(javascript|data|vbscript|file)\\s*:/i.test(lower) ||
+                          lower.includes('<isindex') ||
+                          lower.includes('<layer') ||
+                          lower.includes('<basefont') ||
+                          lower.includes('<blink') ||
+                          /(javascript|data|vbscript|file)[\\s\\x00-\\x1f]*:/i.test(lower) ||
                           /on[a-z]+\\s*=/i.test(lower) ||
-                          /(formaction|srcdoc|srcset|style|action|background|bgcolor|xlink:href|autofocus|contenteditable)\\s*[=>\\s]/i.test(lower)
+                          /\\s+(formaction|srcdoc|srcset|style|action|background|bgcolor|xlink:href|autofocus|contenteditable)(\\s*=|\\s|>|$)/i.test(lower)
                         ) {
                           console.warn('Blocked dangerous HTML pattern in Trusted Types default policy:', s.slice(0, 50) + '...');
                           return s
-                            .replace(/<(script|base|embed|object|applet|meta|form|iframe|frame|frameset|template|math|svg|details|animate|animatemotion|mpath|discard|set|use|portal|link|style|audio|video|source|track|img|picture|area|map|input|keygen|dialog|marquee)/gi, '<blocked-$1')
-                            .replace(/(javascript|data|vbscript|file)\\s*:/gi, 'blocked-$1:')
+                            .replace(/<(script|base|embed|object|applet|meta|form|iframe|frame|frameset|template|math|svg|details|animate|animatemotion|mpath|discard|set|use|portal|link|style|audio|video|source|track|img|picture|area|map|input|keygen|dialog|marquee|isindex|layer|basefont|blink)/gi, '<blocked-$1')
+                            .replace(/(javascript|data|vbscript|file)[\\s\\x00-\\x1f]*:/gi, 'blocked-$1:')
                             .replace(/on[a-z]+\\s*=/gi, (match) => 'blocked-' + match)
-                            .replace(/(formaction|srcdoc|srcset|style|action|background|bgcolor|xlink:href|autofocus|contenteditable)\\s*(=|>|\\s)/gi, (match, p1, p2) => 'blocked-' + p1 + p2);
+                            .replace(/(\\s+)(formaction|srcdoc|srcset|style|action|background|bgcolor|xlink:href|autofocus|contenteditable)([\\s\\x00-\\x1f]*=|\\s|>|$)/gi, '$1blocked-$2$3');
                         }
                       }
                       return s;

@@ -2,18 +2,26 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { useSmoothScroll } from '@/components/providers/SmoothScrollProvider';
 
 export const BackToTop = () => {
   const [isVisible, setIsVisible] = useState(false);
   const reducedMotion = usePrefersReducedMotion();
+  const lenis = useSmoothScroll();
+
   useEffect(() => {
     const toggle = () => setIsVisible(window.scrollY > 400);
     // BOLT: Add passive listener to high-frequency scroll event to improve scroll performance
     window.addEventListener('scroll', toggle, { passive: true });
     return () => window.removeEventListener('scroll', toggle);
   }, []);
+
   const scroll = () => {
-    window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
+    if (lenis && !reducedMotion) {
+      lenis.scrollTo(0);
+    } else {
+      window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
+    }
     // Accessibility: Transfer focus back to the hero section after scroll completes
     setTimeout(() => {
       document.getElementById('hero')?.focus({ preventScroll: true });

@@ -131,7 +131,7 @@ export default function RootLayout({
                         // This is expected and serves as a self-test for the policy.
                         const lower = s.toLowerCase();
                         if (
-                          lower.includes('<script') ||
+                      lower.includes('<script') ||
                           lower.includes('<base') ||
                           lower.includes('<embed') ||
                           lower.includes('<object') ||

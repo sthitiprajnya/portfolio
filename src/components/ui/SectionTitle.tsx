@@ -22,8 +22,8 @@ export function SectionTitle({ number, title, id, className }: SectionTitleProps
   const handleCopy = async () => {
     try {
       // Security: Use the URL API for robust link construction instead of string concatenation.
-      // We link to the section container ID (e.g., #about) instead of the heading ID
-      // to ensure consistent scroll behavior and deep-linking reliability.
+      // We link to the heading ID (pattern: section-title-${sectionId}) for precision,
+      // ensuring consistency with target elements referenced by aria-labelledby.
       const url = new URL(window.location.href);
       url.hash = `#${sectionId}`;
       await navigator.clipboard.writeText(url.toString());

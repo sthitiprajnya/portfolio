@@ -65,7 +65,7 @@
 **Learning:** A standard Trusted Types policy may miss SVG-specific sinks like `xlink:href` which can be used for XSS. Additionally, constructing URLs via simple string concatenation (e.g., `origin + path + "#" + id`) is brittle and potentially exploitable if input is not strictly controlled.
 **Prevention:** Expand Trusted Types `createHTML` policies to include `xlink:href` in the attribute blocklist. Use the native `URL` API for all link construction to ensure robust parsing and prevent injection via malformed URI components.
 
-## 2026-06-25 - Attribute Hardening in Trusted Types
-**Vulnerability:** Potential UI redressing or defacement via "safe" attributes like `autofocus` or `contenteditable`.
-**Learning:** While most CSPs focus on script injection, a robust Trusted Types policy should also restrict attributes that can be used for social engineering or UI manipulation. `autofocus` can be used to steal focus and redirect user input, while `contenteditable` can lead to DOM-based defacement.
-**Prevention:** Include `autofocus` and `contenteditable` in the Trusted Types attribute blocklist. Additionally, ensure component stability by resolving duplicate state and function declarations which can lead to brittle security logic and build failures.
+## 2026-06-25 - Robust Trusted Types for Boolean Attributes and Obfuscation
+**Vulnerability:** XSS bypasses in Trusted Types policies due to missing boolean attributes (e.g., `autofocus`) or protocol obfuscation using non-printable control characters.
+**Learning:** Modern browsers support boolean attributes that can be used for focus hijacking or data exfiltration. Furthermore, attackers may use null bytes or other control characters to bypass simple protocol string matches (e.g., `java\x00script:`).
+**Prevention:** Harden Trusted Types `createHTML` regex to include boolean attributes like `autofocus` and `contenteditable`. Use character class ranges like `[\\s\\x00-\\x1f]*` in protocol and attribute matchers to prevent obfuscation-based bypasses.

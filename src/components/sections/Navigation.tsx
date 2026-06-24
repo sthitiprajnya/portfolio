@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { CyberButton } from '@/components/ui/CyberButton';
 import { PERSONAL }    from '@/data/portfolio';
 import { useScrollTo } from '@/hooks/useScrollTo';
+import { useScrollLock } from '@/hooks/useScrollLock';
 
 export const NAV_LINKS = [
   { label: 'About',     id: 'about'          },
@@ -29,7 +30,9 @@ export function Navigation() {
   const sentinelRef = useRef<HTMLDivElement>(null);
   const scrollToInternal = useScrollTo();
 
-  // UX Enhancement: Handle Escape key to close mobile menu & prevent body scroll
+  useScrollLock(mobileMenuOpen);
+
+  // UX Enhancement: Handle Escape key to close mobile menu
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && mobileMenuOpen) {
@@ -38,14 +41,9 @@ export function Navigation() {
     };
 
     if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
+      window.addEventListener('keydown', handleKeyDown);
     }
-
-    window.addEventListener('keydown', handleKeyDown);
     return () => {
-      document.body.style.overflow = '';
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [mobileMenuOpen]);

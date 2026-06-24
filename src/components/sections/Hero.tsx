@@ -147,9 +147,11 @@ export function Hero() {
 
         {/* Name with per-character cinematic reveal */}
         <div className="mb-4 overflow-hidden w-full text-center">
+          <h1 className="sr-only">{PERSONAL.name}</h1>
           <GlitchText
             className="font-display font-black text-hero tracking-[-0.03em] leading-none z-20"
             style={{ perspective: '1000px' }}
+            aria-hidden="true"
           >
             {NAME_CHARS.map((char, i) => (
               <motion.span

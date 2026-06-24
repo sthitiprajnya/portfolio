@@ -97,3 +97,7 @@
 ## 2025-06-06 - [Layered Animation Early-Exits]
 **Learning:** In complex visual components like the Sentinel orb that feature layered state transitions (e.g., base scroll following vs. proximity-based color overrides), unconditional execution of Stage-2 logic adds unnecessary CPU overhead. By gating secondary lerp operations behind a proximity threshold check (e.g. `if (p > 0.001)`), we can skip dozens of floating-point operations per frame when the effect is not visible.
 **Action:** Always implement early-exits for secondary or "override" animation states in hot loops. Only execute math and state updates when the trigger condition (proximity, interaction, or timer) is active.
+
+## 2025-06-10 - [Conditional Scroll Behavior for Streaming UI]
+**Learning:** Utilizing `behavior: 'smooth'` for `scrollIntoView` during rapid, character-by-character UI updates (like a terminal or typewriter effect) causes significant layout thrashing and main-thread congestion. The browser attempts to start a new animation frame for every scroll call, leading to dropped frames and input lag.
+**Action:** Always use `behavior: 'auto'` for intermediate updates during active streaming or "processing" states. Only switch back to `behavior: 'smooth'` for final resting states or explicit user-initiated scrolls to ensure fluid performance without sacrificing aesthetics.

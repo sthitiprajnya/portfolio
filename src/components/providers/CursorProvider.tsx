@@ -91,14 +91,18 @@ export function CursorProvider({ children }: CursorProviderProps) {
       }
 
       if (ringRef.current) {
-        const scale = isClicking.current ? 0.5 : isHovering.current ? 1.5 : 1;
-        ringRef.current.style.transform = `translate(calc(${ringPos.current.x}px - 50%), calc(${ringPos.current.y}px - 50%)) scale(${scale})`;
+        // BOLT: Use translate3d for hardware-accelerated transforms
+        ringRef.current.style.transform = `translate3d(calc(${ringPos.current.x}px - 50%), calc(${ringPos.current.y}px - 50%), 0) scale(${currentScale})`;
+        // BOLT: Redundancy Check - only set opacity and re-assert classes if needed (defensive against React re-renders)
+        if (ringRef.current.style.opacity !== '1') ringRef.current.style.opacity = '1';
 
         if (!isInitial.current) {
           ringRef.current.style.opacity = '1';
           if (isHovering.current) {
             ringRef.current.classList.add('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]');
-          } else {
+          }
+        } else {
+          if (ringRef.current.classList.contains('bg-cyan/10')) {
             ringRef.current.classList.remove('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]');
           }
         }

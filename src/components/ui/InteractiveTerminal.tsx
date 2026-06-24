@@ -31,7 +31,9 @@ export function InteractiveTerminal({ className }: { className?: string }) {
   const { ref } = useInView({ threshold: 0.1, triggerOnce: true });
 
   const scrollToBottom = () => {
-    endOfTerminalRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // BOLT: Use behavior 'auto' during processing to avoid overlapping smooth scroll animations
+    // and layout thrashing during rapid output streaming.
+    endOfTerminalRef.current?.scrollIntoView({ behavior: isProcessing ? 'auto' : 'smooth' });
   };
 
   useEffect(() => {

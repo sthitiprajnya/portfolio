@@ -14,4 +14,6 @@
 ## 2026-06-19 - [Added aria-pressed to AsciiAvatar toggle button]
 **Learning:** Found an accessibility issue where the 'isHuman' / 'isScan' toggle button lacked the `aria-pressed` attribute, missing a crucial state representation for screen reader users on this interactive element.
 **Action:** Always ensure toggle buttons that represent binary states use `aria-pressed` to semantically communicate their state to assistive technologies.
-## 2026-06-23 - Added aria-hidden to decorative SVGs in interactive elements\n**Learning:** Decorative `<svg>` icons inside interactive elements like buttons (especially icon-only ones) that already have `aria-label` or visible text can be redundantly read by screen readers. For example, a button labeled "Back to top" with a caret SVG should not have the screen reader attempt to read the SVG paths.\n**Action:** Always verify that decorative SVGs have `aria-hidden="true"` when placed inside `<button>` or `<a>` tags that already have accessibility labels or readable text.
+## 2026-06-22 - Native titles for aria-labels
+**Learning:** When using `aria-label` for screen readers on interactive elements (like inputs) or icon-only buttons, it is important to provide a native `title` attribute to ensure the intent is accessible via hover for sighted users.
+**Action:** Always verify elements with an `aria-label` have a matching `title` attribute.

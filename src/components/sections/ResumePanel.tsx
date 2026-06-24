@@ -39,7 +39,8 @@ export function ResumePanel() {
   };
 
   const handleCopyLink = () => {
-    const fullUrl = `${window.location.origin}${PERSONAL.resumeUrl}`;
+    // Security: Use the URL API for robust link construction instead of string concatenation.
+    const fullUrl = new URL(PERSONAL.resumeUrl, window.location.origin).toString();
     handleCopy(fullUrl);
     setLinkCopied(true);
     setTimeout(() => setLinkCopied(false), 2000);
@@ -106,7 +107,9 @@ export function ResumePanel() {
                     src={PERSONAL.resumeUrl}
                     className="w-full h-[600px] border-none"
                     title="Resume PDF"
-                    sandbox="allow-same-origin"
+                    // Security: Restrict iframe privileges by omitting 'allow-same-origin'.
+                    // This ensures the document is treated as a unique origin.
+                    sandbox=""
                     referrerPolicy="no-referrer"
                     loading="lazy"
                     allow="camera 'none'; microphone 'none'; geolocation 'none'; autoplay 'none'; payment 'none'; usb 'none'; magnetometer 'none'; accelerometer 'none'; gyroscope 'none'"

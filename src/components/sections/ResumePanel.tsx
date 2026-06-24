@@ -107,7 +107,7 @@ export function ResumePanel() {
                     src={PERSONAL.resumeUrl}
                     className="w-full h-[600px] border-none"
                     title="Resume PDF"
-                    sandbox="allow-same-origin"
+                    sandbox=""
                     referrerPolicy="no-referrer"
                     loading="lazy"
                     allow="camera 'none'; microphone 'none'; geolocation 'none'; autoplay 'none'; payment 'none'; usb 'none'; magnetometer 'none'; accelerometer 'none'; gyroscope 'none'"

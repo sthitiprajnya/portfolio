@@ -62,6 +62,8 @@ export function SectionTitle({ number, title, id, className }: SectionTitleProps
             <AnimatePresence>
               {copied && (
                 <motion.span
+                  role="status"
+                  aria-live="polite"
                   initial={{ opacity: 0, y: 10, x: '-50%' }}
                   animate={{ opacity: 1, y: 0, x: '-50%' }}
                   exit={{ opacity: 0, y: 10, x: '-50%' }}

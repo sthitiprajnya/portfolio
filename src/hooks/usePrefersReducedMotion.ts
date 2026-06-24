@@ -41,3 +41,8 @@ export const __resetMqlCacheForTesting = () => {
 export function usePrefersReducedMotion() {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
+
+// Exported for Vitest tests to prevent state leakage between tests
+export const resetMatchMediaCache = () => {
+  mqlCache = null;
+};

@@ -32,6 +32,9 @@ export function CursorProvider({ children }: CursorProviderProps) {
     let animationFrameId: number;
 
     const render = () => {
+      const targetX = mousePos.current.x;
+      const targetY = mousePos.current.y;
+
       // Lerp for smooth follow (lag)
       const dx = mousePos.current.x - ringPos.current.x;
       const dy = mousePos.current.y - ringPos.current.y;
@@ -121,7 +124,7 @@ export function CursorProvider({ children }: CursorProviderProps) {
       window.removeEventListener('mouseover', handleMouseOver);
       window.removeEventListener('mousedown', handleMouseDown);
       window.removeEventListener('mouseup', handleMouseUp);
-      cancelAnimationFrame(animationFrameId);
+      if (animationFrameId !== null) cancelAnimationFrame(animationFrameId);
     };
   }, [isTouchDevice, prefersReducedMotion]);
 

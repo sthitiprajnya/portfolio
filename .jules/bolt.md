@@ -97,3 +97,7 @@
 ## 2025-06-06 - [Layered Animation Early-Exits]
 **Learning:** In complex visual components like the Sentinel orb that feature layered state transitions (e.g., base scroll following vs. proximity-based color overrides), unconditional execution of Stage-2 logic adds unnecessary CPU overhead. By gating secondary lerp operations behind a proximity threshold check (e.g. `if (p > 0.001)`), we can skip dozens of floating-point operations per frame when the effect is not visible.
 **Action:** Always implement early-exits for secondary or "override" animation states in hot loops. Only execute math and state updates when the trigger condition (proximity, interaction, or timer) is active.
+
+## 2025-06-10 - [Sleepy Loops and Mutation Guarding for Interactive UI]
+**Learning:** High-frequency interactive elements like custom cursors often run `requestAnimationFrame` loops indefinitely, even when the user is idle, consuming unnecessary CPU/GPU resources. Furthermore, redundant DOM writes (e.g., setting the same style or class on every frame) trigger expensive browser work.
+**Action:** Implement "Sleepy" loops that `cancelAnimationFrame` when the delta between current and target state is negligible and wake up only on interaction events. Use "Redundancy Guards" to check current DOM values (e.g., `if (style.opacity !== '1')`) before writing, and combine this with "Mutation Hoisting" to apply instantaneous feedback in event handlers while letting the loop handle smooth interpolation.

@@ -20,6 +20,7 @@ export function CursorProvider({ children }: CursorProviderProps) {
   const isHovering = useRef(false);
   const isClicking = useRef(false);
   const isInitial = useRef(true);
+  const isActive = useRef(false);
 
   useEffect(() => {
     setIsTouchDevice(window.matchMedia('(pointer: coarse)').matches);
@@ -28,11 +29,52 @@ export function CursorProvider({ children }: CursorProviderProps) {
   useEffect(() => {
     if (isTouchDevice || prefersReducedMotion) return;
 
-    let animationFrameId: number | null = null;
-    let lastScale = 1;
+    let animationFrameId: number;
+
+    const render = () => {
+      const targetX = mousePos.current.x;
+      const targetY = mousePos.current.y;
+
+      // Lerp for smooth follow (lag)
+      const dx = mousePos.current.x - ringPos.current.x;
+      const dy = mousePos.current.y - ringPos.current.y;
+
+      ringPos.current.x += dx * 0.15;
+      ringPos.current.y += dy * 0.15;
+
+      if (dotRef.current) {
+        const dotScale = isClicking.current ? 0.75 : 1;
+        dotRef.current.style.transform = `translate(calc(${mousePos.current.x}px - 50%), calc(${mousePos.current.y}px - 50%)) scale(${dotScale})`;
+        if (!isInitial.current) dotRef.current.style.opacity = '1';
+      }
+
+      if (ringRef.current) {
+        const scale = isClicking.current ? 0.5 : isHovering.current ? 1.5 : 1;
+        ringRef.current.style.transform = `translate(calc(${ringPos.current.x}px - 50%), calc(${ringPos.current.y}px - 50%)) scale(${scale})`;
+
+        if (!isInitial.current) {
+          ringRef.current.style.opacity = '1';
+          if (isHovering.current) {
+            ringRef.current.classList.add('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]');
+          } else {
+            ringRef.current.classList.remove('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]');
+          }
+        }
+      }
+
+      // BOLT: Sleepy Loop - Stop the requestAnimationFrame loop when the cursor is stationary
+      // and the follower ring has caught up. This significantly reduces idle CPU usage.
+      if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1 && !isInitial.current) {
+        isActive.current = false;
+        return;
+      }
+
+      animationFrameId = requestAnimationFrame(render);
+    };
 
     const wake = () => {
-      if (animationFrameId === null) {
+      if (!isActive.current) {
+        isActive.current = true;
         animationFrameId = requestAnimationFrame(render);
       }
     };
@@ -49,18 +91,12 @@ export function CursorProvider({ children }: CursorProviderProps) {
 
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      // BOLT: Use a single optimized selector for interactive elements to reduce per-event CPU overhead
+      // BOLT: Optimized interactive check using a single closest() call
+      // to reduce CPU overhead during high-frequency mouseover events.
       const isInteractive = !!target.closest('a, button, [role="button"], input, textarea');
 
       if (isHovering.current !== isInteractive) {
         isHovering.current = isInteractive;
-        if (ringRef.current) {
-          if (isInteractive) {
-            ringRef.current.classList.add('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]');
-          } else {
-            ringRef.current.classList.remove('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]');
-          }
-        }
         wake();
       }
     };
@@ -80,43 +116,8 @@ export function CursorProvider({ children }: CursorProviderProps) {
     window.addEventListener('mousedown', handleMouseDown, { passive: true });
     window.addEventListener('mouseup', handleMouseUp, { passive: true });
 
-    const render = () => {
-      const targetX = mousePos.current.x;
-      const targetY = mousePos.current.y;
-
-      // Lerp for smooth follow (lag)
-      const dx = targetX - ringPos.current.x;
-      const dy = targetY - ringPos.current.y;
-
-      ringPos.current.x += dx * 0.15;
-      ringPos.current.y += dy * 0.15;
-
-      const targetScale = isClicking.current ? 0.5 : isHovering.current ? 1.5 : 1;
-      const dotScale = isClicking.current ? 0.75 : 1;
-
-      if (dotRef.current) {
-        dotRef.current.style.transform = `translate(calc(${targetX}px - 50%), calc(${targetY}px - 50%)) scale(${dotScale})`;
-        if (!isInitial.current) dotRef.current.style.opacity = '1';
-      }
-
-      if (ringRef.current) {
-        ringRef.current.style.transform = `translate(calc(${ringPos.current.x}px - 50%), calc(${ringPos.current.y}px - 50%)) scale(${targetScale})`;
-        if (!isInitial.current) ringRef.current.style.opacity = '1';
-      }
-
-      // BOLT: Sleepy RAF Loop - Stop the loop when cursor is stationary and state is stable to save CPU/battery.
-      const isStationary = Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1;
-      const isStateStable = targetScale === lastScale;
-
-      if (isStationary && isStateStable && !isInitial.current) {
-        animationFrameId = null;
-      } else {
-        lastScale = targetScale;
-        animationFrameId = requestAnimationFrame(render);
-      }
-    };
-
-    render();
+    // Start initial loop
+    wake();
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);

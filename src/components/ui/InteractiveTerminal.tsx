@@ -30,20 +30,26 @@ export function InteractiveTerminal({ className }: { className?: string }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const { ref } = useInView({ threshold: 0.1, triggerOnce: true });
 
-  const scrollToBottom = () => {
-    endOfTerminalRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const scrollToBottom = (behavior: ScrollBehavior = 'auto') => {
+    endOfTerminalRef.current?.scrollIntoView({ behavior });
   };
 
   useEffect(() => {
-    scrollToBottom();
-  }, [lines]);
+    // BOLT: Use 'auto' scroll for intermediate terminal updates to prevent layout thrashing
+    // and main-thread congestion caused by 'smooth' scroll animations.
+    scrollToBottom(isProcessing ? 'auto' : 'smooth');
+  }, [lines, isProcessing]);
 
   const addLinesWithDelay = async (newOutputLines: string[], delay: number = 200) => {
     setIsProcessing(true);
-    for (let i = 0; i < newOutputLines.length; i++) {
-      await new Promise(r => setTimeout(r, delay));
-      // Security: Limit terminal lines to 100 to prevent client-side memory exhaustion (DoS mitigation)
-      setLines(prev => [...prev, { output: newOutputLines[i] }].slice(-100));
+    // BOLT: Batch multi-line updates if delay is very short (< 30ms) to reduce re-renders.
+    if (delay < 30) {
+      setLines(prev => [...prev, ...newOutputLines.map(output => ({ output }))].slice(-100));
+    } else {
+      for (let i = 0; i < newOutputLines.length; i++) {
+        await new Promise(r => setTimeout(r, delay));
+        setLines(prev => [...prev, { output: newOutputLines[i] }].slice(-100));
+      }
     }
     setIsProcessing(false);
   };
@@ -215,6 +221,7 @@ export function InteractiveTerminal({ className }: { className?: string }) {
               ref={inputRef}
               type="text"
               aria-label="Terminal command input"
+              title="Terminal command input"
               value={currentInput}
               onChange={(e) => setCurrentInput(e.target.value)}
               onKeyDown={handleKeyDown}

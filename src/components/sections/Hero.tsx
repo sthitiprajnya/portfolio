@@ -198,14 +198,16 @@ export function Hero() {
         >
           {PROCESSED_HERO_STATS.map((stat, i) => (
             <div key={i} className="flex flex-col items-center xs:px-2">
-              <span className="font-display text-xl xs:text-2xl text-cyan mb-1 flex items-center" aria-hidden="true">
-                <CountUp end={stat.numericValue} duration={2.5} separator="," enableScrollSpy={true} scrollSpyOnce={true} />
-                {stat.suffix}
-              </span>
-              <span className="sr-only">{stat.numericValue}{stat.suffix}</span>
-              <span className="font-mono text-[0.55rem] xs:text-[0.6rem] uppercase tracking-widest text-text-muted text-center max-w-[80px] xs:max-w-none">
-                {stat.label}
-              </span>
+              <div aria-hidden="true" className="flex flex-col items-center">
+                <span className="font-display text-xl xs:text-2xl text-cyan mb-1 flex items-center">
+                  <CountUp end={stat.numericValue} duration={2.5} separator="," enableScrollSpy={true} scrollSpyOnce={true} />
+                  {stat.suffix}
+                </span>
+                <span className="font-mono text-[0.55rem] xs:text-[0.6rem] uppercase tracking-widest text-text-muted text-center max-w-[80px] xs:max-w-none">
+                  {stat.label}
+                </span>
+              </div>
+              <span className="sr-only">{stat.value}{stat.suffix} {stat.label}</span>
             </div>
           ))}
         </motion.div>

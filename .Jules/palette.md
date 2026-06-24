@@ -14,6 +14,6 @@
 ## 2026-06-19 - [Added aria-pressed to AsciiAvatar toggle button]
 **Learning:** Found an accessibility issue where the 'isHuman' / 'isScan' toggle button lacked the `aria-pressed` attribute, missing a crucial state representation for screen reader users on this interactive element.
 **Action:** Always ensure toggle buttons that represent binary states use `aria-pressed` to semantically communicate their state to assistive technologies.
-## 2026-06-24 - Prevent Animated Counter Spam
-**Learning:** Animated number counters (like `react-countup`) cause excessive and confusing audio spam for screen reader users as they attempt to read out every intermediate number during the animation.
-**Action:** When using animated number counters, wrap the animating element in `aria-hidden="true"` and provide the final static value in a visually hidden (`.sr-only`) span to ensure screen readers only announce the correct final value.
+## 2026-06-22 - Native titles for aria-labels
+**Learning:** When using `aria-label` for screen readers on interactive elements (like inputs) or icon-only buttons, it is important to provide a native `title` attribute to ensure the intent is accessible via hover for sighted users.
+**Action:** Always verify elements with an `aria-label` have a matching `title` attribute.

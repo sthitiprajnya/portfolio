@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
@@ -16,10 +17,10 @@ const RESUME_SHA256 = 'f4a9f24d314dd2a6869c505d896746a84561e97392e77d1a53c6b8adc
 export function ResumePanel() {
   const [downloadStarted, setDownloadStarted] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [docIdCopied, setDocIdCopied] = useState(false);
+  const [hashCopied, setHashCopied] = useState(false);
 
   // BOLT: Performance Optimization — Lazy-load the ~1.5MB PDF asset.
-  // We use IntersectionObserver with a rootMargin of 200px to ensure the PDF starts
-  // loading just before the user scrolls to it, improving TTI and reducing initial bandwidth.
   const { ref: iframeRef, inView } = useInView({
     triggerOnce: true,
     rootMargin: '200px',
@@ -38,9 +39,8 @@ export function ResumePanel() {
     }
   };
 
-  const handleCopyLink = () => {
-    // Security: Use the URL API for robust link construction instead of string concatenation.
-    const fullUrl = new URL(PERSONAL.resumeUrl, window.location.origin).toString();
+  const handleCopyLink = async () => {
+    const fullUrl = `${window.location.origin}${PERSONAL.resumeUrl}`;
     handleCopy(fullUrl);
     setLinkCopied(true);
     setTimeout(() => setLinkCopied(false), 2000);
@@ -107,8 +107,6 @@ export function ResumePanel() {
                     src={PERSONAL.resumeUrl}
                     className="w-full h-[600px] border-none"
                     title="Resume PDF"
-                    // Security: Restrict iframe privileges by omitting 'allow-same-origin'.
-                    // This ensures the document is treated as a unique origin.
                     sandbox=""
                     referrerPolicy="no-referrer"
                     loading="lazy"
@@ -201,30 +199,35 @@ export function ResumePanel() {
                   </span>
                 </CyberButton>
 
-                <button
-                  onClick={handleCopyLink}
-                  className={clsx(
-                    "w-full mt-3 flex items-center justify-center space-x-2 py-2 border font-mono text-xs uppercase tracking-widest rounded-pill glass transition-all outline-none focus-visible:ring-2 focus-visible:ring-cyan relative z-10",
-                    linkCopied ? "border-green text-green bg-green/10" : "border-cyan/30 text-cyan hover:bg-cyan/10"
-                  )}
-                  aria-label={linkCopied ? "Link copied to clipboard" : "Copy direct link to resume"}
-                >
-                  {linkCopied ? (
-                    <>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span>LINK_COPIED</span>
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                      </svg>
-                      <span>COPY_DIRECT_LINK</span>
-                    </>
-                  )}
-                </button>
+                <div className="relative">
+                  <button
+                    onClick={handleCopyLink}
+                    className={clsx(
+                      "w-full mt-3 flex items-center justify-center space-x-2 py-2 border font-mono text-xs uppercase tracking-widest rounded-pill glass transition-all outline-none focus-visible:ring-2 focus-visible:ring-cyan relative z-10",
+                      linkCopied ? "border-green text-green bg-green/10" : "border-cyan/30 text-cyan hover:bg-cyan/10"
+                    )}
+                    aria-label={linkCopied ? "Link copied to clipboard" : "Copy direct link to resume"}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={linkCopied ? "M5 13l4 4L19 7" : "M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"} />
+                    </svg>
+                    <span>{linkCopied ? 'LINK_COPIED' : 'COPY_DIRECT_LINK'}</span>
+                  </button>
+                  <AnimatePresence>
+                    {linkCopied && (
+                      <motion.span
+                        initial={{ opacity: 0, y: 10, x: '-50%' }}
+                        animate={{ opacity: 1, y: 0, x: '-50%' }}
+                        exit={{ opacity: 0, y: 10, x: '-50%' }}
+                        role="status"
+                        aria-live="polite"
+                        className="absolute bottom-full left-1/2 mb-2 px-2 py-1 bg-green text-black font-mono text-[0.6rem] rounded-card font-bold shadow-[var(--glow-green-sm)] z-20 pointer-events-none whitespace-nowrap"
+                      >
+                        COPIED!
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </div>
 
                 {/* Audit trail label */}
                 <div className="mt-4 text-center font-mono text-[0.6rem] text-text-muted flex items-center justify-center gap-2 relative z-10">

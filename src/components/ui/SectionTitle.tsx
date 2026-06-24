@@ -23,16 +23,15 @@ export function SectionTitle({ number, title, id, className }: SectionTitleProps
   const handleCopy = async () => {
     try {
       // Security: Use the URL API for robust link construction instead of string concatenation.
-      // We link to the section container ID (e.g., #about) instead of the heading ID
-      // to ensure consistent scroll behavior and deep-linking reliability.
+      // We link to the heading ID (pattern: section-title-${sectionId}) for precision,
+      // ensuring consistency with target elements referenced by aria-labelledby.
       const url = new URL(window.location.href);
       url.hash = `#${sectionId}`;
       await navigator.clipboard.writeText(url.toString());
       setCopied(true);
-      toast.success('SECTION_LINK_COPIED');
       setTimeout(() => setCopied(false), 2000);
-    } catch (e) {
-      console.warn('Failed to copy section link:', e);
+    } catch (err) {
+      console.error('Failed to copy section link:', err);
     }
   };
 
@@ -57,13 +56,15 @@ export function SectionTitle({ number, title, id, className }: SectionTitleProps
               title={`Copy link to ${title} section`}
               className="ml-4 opacity-20 md:opacity-0 group-hover:opacity-100 transition-opacity focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black p-1 rounded-card"
             >
-              <svg className="w-5 h-5 text-text-muted hover:text-cyan transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg aria-hidden="true" className="w-5 h-5 text-text-muted hover:text-cyan transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
               </svg>
             </button>
             <AnimatePresence>
               {copied && (
                 <motion.span
+                  role="status"
+                  aria-live="polite"
                   initial={{ opacity: 0, y: 10, x: '-50%' }}
                   animate={{ opacity: 1, y: 0, x: '-50%' }}
                   exit={{ opacity: 0, y: 10, x: '-50%' }}

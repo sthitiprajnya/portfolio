@@ -12,8 +12,8 @@ export function Footer() {
   const [visitorCount, setVisitorCount] = React.useState(0);
   const [copied, setCopied] = React.useState(false);
 
-  const handleCopyEmail = () => {
-    navigator.clipboard.writeText(PERSONAL.email);
+  const handleCopyEmail = async () => {
+    await navigator.clipboard.writeText(PERSONAL.email);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

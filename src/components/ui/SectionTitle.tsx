@@ -28,7 +28,6 @@ export function SectionTitle({ number, title, id, className }: SectionTitleProps
       url.hash = `#${sectionId}`;
       await navigator.clipboard.writeText(url.toString());
       setCopied(true);
-      toast.success('SECTION_LINK_COPIED');
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error('Failed to copy section link:', err);

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { NAV_LINKS } from '@/components/sections/Navigation'; // Will export this from Navigation.tsx
+import { useScrollLock } from '@/hooks/useScrollLock';
 
 export function CommandPalette() {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,6 +12,8 @@ export function CommandPalette() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
+
+  useScrollLock(isOpen);
 
   useEffect(() => {
     const handleOpen = () => {
@@ -52,16 +55,13 @@ export function CommandPalette() {
     if (isOpen) {
       // Small delay to ensure render before focus
       setTimeout(() => inputRef.current?.focus(), 100);
-      document.body.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = '';
       // Return focus to the trigger element when closed
       if (triggerRef.current) {
         triggerRef.current.focus();
         triggerRef.current = null;
       }
     }
-    return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
   const filteredLinks = NAV_LINKS.filter(link =>

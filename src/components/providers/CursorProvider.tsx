@@ -30,6 +30,7 @@ export function CursorProvider({ children }: CursorProviderProps) {
   const isHovering = useRef(false);
   const isClicking = useRef(false);
   const isInitial = useRef(true);
+  const isActive = useRef(false);
 
   const rafId = useRef<number | null>(null);
 
@@ -71,71 +72,102 @@ export function CursorProvider({ children }: CursorProviderProps) {
   useEffect(() => {
     if (isTouchDevice || prefersReducedMotion) return;
 
-    const handleMouseMove = (e: MouseEvent) => {
-      mousePos.current = { x: e.clientX, y: e.clientY };
+    let animationFrameId: number;
+
+    const render = () => {
+      const targetX = mousePos.current.x;
+      const targetY = mousePos.current.y;
+
+      // Lerp for smooth follow (lag)
+      const dx = mousePos.current.x - ringPos.current.x;
+      const dy = mousePos.current.y - ringPos.current.y;
+
+      ringPos.current.x += dx * 0.15;
+      ringPos.current.y += dy * 0.15;
 
       if (dotRef.current) {
         const dotScale = isClicking.current ? 0.75 : 1;
-        dotRef.current.style.transform = `translate3d(calc(${e.clientX}px - 50%), calc(${e.clientY}px - 50%), 0) scale(${dotScale})`;
-        if (isInitial.current) {
-          dotRef.current.style.opacity = '1';
-        }
+        dotRef.current.style.transform = `translate(calc(${mousePos.current.x}px - 50%), calc(${mousePos.current.y}px - 50%)) scale(${dotScale})`;
+        if (!isInitial.current) dotRef.current.style.opacity = '1';
       }
 
-      if (isInitial.current) {
-        if (ringRef.current) ringRef.current.style.opacity = '1';
-        isInitial.current = false;
-      }
+      if (ringRef.current) {
+        const scale = isClicking.current ? 0.5 : isHovering.current ? 1.5 : 1;
+        ringRef.current.style.transform = `translate(calc(${ringPos.current.x}px - 50%), calc(${ringPos.current.y}px - 50%)) scale(${scale})`;
 
-      wake();
-    };
-
-    const handleMouseOver = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      // BOLT: Single efficient traversal for interactive elements
-      const interactive = target.closest('a, button, [role="button"], input, textarea');
-      const isInteractive = !!interactive;
-
-      if (isHovering.current !== isInteractive) {
-        isHovering.current = isInteractive;
-        if (ringRef.current) {
-          if (isInteractive) {
+        if (!isInitial.current) {
+          ringRef.current.style.opacity = '1';
+          if (isHovering.current) {
             ringRef.current.classList.add('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]');
           } else {
             ringRef.current.classList.remove('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]');
           }
         }
+      }
+
+      // BOLT: Sleepy Loop - Stop the requestAnimationFrame loop when the cursor is stationary
+      // and the follower ring has caught up. This significantly reduces idle CPU usage.
+      if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1 && !isInitial.current) {
+        isActive.current = false;
+        return;
+      }
+
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    const wake = () => {
+      if (!isActive.current) {
+        isActive.current = true;
+        animationFrameId = requestAnimationFrame(render);
+      }
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      mousePos.current = { x: e.clientX, y: e.clientY };
+      if (isInitial.current) {
+        if (dotRef.current) dotRef.current.style.opacity = '1';
+        if (ringRef.current) ringRef.current.style.opacity = '1';
+        isInitial.current = false;
+      }
+      wake();
+    };
+
+    const handleMouseOver = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      // BOLT: Optimized interactive check using a single closest() call
+      // to reduce CPU overhead during high-frequency mouseover events.
+      const isInteractive = !!target.closest('a, button, [role="button"], input, textarea');
+
+      if (isHovering.current !== isInteractive) {
+        isHovering.current = isInteractive;
         wake();
       }
     };
 
     const handleMouseDown = () => {
       isClicking.current = true;
-      if (dotRef.current) {
-        dotRef.current.style.transform = `translate3d(calc(${mousePos.current.x}px - 50%), calc(${mousePos.current.y}px - 50%), 0) scale(0.75)`;
-      }
       wake();
     };
-
     const handleMouseUp = () => {
       isClicking.current = false;
-      if (dotRef.current) {
-        dotRef.current.style.transform = `translate3d(calc(${mousePos.current.x}px - 50%), calc(${mousePos.current.y}px - 50%), 0) scale(1)`;
-      }
       wake();
     };
 
+    // BOLT: Adding { passive: true } to high-frequency event listeners to prevent main-thread blocking and layout jank
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
     window.addEventListener('mouseover', handleMouseOver, { passive: true });
     window.addEventListener('mousedown', handleMouseDown, { passive: true });
     window.addEventListener('mouseup', handleMouseUp, { passive: true });
+
+    // Start initial loop
+    wake();
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseover', handleMouseOver);
       window.removeEventListener('mousedown', handleMouseDown);
       window.removeEventListener('mouseup', handleMouseUp);
-      if (rafId.current) cancelAnimationFrame(rafId.current);
+      if (animationFrameId !== null) cancelAnimationFrame(animationFrameId);
     };
   }, [isTouchDevice, prefersReducedMotion, wake]);
 

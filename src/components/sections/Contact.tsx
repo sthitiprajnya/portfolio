@@ -17,6 +17,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export function Contact() {
   const formRef = useRef<HTMLFormElement>(null);
   const successButtonRef = useRef<HTMLButtonElement>(null);
+  const [emailCopied, setEmailCopied] = useState(false);
 
   const [emailCopied, setEmailCopied] = useState(false);
   const [form, setForm] = useState({

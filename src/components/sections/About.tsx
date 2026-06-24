@@ -78,7 +78,7 @@ export function About() {
             >
               {ABOUT_STATS.map((stat, i) => (
                 <ScrollReveal key={i} variants={fadeSlideUp} className="flex flex-col glass rounded-card px-4 py-3 relative overflow-hidden">
-                  <div className="font-display text-3xl md:text-4xl text-cyan mb-2 relative z-10">
+                  <div className="font-display text-3xl md:text-4xl text-cyan mb-2 relative z-10" aria-hidden="true">
                     <CountUp
                       end={stat.value}
                       duration={2.5}
@@ -88,6 +88,7 @@ export function About() {
                     />
                     {stat.suffix}
                   </div>
+                  <span className="sr-only">{stat.value}{stat.suffix}</span>
                   <div className="font-mono text-[0.65rem] text-text-muted uppercase tracking-widest leading-snug relative z-10">
                     {stat.label}
                   </div>

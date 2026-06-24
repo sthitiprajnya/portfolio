@@ -147,15 +147,18 @@ export function GitHubStats() {
 
                      <div className="mt-4 grid grid-cols-3 gap-6 w-full text-center border-t border-[var(--glass-border)] pt-6 relative z-10">
                        <div>
-                         <div className="font-mono text-xl text-cyan font-bold mb-1"><CountUp end={stats.commits} duration={2.5} enableScrollSpy scrollSpyOnce /></div>
+                         <div className="font-mono text-xl text-cyan font-bold mb-1" aria-hidden="true"><CountUp end={stats.commits} duration={2.5} enableScrollSpy scrollSpyOnce /></div>
+                         <span className="sr-only">{stats.commits} Commits</span>
                          <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest">Commits</div>
                        </div>
                        <div>
-                         <div className="font-mono text-xl text-green font-bold mb-1"><CountUp end={stats.prs} duration={2.5} enableScrollSpy scrollSpyOnce /></div>
+                         <div className="font-mono text-xl text-green font-bold mb-1" aria-hidden="true"><CountUp end={stats.prs} duration={2.5} enableScrollSpy scrollSpyOnce /></div>
+                         <span className="sr-only">{stats.prs} Pull Requests</span>
                          <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest">Pull Requests</div>
                        </div>
                        <div>
-                         <div className="font-mono text-xl text-amber font-bold mb-1"><CountUp end={stats.issues} duration={2.5} enableScrollSpy scrollSpyOnce /></div>
+                         <div className="font-mono text-xl text-amber font-bold mb-1" aria-hidden="true"><CountUp end={stats.issues} duration={2.5} enableScrollSpy scrollSpyOnce /></div>
+                         <span className="sr-only">{stats.issues} Issues</span>
                          <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest">Issues</div>
                        </div>
                      </div>
@@ -218,9 +221,10 @@ export function GitHubStats() {
 const StatCard = React.memo(function StatCard({ label, value }: { label: string, value: number }) {
   return (
     <div className="p-6 flex flex-col items-center justify-center text-center glass rounded-card relative overflow-hidden">
-      <div className="font-display text-3xl text-cyan mb-2 relative z-10">
+      <div className="font-display text-3xl text-cyan mb-2 relative z-10" aria-hidden="true">
         <CountUp end={value} duration={2} enableScrollSpy scrollSpyOnce />
       </div>
+      <span className="sr-only">{value} {label}</span>
       <div className="font-mono text-[0.65rem] uppercase tracking-widest text-text-muted relative z-10">
         {label}
       </div>

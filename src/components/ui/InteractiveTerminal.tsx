@@ -215,6 +215,7 @@ export function InteractiveTerminal({ className }: { className?: string }) {
               ref={inputRef}
               type="text"
               aria-label="Terminal command input"
+              title="Terminal command input"
               value={currentInput}
               onChange={(e) => setCurrentInput(e.target.value)}
               onKeyDown={handleKeyDown}

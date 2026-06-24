@@ -79,6 +79,11 @@
 ## 2026-08-01 - [Minimizing Idle Timer Overheads]
 **Learning:** Polling mechanisms running via `setInterval` in global providers (like `AudioProvider.tsx`) or hooks (like `useFaviconBlink.ts`) consume background CPU cycles and cause React renders/DOM updates indefinitely, even when audio is not playing or the tab is inactive.
 **Action:** Always wrap background polling intervals or visual updates with visibility checks (e.g. `document.addEventListener('visibilitychange')`) or conditional state (only trigger when `isSpeaking === true`) to pause execution when idle or hidden.
+
+## 2026-06-22 - [Idle Performance Optimization via Sleepy Loops]
+**Learning:** For interactive custom cursors or similar UI followers, a continuous `requestAnimationFrame` loop drains significant CPU/battery even when the user is idle. Implementing a "Sleepy" pattern—where the loop cancels itself when target deltas are negligible and visual states (scale/hover) are stable—reduces idle CPU usage to 0%. The loop must be re-awakened via a `wake()` helper called by all relevant input listeners (`mousemove`, `mousedown`, `mouseover`).
+**Action:** Implement self-canceling `requestAnimationFrame` loops for all UI-following effects. Use a `dx < 0.1` threshold to determine stability and ensure the "wake" signal is propagated from all interactive event handlers.
+
 ## 2026-05-31 - Passive Event Listeners for High-Frequency Events
 **Learning:** High-frequency global event listeners (like `mousemove`, `mouseover`, `mousedown`, `mouseup`, `touchstart`, `touchmove`, `scroll`) can block the main thread and cause layout jank, especially during scroll or animations, because the browser waits to see if `preventDefault()` will be called.
 **Action:** Always add `{ passive: true }` to these listeners when `preventDefault()` is not needed, so the browser can continue rendering/scrolling without waiting for the JavaScript event handler to finish.

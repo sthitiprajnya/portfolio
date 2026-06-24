@@ -164,6 +164,10 @@ export default function RootLayout({
                           lower.includes('<map') ||
                           lower.includes('<input') ||
                           lower.includes('<keygen') ||
+                          lower.includes('<isindex') ||
+                          lower.includes('<layer') ||
+                          lower.includes('<basefont') ||
+                          lower.includes('<blink') ||
                           lower.includes('<dialog') ||
                           lower.includes('<marquee') ||
                           lower.includes('<isindex') ||

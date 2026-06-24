@@ -18,7 +18,9 @@ vi.mock('framer-motion', async () => {
     ...actual as Record<string, unknown>,
     motion: {
       div: ({ children, ...props }: Record<string, unknown> & { children?: React.ReactNode }) => <div {...props as React.HTMLAttributes<HTMLDivElement>}>{children}</div>,
+      span: ({ children, ...props }: Record<string, unknown> & { children?: React.ReactNode }) => <span {...props as React.HTMLAttributes<HTMLSpanElement>}>{children}</span>,
     },
+    AnimatePresence: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
   };
 });
 
@@ -72,5 +74,24 @@ describe('Contact Component - Error Handling', () => {
     expect(button).toHaveClass('border-red text-red hover:bg-red');
 
     consoleSpy.mockRestore();
+  });
+
+  it('should handle email copy functionality', async () => {
+    const writeTextMock = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, {
+      clipboard: {
+        writeText: writeTextMock,
+      },
+    });
+
+    render(<Contact />);
+
+    const copyButton = screen.getByRole('button', { name: /Copy email address to clipboard/i });
+    expect(copyButton).toBeInTheDocument();
+
+    fireEvent.click(copyButton);
+
+    expect(writeTextMock).toHaveBeenCalled();
+    expect(await screen.findByText('COPIED!')).toBeInTheDocument();
   });
 });

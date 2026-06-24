@@ -166,6 +166,12 @@ export function Contact() {
     }
   };
 
+  const handleCopyEmail = () => {
+    navigator.clipboard.writeText(PERSONAL.email);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <section
       id="contact"
@@ -217,12 +223,13 @@ export function Contact() {
                 {/* Micro-UX: Quick copy button for accessibility/convenience */}
                 <div className="absolute top-2 right-2">
                   <button
-                    onClick={async () => {
-                      await navigator.clipboard.writeText(PERSONAL.email);
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigator.clipboard.writeText(PERSONAL.email);
                       setEmailCopied(true);
                       setTimeout(() => setEmailCopied(false), 2000);
                     }}
-                    className="p-1.5 rounded-card bg-cyan/5 border border-cyan/10 text-cyan opacity-20 md:opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-all hover:bg-cyan hover:text-black outline-none focus-visible:ring-2 focus-visible:ring-cyan"
+                    className="p-1.5 rounded-card bg-cyan/5 border border-cyan/10 text-cyan opacity-20 group-hover:opacity-100 focus-visible:opacity-100 transition-all hover:bg-cyan hover:text-black outline-none focus-visible:ring-2 focus-visible:ring-cyan"
                     aria-label="Copy email address to clipboard"
                     title="Copy email address"
                   >
@@ -233,12 +240,12 @@ export function Contact() {
                   <AnimatePresence>
                     {emailCopied && (
                       <motion.span
-                        initial={{ opacity: 0, y: 10, x: '-50%' }}
+                        initial={{ opacity: 0, y: 5, x: '-50%' }}
                         animate={{ opacity: 1, y: 0, x: '-50%' }}
-                        exit={{ opacity: 0, y: 10, x: '-50%' }}
+                        exit={{ opacity: 0, y: 5, x: '-50%' }}
+                        className="absolute bottom-full left-1/2 mb-2 px-2 py-1 bg-cyan text-black font-mono text-[0.6rem] rounded-card font-bold shadow-[var(--glow-cyan-sm)] z-20 pointer-events-none whitespace-nowrap"
                         role="status"
                         aria-live="polite"
-                        className="absolute bottom-full left-1/2 mb-2 px-2 py-1 bg-cyan text-black font-mono text-[0.5rem] rounded-card font-bold shadow-[var(--glow-cyan-sm)] z-20 pointer-events-none whitespace-nowrap"
                       >
                         COPIED!
                       </motion.span>

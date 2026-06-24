@@ -11,6 +11,10 @@ interface SectionTitleProps {
   className?: string;
 }
 
+/**
+ * SectionTitle component providing a numbered heading and a deep-link copy button.
+ * Uses the URL API for robust link construction and localized 'COPIED!' feedback.
+ */
 export function SectionTitle({ number, title, id, className }: SectionTitleProps) {
   const [copied, setCopied] = useState(false);
   const sectionId = id || title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
@@ -21,9 +25,10 @@ export function SectionTitle({ number, title, id, className }: SectionTitleProps
       // We link to the section container ID (e.g., #about) instead of the heading ID
       // to ensure consistent scroll behavior and deep-linking reliability.
       const url = new URL(window.location.href);
-      url.hash = sectionId;
+      url.hash = `#${sectionId}`;
       await navigator.clipboard.writeText(url.toString());
       setCopied(true);
+      toast.success('SECTION_LINK_COPIED');
       setTimeout(() => setCopied(false), 2000);
     } catch (e) {
       console.warn('Failed to copy section link:', e);
@@ -33,10 +38,10 @@ export function SectionTitle({ number, title, id, className }: SectionTitleProps
   return (
     <ScrollReveal
       variants={fadeSlideLeft}
-      className={clsx("mb-12 md:mb-16", className)}
+      className={clsx("mb-12 md:mb-16 group", className)}
       data-orb-target="true"
     >
-      <div className="flex flex-col items-start">
+      <div className="flex flex-col items-start group">
         <span className="font-mono text-label text-cyan mb-3 px-3 py-1 inline-block glass-pill rounded-pill">
           // {number}
         </span>
@@ -64,6 +69,8 @@ export function SectionTitle({ number, title, id, className }: SectionTitleProps
                   role="status"
                   aria-live="polite"
                   className="absolute bottom-full left-1/2 mb-2 px-2 py-1 bg-cyan text-black font-mono text-[0.6rem] rounded-card font-bold shadow-[var(--glow-cyan-sm)] z-20 pointer-events-none whitespace-nowrap"
+                  role="status"
+                  aria-live="polite"
                 >
                   COPIED!
                 </motion.span>

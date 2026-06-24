@@ -10,6 +10,7 @@ import { useInView } from 'react-intersection-observer';
 import { AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { useScrollTo } from '@/hooks/useScrollTo';
+import { useScrollLock } from '@/hooks/useScrollLock';
 
 const MatrixRain = lazy(() => import('@/components/canvas/MatrixRain'));
 const NetworkConnector = lazy(() => import('@/components/canvas/NetworkConnector'));
@@ -39,10 +40,11 @@ export function Hero() {
   const intelModalRef = React.useRef<HTMLDivElement>(null);
   const scrollTo = useScrollTo();
 
+  const hasModalOpen = showMethodology || activeIntel !== null;
+  useScrollLock(hasModalOpen);
+
   // BOLT: Performance Optimization - Consolidated Redundant Effects
   React.useEffect(() => {
-    const hasModalOpen = showMethodology || activeIntel !== null;
-
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         if (showMethodology) setShowMethodology(false);
@@ -81,7 +83,6 @@ export function Hero() {
 
     if (hasModalOpen) {
       window.addEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'hidden';
       // Store trigger for focus restoration
       if (!triggerRef.current) {
         triggerRef.current = document.activeElement as HTMLElement;
@@ -98,9 +99,13 @@ export function Hero() {
         triggerRef.current.focus();
         triggerRef.current = null;
       }
-      document.body.style.overflow = '';
     }
-  }, [showMethodology, activeIntel]);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [hasModalOpen, showMethodology, activeIntel]);
+
   return (
     <section
       id="hero"

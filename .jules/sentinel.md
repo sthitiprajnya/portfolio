@@ -65,7 +65,7 @@
 **Learning:** A standard Trusted Types policy may miss SVG-specific sinks like `xlink:href` which can be used for XSS. Additionally, constructing URLs via simple string concatenation (e.g., `origin + path + "#" + id`) is brittle and potentially exploitable if input is not strictly controlled.
 **Prevention:** Expand Trusted Types `createHTML` policies to include `xlink:href` in the attribute blocklist. Use the native `URL` API for all link construction to ensure robust parsing and prevent injection via malformed URI components.
 
-## 2026-06-23 - Hardened Trusted Types and Build Stability
-**Vulnerability:** XSS via legacy/obscure tags (isindex, layer, blink) and attributes (autofocus, contenteditable) missed by string-based 'includes' checks.
-**Learning:** Using multiple `.includes()` calls for tag detection in a Trusted Types policy is brittle and can lead to build regressions (e.g., duplicate logic if not properly merged). Regex-based detection is more robust and easier to maintain. Furthermore, some attributes like `autofocus` can be used for UI redress or exfiltration in specific contexts.
-**Prevention:** Prefer regex-based tag and attribute detection in Trusted Types policies. Always verify build stability (`pnpm build`) after merging security enhancements to catch duplicate declaration errors that might arise from automated merging.
+## 2026-06-25 - Robust Trusted Types for Boolean Attributes and Obfuscation
+**Vulnerability:** XSS bypasses in Trusted Types policies due to missing boolean attributes (e.g., `autofocus`) or protocol obfuscation using non-printable control characters.
+**Learning:** Modern browsers support boolean attributes that can be used for focus hijacking or data exfiltration. Furthermore, attackers may use null bytes or other control characters to bypass simple protocol string matches (e.g., `java\x00script:`).
+**Prevention:** Harden Trusted Types `createHTML` regex to include boolean attributes like `autofocus` and `contenteditable`. Use character class ranges like `[\\s\\x00-\\x1f]*` in protocol and attribute matchers to prevent obfuscation-based bypasses.

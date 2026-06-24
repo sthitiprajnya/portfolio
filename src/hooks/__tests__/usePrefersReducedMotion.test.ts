@@ -1,12 +1,13 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { usePrefersReducedMotion } from '../usePrefersReducedMotion';
+import { usePrefersReducedMotion, __resetMqlCacheForTesting } from '../usePrefersReducedMotion';
 
 describe('usePrefersReducedMotion', () => {
   let originalMatchMedia: typeof window.matchMedia;
 
   beforeEach(() => {
     originalMatchMedia = window.matchMedia;
+    __resetMqlCacheForTesting();
   });
 
   afterEach(() => {
@@ -65,14 +66,16 @@ describe('usePrefersReducedMotion', () => {
       if (changeCallback) {
         // Change matches to true in the mock before triggering event
         // because getSnapshot will call matchMedia again
-        window.matchMedia = vi.fn().mockImplementation((query) => ({
+        const mqlMock = {
           matches: true,
-          media: query,
+          media: '(prefers-reduced-motion: reduce)',
           onchange: null,
           addEventListener: vi.fn(), // Already added
           removeEventListener: vi.fn(),
           dispatchEvent: vi.fn(),
-        }));
+        };
+        window.matchMedia = vi.fn().mockImplementation(() => mqlMock);
+        __resetMqlCacheForTesting(); // Reset cache to force reading from new mock
 
         changeCallback({ matches: true });
       }

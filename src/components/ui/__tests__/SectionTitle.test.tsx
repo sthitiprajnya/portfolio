@@ -13,7 +13,7 @@ describe('SectionTitle', () => {
     render(<SectionTitle number="01" title="Test Title" />);
     expect(screen.getByText('// 01')).toBeInTheDocument();
     expect(screen.getByText('Test Title')).toBeInTheDocument();
-      });
+  });
 
   it('renders correctly with id and handles copy link', async () => {
     // Mock clipboard

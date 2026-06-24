@@ -79,9 +79,18 @@
 ## 2026-08-01 - [Minimizing Idle Timer Overheads]
 **Learning:** Polling mechanisms running via `setInterval` in global providers (like `AudioProvider.tsx`) or hooks (like `useFaviconBlink.ts`) consume background CPU cycles and cause React renders/DOM updates indefinitely, even when audio is not playing or the tab is inactive.
 **Action:** Always wrap background polling intervals or visual updates with visibility checks (e.g. `document.addEventListener('visibilitychange')`) or conditional state (only trigger when `isSpeaking === true`) to pause execution when idle or hidden.
+
+## 2026-06-22 - [Idle Performance Optimization via Sleepy Loops]
+**Learning:** For interactive custom cursors or similar UI followers, a continuous `requestAnimationFrame` loop drains significant CPU/battery even when the user is idle. Implementing a "Sleepy" pattern—where the loop cancels itself when target deltas are negligible and visual states (scale/hover) are stable—reduces idle CPU usage to 0%. The loop must be re-awakened via a `wake()` helper called by all relevant input listeners (`mousemove`, `mousedown`, `mouseover`).
+**Action:** Implement self-canceling `requestAnimationFrame` loops for all UI-following effects. Use a `dx < 0.1` threshold to determine stability and ensure the "wake" signal is propagated from all interactive event handlers.
+
 ## 2026-05-31 - Passive Event Listeners for High-Frequency Events
 **Learning:** High-frequency global event listeners (like `mousemove`, `mouseover`, `mousedown`, `mouseup`, `touchstart`, `touchmove`, `scroll`) can block the main thread and cause layout jank, especially during scroll or animations, because the browser waits to see if `preventDefault()` will be called.
 **Action:** Always add `{ passive: true }` to these listeners when `preventDefault()` is not needed, so the browser can continue rendering/scrolling without waiting for the JavaScript event handler to finish.
+
+## 2025-06-04 - [Sleepy Animation Loop Pattern]
+**Learning:** High-frequency animation loops (like custom cursors) that run perpetually at 60fps consume significant CPU and battery even when the UI is stationary. Implementing a "Sleepy" loop that only runs during active interaction (moving, clicking) and sleeps when the interpolated state settles drastically reduces idle overhead.
+**Action:** Always implement a `wake()` mechanism for non-essential animation loops. Halts the `requestAnimationFrame` once the delta between current and target state falls below a threshold (e.g., `< 0.1`).
 
 ## 2025-06-05 - [Active Set Optimization for Sparse Animations]
 **Learning:** In high-frequency effects like the Matrix Rain glitch burst, iterating through the entire column set ( \approx 100$) for every trail level (=13$) to render a few active glitch columns (=3$) results in significant redundant work ((N \times T)$). By maintaining an "active set" array of glitch indices, we can reduce complexity to (G \times T)$, saving over 1,200 iterations per frame during bursts.
@@ -98,6 +107,6 @@
 **Learning:** In complex visual components like the Sentinel orb that feature layered state transitions (e.g., base scroll following vs. proximity-based color overrides), unconditional execution of Stage-2 logic adds unnecessary CPU overhead. By gating secondary lerp operations behind a proximity threshold check (e.g. `if (p > 0.001)`), we can skip dozens of floating-point operations per frame when the effect is not visible.
 **Action:** Always implement early-exits for secondary or "override" animation states in hot loops. Only execute math and state updates when the trigger condition (proximity, interaction, or timer) is active.
 
-## 2026-05-31 - Sleepy RAF Pattern for Custom Cursors
-**Learning:** Custom cursor implementations often use a continuous `requestAnimationFrame` loop to handle lerping, which consumes CPU cycles even when the mouse is stationary. By implementing a "Sleepy" pattern—where the loop is only active when movement occurs and automatically sleeps once the target state is reached (e.g., `distSq < 0.01`)—we can significantly reduce idle CPU overhead. Additionally, moving DOM mutations like `classList` and `opacity` changes into event handlers instead of the hot loop avoids redundant per-frame writes.
-**Action:** Implement `wake()` and `sleep` logic for all high-frequency animation loops that depend on user input. Gate DOM mutations behind state-change checks in event handlers to keep the RAF loop as lightweight as possible.
+## 2025-06-10 - [Sleepy RAF Loops and Optimized Interaction Checks]
+**Learning:** Global animation loops (like custom cursors) that run `requestAnimationFrame` perpetually cause constant CPU overhead even when the interface is idle. Implementing a "sleepy" mechanism that stops the loop when the cursor is stationary and its visual state (scale, hover classes) is stable can drastically reduce background battery drain. Additionally, checking for interactive elements in a high-frequency `mouseover` handler using iterative `closest()` calls or multiple `tagName` checks is inefficient; a single consolidated selector (`target.closest('a, button, ...')`) is significantly faster.
+**Action:** Always include a sleep condition in vanilla `raf` loops that cancels the frame when the delta is negligible. Consolidate interaction detection into a single optimized query to minimize per-event processing time.

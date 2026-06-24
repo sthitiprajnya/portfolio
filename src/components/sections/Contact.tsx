@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useRef } from 'react';
-import toast from 'react-hot-toast';
+import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { CyberButton }  from '@/components/ui/CyberButton';
@@ -17,6 +17,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export function Contact() {
   const formRef = useRef<HTMLFormElement>(null);
   const successButtonRef = useRef<HTMLButtonElement>(null);
+  const [emailCopied, setEmailCopied] = useState(false);
 
   const [form, setForm] = useState({
     from_name:  '',
@@ -215,9 +216,16 @@ export function Contact() {
 
                 {/* Micro-UX: Quick copy button for accessibility/convenience */}
                 <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(PERSONAL.email);
-                    toast.success('EMAIL_COPIED_TO_CLIPBOARD');
+                  onClick={async () => {
+                    // Security: Clipboard operations should be awaited to ensure feedback
+                    // accurately reflects the outcome of the asynchronous action.
+                    try {
+                      await navigator.clipboard.writeText(PERSONAL.email);
+                      setEmailCopied(true);
+                      setTimeout(() => setEmailCopied(false), 2000);
+                    } catch (e) {
+                      console.error('Email copy failed:', e);
+                    }
                   }}
                   className="absolute top-2 right-2 p-1.5 rounded-card bg-cyan/5 border border-cyan/10 text-cyan opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-all hover:bg-cyan hover:text-black outline-none focus-visible:ring-2 focus-visible:ring-cyan"
                   aria-label="Copy email address to clipboard"
@@ -226,6 +234,18 @@ export function Contact() {
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
                   </svg>
+                  <AnimatePresence>
+                    {emailCopied && (
+                      <motion.span
+                        initial={{ opacity: 0, y: 10, x: '-50%' }}
+                        animate={{ opacity: 1, y: 0, x: '-50%' }}
+                        exit={{ opacity: 0, y: 10, x: '-50%' }}
+                        className="absolute bottom-full left-1/2 mb-2 px-2 py-1 bg-cyan text-black font-mono text-[0.6rem] rounded-card font-bold shadow-[var(--glow-cyan-sm)] z-50 pointer-events-none whitespace-nowrap"
+                      >
+                        COPIED!
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
                 </button>
               </div>
 

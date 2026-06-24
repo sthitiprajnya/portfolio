@@ -64,3 +64,8 @@
 **Vulnerability:** XSS via SVG-specific attributes (like `xlink:href`) and potential injection vectors in string-based URL construction for deep-links.
 **Learning:** A standard Trusted Types policy may miss SVG-specific sinks like `xlink:href` which can be used for XSS. Additionally, constructing URLs via simple string concatenation (e.g., `origin + path + "#" + id`) is brittle and potentially exploitable if input is not strictly controlled.
 **Prevention:** Expand Trusted Types `createHTML` policies to include `xlink:href` in the attribute blocklist. Use the native `URL` API for all link construction to ensure robust parsing and prevent injection via malformed URI components.
+
+## 2026-06-24 - Origin Isolation for Static Documents
+**Vulnerability:** Use of 'allow-same-origin' in an iframe sandbox for content served from the same domain as the parent application.
+**Learning:** In a sandbox, 'allow-same-origin' allows the iframe to be treated as being from the same origin as the parent. If the document is served from the same domain, this enables the iframe to access the parent's cookies and localStorage, defeating the purpose of origin isolation even if scripts are blocked.
+**Prevention:** For static documents that do not require origin-bound features, use an empty sandbox attribute (`sandbox=""`). This treats the content as a unique origin, providing true isolation from sensitive parent data.

@@ -8,7 +8,6 @@ import { ScrollProgress }       from '@/components/global/ScrollProgress';
 import { Hero }                 from '@/components/sections/Hero';
 import { SmoothScrollProvider } from '@/components/providers/SmoothScrollProvider';
 import { CursorProvider }       from '@/components/providers/CursorProvider';
-import { Toaster }              from 'react-hot-toast';
 import { BackToTop }            from '@/components/ui/BackToTop';
 
 import dynamic from 'next/dynamic';
@@ -57,27 +56,6 @@ export default function Home() {
         </SmoothScrollProvider>
       </CursorProvider>
 
-      <Toaster
-        position="bottom-right"
-        toastOptions={{
-          style: {
-            background:  'var(--color-surface)',
-            color:       'var(--text-primary)',
-            border:      '1px solid var(--color-border)',
-            fontFamily:  'var(--font-mono)',
-            fontSize:    '0.8rem',
-            borderRadius:'4px',
-          },
-          success: {
-            iconTheme: { primary: 'var(--color-green)', secondary: 'black' },
-            style: { borderColor: 'var(--color-green)', boxShadow: 'var(--glow-green-sm)' },
-          },
-          error: {
-            iconTheme: { primary: 'var(--color-red)', secondary: 'white' },
-            style: { borderColor: 'var(--color-red)' },
-          },
-        }}
-      />
     </>
   );
 }

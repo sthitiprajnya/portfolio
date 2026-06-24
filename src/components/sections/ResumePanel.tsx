@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
@@ -38,7 +39,7 @@ export function ResumePanel() {
     }
   };
 
-  const handleCopyLink = () => {
+  const handleCopyLink = async () => {
     const fullUrl = `${window.location.origin}${PERSONAL.resumeUrl}`;
     handleCopy(fullUrl);
     setLinkCopied(true);

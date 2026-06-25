@@ -19,7 +19,6 @@ export function Contact() {
   const successButtonRef = useRef<HTMLButtonElement>(null);
   const [emailCopied, setEmailCopied] = useState(false);
 
-  const [emailCopied, setEmailCopied] = useState(false);
   const [form, setForm] = useState({
     from_name:  '',
     from_email: '',
@@ -30,7 +29,6 @@ export function Contact() {
 
   const [errors, setErrors]   = useState<Partial<typeof form>>({});
   const [status, setStatus]   = useState<Status>('idle');
-  const [emailCopied, setEmailCopied] = useState(false);
 
   const validate = (): boolean => {
     const errs: Partial<typeof form> = {};
@@ -168,11 +166,6 @@ export function Contact() {
     }
   };
 
-  const handleCopyEmail = () => {
-    navigator.clipboard.writeText(PERSONAL.email);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
 
   return (
     <section

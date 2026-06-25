@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { CyberButton }  from '@/components/ui/CyberButton';
@@ -17,8 +16,6 @@ const RESUME_SHA256 = 'f4a9f24d314dd2a6869c505d896746a84561e97392e77d1a53c6b8adc
 export function ResumePanel() {
   const [downloadStarted, setDownloadStarted] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
-  const [docIdCopied, setDocIdCopied] = useState(false);
-  const [hashCopied, setHashCopied] = useState(false);
 
   // BOLT: Performance Optimization — Lazy-load the ~1.5MB PDF asset.
   const { ref: iframeRef, inView } = useInView({

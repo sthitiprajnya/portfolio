@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from 'react';
-import { toast } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { ScrollReveal, fadeSlideLeft } from './ScrollReveal';

@@ -4,6 +4,8 @@ import { usePrefersReducedMotion, __resetMqlCacheForTesting, _resetMqlCache } fr
 
 const QUERY = '(prefers-reduced-motion: reduce)';
 
+const QUERY = '(prefers-reduced-motion: reduce)';
+
 describe('usePrefersReducedMotion', () => {
   let originalMatchMedia: typeof window.matchMedia;
 

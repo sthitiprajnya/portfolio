@@ -16,6 +16,10 @@ const getMql = () => {
   return mqlCache;
 };
 
+export const _resetMqlCache = () => {
+  mqlCache = null;
+};
+
 const subscribe = (callback: () => void) => {
   const mql = getMql();
   if (!mql) return () => {};

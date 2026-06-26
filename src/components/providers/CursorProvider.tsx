@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 interface CursorProviderProps {
@@ -30,8 +30,6 @@ export function CursorProvider({ children }: CursorProviderProps) {
   const isHovering = useRef(false);
   const isClicking = useRef(false);
   const isInitial = useRef(true);
-
-  const rafId = useRef<number | null>(null);
 
   useEffect(() => {
     setIsTouchDevice(window.matchMedia('(pointer: coarse)').matches);
@@ -135,7 +133,7 @@ export function CursorProvider({ children }: CursorProviderProps) {
       window.removeEventListener('mouseup', handleMouseUp);
       if (rafId.current !== null) cancelAnimationFrame(rafId.current);
     };
-  }, [isTouchDevice, prefersReducedMotion, wake]);
+  }, [isTouchDevice, prefersReducedMotion]);
 
   return (
     <>

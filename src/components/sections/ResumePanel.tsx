@@ -107,7 +107,7 @@ export function ResumePanel() {
                     sandbox=""
                     referrerPolicy="no-referrer"
                     loading="lazy"
-                    allow="camera 'none'; microphone 'none'; geolocation 'none'; autoplay 'none'; payment 'none'; usb 'none'; magnetometer 'none'; accelerometer 'none'; gyroscope 'none'"
+                    allow="camera 'none'; microphone 'none'; geolocation 'none'; autoplay 'none'; payment 'none'; usb 'none'; magnetometer 'none'; accelerometer 'none'; gyroscope 'none'; clipboard-read 'none'; clipboard-write 'none'"
                   />
                 ) : (
                   <div className="flex flex-col items-center gap-4 text-text-muted animate-pulse font-mono text-xs uppercase tracking-widest">

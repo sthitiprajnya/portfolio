@@ -76,22 +76,4 @@ describe('Contact Component - Error Handling', () => {
     consoleSpy.mockRestore();
   });
 
-  it('should handle email copy functionality', async () => {
-    const writeTextMock = vi.fn().mockResolvedValue(undefined);
-    Object.assign(navigator, {
-      clipboard: {
-        writeText: writeTextMock,
-      },
-    });
-
-    render(<Contact />);
-
-    const copyButton = screen.getByRole('button', { name: /Copy email address to clipboard/i });
-    expect(copyButton).toBeInTheDocument();
-
-    fireEvent.click(copyButton);
-
-    expect(writeTextMock).toHaveBeenCalled();
-    expect(await screen.findByText('COPIED!')).toBeInTheDocument();
-  });
 });

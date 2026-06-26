@@ -39,10 +39,5 @@ export function usePrefersReducedMotion() {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
 
-// Exported for testing purposes only to prevent state leakage between tests
-export const _resetMqlCache = () => {
-  mqlCache = null;
-};
-
 // Alias for testing compatibility
 export const __resetMqlCacheForTesting = _resetMqlCache;

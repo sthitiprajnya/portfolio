@@ -17,3 +17,7 @@
 ## 2026-06-15 - Localized Feedback over Global Toasts
 **Learning:** For interactions that happen within a specific UI context (like clicking a copy button next to an email or a section title), global toast notifications can be disconnected from the user's focus. Localized, contextual feedback (e.g., a "COPIED!" badge appearing right next to the button) provides immediate, clear confirmation without cluttering the screen or requiring the user to shift their gaze.
 **Action:** Prefer localized AnimatePresence-based feedback for micro-interactions. Reserve global toasts only for application-wide events or asynchronous processes that might finish when the trigger is no longer in view.
+
+## 2025-06-01 - Heading Hierarchy Stability
+**Learning:** Decorative typography (like glitch text) often breaks the logical document structure for screen readers if not properly hidden and complemented with SR-only headings.
+**Action:** Use `sr-only` classes for H1s when the visual primary title is highly stylized or animated.

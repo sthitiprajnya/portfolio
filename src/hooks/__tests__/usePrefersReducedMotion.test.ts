@@ -1,6 +1,8 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { usePrefersReducedMotion, __resetMqlCacheForTesting } from '../usePrefersReducedMotion';
+import { usePrefersReducedMotion, __resetMqlCacheForTesting, _resetMqlCache } from '../usePrefersReducedMotion';
+
+const QUERY = '(prefers-reduced-motion: reduce)';
 
 describe('usePrefersReducedMotion', () => {
   let originalMatchMedia: typeof window.matchMedia;
@@ -49,7 +51,7 @@ describe('usePrefersReducedMotion', () => {
 
     const mqlMock = {
       matches: false,
-      media: query,
+      media: '(prefers-reduced-motion: reduce)',
       onchange: null,
       addEventListener: vi.fn().mockImplementation((event, callback) => {
         if (event === 'change') {

@@ -110,3 +110,7 @@
 ## 2025-06-10 - [Sleepy RAF Loops and Optimized Interaction Checks]
 **Learning:** Global animation loops (like custom cursors) that run `requestAnimationFrame` perpetually cause constant CPU overhead even when the interface is idle. Implementing a "sleepy" mechanism that stops the loop when the cursor is stationary and its visual state (scale, hover classes) is stable can drastically reduce background battery drain. Additionally, checking for interactive elements in a high-frequency `mouseover` handler using iterative `closest()` calls or multiple `tagName` checks is inefficient; a single consolidated selector (`target.closest('a, button, ...')`) is significantly faster.
 **Action:** Always include a sleep condition in vanilla `raf` loops that cancels the frame when the delta is negligible. Consolidate interaction detection into a single optimized query to minimize per-event processing time.
+
+## 2025-06-01 - Animation Loop Consolidation
+**Learning:** Multiple RAF loops for the same interaction (e.g., cursor) can lead to redundant calculations and inconsistent states. Consolidating into a single "sleepy" loop improves CPU efficiency.
+**Action:** Ensure high-frequency UI components use a centralized animation controller or stable RAF state management.

@@ -17,7 +17,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export function Contact() {
   const formRef = useRef<HTMLFormElement>(null);
   const successButtonRef = useRef<HTMLButtonElement>(null);
-
+  const [emailCopied, setEmailCopied] = useState(false);
   const [form, setForm] = useState({
     from_name:  '',
     from_email: '',
@@ -28,7 +28,6 @@ export function Contact() {
 
   const [errors, setErrors]   = useState<Partial<typeof form>>({});
   const [status, setStatus]   = useState<Status>('idle');
-  const [emailCopied, setEmailCopied] = useState(false);
 
   const validate = (): boolean => {
     const errs: Partial<typeof form> = {};
@@ -166,12 +165,6 @@ export function Contact() {
     }
   };
 
-  const handleCopyEmail = (e: React.MouseEvent) => {
-    e.preventDefault();
-    navigator.clipboard.writeText(PERSONAL.email);
-    setEmailCopied(true);
-    setTimeout(() => setEmailCopied(false), 2000);
-  };
 
   return (
     <section

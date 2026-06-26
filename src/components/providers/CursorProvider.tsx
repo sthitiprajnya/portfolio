@@ -54,7 +54,6 @@ export function CursorProvider({ children }: CursorProviderProps) {
 
     if (ringRef.current) {
       const scale = isClicking.current ? 0.5 : isHovering.current ? 1.5 : 1;
-      // BOLT: Use translate3d for hardware-accelerated transforms
       ringRef.current.style.transform = `translate3d(calc(${ringPos.current.x}px - 50%), calc(${ringPos.current.y}px - 50%), 0) scale(${scale})`;
 
       if (!isInitial.current) {
@@ -73,13 +72,15 @@ export function CursorProvider({ children }: CursorProviderProps) {
       ringPos.current.x = mousePos.current.x;
       ringPos.current.y = mousePos.current.y;
       rafId.current = null;
+      isActive.current = false;
     } else {
       rafId.current = requestAnimationFrame(render);
     }
   }, []);
 
   const wake = useCallback(() => {
-    if (rafId.current !== null || isTouchDevice || prefersReducedMotion) return;
+    if (isActive.current || isTouchDevice || prefersReducedMotion) return;
+    isActive.current = true;
     rafId.current = requestAnimationFrame(render);
   }, [isTouchDevice, prefersReducedMotion, render]);
 
@@ -89,8 +90,6 @@ export function CursorProvider({ children }: CursorProviderProps) {
     const handleMouseMove = (e: MouseEvent) => {
       mousePos.current = { x: e.clientX, y: e.clientY };
       if (isInitial.current) {
-        if (dotRef.current) dotRef.current.style.opacity = '1';
-        if (ringRef.current) ringRef.current.style.opacity = '1';
         isInitial.current = false;
       }
       wake();
@@ -98,8 +97,6 @@ export function CursorProvider({ children }: CursorProviderProps) {
 
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      // BOLT: Optimized interactive check using a single closest() call
-      // to reduce CPU overhead during high-frequency mouseover events.
       const isInteractive = !!target.closest('a, button, [role="button"], input, textarea');
 
       if (isHovering.current !== isInteractive) {
@@ -117,13 +114,11 @@ export function CursorProvider({ children }: CursorProviderProps) {
       wake();
     };
 
-    // BOLT: Adding { passive: true } to high-frequency event listeners to prevent main-thread blocking and layout jank
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
     window.addEventListener('mouseover', handleMouseOver, { passive: true });
     window.addEventListener('mousedown', handleMouseDown, { passive: true });
     window.addEventListener('mouseup', handleMouseUp, { passive: true });
 
-    // Start initial loop
     wake();
 
     return () => {

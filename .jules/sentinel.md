@@ -69,3 +69,7 @@
 **Vulnerability:** XSS bypasses in Trusted Types policies due to missing boolean attributes (e.g., `autofocus`) or protocol obfuscation using non-printable control characters.
 **Learning:** Modern browsers support boolean attributes that can be used for focus hijacking or data exfiltration. Furthermore, attackers may use null bytes or other control characters to bypass simple protocol string matches (e.g., `java\x00script:`).
 **Prevention:** Harden Trusted Types `createHTML` regex to include boolean attributes like `autofocus` and `contenteditable`. Use character class ranges like `[\\s\\x00-\\x1f]*` in protocol and attribute matchers to prevent obfuscation-based bypasses.
+
+## 2025-06-01 - CSP Hardening
+**Learning:** Restricting `form-action` to `'self'` prevents data exfiltration via traditional form submissions to unauthorized origins, even if other security layers are bypassed.
+**Action:** Always audit `form-action` when using client-side API libraries (like EmailJS) which do not require native form actions.

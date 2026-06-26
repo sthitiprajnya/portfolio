@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { CyberButton }  from '@/components/ui/CyberButton';
@@ -17,8 +16,6 @@ const RESUME_SHA256 = 'f4a9f24d314dd2a6869c505d896746a84561e97392e77d1a53c6b8adc
 export function ResumePanel() {
   const [downloadStarted, setDownloadStarted] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
-  const [docIdCopied, setDocIdCopied] = useState(false);
-  const [hashCopied, setHashCopied] = useState(false);
 
   // BOLT: Performance Optimization — Lazy-load the ~1.5MB PDF asset.
   const { ref: iframeRef, inView } = useInView({
@@ -124,11 +121,11 @@ export function ResumePanel() {
 
               {/* Footer stamp */}
               <div className="px-6 py-4 border-t border-[var(--glass-border)] flex flex-col md:flex-row justify-between items-center bg-[rgba(0,0,0,0.6)] gap-4 relative z-10">
-                <span className="text-[0.6rem] text-text-muted font-mono text-center md:text-left">
+                <div className="text-[0.6rem] text-text-muted font-mono text-center md:text-left">
                   DOC_ID: <RedactedText text="SB-RESUME-2025-v3" label="document ID" handleCopy={handleCopy} />
                   <br className="md:hidden" />
                   <span className="hidden md:inline"> · </span>SHA256: <RedactedText text={RESUME_SHA256} label="SHA256 hash" handleCopy={handleCopy} />
-                </span>
+                </div>
                 <span className="text-[0.6rem] text-green font-bold font-mono uppercase tracking-widest flex items-center gap-1.5 shrink-0">
                   <span className="w-1.5 h-1.5 rounded-full bg-green animate-pulse" />
                   INTEGRITY OK

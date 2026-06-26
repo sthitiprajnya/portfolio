@@ -113,7 +113,7 @@ export default function RootLayout({
       <head>
         <meta
           httpEquiv="Content-Security-Policy"
-          content="default-src 'self'; script-src 'self' 'unsafe-inline'; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://images.unsplash.com https://ghchart.rshah.org; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://api.github.com https://api.emailjs.com; form-action 'self' https://api.emailjs.com; object-src 'none'; base-uri 'none'; manifest-src 'self'; worker-src 'none'; upgrade-insecure-requests; frame-ancestors 'none'; require-trusted-types-for 'script'; trusted-types default;"
+          content="default-src 'self'; script-src 'self' 'unsafe-inline'; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://images.unsplash.com https://ghchart.rshah.org; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://api.github.com https://api.emailjs.com; form-action 'self'; object-src 'none'; base-uri 'none'; manifest-src 'self'; worker-src 'none'; upgrade-insecure-requests; frame-ancestors 'none'; require-trusted-types-for 'script'; trusted-types default;"
         />
         {/* Security: Define a default Trusted Types policy to satisfy the CSP and prevent DOM XSS sinks. */}
         <script

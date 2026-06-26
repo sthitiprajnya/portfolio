@@ -2,20 +2,6 @@ import { useSyncExternalStore } from 'react';
 
 const QUERY = '(prefers-reduced-motion: reduce)';
 
-let mqlCache: MediaQueryList | null = null;
-
-const getMql = () => {
-  if (typeof window === 'undefined') return null;
-  if (!mqlCache) {
-    mqlCache = window.matchMedia(QUERY);
-  }
-  return mqlCache;
-};
-
-export const _resetMqlCache = () => {
-  mqlCache = null;
-};
-
 // BOLT: Hoist subscription and snapshots to module level to ensure stability
 // across all 27 components consuming this hook, minimizing per-component overhead.
 // This replaces two useEffects and one useState per component with a single
@@ -52,11 +38,12 @@ export const __resetMqlCacheForTesting = () => {
   mqlCache = null;
 };
 
+// Also export as _resetMqlCache for potential internal use
+export const _resetMqlCache = __resetMqlCacheForTesting;
+
 export function usePrefersReducedMotion() {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
 
 // Exported for Vitest tests to prevent state leakage between tests
-export const resetMatchMediaCache = () => {
-  mqlCache = null;
-};
+export const resetMatchMediaCache = __resetMqlCacheForTesting;

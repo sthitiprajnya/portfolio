@@ -16,29 +16,29 @@ export function Preloader() {
     }
 
     const sequence = async () => {
-      // Stage 0: 0-180ms (Blinking cursor)
-      await new Promise(r => setTimeout(r, 180));
+      // Stage 0: 0-120ms (Blinking cursor)
+      await new Promise(r => setTimeout(r, 120));
       setStage(1); // SYSTEM BOOT
 
-      await new Promise(r => setTimeout(r, 180));
+      await new Promise(r => setTimeout(r, 120));
       setStage(2); // INITIALIZING
 
-      await new Promise(r => setTimeout(r, 180));
+      await new Promise(r => setTimeout(r, 120));
       setStage(3); // LOADING SECURITY PROTOCOLS
 
-      await new Promise(r => setTimeout(r, 180));
+      await new Promise(r => setTimeout(r, 120));
       setStage(4); // MOUNTING ROOT FILESYSTEM
 
-      await new Promise(r => setTimeout(r, 180));
+      await new Promise(r => setTimeout(r, 120));
       setStage(5); // BYPASSING MAINFRAME FIREWALL
 
-      await new Promise(r => setTimeout(r, 180));
+      await new Promise(r => setTimeout(r, 120));
       setStage(6); // DECRYPTING PORTFOLIO ASSETS
 
-      await new Promise(r => setTimeout(r, 180));
+      await new Promise(r => setTimeout(r, 120));
       setStage(7); // ESTABLISHING ENCRYPTED CHANNEL
 
-      await new Promise(r => setTimeout(r, 180));
+      await new Promise(r => setTimeout(r, 120));
       setStage(8); // Start progress bar & hex scroll
 
       // Simulate progress bar and hex dump

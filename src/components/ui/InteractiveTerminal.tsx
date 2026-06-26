@@ -73,18 +73,34 @@ export function InteractiveTerminal({ className }: { className?: string }) {
     let outputToDelay: string[] = [];
 
     switch (lowerCmd) {
-      case 'help':
-        outputToDelay = [
-          'Available commands:',
-          '  whoami          - Display current user identity',
-          '  cat skills.txt  - List top tools',
-          '  ls projects/    - List project directories',
-          '  cat awards.txt  - Show recent awards',
-          '  cat certs.txt   - List certifications',
-          '  nmap -sV target - Run scan on target',
-          '  clear           - Clear terminal output'
-        ];
-        break;
+      case 'help': {
+        const CommandLink = ({ cmd }: { cmd: string }) => (
+          <button
+            onClick={() => handleCommand(cmd)}
+            className="text-cyan hover:underline focus:underline outline-none"
+            title={`Run ${cmd}`}
+          >
+            {cmd}
+          </button>
+        );
+
+        setLines(prev => [...prev, {
+          output: (
+            <div className="space-y-1">
+              <div>Available commands:</div>
+              <div>  <CommandLink cmd="whoami" />          - Display current user identity</div>
+              <div>  <CommandLink cmd="cat skills.txt" />  - List top tools</div>
+              <div>  <CommandLink cmd="ls projects/" />    - List project directories</div>
+              <div>  <CommandLink cmd="cat awards.txt" />  - Show recent awards</div>
+              <div>  <CommandLink cmd="cat certs.txt" />   - List certifications</div>
+              <div>  <CommandLink cmd="nmap -sV target" /> - Run scan on target</div>
+              <div>  <CommandLink cmd="clear" />           - Clear terminal output</div>
+            </div>
+          )
+        }].slice(-100));
+        setCurrentInput('');
+        return;
+      }
       case 'whoami':
         outputToDelay = [
           `${PERSONAL.name}`,
@@ -208,10 +224,10 @@ export function InteractiveTerminal({ className }: { className?: string }) {
         aria-atomic="false"
       >
         {lines.map((line, lineIdx) => (
-          <div key={lineIdx} className="flex whitespace-pre-wrap break-words">
+          <div key={lineIdx} className={clsx("flex break-words", typeof line.output === 'string' && "whitespace-pre-wrap")}>
             {line.prompt && <span className="text-text-muted mr-2 shrink-0">{line.prompt}</span>}
             {line.command && <span>{line.command}</span>}
-            {line.output && <span className="text-text-secondary">{line.output}</span>}
+            {line.output && <div className="text-text-secondary flex-grow">{line.output}</div>}
           </div>
         ))}
         {!isProcessing && (
@@ -229,7 +245,6 @@ export function InteractiveTerminal({ className }: { className?: string }) {
               placeholder="Type 'help' for available commands..."
               autoComplete="off"
               spellCheck="false"
-              autoFocus
               maxLength={500}
             />
           </div>

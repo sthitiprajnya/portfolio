@@ -14,7 +14,7 @@ describe('usePrefersReducedMotion', () => {
 
   afterEach(() => {
     window.matchMedia = originalMatchMedia;
-    _resetMqlCache();
+    __resetMqlCacheForTesting();
   });
 
   it('should return false if reduced motion is not preferred', () => {
@@ -50,7 +50,7 @@ describe('usePrefersReducedMotion', () => {
 
     const mqlMock = {
       matches: false,
-      media: QUERY,
+      media: '(prefers-reduced-motion: reduce)',
       onchange: null,
       addEventListener: vi.fn().mockImplementation((event, callback) => {
         if (event === 'change') {

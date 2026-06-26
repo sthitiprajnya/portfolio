@@ -30,7 +30,6 @@ export function CursorProvider({ children }: CursorProviderProps) {
   const isHovering = useRef(false);
   const isClicking = useRef(false);
   const isInitial = useRef(true);
-  const isActive = useRef(false);
 
   const rafId = useRef<number | null>(null);
 

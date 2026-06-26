@@ -107,7 +107,7 @@ export function ResumePanel() {
                     sandbox=""
                     referrerPolicy="no-referrer"
                     loading="lazy"
-                    allow="camera 'none'; microphone 'none'; geolocation 'none'; autoplay 'none'; payment 'none'; usb 'none'; magnetometer 'none'; accelerometer 'none'; gyroscope 'none'"
+                    allow="camera 'none'; microphone 'none'; geolocation 'none'; autoplay 'none'; payment 'none'; usb 'none'; magnetometer 'none'; accelerometer 'none'; gyroscope 'none'; clipboard-read 'none'; clipboard-write 'none'"
                   />
                 ) : (
                   <div className="flex flex-col items-center gap-4 text-text-muted animate-pulse font-mono text-xs uppercase tracking-widest">
@@ -121,11 +121,11 @@ export function ResumePanel() {
 
               {/* Footer stamp */}
               <div className="px-6 py-4 border-t border-[var(--glass-border)] flex flex-col md:flex-row justify-between items-center bg-[rgba(0,0,0,0.6)] gap-4 relative z-10">
-                <span className="text-[0.6rem] text-text-muted font-mono text-center md:text-left">
+                <div className="text-[0.6rem] text-text-muted font-mono text-center md:text-left">
                   DOC_ID: <RedactedText text="SB-RESUME-2025-v3" label="document ID" handleCopy={handleCopy} />
                   <br className="md:hidden" />
                   <span className="hidden md:inline"> · </span>SHA256: <RedactedText text={RESUME_SHA256} label="SHA256 hash" handleCopy={handleCopy} />
-                </span>
+                </div>
                 <span className="text-[0.6rem] text-green font-bold font-mono uppercase tracking-widest flex items-center gap-1.5 shrink-0">
                   <span className="w-1.5 h-1.5 rounded-full bg-green animate-pulse" />
                   INTEGRITY OK

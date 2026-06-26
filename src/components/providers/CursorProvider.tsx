@@ -101,6 +101,13 @@ export function CursorProvider({ children }: CursorProviderProps) {
 
       if (isHovering.current !== isInteractive) {
         isHovering.current = isInteractive;
+        if (ringRef.current) {
+          if (isInteractive) {
+            ringRef.current.classList.add('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]');
+          } else {
+            ringRef.current.classList.remove('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]');
+          }
+        }
         wake();
       }
     };

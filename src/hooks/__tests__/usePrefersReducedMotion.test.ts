@@ -47,6 +47,7 @@ describe('usePrefersReducedMotion', () => {
 
   it('should update value when media query change event occurs', () => {
     let changeCallback: ((event: { matches: boolean }) => void) | null = null;
+    const query = '(prefers-reduced-motion: reduce)';
 
     const mqlMock = {
       matches: false,
@@ -71,15 +72,15 @@ describe('usePrefersReducedMotion', () => {
       if (changeCallback) {
         // Change matches to true in the mock before triggering event
         // because getSnapshot will call matchMedia again
-        const mqlMock = {
+        const mqlMockUpdated = {
           matches: true,
-          media: '(prefers-reduced-motion: reduce)',
+          media: query,
           onchange: null,
           addEventListener: vi.fn(), // Already added
           removeEventListener: vi.fn(),
           dispatchEvent: vi.fn(),
         };
-        window.matchMedia = vi.fn().mockImplementation(() => mqlMock);
+        window.matchMedia = vi.fn().mockImplementation(() => mqlMockUpdated);
         __resetMqlCacheForTesting(); // Reset cache to force reading from new mock
 
         changeCallback({ matches: true });

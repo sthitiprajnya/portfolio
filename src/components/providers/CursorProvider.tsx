@@ -30,71 +30,64 @@ export function CursorProvider({ children }: CursorProviderProps) {
   const isHovering = useRef(false);
   const isClicking = useRef(false);
   const isInitial = useRef(true);
-  const isActive = useRef(false);
 
   useEffect(() => {
     setIsTouchDevice(window.matchMedia('(pointer: coarse)').matches);
   }, []);
 
-  useEffect(() => {
-    if (isTouchDevice || prefersReducedMotion) return;
+  const render = useCallback(() => {
+    // Lerp for smooth follow
+    const dx = mousePos.current.x - ringPos.current.x;
+    const dy = mousePos.current.y - ringPos.current.y;
 
-    let animationFrameId: number | null = null;
+    const LERP = 0.15;
+    ringPos.current.x += dx * LERP;
+    ringPos.current.y += dy * LERP;
 
-    const render = () => {
-      // Lerp for smooth follow (lag)
-      const dx = mousePos.current.x - ringPos.current.x;
-      const dy = mousePos.current.y - ringPos.current.y;
+    if (dotRef.current) {
+      const dotScale = isClicking.current ? 0.75 : 1;
+      dotRef.current.style.transform = `translate3d(calc(${mousePos.current.x}px - 50%), calc(${mousePos.current.y}px - 50%), 0) scale(${dotScale})`;
+      if (!isInitial.current) dotRef.current.style.opacity = '1';
+    }
 
-      ringPos.current.x += dx * 0.15;
-      ringPos.current.y += dy * 0.15;
+    if (ringRef.current) {
+      const scale = isClicking.current ? 0.5 : isHovering.current ? 1.5 : 1;
+      ringRef.current.style.transform = `translate3d(calc(${ringPos.current.x}px - 50%), calc(${ringPos.current.y}px - 50%), 0) scale(${scale})`;
 
-      // BOLT: Use translate3d to ensure GPU acceleration and prevent sub-pixel layout shifts
-      if (dotRef.current) {
-        const dotScale = isClicking.current ? 0.75 : 1;
-        dotRef.current.style.transform = `translate(calc(${mousePos.current.x}px - 50%), calc(${mousePos.current.y}px - 50%)) scale(${dotScale})`;
-        if (!isInitial.current) dotRef.current.style.opacity = '1';
-      }
-
-      if (ringRef.current) {
-        const currentScale = isClicking.current ? 0.8 : isHovering.current ? 1.5 : 1;
-        // BOLT: Use translate3d for hardware-accelerated transforms
-        ringRef.current.style.transform = `translate3d(calc(${ringPos.current.x}px - 50%), calc(${ringPos.current.y}px - 50%), 0) scale(${currentScale})`;
-
-        if (ringRef.current.style.opacity !== '1') ringRef.current.style.opacity = '1';
-
-        if (!isInitial.current) {
-          if (isHovering.current) {
-            ringRef.current.classList.add('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]');
-          } else {
-            ringRef.current.classList.remove('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]');
-          }
+      if (!isInitial.current) {
+        ringRef.current.style.opacity = '1';
+        if (isHovering.current) {
+          ringRef.current.classList.add('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]');
+        } else {
+          ringRef.current.classList.remove('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]');
         }
       }
+    }
 
-      // BOLT: Sleepy Loop - Stop the requestAnimationFrame loop when the cursor is stationary
-      // and the follower ring has caught up. This significantly reduces idle CPU usage.
-      if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1 && !isInitial.current) {
-        isActive.current = false;
-        animationFrameId = null;
-        return;
-      }
+    // BOLT: Sleep check - if the ring has caught up and state is stable, stop the loop.
+    const distSq = dx * dx + dy * dy;
+    if (distSq < 0.001 && !isInitial.current) {
+      ringPos.current.x = mousePos.current.x;
+      ringPos.current.y = mousePos.current.y;
+      rafId.current = null;
+      isActive.current = false;
+    } else {
+      rafId.current = requestAnimationFrame(render);
+    }
+  }, []);
 
-      animationFrameId = requestAnimationFrame(render);
-    };
+  const wake = useCallback(() => {
+    if (isActive.current || isTouchDevice || prefersReducedMotion) return;
+    isActive.current = true;
+    rafId.current = requestAnimationFrame(render);
+  }, [isTouchDevice, prefersReducedMotion, render]);
 
-    const wake = () => {
-      if (!isActive.current) {
-        isActive.current = true;
-        animationFrameId = requestAnimationFrame(render);
-      }
-    };
+  useEffect(() => {
+    if (isTouchDevice || prefersReducedMotion) return;
 
     const handleMouseMove = (e: MouseEvent) => {
       mousePos.current = { x: e.clientX, y: e.clientY };
       if (isInitial.current) {
-        if (dotRef.current) dotRef.current.style.opacity = '1';
-        if (ringRef.current) ringRef.current.style.opacity = '1';
         isInitial.current = false;
       }
       wake();
@@ -106,6 +99,13 @@ export function CursorProvider({ children }: CursorProviderProps) {
 
       if (isHovering.current !== isInteractive) {
         isHovering.current = isInteractive;
+        if (ringRef.current) {
+          if (isInteractive) {
+            ringRef.current.classList.add('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]');
+          } else {
+            ringRef.current.classList.remove('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]');
+          }
+        }
         wake();
       }
     };
@@ -124,7 +124,6 @@ export function CursorProvider({ children }: CursorProviderProps) {
     window.addEventListener('mousedown', handleMouseDown, { passive: true });
     window.addEventListener('mouseup', handleMouseUp, { passive: true });
 
-    // Start initial loop
     wake();
 
     return () => {
@@ -132,7 +131,7 @@ export function CursorProvider({ children }: CursorProviderProps) {
       window.removeEventListener('mouseover', handleMouseOver);
       window.removeEventListener('mousedown', handleMouseDown);
       window.removeEventListener('mouseup', handleMouseUp);
-      if (animationFrameId !== null) cancelAnimationFrame(animationFrameId);
+      if (rafId.current !== null) cancelAnimationFrame(rafId.current);
     };
   }, [isTouchDevice, prefersReducedMotion]);
 

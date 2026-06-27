@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { usePrefersReducedMotion, __resetMqlCacheForTesting } from '../usePrefersReducedMotion';
+import { usePrefersReducedMotion, __resetMqlCacheForTesting, _resetMqlCache } from '../usePrefersReducedMotion';
 
 
 describe('usePrefersReducedMotion', () => {

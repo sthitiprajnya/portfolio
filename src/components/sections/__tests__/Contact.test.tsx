@@ -38,13 +38,13 @@ describe('Contact Component - Error Handling', () => {
     vi.stubEnv('NEXT_PUBLIC_EMAILJS_PUBLIC_KEY', 'test_public_key');
   });
 
-  it('should handle emailjs.sendForm errors and set status to error', async () => {
+  it('should handle emailjs.send errors and set status to error', async () => {
     // Silence console.error for this test as we expect an error to be logged
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     // Mock send to reject
     const mockError = new Error('Test Error');
-    (emailjs.sendForm as ReturnType<typeof vi.fn>).mockRejectedValueOnce(mockError);
+    (emailjs.send as ReturnType<typeof vi.fn>).mockRejectedValueOnce(mockError);
 
     render(
       <Contact />

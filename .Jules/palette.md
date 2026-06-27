@@ -17,3 +17,7 @@
 ## 2026-06-22 - Native titles for aria-labels
 **Learning:** When using `aria-label` for screen readers on interactive elements (like inputs) or icon-only buttons, it is important to provide a native `title` attribute to ensure the intent is accessible via hover for sighted users.
 **Action:** Always verify elements with an `aria-label` have a matching `title` attribute.
+
+## 2024-06-27 - Linking Modals and Toggles with ARIA
+**Learning:** For accessibility in custom toggle components, floating widgets, and overlays, it is critical to explicitly link the toggle button to its target container using `aria-controls` (matching the container's `id`) and dynamically manage the `aria-expanded` state. This was missing for the methodology and intel modals.
+**Action:** When adding modal toggles or expanding sections, always ensure the button has `aria-expanded` reflecting the state, and `aria-controls` pointing to the `id` of the content block it toggles.

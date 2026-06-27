@@ -222,7 +222,7 @@ export function Hero() {
           className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6"
         >
           <CyberButton onClick={() => scrollTo('projects')}>VIEW_PROJECTS</CyberButton>
-          <CyberButton color="amber" onClick={() => { triggerRef.current = null; setShowMethodology(true); }} aria-haspopup="dialog">VIEW_METHODOLOGY</CyberButton>
+          <CyberButton color="amber" onClick={() => { triggerRef.current = null; setShowMethodology(true); }} aria-haspopup="dialog" aria-controls="methodology-modal" aria-expanded={showMethodology}>VIEW_METHODOLOGY</CyberButton>
           <CyberButton color="green" onClick={() => scrollTo('contact')}>CONTACT_ME</CyberButton>
 
           <div className="flex space-x-4 pt-4 sm:pt-0 sm:ml-4">
@@ -273,6 +273,8 @@ export function Hero() {
                 key={i}
                 onClick={() => setActiveIntel(msg)}
                 aria-haspopup="dialog"
+                aria-controls="intel-modal"
+                aria-expanded={activeIntel === msg}
                 className="font-mono text-[0.65rem] text-text-secondary tracking-wide hover:text-cyan hover:underline cursor-pointer outline-none focus-visible:text-cyan focus-visible:underline glass-pill px-3 py-1 border-[var(--glass-border)]"
               >
                 {msg}
@@ -294,6 +296,7 @@ export function Hero() {
           >
             <motion.div
               ref={methodologyModalRef}
+              id="methodology-modal"
               role="dialog"
               aria-modal="true"
               aria-labelledby="methodology-modal-title"
@@ -382,6 +385,7 @@ export function Hero() {
           >
             <motion.div
               ref={intelModalRef}
+              id="intel-modal"
               role="dialog"
               aria-modal="true"
               aria-labelledby="intel-modal-title"

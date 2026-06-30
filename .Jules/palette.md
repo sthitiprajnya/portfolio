@@ -21,3 +21,6 @@
 ## 2024-06-27 - Linking Modals and Toggles with ARIA
 **Learning:** For accessibility in custom toggle components, floating widgets, and overlays, it is critical to explicitly link the toggle button to its target container using `aria-controls` (matching the container's `id`) and dynamically manage the `aria-expanded` state. This was missing for the methodology and intel modals.
 **Action:** When adding modal toggles or expanding sections, always ensure the button has `aria-expanded` reflecting the state, and `aria-controls` pointing to the `id` of the content block it toggles.
+## 2026-06-28 - Add character count to text inputs
+**Learning:** Adding a `maxLength` property to a form input without a visual character counter leads to an inconsistent user experience and poor feedback for users nearing the limit.
+**Action:** When implementing input fields with `maxLength` restrictions, always provide a visual character counter and logically link it to the input using the `aria-describedby` attribute to ensure accessibility and a consistent user experience.

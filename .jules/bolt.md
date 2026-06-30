@@ -114,3 +114,7 @@
 ## 2025-06-01 - Animation Loop Consolidation
 **Learning:** Multiple RAF loops for the same interaction (e.g., cursor) can lead to redundant calculations and inconsistent states. Consolidating into a single "sleepy" loop improves CPU efficiency.
 **Action:** Ensure high-frequency UI components use a centralized animation controller or stable RAF state management.
+
+## 2026-08-01 - [Minimizing Idle Timer Overheads in AsciiAvatar]
+**Learning:** Components containing visual effects powered by `setInterval` (like `AsciiFace` and `MetadataPanel`) continue executing their callbacks every 120-300ms even when the browser tab is hidden. This leads to continuous, unnecessary DOM manipulation and CPU wakeups in the background, consuming battery for a visual effect the user cannot see.
+**Action:** Add an early exit condition (`if (document.hidden) return;`) at the top of high-frequency `setInterval` callbacks to pause execution when the page is not visible, aligning with the pattern used in `useFaviconBlink.ts`.

@@ -52,6 +52,7 @@ function AsciiFace({ inView }: { inView: boolean }) {
   useEffect(() => {
     if (prefersReducedMotion || !inView) return;
     const timer = setInterval(() => {
+      if (document.hidden) return;
       let currentPos = currentPosRef.current;
       const prevLine = linesRef.current[currentPos];
       if (prevLine) {
@@ -114,6 +115,7 @@ function MetadataPanel({ inView }: { inView: boolean }) {
       return;
     }
     const timer = setInterval(() => {
+      if (document.hidden) return;
       let currentVisible = currentVisibleRef.current;
       if (currentVisible >= META_LINES.length) {
         clearInterval(timer);

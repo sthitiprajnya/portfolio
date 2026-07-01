@@ -51,7 +51,10 @@ function AsciiFace({ inView }: { inView: boolean }) {
   const currentPosRef = useRef(0);
   useEffect(() => {
     if (prefersReducedMotion || !inView) return;
-    const timer = setInterval(() => {
+
+    let timer: NodeJS.Timeout | null = null;
+
+    const updateFace = () => {
       let currentPos = currentPosRef.current;
       const prevLine = linesRef.current[currentPos];
       if (prevLine) {
@@ -65,8 +68,29 @@ function AsciiFace({ inView }: { inView: boolean }) {
         nextLine.classList.remove('text-cyan/70');
         nextLine.classList.add('text-cyan', 'bg-cyan/10');
       }
-    }, 120);
-    return () => clearInterval(timer);
+    };
+
+    timer = setInterval(updateFace, 120);
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        if (timer) {
+          clearInterval(timer);
+          timer = null;
+        }
+      } else {
+        if (!timer) {
+          timer = setInterval(updateFace, 120);
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      if (timer) clearInterval(timer);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [prefersReducedMotion, inView]);
 
   return (
@@ -113,10 +137,15 @@ function MetadataPanel({ inView }: { inView: boolean }) {
       }
       return;
     }
-    const timer = setInterval(() => {
+    let timer: NodeJS.Timeout | null = null;
+
+    const updatePanel = () => {
       let currentVisible = currentVisibleRef.current;
       if (currentVisible >= META_LINES.length) {
-        clearInterval(timer);
+        if (timer) {
+          clearInterval(timer);
+          timer = null;
+        }
         return;
       }
       const line = metaLinesRef.current[currentVisible];
@@ -126,8 +155,29 @@ function MetadataPanel({ inView }: { inView: boolean }) {
       }
       currentVisible++;
       currentVisibleRef.current = currentVisible;
-    }, 300);
-    return () => clearInterval(timer);
+    };
+
+    timer = setInterval(updatePanel, 300);
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        if (timer) {
+          clearInterval(timer);
+          timer = null;
+        }
+      } else {
+        if (!timer && currentVisibleRef.current < META_LINES.length) {
+          timer = setInterval(updatePanel, 300);
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      if (timer) clearInterval(timer);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [prefersReducedMotion, inView]);
 
   return (

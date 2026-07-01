@@ -114,3 +114,7 @@
 ## 2025-06-01 - Animation Loop Consolidation
 **Learning:** Multiple RAF loops for the same interaction (e.g., cursor) can lead to redundant calculations and inconsistent states. Consolidating into a single "sleepy" loop improves CPU efficiency.
 **Action:** Ensure high-frequency UI components use a centralized animation controller or stable RAF state management.
+
+## 2026-11-20 - [Minimizing Idle Timer Overheads in UI Components]
+**Learning:** React components containing embedded timers (such as `setInterval` in `AsciiAvatar` for text typing and CSS class toggling animations) continue to execute and cause React renders/DOM manipulation even when the browser tab is hidden. This leads to continuous CPU activity and battery drain, especially when multiple such components exist on a page. Checking `inView` (from IntersectionObserver) is not enough since the user might switch tabs while the element is on-screen.
+**Action:** Always wrap background polling intervals or high-frequency DOM manipulation loops with visibility checks (e.g. `document.addEventListener('visibilitychange')`) to pause execution when the browser tab becomes hidden, and resume only when it becomes active again.

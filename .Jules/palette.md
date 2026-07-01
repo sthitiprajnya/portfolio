@@ -21,3 +21,6 @@
 ## 2024-06-27 - Linking Modals and Toggles with ARIA
 **Learning:** For accessibility in custom toggle components, floating widgets, and overlays, it is critical to explicitly link the toggle button to its target container using `aria-controls` (matching the container's `id`) and dynamically manage the `aria-expanded` state. This was missing for the methodology and intel modals.
 **Action:** When adding modal toggles or expanding sections, always ensure the button has `aria-expanded` reflecting the state, and `aria-controls` pointing to the `id` of the content block it toggles.
+## 2025-07-01 - Hide decorative SVGs from screen readers
+**Learning:** Purely decorative `<svg>` icons placed inside interactive elements that already have an `aria-label` (like a button) can cause screen readers to redundantly announce them or encounter unstructured elements, creating a poor auditory experience.
+**Action:** Always add `aria-hidden="true"` to decorative `<svg>` icons within buttons or links that already have sufficient accessible text (via `aria-label` or internal text) to ensure they are ignored by assistive technologies.

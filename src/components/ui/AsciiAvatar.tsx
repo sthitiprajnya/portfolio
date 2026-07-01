@@ -51,22 +51,55 @@ function AsciiFace({ inView }: { inView: boolean }) {
   const currentPosRef = useRef(0);
   useEffect(() => {
     if (prefersReducedMotion || !inView) return;
-    const timer = setInterval(() => {
-      let currentPos = currentPosRef.current;
-      const prevLine = linesRef.current[currentPos];
-      if (prevLine) {
-        prevLine.classList.remove('text-cyan', 'bg-cyan/10');
-        prevLine.classList.add('text-cyan/70');
+
+    let timer: NodeJS.Timeout | null = null;
+
+    const startTimer = () => {
+      if (timer) return;
+      // BOLT: Extracting the animation loop to a separate function and pausing it when the document is hidden
+      // saves background CPU cycles and battery by preventing DOM manipulation every 120ms when the tab is inactive.
+      timer = setInterval(() => {
+        let currentPos = currentPosRef.current;
+        const prevLine = linesRef.current[currentPos];
+        if (prevLine) {
+          prevLine.classList.remove('text-cyan', 'bg-cyan/10');
+          prevLine.classList.add('text-cyan/70');
+        }
+        currentPos = currentPos >= AVATAR_LINES.length - 1 ? 0 : currentPos + 1;
+        currentPosRef.current = currentPos;
+        const nextLine = linesRef.current[currentPos];
+        if (nextLine) {
+          nextLine.classList.remove('text-cyan/70');
+          nextLine.classList.add('text-cyan', 'bg-cyan/10');
+        }
+      }, 120);
+    };
+
+    const stopTimer = () => {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
       }
-      currentPos = currentPos >= AVATAR_LINES.length - 1 ? 0 : currentPos + 1;
-      currentPosRef.current = currentPos;
-      const nextLine = linesRef.current[currentPos];
-      if (nextLine) {
-        nextLine.classList.remove('text-cyan/70');
-        nextLine.classList.add('text-cyan', 'bg-cyan/10');
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopTimer();
+      } else {
+        startTimer();
       }
-    }, 120);
-    return () => clearInterval(timer);
+    };
+
+    if (!document.hidden) {
+      startTimer();
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      stopTimer();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [prefersReducedMotion, inView]);
 
   return (

@@ -273,13 +273,18 @@ interface FloatingInputProps {
 }
 
 function FloatingInput({ id, name, type, label, value, onChange, error, required, maxLength }: FloatingInputProps) {
+  const charCount = value.length;
+
   return (
     <div className="relative">
       <input
         id={id} name={name} type={type} value={value} onChange={onChange}
         required={required} maxLength={maxLength}
         aria-required={required} aria-invalid={!!error}
-        aria-describedby={error ? `${id}-error` : undefined}
+        aria-describedby={clsx(
+          error && `${id}-error`,
+          maxLength && `${id}-counter`
+        ) || undefined}
         placeholder=" "
         className={clsx(
           'w-full bg-[#020408] border rounded-md px-4 py-4 pt-6 text-text-primary outline-none transition-all peer',
@@ -299,10 +304,24 @@ function FloatingInput({ id, name, type, label, value, onChange, error, required
         {label}
         {required && <span className="text-red ml-1">*</span>}
       </label>
-      <div className="mt-1 px-1">
-        {error && (
-          <span id={`${id}-error`} aria-live="polite" className="font-mono text-[0.65rem] text-red">
-            {error}
+      <div className="flex justify-between items-start mt-1 px-1">
+        <div>
+          {error && (
+            <span id={`${id}-error`} aria-live="polite" className="font-mono text-[0.65rem] text-red">
+              {error}
+            </span>
+          )}
+        </div>
+        {maxLength && (
+          <span
+            id={`${id}-counter`}
+            aria-live="polite"
+            className={clsx(
+              "font-mono text-[0.65rem] transition-colors",
+              charCount >= maxLength ? "text-red" : "text-text-muted"
+            )}
+          >
+            {charCount} / {maxLength}
           </span>
         )}
       </div>
@@ -329,7 +348,7 @@ function FloatingTextarea({ id, name, label, value, onChange, error, required, m
         aria-describedby={clsx(
           error && `${id}-error`,
           maxLength && `${id}-counter`
-        )}
+        ) || undefined}
         placeholder=" "
         className={clsx(
           'w-full bg-[#020408] border rounded-md px-4 py-4 pt-6 text-text-primary outline-none transition-all peer min-h-[140px] resize-y',

@@ -21,3 +21,6 @@
 ## 2024-06-27 - Linking Modals and Toggles with ARIA
 **Learning:** For accessibility in custom toggle components, floating widgets, and overlays, it is critical to explicitly link the toggle button to its target container using `aria-controls` (matching the container's `id`) and dynamically manage the `aria-expanded` state. This was missing for the methodology and intel modals.
 **Action:** When adding modal toggles or expanding sections, always ensure the button has `aria-expanded` reflecting the state, and `aria-controls` pointing to the `id` of the content block it toggles.
+## 2026-07-04 - Character Counter Accessibility Pitfall
+**Learning:** When adding a character counter to an input or textarea that updates on every keystroke, adding `aria-live="polite"` causes the screen reader to spam the user, announcing every single keystroke. Additionally, dynamically accessing `value.length` without a fallback in React forms can cause fatal runtime crashes if the initial state is undefined.
+**Action:** Always use `value?.length || 0` to calculate character counts to prevent crashes. Never use `aria-live` on keystroke-level character counters; rely instead on `aria-describedby` to link the counter programmatically without causing announcement spam.

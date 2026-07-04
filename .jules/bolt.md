@@ -114,3 +114,6 @@
 ## 2025-06-01 - Animation Loop Consolidation
 **Learning:** Multiple RAF loops for the same interaction (e.g., cursor) can lead to redundant calculations and inconsistent states. Consolidating into a single "sleepy" loop improves CPU efficiency.
 **Action:** Ensure high-frequency UI components use a centralized animation controller or stable RAF state management.
+## 2026-07-04 - [Dynamic Module Importing for Heavy SDKs]
+**Learning:** Statically importing heavy third-party SDKs (like `@emailjs/browser`) at the module level unnecessarily increases the initial Next.js JavaScript bundle size, which delays hydration and Time to Interactive (TTI) for the entire application.
+**Action:** Use dynamic imports (e.g., `const module = (await import('lib')).default;`) inside event handlers (like form submissions) to defer loading of large dependencies until they are strictly required by the user.

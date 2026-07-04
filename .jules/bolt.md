@@ -114,3 +114,6 @@
 ## 2025-06-01 - Animation Loop Consolidation
 **Learning:** Multiple RAF loops for the same interaction (e.g., cursor) can lead to redundant calculations and inconsistent states. Consolidating into a single "sleepy" loop improves CPU efficiency.
 **Action:** Ensure high-frequency UI components use a centralized animation controller or stable RAF state management.
+## 2024-07-04 - Dynamic Import of Third-Party SDKs
+**Learning:** Heavy third-party SDKs like `@emailjs/browser` statically imported at the module level significantly increase the initial JavaScript bundle size and can block the main thread, especially on cold paths like a contact form that isn't immediately visible or interacted with.
+**Action:** When a library is only needed inside a specific user interaction handler (like a form submission), use a dynamic import `const module = (await import('package')).default;` inside the event handler rather than a static import at the top of the file to improve initial load performance.

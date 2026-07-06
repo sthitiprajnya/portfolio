@@ -21,3 +21,6 @@
 ## 2024-06-27 - Linking Modals and Toggles with ARIA
 **Learning:** For accessibility in custom toggle components, floating widgets, and overlays, it is critical to explicitly link the toggle button to its target container using `aria-controls` (matching the container's `id`) and dynamically manage the `aria-expanded` state. This was missing for the methodology and intel modals.
 **Action:** When adding modal toggles or expanding sections, always ensure the button has `aria-expanded` reflecting the state, and `aria-controls` pointing to the `id` of the content block it toggles.
+## 2024-05-24 - Avoid aria-live on text input counters
+**Learning:** Adding `aria-live="polite"` directly to character counter spans associated with text inputs creates severe screen reader spam, as it announces on every single keystroke.
+**Action:** Do not use `aria-live` on counters. Instead, rely on linking the counter visually and programmatically using `aria-describedby` with an optional fallback to `undefined` (e.g. `aria-describedby={clsx(...) || undefined}`) to omit the attribute completely when no valid ID is present.

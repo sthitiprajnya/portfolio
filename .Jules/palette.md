@@ -21,3 +21,7 @@
 ## 2024-06-27 - Linking Modals and Toggles with ARIA
 **Learning:** For accessibility in custom toggle components, floating widgets, and overlays, it is critical to explicitly link the toggle button to its target container using `aria-controls` (matching the container's `id`) and dynamically manage the `aria-expanded` state. This was missing for the methodology and intel modals.
 **Action:** When adding modal toggles or expanding sections, always ensure the button has `aria-expanded` reflecting the state, and `aria-controls` pointing to the `id` of the content block it toggles.
+
+## 2026-07-06 - Wait for Preloader in Playwright Tests
+**Learning:** When using Playwright to test the application visually, the application has a full-screen preloader that masks the page upon initial load. Capturing screenshots or asserting on locators immediately after page load can result in capturing only the preloader or encountering 'element not found/interactable' errors.
+**Action:** Always wait for the initial preloader animation to finish, such as by adding an explicit wait for a core page element to become visible (e.g., `expect(page.locator('#hero')).to_be_visible(timeout=10000)`) before proceeding with interactions or taking screenshots.

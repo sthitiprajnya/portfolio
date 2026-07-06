@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Contact } from '../Contact';
-import emailjs from '@emailjs/browser';
 
 // Mock emailjs
 vi.mock('@emailjs/browser', () => ({
@@ -44,7 +43,7 @@ describe('Contact Component - Error Handling', () => {
 
     // Mock send to reject
     const mockError = new Error('Test Error');
-    (emailjs.sendForm as ReturnType<typeof vi.fn>).mockRejectedValueOnce(mockError);
+    ((await import('@emailjs/browser')).default.sendForm as ReturnType<typeof vi.fn>).mockRejectedValueOnce(mockError);
 
     render(
       <Contact />

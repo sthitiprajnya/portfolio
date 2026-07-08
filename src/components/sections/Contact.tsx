@@ -227,6 +227,7 @@ export function Contact() {
                 </div>
               )}
 
+              <input type="text" name="hp_field" value={form.hp_field} onChange={handleChange} tabIndex={-1} aria-hidden="true" className="opacity-0 absolute w-0 h-0 z-[-1]" />
               <FloatingInput id="from_name"  name="from_name"  type="text"  label="Name"             value={form.from_name}  onChange={handleChange} error={errors.from_name}  required maxLength={100} />
               <FloatingInput id="from_email" name="from_email" type="email" label="Email"            value={form.from_email} onChange={handleChange} error={errors.from_email} required maxLength={100} />
               <FloatingInput id="subject"    name="subject"    type="text"  label="Subject (optional)" value={form.subject}   onChange={handleChange} maxLength={200} />

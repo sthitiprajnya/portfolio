@@ -227,6 +227,18 @@ export function Contact() {
                 </div>
               )}
 
+              {/* Honeypot field - visually hidden, inaccessible via keyboard, ignored by screen readers */}
+              <input
+                type="text"
+                name="hp_field"
+                value={form.hp_field}
+                onChange={handleChange}
+                className="opacity-0 w-0 h-0 absolute pointer-events-none"
+                tabIndex={-1}
+                aria-hidden="true"
+                autoComplete="off"
+              />
+
               <FloatingInput id="from_name"  name="from_name"  type="text"  label="Name"             value={form.from_name}  onChange={handleChange} error={errors.from_name}  required maxLength={100} />
               <FloatingInput id="from_email" name="from_email" type="email" label="Email"            value={form.from_email} onChange={handleChange} error={errors.from_email} required maxLength={100} />
               <FloatingInput id="subject"    name="subject"    type="text"  label="Subject (optional)" value={form.subject}   onChange={handleChange} maxLength={200} />
@@ -273,13 +285,18 @@ interface FloatingInputProps {
 }
 
 function FloatingInput({ id, name, type, label, value, onChange, error, required, maxLength }: FloatingInputProps) {
+  const charCount = value?.length || 0;
+
   return (
     <div className="relative">
       <input
         id={id} name={name} type={type} value={value} onChange={onChange}
         required={required} maxLength={maxLength}
         aria-required={required} aria-invalid={!!error}
-        aria-describedby={error ? `${id}-error` : undefined}
+        aria-describedby={clsx(
+          error && `${id}-error`,
+          maxLength && `${id}-counter`
+        ) || undefined}
         placeholder=" "
         className={clsx(
           'w-full bg-[#020408] border rounded-md px-4 py-4 pt-6 text-text-primary outline-none transition-all peer',
@@ -299,10 +316,23 @@ function FloatingInput({ id, name, type, label, value, onChange, error, required
         {label}
         {required && <span className="text-red ml-1">*</span>}
       </label>
-      <div className="mt-1 px-1">
-        {error && (
-          <span id={`${id}-error`} aria-live="polite" className="font-mono text-[0.65rem] text-red">
-            {error}
+      <div className="flex justify-between items-start mt-1 px-1">
+        <div>
+          {error && (
+            <span id={`${id}-error`} aria-live="polite" className="font-mono text-[0.65rem] text-red">
+              {error}
+            </span>
+          )}
+        </div>
+        {maxLength && (
+          <span
+            id={`${id}-counter`}
+            className={clsx(
+              "font-mono text-[0.65rem] transition-colors",
+              charCount >= maxLength ? "text-red" : "text-text-muted"
+            )}
+          >
+            {charCount} / {maxLength}
           </span>
         )}
       </div>
@@ -318,7 +348,7 @@ interface FloatingTextareaProps {
 }
 
 function FloatingTextarea({ id, name, label, value, onChange, error, required, maxLength }: FloatingTextareaProps) {
-  const charCount = value.length;
+  const charCount = value?.length || 0;
 
   return (
     <div className="relative">
@@ -329,7 +359,7 @@ function FloatingTextarea({ id, name, label, value, onChange, error, required, m
         aria-describedby={clsx(
           error && `${id}-error`,
           maxLength && `${id}-counter`
-        )}
+        ) || undefined}
         placeholder=" "
         className={clsx(
           'w-full bg-[#020408] border rounded-md px-4 py-4 pt-6 text-text-primary outline-none transition-all peer min-h-[140px] resize-y',
@@ -360,7 +390,6 @@ function FloatingTextarea({ id, name, label, value, onChange, error, required, m
         {maxLength && (
           <span
             id={`${id}-counter`}
-            aria-live="polite"
             className={clsx(
               "font-mono text-[0.65rem] transition-colors",
               charCount >= maxLength ? "text-red" : "text-text-muted"

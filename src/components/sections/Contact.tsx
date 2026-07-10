@@ -227,6 +227,18 @@ export function Contact() {
                 </div>
               )}
 
+              {/* Security: Honeypot field for bot mitigation */}
+              <input
+                type="text"
+                name="hp_field"
+                value={form.hp_field}
+                onChange={handleChange}
+                className="opacity-0 w-0 h-0 absolute pointer-events-none"
+                tabIndex={-1}
+                aria-hidden="true"
+                autoComplete="off"
+              />
+
               <FloatingInput id="from_name"  name="from_name"  type="text"  label="Name"             value={form.from_name}  onChange={handleChange} error={errors.from_name}  required maxLength={100} />
               <FloatingInput id="from_email" name="from_email" type="email" label="Email"            value={form.from_email} onChange={handleChange} error={errors.from_email} required maxLength={100} />
               <FloatingInput id="subject"    name="subject"    type="text"  label="Subject (optional)" value={form.subject}   onChange={handleChange} maxLength={200} />

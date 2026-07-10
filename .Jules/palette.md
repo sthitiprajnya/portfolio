@@ -21,3 +21,8 @@
 ## 2024-06-27 - Linking Modals and Toggles with ARIA
 **Learning:** For accessibility in custom toggle components, floating widgets, and overlays, it is critical to explicitly link the toggle button to its target container using `aria-controls` (matching the container's `id`) and dynamically manage the `aria-expanded` state. This was missing for the methodology and intel modals.
 **Action:** When adding modal toggles or expanding sections, always ensure the button has `aria-expanded` reflecting the state, and `aria-controls` pointing to the `id` of the content block it toggles.
+## 2024-07-10 - ARIA describedby Fix
+
+**Learning:** When using clsx to dynamically set ARIA attributes like aria-describedby, if the condition resolves to false, it can pass empty string or false. We must append `|| undefined` (e.g., `aria-describedby={clsx(...) || undefined}`) to ensure the attribute is completely omitted from the DOM when no valid ID is present. Empty strings or 'false' in ARIA attributes can cause screen reader errors. Also, for custom char count elements, relying on an uninitialized value like `value.length` causes TypeError on page load, always use optional chaining `value?.length || 0`.
+
+**Action:** Use optional chaining and logical OR with undefined when generating aria-describedby or rendering custom character counts. Ensure the `aria-live` attribute is not overused on character count update elements.

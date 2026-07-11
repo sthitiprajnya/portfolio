@@ -135,6 +135,7 @@ export function CursorProvider({ children }: CursorProviderProps) {
       window.removeEventListener('mouseup', handleMouseUp);
       if (rafId.current !== null) cancelAnimationFrame(rafId.current);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isTouchDevice, prefersReducedMotion]);
 
   return (

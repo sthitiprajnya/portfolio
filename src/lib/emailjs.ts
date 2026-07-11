@@ -1,4 +1,3 @@
-import emailjs from '@emailjs/browser';
 
 const SERVICE_ID  = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || '';
 const TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || '';
@@ -12,5 +11,7 @@ export interface ContactFormData {
 }
 
 export async function sendContactEmail(data: ContactFormData): Promise<void> {
+  // BOLT: Dynamically import heavy @emailjs/browser SDK to reduce initial JS bundle size
+  const emailjs = (await import('@emailjs/browser')).default;
   await emailjs.send(SERVICE_ID, TEMPLATE_ID, data as unknown as Record<string, unknown>, PUBLIC_KEY);
 }

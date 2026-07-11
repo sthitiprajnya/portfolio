@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import emailjs from '@emailjs/browser';
+
 
 // Mock the @emailjs/browser module
 vi.mock('@emailjs/browser', () => ({
@@ -23,7 +23,8 @@ describe('emailjs library', () => {
       vi.stubEnv('NEXT_PUBLIC_EMAILJS_PUBLIC_KEY', 'test_public_key');
 
       // Mock successful response
-      vi.mocked(emailjs.send).mockResolvedValue({ status: 200, text: 'OK' });
+      const mockedEmailjs = (await import('@emailjs/browser')).default;
+      vi.mocked(mockedEmailjs.send).mockResolvedValue({ status: 200, text: 'OK' });
 
       // Dynamically import to ensure it reads the stubbed env variables
       const { sendContactEmail } = await import('./emailjs');
@@ -37,8 +38,8 @@ describe('emailjs library', () => {
 
       await sendContactEmail(testData);
 
-      expect(emailjs.send).toHaveBeenCalledTimes(1);
-      expect(emailjs.send).toHaveBeenCalledWith(
+      expect(mockedEmailjs.send).toHaveBeenCalledTimes(1);
+      expect(mockedEmailjs.send).toHaveBeenCalledWith(
         'test_service_id',
         'test_template_id',
         testData as unknown as Record<string, unknown>,
@@ -50,7 +51,8 @@ describe('emailjs library', () => {
 
     it('should propagate errors if emailjs.send fails', async () => {
       const mockError = new Error('Failed to send email');
-      vi.mocked(emailjs.send).mockRejectedValue(mockError);
+      const mockedEmailjs = (await import('@emailjs/browser')).default;
+      vi.mocked(mockedEmailjs.send).mockRejectedValue(mockError);
 
       const { sendContactEmail } = await import('./emailjs');
 

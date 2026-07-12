@@ -215,6 +215,18 @@ export function Contact() {
           <ScrollReveal variants={fadeSlideLeft}>
             <form ref={formRef} onSubmit={handleSubmit} noValidate className="space-y-6">
 
+              {/* Security: Honeypot field - visually hidden, prevents bot spam */}
+              <input
+                type="text"
+                name="hp_field"
+                value={form.hp_field}
+                onChange={handleChange}
+                className="opacity-0 w-0 h-0 absolute pointer-events-none"
+                tabIndex={-1}
+                aria-hidden="true"
+                autoComplete="off"
+              />
+
               {/* Success overlay */}
               {status === 'sent' && (
                 <div className="p-4 border border-green/50 rounded-md bg-green-ghost">

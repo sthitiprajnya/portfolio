@@ -114,3 +114,6 @@
 ## 2025-06-01 - Animation Loop Consolidation
 **Learning:** Multiple RAF loops for the same interaction (e.g., cursor) can lead to redundant calculations and inconsistent states. Consolidating into a single "sleepy" loop improves CPU efficiency.
 **Action:** Ensure high-frequency UI components use a centralized animation controller or stable RAF state management.
+## 2026-07-13 - Pause UI Animations on Hidden Tabs
+**Learning:** Relying solely on `IntersectionObserver` (`inView`) for `setInterval` animations is insufficient because elements remain "in view" when users switch tabs, wasting CPU cycles in the background.
+**Action:** Always supplement `IntersectionObserver` checks with `visibilitychange` event listeners to pause continuous execution when `document.hidden` is true.

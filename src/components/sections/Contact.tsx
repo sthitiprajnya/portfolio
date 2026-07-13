@@ -9,8 +9,6 @@ import { PERSONAL } from '@/data/portfolio';
 
 type Status = 'idle' | 'transmitting' | 'sent' | 'error';
 
-import emailjs from '@emailjs/browser';
-
 // This form uses EmailJS to send emails directly from the browser.
 export function Contact() {
   const formRef = useRef<HTMLFormElement>(null);
@@ -96,6 +94,9 @@ export function Contact() {
       }
 
       if (!formRef.current) return;
+
+      // BOLT: Dynamically import @emailjs/browser to reduce initial bundle size
+      const emailjs = (await import('@emailjs/browser')).default;
 
       await emailjs.sendForm(
         serviceId,

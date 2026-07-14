@@ -114,3 +114,6 @@
 ## 2025-06-01 - Animation Loop Consolidation
 **Learning:** Multiple RAF loops for the same interaction (e.g., cursor) can lead to redundant calculations and inconsistent states. Consolidating into a single "sleepy" loop improves CPU efficiency.
 **Action:** Ensure high-frequency UI components use a centralized animation controller or stable RAF state management.
+## 2026-05-31 - EmailJS Dynamic Import Next.js Interop
+**Learning:** When replacing a static default import (e.g., `import emailjs from '@emailjs/browser'`) with a dynamic import in Next.js/Webpack, it is critical to explicitly extract the `.default` property (e.g., `(await import('@emailjs/browser')).default`). Furthermore, when doing this in a codebase with tests (like Vitest), ensure you add comments explaining the optimization, as missing this can lead to incomplete PR requirements.
+**Action:** Always fetch the `.default` export when dynamically importing libraries that were previously imported via default static imports, and always explicitly satisfy persona-specific rules like adding explanatory code comments.

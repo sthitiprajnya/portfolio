@@ -22,26 +22,38 @@ export function useFaviconBlink() {
 
     updateFavicon(); // Initial set
 
-    let intervalId: NodeJS.Timeout | null = setInterval(updateFavicon, 800);
+    let intervalId: NodeJS.Timeout | null = null;
+
+    const startInterval = () => {
+      if (!intervalId) {
+        intervalId = setInterval(updateFavicon, 800);
+      }
+    };
+
+    const stopInterval = () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    };
+
+    if (!document.hidden) {
+      startInterval();
+    }
 
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        if (intervalId) {
-          clearInterval(intervalId);
-          intervalId = null;
-        }
+        stopInterval();
       } else {
-        if (!intervalId) {
-          updateFavicon();
-          intervalId = setInterval(updateFavicon, 800);
-        }
+        updateFavicon();
+        startInterval();
       }
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
-      if (intervalId) clearInterval(intervalId);
+      stopInterval();
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);

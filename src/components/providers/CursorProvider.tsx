@@ -135,7 +135,7 @@ export function CursorProvider({ children }: CursorProviderProps) {
       window.removeEventListener('mouseup', handleMouseUp);
       if (rafId.current !== null) cancelAnimationFrame(rafId.current);
     };
-  }, [isTouchDevice, prefersReducedMotion]);
+  }, [isTouchDevice, prefersReducedMotion, wake]);
 
   return (
     <>

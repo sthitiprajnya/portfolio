@@ -51,22 +51,47 @@ function AsciiFace({ inView }: { inView: boolean }) {
   const currentPosRef = useRef(0);
   useEffect(() => {
     if (prefersReducedMotion || !inView) return;
-    const timer = setInterval(() => {
-      let currentPos = currentPosRef.current;
-      const prevLine = linesRef.current[currentPos];
-      if (prevLine) {
-        prevLine.classList.remove('text-cyan', 'bg-cyan/10');
-        prevLine.classList.add('text-cyan/70');
+
+    let timer: NodeJS.Timeout | null = null;
+
+    const startTimer = () => {
+      if (timer) return;
+      timer = setInterval(() => {
+        let currentPos = currentPosRef.current;
+        const prevLine = linesRef.current[currentPos];
+        if (prevLine) {
+          prevLine.classList.remove('text-cyan', 'bg-cyan/10');
+          prevLine.classList.add('text-cyan/70');
+        }
+        currentPos = currentPos >= AVATAR_LINES.length - 1 ? 0 : currentPos + 1;
+        currentPosRef.current = currentPos;
+        const nextLine = linesRef.current[currentPos];
+        if (nextLine) {
+          nextLine.classList.remove('text-cyan/70');
+          nextLine.classList.add('text-cyan', 'bg-cyan/10');
+        }
+      }, 120);
+    };
+
+    const stopTimer = () => {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
       }
-      currentPos = currentPos >= AVATAR_LINES.length - 1 ? 0 : currentPos + 1;
-      currentPosRef.current = currentPos;
-      const nextLine = linesRef.current[currentPos];
-      if (nextLine) {
-        nextLine.classList.remove('text-cyan/70');
-        nextLine.classList.add('text-cyan', 'bg-cyan/10');
-      }
-    }, 120);
-    return () => clearInterval(timer);
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) stopTimer();
+      else startTimer();
+    };
+
+    if (!document.hidden) startTimer();
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      stopTimer();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [prefersReducedMotion, inView]);
 
   return (
@@ -113,21 +138,46 @@ function MetadataPanel({ inView }: { inView: boolean }) {
       }
       return;
     }
-    const timer = setInterval(() => {
-      let currentVisible = currentVisibleRef.current;
-      if (currentVisible >= META_LINES.length) {
+
+    let timer: NodeJS.Timeout | null = null;
+
+    const startTimer = () => {
+      if (timer || currentVisibleRef.current >= META_LINES.length) return;
+      timer = setInterval(() => {
+        let currentVisible = currentVisibleRef.current;
+        if (currentVisible >= META_LINES.length) {
+          stopTimer();
+          return;
+        }
+        const line = metaLinesRef.current[currentVisible];
+        if (line) {
+          line.classList.remove('opacity-0', '-translate-x-2');
+          line.classList.add('opacity-100', 'translate-x-0', 'text-green/90');
+        }
+        currentVisible++;
+        currentVisibleRef.current = currentVisible;
+      }, 300);
+    };
+
+    const stopTimer = () => {
+      if (timer) {
         clearInterval(timer);
-        return;
+        timer = null;
       }
-      const line = metaLinesRef.current[currentVisible];
-      if (line) {
-        line.classList.remove('opacity-0', '-translate-x-2');
-        line.classList.add('opacity-100', 'translate-x-0', 'text-green/90');
-      }
-      currentVisible++;
-      currentVisibleRef.current = currentVisible;
-    }, 300);
-    return () => clearInterval(timer);
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) stopTimer();
+      else startTimer();
+    };
+
+    if (!document.hidden) startTimer();
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      stopTimer();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [prefersReducedMotion, inView]);
 
   return (

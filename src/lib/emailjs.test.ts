@@ -3,6 +3,7 @@ import emailjs from '@emailjs/browser';
 
 // Mock the @emailjs/browser module
 vi.mock('@emailjs/browser', () => ({
+  __esModule: true,
   default: {
     send: vi.fn(),
   },

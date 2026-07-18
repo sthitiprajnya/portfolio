@@ -114,3 +114,6 @@
 ## 2025-06-01 - Animation Loop Consolidation
 **Learning:** Multiple RAF loops for the same interaction (e.g., cursor) can lead to redundant calculations and inconsistent states. Consolidating into a single "sleepy" loop improves CPU efficiency.
 **Action:** Ensure high-frequency UI components use a centralized animation controller or stable RAF state management.
+## 2025-06-25 - [Dynamic Imports in React Component Handlers]
+**Learning:** Heavy third-party SDKs like `@emailjs/browser` that are only used upon specific user interactions (like submitting a form) block the main thread and unnecessarily increase the initial JS bundle size when statically imported at the module level.
+**Action:** Always prefer dynamically importing such libraries (e.g., `const emailjs = (await import('@emailjs/browser')).default;`) inside the event handler where they are actually used to improve initial load performance and reduce Total Blocking Time.

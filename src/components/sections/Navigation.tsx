@@ -248,7 +248,7 @@ export function Navigation() {
             </div>
 
             <motion.div className="mt-auto pt-8" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
-              <CyberButton as="a" href={PERSONAL.resumeUrl} download color="green" className="w-full" aria-label="Download Resume (CV)">
+              <CyberButton as="a" href={PERSONAL.resumeUrl} download color="green" className="w-full" aria-label="Download Resume (CV)" title="Download Resume (CV)">
                 DOWNLOAD_CV
               </CyberButton>
             </motion.div>

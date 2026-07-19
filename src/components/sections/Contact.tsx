@@ -9,6 +9,9 @@ import { PERSONAL } from '@/data/portfolio';
 
 type Status = 'idle' | 'transmitting' | 'sent' | 'error';
 
+// BOLT: Removed static import of emailjs. It is now dynamically imported on submit
+// to reduce the initial JavaScript bundle size.
+
 // This form uses EmailJS to send emails directly from the browser.
 export function Contact() {
   const formRef = useRef<HTMLFormElement>(null);
@@ -95,6 +98,8 @@ export function Contact() {
 
       if (!formRef.current) return;
 
+      // BOLT: Dynamically import emailjs only when the user submits the form.
+      // This prevents the EmailJS SDK from blocking the main thread during initial page load.
       const emailjs = (await import('@emailjs/browser')).default;
 
       await emailjs.sendForm(
@@ -127,7 +132,7 @@ export function Contact() {
             <GlassCard className="hover:shadow-[var(--glow-cyan-sm)] group/email">
               <div className="p-6 flex items-center space-x-4">
                 <div className="w-12 h-12 rounded bg-cyan-ghost border border-cyan/30 flex items-center justify-center text-cyan shrink-0">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
                       d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                   </svg>
@@ -150,11 +155,11 @@ export function Contact() {
                   title="Copy email address"
                 >
                   {emailCopied ? (
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                     </svg>
                   ) : (
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
                     </svg>
                   )}
@@ -165,7 +170,7 @@ export function Contact() {
             <GlassCard className="hover:shadow-[var(--glow-violet-sm)]">
               <div className="p-6 flex items-center space-x-4">
                 <div className="w-12 h-12 rounded bg-[rgba(191,0,255,0.1)] border border-violet/30 flex items-center justify-center text-violet shrink-0">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
                   </svg>
                 </div>
@@ -182,7 +187,7 @@ export function Contact() {
             <GlassCard>
               <div className="p-6 flex items-center space-x-4">
                 <div className="w-12 h-12 rounded bg-surface border border-border flex items-center justify-center text-text-primary shrink-0">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
                       d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -244,7 +249,7 @@ export function Contact() {
                 {status === 'idle'         && 'TRANSMIT_MESSAGE'}
                 {status === 'transmitting' && (
                   <span className="flex items-center justify-center gap-2">
-                    <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                     </svg>
@@ -273,13 +278,18 @@ interface FloatingInputProps {
 }
 
 function FloatingInput({ id, name, type, label, value, onChange, error, required, maxLength }: FloatingInputProps) {
+  const charCount = value.length;
+
   return (
     <div className="relative">
       <input
         id={id} name={name} type={type} value={value} onChange={onChange}
         required={required} maxLength={maxLength}
         aria-required={required} aria-invalid={!!error}
-        aria-describedby={error ? `${id}-error` : undefined}
+        aria-describedby={clsx(
+          error && `${id}-error`,
+          maxLength && `${id}-counter`
+        )}
         placeholder=" "
         className={clsx(
           'w-full bg-[#020408] border rounded-md px-4 py-4 pt-6 text-text-primary outline-none transition-all peer',
@@ -299,10 +309,24 @@ function FloatingInput({ id, name, type, label, value, onChange, error, required
         {label}
         {required && <span className="text-red ml-1">*</span>}
       </label>
-      <div className="mt-1 px-1">
-        {error && (
-          <span id={`${id}-error`} aria-live="polite" className="font-mono text-[0.65rem] text-red">
-            {error}
+      <div className="flex justify-between items-start mt-1 px-1">
+        <div>
+          {error && (
+            <span id={`${id}-error`} aria-live="polite" className="font-mono text-[0.65rem] text-red">
+              {error}
+            </span>
+          )}
+        </div>
+        {maxLength && (
+          <span
+            id={`${id}-counter`}
+            aria-live="polite"
+            className={clsx(
+              "font-mono text-[0.65rem] transition-colors",
+              charCount >= maxLength ? "text-red" : "text-text-muted"
+            )}
+          >
+            {charCount} / {maxLength}
           </span>
         )}
       </div>
@@ -329,7 +353,7 @@ function FloatingTextarea({ id, name, label, value, onChange, error, required, m
         aria-describedby={clsx(
           error && `${id}-error`,
           maxLength && `${id}-counter`
-        )}
+        ) || undefined}
         placeholder=" "
         className={clsx(
           'w-full bg-[#020408] border rounded-md px-4 py-4 pt-6 text-text-primary outline-none transition-all peer min-h-[140px] resize-y',

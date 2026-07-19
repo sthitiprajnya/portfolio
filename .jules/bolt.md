@@ -114,6 +114,7 @@
 ## 2025-06-01 - Animation Loop Consolidation
 **Learning:** Multiple RAF loops for the same interaction (e.g., cursor) can lead to redundant calculations and inconsistent states. Consolidating into a single "sleepy" loop improves CPU efficiency.
 **Action:** Ensure high-frequency UI components use a centralized animation controller or stable RAF state management.
-## 2026-05-31 - Lazy Loading Heavy Third-Party SDKs
-**Learning:** Heavy third-party SDKs like `@emailjs/browser` should not be statically imported if they are only used in response to user actions (e.g., form submissions). Static imports cause these dependencies to be included in the initial Next.js JavaScript bundle, unnecessarily increasing bundle size and potentially impacting Core Web Vitals (FCP/LCP).
-**Action:** Always dynamically import heavy dependencies using `await import(...)` inside the specific event handlers or lifecycle methods where they are needed, deferring their load until actual user interaction.
+
+## 2026-06-28 - [Optimizing Idle Animation Loops via Page Visibility]
+**Learning:** Continuous `setInterval` loops used for visual effects (like the 120ms and 300ms animations in `AsciiAvatar.tsx`) continue running in the background even when the tab is not visible, consuming unnecessary CPU cycles and draining battery on mobile devices.
+**Action:** Always wrap background `setInterval` visual updates with a `visibilitychange` event listener to clear the interval when `document.hidden` is true and restart it when the tab becomes visible.

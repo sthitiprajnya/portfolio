@@ -54,10 +54,8 @@ function AsciiFace({ inView }: { inView: boolean }) {
 
     let timer: NodeJS.Timeout | null = null;
 
-    const startTimer = () => {
+    const startAnimation = () => {
       if (timer) return;
-      // BOLT: Extracting the animation loop to a separate function and pausing it when the document is hidden
-      // saves background CPU cycles and battery by preventing DOM manipulation every 120ms when the tab is inactive.
       timer = setInterval(() => {
         let currentPos = currentPosRef.current;
         const prevLine = linesRef.current[currentPos];
@@ -75,7 +73,7 @@ function AsciiFace({ inView }: { inView: boolean }) {
       }, 120);
     };
 
-    const stopTimer = () => {
+    const stopAnimation = () => {
       if (timer) {
         clearInterval(timer);
         timer = null;
@@ -84,20 +82,21 @@ function AsciiFace({ inView }: { inView: boolean }) {
 
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        stopTimer();
+        stopAnimation();
       } else {
-        startTimer();
+        startAnimation();
       }
     };
 
+    // BOLT: Only run animation when tab is visible to save CPU/battery
     if (!document.hidden) {
-      startTimer();
+      startAnimation();
     }
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
-      stopTimer();
+      stopAnimation();
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [prefersReducedMotion, inView]);
@@ -146,21 +145,54 @@ function MetadataPanel({ inView }: { inView: boolean }) {
       }
       return;
     }
-    const timer = setInterval(() => {
-      let currentVisible = currentVisibleRef.current;
-      if (currentVisible >= META_LINES.length) {
+
+    let timer: NodeJS.Timeout | null = null;
+
+    const startAnimation = () => {
+      if (timer) return;
+      if (currentVisibleRef.current >= META_LINES.length) return;
+
+      timer = setInterval(() => {
+        let currentVisible = currentVisibleRef.current;
+        if (currentVisible >= META_LINES.length) {
+          stopAnimation();
+          return;
+        }
+        const line = metaLinesRef.current[currentVisible];
+        if (line) {
+          line.classList.remove('opacity-0', '-translate-x-2');
+          line.classList.add('opacity-100', 'translate-x-0', 'text-green/90');
+        }
+        currentVisible++;
+        currentVisibleRef.current = currentVisible;
+      }, 300);
+    };
+
+    const stopAnimation = () => {
+      if (timer) {
         clearInterval(timer);
-        return;
+        timer = null;
       }
-      const line = metaLinesRef.current[currentVisible];
-      if (line) {
-        line.classList.remove('opacity-0', '-translate-x-2');
-        line.classList.add('opacity-100', 'translate-x-0', 'text-green/90');
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopAnimation();
+      } else {
+        startAnimation();
       }
-      currentVisible++;
-      currentVisibleRef.current = currentVisible;
-    }, 300);
-    return () => clearInterval(timer);
+    };
+
+    if (!document.hidden) {
+      startAnimation();
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      stopAnimation();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [prefersReducedMotion, inView]);
 
   return (

@@ -9,7 +9,8 @@ import { PERSONAL } from '@/data/portfolio';
 
 type Status = 'idle' | 'transmitting' | 'sent' | 'error';
 
-import emailjs from '@emailjs/browser';
+// BOLT: Removed static import of emailjs. It is now dynamically imported on submit
+// to reduce the initial JavaScript bundle size.
 
 // This form uses EmailJS to send emails directly from the browser.
 export function Contact() {
@@ -96,6 +97,10 @@ export function Contact() {
       }
 
       if (!formRef.current) return;
+
+      // BOLT: Dynamically import emailjs only when the user submits the form.
+      // This prevents the EmailJS SDK from blocking the main thread during initial page load.
+      const emailjs = (await import('@emailjs/browser')).default;
 
       await emailjs.sendForm(
         serviceId,

@@ -54,41 +54,49 @@ function AsciiFace({ inView }: { inView: boolean }) {
 
     let timer: NodeJS.Timeout | null = null;
 
-    const updateFace = () => {
-      let currentPos = currentPosRef.current;
-      const prevLine = linesRef.current[currentPos];
-      if (prevLine) {
-        prevLine.classList.remove('text-cyan', 'bg-cyan/10');
-        prevLine.classList.add('text-cyan/70');
-      }
-      currentPos = currentPos >= AVATAR_LINES.length - 1 ? 0 : currentPos + 1;
-      currentPosRef.current = currentPos;
-      const nextLine = linesRef.current[currentPos];
-      if (nextLine) {
-        nextLine.classList.remove('text-cyan/70');
-        nextLine.classList.add('text-cyan', 'bg-cyan/10');
-      }
+    const startAnimation = () => {
+      if (timer) return;
+      timer = setInterval(() => {
+        let currentPos = currentPosRef.current;
+        const prevLine = linesRef.current[currentPos];
+        if (prevLine) {
+          prevLine.classList.remove('text-cyan', 'bg-cyan/10');
+          prevLine.classList.add('text-cyan/70');
+        }
+        currentPos = currentPos >= AVATAR_LINES.length - 1 ? 0 : currentPos + 1;
+        currentPosRef.current = currentPos;
+        const nextLine = linesRef.current[currentPos];
+        if (nextLine) {
+          nextLine.classList.remove('text-cyan/70');
+          nextLine.classList.add('text-cyan', 'bg-cyan/10');
+        }
+      }, 120);
     };
 
-    timer = setInterval(updateFace, 120);
+    const stopAnimation = () => {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+    };
 
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        if (timer) {
-          clearInterval(timer);
-          timer = null;
-        }
+        stopAnimation();
       } else {
-        if (!timer) {
-          timer = setInterval(updateFace, 120);
-        }
+        startAnimation();
       }
     };
+
+    // BOLT: Only run animation when tab is visible to save CPU/battery
+    if (!document.hidden) {
+      startAnimation();
+    }
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
-      if (timer) clearInterval(timer);
+      stopAnimation();
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [prefersReducedMotion, inView]);
@@ -137,45 +145,52 @@ function MetadataPanel({ inView }: { inView: boolean }) {
       }
       return;
     }
+
     let timer: NodeJS.Timeout | null = null;
 
-    const updatePanel = () => {
-      let currentVisible = currentVisibleRef.current;
-      if (currentVisible >= META_LINES.length) {
-        if (timer) {
-          clearInterval(timer);
-          timer = null;
+    const startAnimation = () => {
+      if (timer) return;
+      if (currentVisibleRef.current >= META_LINES.length) return;
+
+      timer = setInterval(() => {
+        let currentVisible = currentVisibleRef.current;
+        if (currentVisible >= META_LINES.length) {
+          stopAnimation();
+          return;
         }
-        return;
-      }
-      const line = metaLinesRef.current[currentVisible];
-      if (line) {
-        line.classList.remove('opacity-0', '-translate-x-2');
-        line.classList.add('opacity-100', 'translate-x-0', 'text-green/90');
-      }
-      currentVisible++;
-      currentVisibleRef.current = currentVisible;
+        const line = metaLinesRef.current[currentVisible];
+        if (line) {
+          line.classList.remove('opacity-0', '-translate-x-2');
+          line.classList.add('opacity-100', 'translate-x-0', 'text-green/90');
+        }
+        currentVisible++;
+        currentVisibleRef.current = currentVisible;
+      }, 300);
     };
 
-    timer = setInterval(updatePanel, 300);
+    const stopAnimation = () => {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+    };
 
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        if (timer) {
-          clearInterval(timer);
-          timer = null;
-        }
+        stopAnimation();
       } else {
-        if (!timer && currentVisibleRef.current < META_LINES.length) {
-          timer = setInterval(updatePanel, 300);
-        }
+        startAnimation();
       }
     };
+
+    if (!document.hidden) {
+      startAnimation();
+    }
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
-      if (timer) clearInterval(timer);
+      stopAnimation();
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [prefersReducedMotion, inView]);

@@ -289,6 +289,7 @@ function FloatingInput({ id, name, type, label, value, onChange, error, required
         aria-describedby={clsx(
           error && `${id}-error`,
           maxLength && `${id}-counter`
+        ) || undefined}
         )}
         placeholder=" "
         className={clsx(

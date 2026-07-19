@@ -348,7 +348,7 @@ function FloatingTextarea({ id, name, label, value, onChange, error, required, m
         aria-describedby={clsx(
           error && `${id}-error`,
           maxLength && `${id}-counter`
-        )}
+        ) || undefined}
         placeholder=" "
         className={clsx(
           'w-full bg-[#020408] border rounded-md px-4 py-4 pt-6 text-text-primary outline-none transition-all peer min-h-[140px] resize-y',

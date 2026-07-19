@@ -114,6 +114,7 @@
 ## 2025-06-01 - Animation Loop Consolidation
 **Learning:** Multiple RAF loops for the same interaction (e.g., cursor) can lead to redundant calculations and inconsistent states. Consolidating into a single "sleepy" loop improves CPU efficiency.
 **Action:** Ensure high-frequency UI components use a centralized animation controller or stable RAF state management.
-## 2026-05-31 - [Lazy Load EmailJS SDK]
-**Learning:** The `@emailjs/browser` SDK statically imported adds ~15KB (gzipped) to the initial bundle. Since it is only needed when the user actually submits the contact form, statically importing it blocks the main thread during initial page load for no reason.
-**Action:** Always dynamically import heavy third-party SDKs like EmailJS (`const emailjs = (await import('@emailjs/browser')).default;`) inside the submit handler when they aren't needed for the initial UI render.
+
+## 2026-06-28 - [Optimizing Idle Animation Loops via Page Visibility]
+**Learning:** Continuous `setInterval` loops used for visual effects (like the 120ms and 300ms animations in `AsciiAvatar.tsx`) continue running in the background even when the tab is not visible, consuming unnecessary CPU cycles and draining battery on mobile devices.
+**Action:** Always wrap background `setInterval` visual updates with a `visibilitychange` event listener to clear the interval when `document.hidden` is true and restart it when the tab becomes visible.

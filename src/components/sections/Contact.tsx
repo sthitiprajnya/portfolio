@@ -219,6 +219,17 @@ export function Contact() {
           {/* ── Right: form ── */}
           <ScrollReveal variants={fadeSlideLeft}>
             <form ref={formRef} onSubmit={handleSubmit} noValidate className="space-y-6">
+              {/* Security: Honeypot field (hidden from legitimate users, filled by bots) */}
+              <input
+                type="text"
+                name="hp_field"
+                value={form.hp_field}
+                onChange={handleChange}
+                tabIndex={-1}
+                aria-hidden="true"
+                autoComplete="off"
+                className="opacity-0 absolute w-0 h-0 pointer-events-none"
+              />
 
               {/* Success overlay */}
               {status === 'sent' && (
@@ -290,7 +301,6 @@ function FloatingInput({ id, name, type, label, value, onChange, error, required
           error && `${id}-error`,
           maxLength && `${id}-counter`
         ) || undefined}
-        )}
         placeholder=" "
         className={clsx(
           'w-full bg-[#020408] border rounded-md px-4 py-4 pt-6 text-text-primary outline-none transition-all peer',

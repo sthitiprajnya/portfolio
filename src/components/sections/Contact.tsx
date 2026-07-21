@@ -220,6 +220,18 @@ export function Contact() {
           <ScrollReveal variants={fadeSlideLeft}>
             <form ref={formRef} onSubmit={handleSubmit} noValidate className="space-y-6">
 
+              {/* Security: visually hidden honeypot field for bot detection */}
+              <input
+                type="text"
+                name="hp_field"
+                value={form.hp_field}
+                onChange={handleChange}
+                tabIndex={-1}
+                aria-hidden="true"
+                autoComplete="off"
+                className="opacity-0 w-0 h-0 absolute pointer-events-none"
+              />
+
               {/* Success overlay */}
               {status === 'sent' && (
                 <div className="p-4 border border-green/50 rounded-md bg-green-ghost">
@@ -278,7 +290,7 @@ interface FloatingInputProps {
 }
 
 function FloatingInput({ id, name, type, label, value, onChange, error, required, maxLength }: FloatingInputProps) {
-  const charCount = value.length;
+  const charCount = value?.length || 0;
 
   return (
     <div className="relative">
@@ -290,7 +302,6 @@ function FloatingInput({ id, name, type, label, value, onChange, error, required
           error && `${id}-error`,
           maxLength && `${id}-counter`
         ) || undefined}
-        )}
         placeholder=" "
         className={clsx(
           'w-full bg-[#020408] border rounded-md px-4 py-4 pt-6 text-text-primary outline-none transition-all peer',
@@ -343,7 +354,7 @@ interface FloatingTextareaProps {
 }
 
 function FloatingTextarea({ id, name, label, value, onChange, error, required, maxLength }: FloatingTextareaProps) {
-  const charCount = value.length;
+  const charCount = value?.length || 0;
 
   return (
     <div className="relative">

@@ -290,7 +290,6 @@ function FloatingInput({ id, name, type, label, value, onChange, error, required
           error && `${id}-error`,
           maxLength && `${id}-counter`
         ) || undefined}
-        )}
         placeholder=" "
         className={clsx(
           'w-full bg-[#020408] border rounded-md px-4 py-4 pt-6 text-text-primary outline-none transition-all peer',
@@ -321,7 +320,6 @@ function FloatingInput({ id, name, type, label, value, onChange, error, required
         {maxLength && (
           <span
             id={`${id}-counter`}
-            aria-live="polite"
             className={clsx(
               "font-mono text-[0.65rem] transition-colors",
               charCount >= maxLength ? "text-red" : "text-text-muted"
@@ -385,7 +383,6 @@ function FloatingTextarea({ id, name, label, value, onChange, error, required, m
         {maxLength && (
           <span
             id={`${id}-counter`}
-            aria-live="polite"
             className={clsx(
               "font-mono text-[0.65rem] transition-colors",
               charCount >= maxLength ? "text-red" : "text-text-muted"

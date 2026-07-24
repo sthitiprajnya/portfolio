@@ -346,7 +346,7 @@ interface FloatingTextareaProps {
 }
 
 function FloatingTextarea({ id, name, label, value, onChange, error, required, maxLength }: FloatingTextareaProps) {
-  const charCount = value.length;
+  const charCount = value?.length || 0;
 
   return (
     <div className="relative">
@@ -388,7 +388,6 @@ function FloatingTextarea({ id, name, label, value, onChange, error, required, m
         {maxLength && (
           <span
             id={`${id}-counter`}
-            aria-live="polite"
             className={clsx(
               "font-mono text-[0.65rem] transition-colors",
               charCount >= maxLength ? "text-red" : "text-text-muted"

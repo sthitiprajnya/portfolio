@@ -223,12 +223,17 @@ export function Contact() {
           <ScrollReveal variants={fadeSlideLeft}>
             <form ref={formRef} onSubmit={handleSubmit} noValidate className="space-y-6">
 
+              {/* Security: visually hidden honeypot field for bot detection */}
               {/* Security: Honeypot field for bot mitigation */}
               <input
                 type="text"
                 name="hp_field"
                 value={form.hp_field}
                 onChange={handleChange}
+                tabIndex={-1}
+                aria-hidden="true"
+                autoComplete="off"
+                className="opacity-0 w-0 h-0 absolute pointer-events-none"
                 className="opacity-0 w-0 h-0 absolute pointer-events-none"
                 tabIndex={-1}
                 aria-hidden="true"

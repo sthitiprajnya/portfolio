@@ -114,6 +114,12 @@
 ## 2025-06-01 - Animation Loop Consolidation
 **Learning:** Multiple RAF loops for the same interaction (e.g., cursor) can lead to redundant calculations and inconsistent states. Consolidating into a single "sleepy" loop improves CPU efficiency.
 **Action:** Ensure high-frequency UI components use a centralized animation controller or stable RAF state management.
+## 2026-07-03 - Lazy Loading EmailJS
+**Learning:** The  library is heavily bundled (15KB gzipped) and is only needed during form submission. Since Next.js statically imports it by default when placed at the top level of a component file, it blocks the main thread unnecessarily during the initial load.
+**Action:** Use dynamic imports (e.g. `const emailjs = (await import('@emailjs/browser')).default;`) inside the event handler instead of statically importing it at the module level.
+## 2024-05-31 - Lazy Loading EmailJS
+**Learning:** The `@emailjs/browser` library is heavily bundled (15KB gzipped) and is only needed during form submission. Since Next.js statically imports it by default when placed at the top level of a component file, it blocks the main thread unnecessarily during the initial load.
+**Action:** Use dynamic imports (e.g. `const emailjs = (await import('@emailjs/browser')).default;`) inside the event handler instead of statically importing it at the module level.
 
 ## 2026-06-28 - [Optimizing Idle Animation Loops via Page Visibility]
 **Learning:** Continuous `setInterval` loops used for visual effects (like the 120ms and 300ms animations in `AsciiAvatar.tsx`) continue running in the background even when the tab is not visible, consuming unnecessary CPU cycles and draining battery on mobile devices.

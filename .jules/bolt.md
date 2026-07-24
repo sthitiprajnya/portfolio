@@ -120,3 +120,7 @@
 ## 2024-05-31 - Lazy Loading EmailJS
 **Learning:** The `@emailjs/browser` library is heavily bundled (15KB gzipped) and is only needed during form submission. Since Next.js statically imports it by default when placed at the top level of a component file, it blocks the main thread unnecessarily during the initial load.
 **Action:** Use dynamic imports (e.g. `const emailjs = (await import('@emailjs/browser')).default;`) inside the event handler instead of statically importing it at the module level.
+
+## 2026-06-28 - [Optimizing Idle Animation Loops via Page Visibility]
+**Learning:** Continuous `setInterval` loops used for visual effects (like the 120ms and 300ms animations in `AsciiAvatar.tsx`) continue running in the background even when the tab is not visible, consuming unnecessary CPU cycles and draining battery on mobile devices.
+**Action:** Always wrap background `setInterval` visual updates with a `visibilitychange` event listener to clear the interval when `document.hidden` is true and restart it when the tab becomes visible.

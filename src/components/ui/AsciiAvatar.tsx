@@ -49,24 +49,109 @@ function AsciiFace({ inView }: { inView: boolean }) {
   const linesRef = useRef<(HTMLDivElement | null)[]>([]);
 
   const currentPosRef = useRef(0);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
+    if (prefersReducedMotion || !inView) {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+      return;
+    }
+
+    const startTimer = () => {
+      if (!timerRef.current) {
+        timerRef.current = setInterval(() => {
+          let currentPos = currentPosRef.current;
+          const prevLine = linesRef.current[currentPos];
+          if (prevLine) {
+            prevLine.classList.remove('text-cyan', 'bg-cyan/10');
+            prevLine.classList.add('text-cyan/70');
+          }
+          currentPos = currentPos >= AVATAR_LINES.length - 1 ? 0 : currentPos + 1;
+          currentPosRef.current = currentPos;
+          const nextLine = linesRef.current[currentPos];
+          if (nextLine) {
+            nextLine.classList.remove('text-cyan/70');
+            nextLine.classList.add('text-cyan', 'bg-cyan/10');
+          }
+        }, 120);
+      }
+    };
+
+    const stopTimer = () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      // BOLT: Pause animation when tab is inactive to save CPU and battery
+      if (document.hidden) {
+        stopTimer();
+      } else {
+        startTimer();
+      }
+    };
+
+    if (!document.hidden) {
+      startTimer();
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      stopTimer();
     if (prefersReducedMotion || !inView) return;
-    const timer = setInterval(() => {
-      let currentPos = currentPosRef.current;
-      const prevLine = linesRef.current[currentPos];
-      if (prevLine) {
-        prevLine.classList.remove('text-cyan', 'bg-cyan/10');
-        prevLine.classList.add('text-cyan/70');
+
+    let timer: NodeJS.Timeout | null = null;
+
+    const startAnimation = () => {
+      if (timer) return;
+      timer = setInterval(() => {
+        let currentPos = currentPosRef.current;
+        const prevLine = linesRef.current[currentPos];
+        if (prevLine) {
+          prevLine.classList.remove('text-cyan', 'bg-cyan/10');
+          prevLine.classList.add('text-cyan/70');
+        }
+        currentPos = currentPos >= AVATAR_LINES.length - 1 ? 0 : currentPos + 1;
+        currentPosRef.current = currentPos;
+        const nextLine = linesRef.current[currentPos];
+        if (nextLine) {
+          nextLine.classList.remove('text-cyan/70');
+          nextLine.classList.add('text-cyan', 'bg-cyan/10');
+        }
+      }, 120);
+    };
+
+    const stopAnimation = () => {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
       }
-      currentPos = currentPos >= AVATAR_LINES.length - 1 ? 0 : currentPos + 1;
-      currentPosRef.current = currentPos;
-      const nextLine = linesRef.current[currentPos];
-      if (nextLine) {
-        nextLine.classList.remove('text-cyan/70');
-        nextLine.classList.add('text-cyan', 'bg-cyan/10');
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopAnimation();
+      } else {
+        startAnimation();
       }
-    }, 120);
-    return () => clearInterval(timer);
+    };
+
+    // BOLT: Only run animation when tab is visible to save CPU/battery
+    if (!document.hidden) {
+      startAnimation();
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      stopAnimation();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [prefersReducedMotion, inView]);
 
   return (
@@ -100,9 +185,14 @@ function MetadataPanel({ inView }: { inView: boolean }) {
   const prefersReducedMotion = usePrefersReducedMotion();
   const metaLinesRef = useRef<(HTMLDivElement | null)[]>([]);
   const currentVisibleRef = useRef(0);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (prefersReducedMotion || !inView) {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
       if (prefersReducedMotion) {
          metaLinesRef.current.forEach(el => {
            if(el) {
@@ -113,21 +203,88 @@ function MetadataPanel({ inView }: { inView: boolean }) {
       }
       return;
     }
-    const timer = setInterval(() => {
-      let currentVisible = currentVisibleRef.current;
-      if (currentVisible >= META_LINES.length) {
+
+    const startTimer = () => {
+      if (!timerRef.current && currentVisibleRef.current < META_LINES.length) {
+        timerRef.current = setInterval(() => {
+          let currentVisible = currentVisibleRef.current;
+          if (currentVisible >= META_LINES.length) {
+            stopTimer();
+            return;
+          }
+          const line = metaLinesRef.current[currentVisible];
+          if (line) {
+            line.classList.remove('opacity-0', '-translate-x-2');
+            line.classList.add('opacity-100', 'translate-x-0', 'text-green/90');
+          }
+          currentVisible++;
+          currentVisibleRef.current = currentVisible;
+        }, 300);
+      }
+    };
+
+    const stopTimer = () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+    let timer: NodeJS.Timeout | null = null;
+
+    const startAnimation = () => {
+      if (timer) return;
+      if (currentVisibleRef.current >= META_LINES.length) return;
+
+      timer = setInterval(() => {
+        let currentVisible = currentVisibleRef.current;
+        if (currentVisible >= META_LINES.length) {
+          stopAnimation();
+          return;
+        }
+        const line = metaLinesRef.current[currentVisible];
+        if (line) {
+          line.classList.remove('opacity-0', '-translate-x-2');
+          line.classList.add('opacity-100', 'translate-x-0', 'text-green/90');
+        }
+        currentVisible++;
+        currentVisibleRef.current = currentVisible;
+      }, 300);
+    };
+
+    const stopAnimation = () => {
+      if (timer) {
         clearInterval(timer);
-        return;
+        timer = null;
       }
-      const line = metaLinesRef.current[currentVisible];
-      if (line) {
-        line.classList.remove('opacity-0', '-translate-x-2');
-        line.classList.add('opacity-100', 'translate-x-0', 'text-green/90');
+    };
+
+    const handleVisibilityChange = () => {
+      // BOLT: Pause animation when tab is inactive to save CPU and battery
+      if (document.hidden) {
+        stopTimer();
+      } else {
+        startTimer();
+      if (document.hidden) {
+        stopAnimation();
+      } else {
+        startAnimation();
       }
-      currentVisible++;
-      currentVisibleRef.current = currentVisible;
-    }, 300);
-    return () => clearInterval(timer);
+    };
+
+    if (!document.hidden) {
+      startTimer();
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      stopTimer();
+      startAnimation();
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      stopAnimation();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [prefersReducedMotion, inView]);
 
   return (

@@ -98,6 +98,7 @@ export function Contact() {
 
       if (!formRef.current) return;
 
+      // ⚡ Bolt: Dynamically import heavy EmailJS SDK only when needed to reduce initial bundle size
       // BOLT: Dynamically import emailjs only when the user submits the form.
       // This prevents the EmailJS SDK from blocking the main thread during initial page load.
       const emailjs = (await import('@emailjs/browser')).default;

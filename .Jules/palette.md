@@ -21,9 +21,23 @@
 ## 2024-06-27 - Linking Modals and Toggles with ARIA
 **Learning:** For accessibility in custom toggle components, floating widgets, and overlays, it is critical to explicitly link the toggle button to its target container using `aria-controls` (matching the container's `id`) and dynamically manage the `aria-expanded` state. This was missing for the methodology and intel modals.
 **Action:** When adding modal toggles or expanding sections, always ensure the button has `aria-expanded` reflecting the state, and `aria-controls` pointing to the `id` of the content block it toggles.
+## 2026-07-05 - Character Counter Accessibility
+**Learning:** Adding `aria-live` to character counters in text inputs causes significant screen reader spam on every keystroke. Using `aria-describedby` on the input pointing to the counter ID is sufficient and more accessible. Also, dynamic ARIA attributes (like `aria-describedby`) should append `|| undefined` in React to prevent rendering empty strings.
+**Action:** When implementing input character counters, rely on `aria-describedby` without `aria-live`. Always append `|| undefined` when conditionally rendering ARIA attributes with tools like `clsx`.
+
+## 2026-07-04 - Prevent aria-describedby DOM errors
+**Learning:** When dynamically setting ARIA attributes like `aria-describedby` using conditionals or libraries like `clsx` in React, if the condition fails, it can result in an empty string (`""`) or `"false"` being injected into the DOM. This causes screen reader errors because they try to parse the empty string as a target ID.
+**Action:** Always append `|| undefined` (e.g., `aria-describedby={clsx(...) || undefined}`) to ensure the attribute is completely omitted from the DOM when no valid ID is present.
 ## 2026-07-03 - Dynamic ARIA Attributes with clsx
 **Learning:** When dynamically setting ARIA attributes like `aria-describedby` using conditionals or libraries like `clsx` in React, empty strings or 'false' values can cause screen reader errors.
 **Action:** Append `|| undefined` (e.g., `aria-describedby={clsx(...) || undefined}`) to ensure the attribute is completely omitted from the DOM when no valid ID is present.
 ## 2026-06-30 - Native titles for complex dynamic components
 **Learning:** Even when standard elements have aria-labels, visually dynamic state-toggling components (like the methodology accordion) often miss corresponding `title` tooltips, leaving mouse users without clear hover feedback.
 **Action:** When adding or verifying `aria-label` on dynamic toggle buttons (like expanding sections or modals), dynamically bind the `title` attribute to match the `aria-label` so mouse users see descriptive state changes on hover.
+
+## 2024-07-24 - Prevent Screen Reader Spam on Character Counters
+**Learning:** Adding `aria-live="polite"` to a character counter span that updates on every keystroke causes extreme verbosity and spam for screen reader users, making the form very difficult to use.
+**Action:** Remove `aria-live` from real-time character counters. Instead, ensure the counter is programmatically linked to the input via `aria-describedby` so the limits are announced when the field receives focus, and rely on standard validation for max length.
+## 2026-07-24 - Avoid aria-live on visual character counters
+**Learning:** Using `aria-live` on visual character counters inside text inputs or textareas causes significant screen reader spam, as it announces every single keystroke.
+**Action:** When implementing visual character counters, do not use `aria-live`. Rely on linking the counter visually and programmatically via `aria-describedby` on the input element.

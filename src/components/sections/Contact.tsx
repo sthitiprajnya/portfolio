@@ -98,6 +98,9 @@ export function Contact() {
 
       if (!formRef.current) return;
 
+      // BOLT: Dynamically importing @emailjs/browser to significantly reduce the Next.js
+      // initial JavaScript bundle size, deferring the load until the user actually submits the form.
+      // ⚡ Bolt: Dynamically import heavy EmailJS SDK only when needed to reduce initial bundle size
       // BOLT: Dynamically import emailjs only when the user submits the form.
       // This prevents the EmailJS SDK from blocking the main thread during initial page load.
       const emailjs = (await import('@emailjs/browser')).default;
@@ -221,6 +224,7 @@ export function Contact() {
             <form ref={formRef} onSubmit={handleSubmit} noValidate className="space-y-6">
 
               {/* Security: visually hidden honeypot field for bot detection */}
+              {/* Security: Honeypot field for bot mitigation */}
               <input
                 type="text"
                 name="hp_field"
@@ -230,6 +234,10 @@ export function Contact() {
                 aria-hidden="true"
                 autoComplete="off"
                 className="opacity-0 w-0 h-0 absolute pointer-events-none"
+                className="opacity-0 w-0 h-0 absolute pointer-events-none"
+                tabIndex={-1}
+                aria-hidden="true"
+                autoComplete="off"
               />
 
               {/* Success overlay */}
@@ -243,6 +251,18 @@ export function Contact() {
                   </div>
                 </div>
               )}
+
+              {/* Honeypot field for bot deterrence */}
+              <input
+                type="text"
+                name="hp_field"
+                value={form.hp_field}
+                onChange={handleChange}
+                className="opacity-0 w-0 h-0 absolute pointer-events-none"
+                tabIndex={-1}
+                aria-hidden="true"
+                autoComplete="off"
+              />
 
               <FloatingInput id="from_name"  name="from_name"  type="text"  label="Name"             value={form.from_name}  onChange={handleChange} error={errors.from_name}  required maxLength={100} />
               <FloatingInput id="from_email" name="from_email" type="email" label="Email"            value={form.from_email} onChange={handleChange} error={errors.from_email} required maxLength={100} />
@@ -332,7 +352,6 @@ function FloatingInput({ id, name, type, label, value, onChange, error, required
         {maxLength && (
           <span
             id={`${id}-counter`}
-            aria-live="polite"
             className={clsx(
               "font-mono text-[0.65rem] transition-colors",
               charCount >= maxLength ? "text-red" : "text-text-muted"
@@ -396,7 +415,6 @@ function FloatingTextarea({ id, name, label, value, onChange, error, required, m
         {maxLength && (
           <span
             id={`${id}-counter`}
-            aria-live="polite"
             className={clsx(
               "font-mono text-[0.65rem] transition-colors",
               charCount >= maxLength ? "text-red" : "text-text-muted"

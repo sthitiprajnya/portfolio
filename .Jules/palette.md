@@ -34,6 +34,9 @@
 ## 2026-06-30 - Native titles for complex dynamic components
 **Learning:** Even when standard elements have aria-labels, visually dynamic state-toggling components (like the methodology accordion) often miss corresponding `title` tooltips, leaving mouse users without clear hover feedback.
 **Action:** When adding or verifying `aria-label` on dynamic toggle buttons (like expanding sections or modals), dynamically bind the `title` attribute to match the `aria-label` so mouse users see descriptive state changes on hover.
+## 2025-07-20 - Character Counters and aria-live
+**Learning:** Adding `aria-live="polite"` directly to a character counter element that updates on every keystroke creates severe screen reader spam, completely overwhelming the user experience.
+**Action:** Remove `aria-live` from character counters and ensure they are instead linked programmatically to the input field using `aria-describedby`. Also ensure that optional chaining (e.g. `value?.length || 0`) is used to prevent runtime errors on uninitialized state.
 
 ## 2024-07-24 - Prevent Screen Reader Spam on Character Counters
 **Learning:** Adding `aria-live="polite"` to a character counter span that updates on every keystroke causes extreme verbosity and spam for screen reader users, making the form very difficult to use.

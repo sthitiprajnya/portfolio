@@ -1,45 +1,64 @@
+
 "use client";
 import React, { useEffect, createContext, useContext, useState } from 'react';
-import Lenis from 'lenis';
+import type LenisType from 'lenis';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 interface SmoothScrollProviderProps {
   children: React.ReactNode;
 }
 
-const SmoothScrollContext = createContext<Lenis | null>(null);
+const SmoothScrollContext = createContext<LenisType | null>(null);
 
 export const useSmoothScroll = () => useContext(SmoothScrollContext);
 
 export function SmoothScrollProvider({ children }: SmoothScrollProviderProps) {
-  const [lenisInstance, setLenisInstance] = useState<Lenis | null>(null);
+  const [lenisInstance, setLenisInstance] = useState<LenisType | null>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     if (prefersReducedMotion) return;
 
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      gestureOrientation: 'vertical',
-      smoothWheel: true,
-      wheelMultiplier: 0.85,
-      touchMultiplier: 1.5,
-      infinite: false,
-    });
+    let lenis: LenisType | null = null;
+    let rafId: number | null = null;
+    let isMounted = true;
 
-    setLenisInstance(lenis);
+    // BOLT: Dynamically import Lenis to reduce initial bundle size.
+    // Lenis is only needed on the client and isn't critical for initial paint.
+    import('lenis').then(({ default: Lenis }) => {
+      if (!isMounted) return;
 
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
+      lenis = new Lenis({
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        orientation: 'vertical',
+        gestureOrientation: 'vertical',
+        smoothWheel: true,
+        wheelMultiplier: 0.85,
+        touchMultiplier: 1.5,
+        infinite: false,
+      });
 
-    requestAnimationFrame(raf);
+      setLenisInstance(lenis);
+
+      function raf(time: number) {
+        if (lenis) {
+          lenis.raf(time);
+        }
+        rafId = requestAnimationFrame(raf);
+      }
+
+      rafId = requestAnimationFrame(raf);
+    }).catch(console.error);
 
     return () => {
-      lenis.destroy();
+      isMounted = false;
+      if (lenis) {
+        lenis.destroy();
+      }
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
       setLenisInstance(null);
     };
   }, [prefersReducedMotion]);

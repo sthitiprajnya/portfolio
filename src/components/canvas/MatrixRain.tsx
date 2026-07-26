@@ -148,8 +148,8 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
     resize();
 
     const draw = () => {
+      // BOLT: "Sleepy" Loop Optimization - Cancel requestAnimationFrame when out of view to eliminate background CPU overhead. The loop automatically restarts when inView triggers a re-render.
       if (!inView) {
-        animationFrameId = requestAnimationFrame(draw);
         return;
       }
 
@@ -237,7 +237,9 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
     };
 
     scheduleGlitch();
-    draw();
+    if (inView) {
+      draw();
+    }
 
     return () => {
       window.removeEventListener('resize', resize);

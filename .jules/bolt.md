@@ -114,3 +114,16 @@
 ## 2025-06-01 - Animation Loop Consolidation
 **Learning:** Multiple RAF loops for the same interaction (e.g., cursor) can lead to redundant calculations and inconsistent states. Consolidating into a single "sleepy" loop improves CPU efficiency.
 **Action:** Ensure high-frequency UI components use a centralized animation controller or stable RAF state management.
+## 2026-07-04 - [Dynamic Module Importing for Heavy SDKs]
+**Learning:** Statically importing heavy third-party SDKs (like `@emailjs/browser`) at the module level unnecessarily increases the initial Next.js JavaScript bundle size, which delays hydration and Time to Interactive (TTI) for the entire application.
+**Action:** Use dynamic imports (e.g., `const module = (await import('lib')).default;`) inside event handlers (like form submissions) to defer loading of large dependencies until they are strictly required by the user.
+
+## 2024-07-04 - Dynamic Imports for Heavy SDKs
+**Learning:** Statically importing heavy third-party SDKs (like `@emailjs/browser`) in Next.js components significantly inflates the initial JavaScript bundle size, even if the library is only used upon user interaction (like submitting a form).
+**Action:** When a heavy library is only required within specific event handlers (e.g., form submissions, explicit button clicks), use dynamic imports (`const module = (await import('module')).default`) inside the handler instead of static imports at the module level to reduce initial load times and prevent main-thread blocking.
+## 2026-08-15 - [Visibility-Aware Timers in Background Animations]
+**Learning:** React components that use `setInterval` for background animations (like terminal typing effects or ascii character updates) continue to run and trigger CPU work even when the document is hidden (`document.hidden` is true), as `react-intersection-observer` only checks viewport visibility, not tab visibility. This causes unnecessary battery drain and main thread usage when the user switches tabs.
+**Action:** Always wrap `setInterval` background animations with a `document.addEventListener('visibilitychange')` check. Pause the intervals when `document.hidden` becomes true, and resume them when it becomes false.
+## 2026-06-28 - [Optimizing Idle Animation Loops via Page Visibility]
+**Learning:** Continuous `setInterval` loops used for visual effects (like the 120ms and 300ms animations in `AsciiAvatar.tsx`) continue running in the background even when the tab is not visible, consuming unnecessary CPU cycles and draining battery on mobile devices.
+**Action:** Always wrap background `setInterval` visual updates with a `visibilitychange` event listener to clear the interval when `document.hidden` is true and restart it when the tab becomes visible.

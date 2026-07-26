@@ -10,6 +10,7 @@ export interface ContactFormData {
 }
 
 export async function sendContactEmail(data: ContactFormData): Promise<void> {
+  // ⚡ Bolt: Dynamically import heavy third-party SDK to reduce initial bundle size
   // ⚡ Bolt: Dynamically import EmailJS to reduce initial bundle size and avoid blocking the main thread
   const emailjs = (await import('@emailjs/browser')).default;
   await emailjs.send(SERVICE_ID, TEMPLATE_ID, data as unknown as Record<string, unknown>, PUBLIC_KEY);

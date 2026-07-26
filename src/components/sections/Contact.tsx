@@ -13,6 +13,7 @@ type Status = 'idle' | 'transmitting' | 'sent' | 'error';
 // to reduce the initial JavaScript bundle size.
 
 // This form uses EmailJS to send emails directly from the browser.
+// EmailJS is dynamically imported inside handleSubmit to reduce initial bundle size.
 export function Contact() {
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -98,6 +99,7 @@ export function Contact() {
 
       if (!formRef.current) return;
 
+      // ⚡ Bolt: Dynamically import heavy third-party SDK to reduce initial bundle size
       // ⚡ Bolt: Dynamically import EmailJS to reduce initial bundle size and avoid blocking the main thread
       // BOLT: Dynamically importing @emailjs/browser to significantly reduce the Next.js
       // initial JavaScript bundle size, deferring the load until the user actually submits the form.

@@ -73,3 +73,8 @@
 ## 2025-06-01 - CSP Hardening
 **Learning:** Restricting `form-action` to `'self'` prevents data exfiltration via traditional form submissions to unauthorized origins, even if other security layers are bypassed.
 **Action:** Always audit `form-action` when using client-side API libraries (like EmailJS) which do not require native form actions.
+
+## 2026-10-24 - Honeypot Render Requirement
+**Vulnerability:** Honeypot anti-spam mechanisms that only exist in component state are ineffective against automated bots.
+**Learning:** For a honeypot field to successfully trap a bot, it must actually be rendered in the DOM. If the field is only referenced in React state and submission logic, bots (which scrape the HTML to find form fields) will never see it, rendering the check useless.
+**Prevention:** Always render honeypot inputs within the `<form>` element in the DOM. Ensure they are visually hidden from real users using CSS (e.g., `opacity-0 w-0 h-0 absolute -z-10 pointer-events-none`) and accessibility attributes (e.g., `tabIndex={-1}` and `aria-hidden="true"`).

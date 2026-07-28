@@ -84,6 +84,8 @@ export function Contact() {
       return;
     }
 
+    // Security: Set cooldown synchronously to prevent race conditions from concurrent script submissions
+    localStorage.setItem(LAST_SUBMISSION_KEY, now.toString());
     setStatus('transmitting');
 
     try {
@@ -116,7 +118,6 @@ export function Contact() {
       );
 
       setStatus('sent');
-      localStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
       setForm({ from_name: '', from_email: '', subject: '', message: '', hp_field: '' });
       setTimeout(() => setStatus('idle'), 6000);
     } catch (error) {

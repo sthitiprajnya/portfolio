@@ -101,6 +101,8 @@ export function Contact() {
 
       if (!formRef.current) return;
 
+      // ⚡ Bolt: Dynamically import heavy @emailjs/browser SDK (~15KB) only when the form is submitted
+      // to reduce the initial JavaScript bundle size and improve page load performance.
       // ⚡ Bolt: Dynamically import heavy third-party SDK to reduce initial bundle size
       // ⚡ Bolt: Dynamically import EmailJS to reduce initial bundle size and avoid blocking the main thread
       // BOLT: Dynamically importing @emailjs/browser to significantly reduce the Next.js

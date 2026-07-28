@@ -17,6 +17,12 @@ export function useCardTilt() {
     const el = ref.current;
     if (!el) return;
 
+    // Disable tilt on touch devices or low-memory devices to avoid unnecessary work
+    const isTouch = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    const deviceMemory = typeof navigator !== 'undefined' && (navigator as any).deviceMemory ? (navigator as any).deviceMemory : 8;
+    const isLowEnd = deviceMemory < 2;
+    if (isTouch || isLowEnd) return;
+
     // Cache document-relative bounds to avoid recalculating on scroll
     let docRect: { top: number; left: number; width: number; height: number } | null = null;
 
@@ -34,8 +40,12 @@ export function useCardTilt() {
       updateRect();
     };
 
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!docRect) updateRect();
+    // rAF-batched mousemove handler to avoid thousands of synchronous updates
+    let pending = false;
+    let lastEvent: MouseEvent | null = null;
+    let rafId: number | null = null;
+
+    const processMouse = (e: MouseEvent) => {
       if (!docRect) return;
 
       // Calculate the current viewport-relative position
@@ -59,7 +69,17 @@ export function useCardTilt() {
       mouseY.set(e.clientY - currentTop);
 
       el.style.setProperty('--mouse-x', `${e.clientX - currentLeft}px`);
-      el.style.setProperty('--mouse-y', `${e.clientY - currentTop}px`);
+      el.style.setProperty('--mouse-y', `${e.clientY - currentLeft ? e.clientX - currentLeft : -1000}px`);
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      lastEvent = e;
+      if (pending) return;
+      pending = true;
+      rafId = requestAnimationFrame(() => {
+        pending = false;
+        if (lastEvent) processMouse(lastEvent);
+      });
     };
 
     const handleMouseLeave = () => {
@@ -68,20 +88,23 @@ export function useCardTilt() {
       y.set(0);
       el.style.setProperty('--mouse-x', `-1000px`);
       el.style.setProperty('--mouse-y', `-1000px`);
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = null;
     };
 
     el.addEventListener('mouseenter', handleMouseEnter);
-    // BOLT: Add passive listener to high-frequency mousemove to ensure main-thread remains clear during scrolling
+    // rAF-batched listener — passive is safe as we don't call preventDefault
     el.addEventListener('mousemove', handleMouseMove, { passive: true });
     el.addEventListener('mouseleave', handleMouseLeave);
     window.addEventListener('resize', updateRect, { passive: true });
-    // Removed window.addEventListener('scroll', updateRect)
 
     return () => {
       el.removeEventListener('mouseenter', handleMouseEnter);
       el.removeEventListener('mousemove', handleMouseMove);
       el.removeEventListener('mouseleave', handleMouseLeave);
       window.removeEventListener('resize', updateRect);
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = null;
     };
   }, [x, y, mouseX, mouseY]);
 

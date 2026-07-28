@@ -209,8 +209,8 @@ export default function HeroOrb() {
     let lastTime = 0;
 
     function tick(now: number) {
+      // BOLT: "Sleepy" Loop Optimization - Cancel requestAnimationFrame when out of view to eliminate background CPU overhead. The loop automatically restarts when inView triggers a re-render.
       if (!inView) {
-        rafRef.current = requestAnimationFrame(tick);
         return;
       }
 
@@ -267,7 +267,9 @@ export default function HeroOrb() {
       rafRef.current = requestAnimationFrame(tick);
     }
 
-    rafRef.current = requestAnimationFrame(tick);
+    if (inView) {
+      rafRef.current = requestAnimationFrame(tick);
+    }
 
     return () => {
       cancelAnimationFrame(rafRef.current);

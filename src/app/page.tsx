@@ -1,7 +1,12 @@
 'use client';
 
 import React from 'react';
-import { Preloader }            from '@/components/sections/Preloader';
+import dynamic from 'next/dynamic';
+
+// ⚡ Bolt: Dynamically import Preloader to defer loading of framer-motion and reduce initial bundle size
+const Preloader = dynamic(() => import('@/components/sections/Preloader').then(mod => ({ default: mod.Preloader })), {
+  ssr: false,
+});
 import { Navigation }           from '@/components/sections/Navigation';
 import { CommandPalette }       from '@/components/global/CommandPalette';
 import { ScrollProgress }       from '@/components/global/ScrollProgress';

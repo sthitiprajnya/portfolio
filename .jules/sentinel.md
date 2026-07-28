@@ -73,3 +73,8 @@
 ## 2025-06-01 - CSP Hardening
 **Learning:** Restricting `form-action` to `'self'` prevents data exfiltration via traditional form submissions to unauthorized origins, even if other security layers are bypassed.
 **Action:** Always audit `form-action` when using client-side API libraries (like EmailJS) which do not require native form actions.
+
+## 2025-06-01 - Client-Side Rate Limit Bypass via Race Condition
+**Vulnerability:** A race condition in the contact form's client-side rate limiting logic allowed attackers to submit multiple requests in the same execution tick, bypassing the 60-second cooldown and potentially exhausting the EmailJS API quota.
+**Learning:** React state updates (setStatus) are asynchronous. If a rate limit cooldown is enforced using localStorage, the storage must be updated synchronously at the very beginning of the submission handler, rather than waiting for the asynchronous API call to complete.
+**Prevention:** Always write cooldown timestamps to synchronous storage (localStorage) immediately upon triggering an action, rather than inside a then block or after an await.

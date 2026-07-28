@@ -62,7 +62,11 @@ export const viewport: Viewport = {
 
 import { FaviconBlinkProvider } from '@/components/providers/FaviconBlinkProvider';
 import { VisibilityOptimiserProvider } from '@/components/providers/VisibilityOptimiserProvider';
-import Sentinel from '@/components/canvas/Sentinel';
+import dynamic from 'next/dynamic';
+
+const Sentinel = dynamic(() => import('@/components/canvas/Sentinel'), {
+  ssr: false,
+});
 
 export default function RootLayout({
   children,

@@ -98,6 +98,7 @@ export default function Sentinel() {
   const isDisabled = process.env.NEXT_PUBLIC_DISABLE_CANVAS === 'true' || (typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('no3d'));
   const targetCacheRef = useRef<TargetCache[]>([]);
   const ctfCenterYRef = useRef<number | null>(null);
+  const loopControlsRef = useRef<{ start: () => void; stop: () => void }>({ start: () => {}, stop: () => {} });
 
   const stateRef = useRef<OrbState>({
     y: 0,
@@ -207,6 +208,8 @@ export default function Sentinel() {
 
     const onScroll = () => {
       stateRef.current.targetY = window.scrollY;
+      // Wake up the loop if it went to sleep
+      loopControlsRef.current.start();
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
@@ -296,10 +299,7 @@ export default function Sentinel() {
 
     const draw = () => {
       if (!ctx) return;
-      if (!isVisibleRef.current) {
-        rafRef.current = requestAnimationFrame(draw);
-        return;
-      }
+      // We explicitly cancel/start the loop via effect, so we don't need to re-request while asleep here.
       ctx.clearRect(0, 0, width, height);
       const s = stateRef.current;
 
@@ -441,14 +441,31 @@ export default function Sentinel() {
           rippleRef.current.active = false;
         }
       }
-      // Visibility pause handled at top of draw.
+      // Sleepy loop check: we can pause the RAF if perfectly settled.
+      const isSettled = Math.abs(s.targetY - s.y) < 0.5 && Math.abs(s.xOffset) < 0.5 && Math.abs(s.glow - BASE_GLOW) < 0.5;
+      if (isSettled && !rippleRef.current.active) {
+        rafRef.current = undefined; // Let it sleep
+        return;
+      }
       rafRef.current = requestAnimationFrame(draw);
     };
 
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    rafRef.current = requestAnimationFrame(draw);
+    loopControlsRef.current.start = () => {
+      if (!rafRef.current) rafRef.current = requestAnimationFrame(draw);
+    };
+    loopControlsRef.current.stop = () => {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = undefined;
+      }
+    };
+
+    if (isVisibleRef.current) {
+      loopControlsRef.current.start();
+    }
 
     return () => {
+      loopControlsRef.current.stop();
       window.removeEventListener('resize', resize);
       window.removeEventListener('scroll', onScroll);
       clearTimeout(timer);
@@ -456,6 +473,14 @@ export default function Sentinel() {
       sectionObserver.disconnect();
     };
   }, [prefersReducedMotion, isDisabled]);
+
+  useEffect(() => {
+    if (isDocumentVisible) {
+      loopControlsRef.current.start();
+    } else {
+      loopControlsRef.current.stop();
+    }
+  }, [isDocumentVisible]);
 
   if (prefersReducedMotion || isDisabled) return null;
 

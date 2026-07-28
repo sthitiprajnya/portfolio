@@ -441,8 +441,6 @@ export default function Sentinel() {
           rippleRef.current.active = false;
         }
       }
-      // Sleepy loop check
-      // Sleepy loop check
       // Visibility pause handled at top of draw.
       rafRef.current = requestAnimationFrame(draw);
     };

@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef } from 'react';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
-import { useVisibility } from '@/components/providers/VisibilityOptimiserProvider';
 
 interface OrbState {
   y: number; // Current scroll Y position
@@ -94,8 +93,6 @@ export default function Sentinel() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number>(undefined);
   const prefersReducedMotion = usePrefersReducedMotion();
-  const { isDocumentVisible } = useVisibility();
-  const isDisabled = process.env.NEXT_PUBLIC_DISABLE_CANVAS === 'true' || (typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('no3d'));
   const targetCacheRef = useRef<TargetCache[]>([]);
   const ctfCenterYRef = useRef<number | null>(null);
 
@@ -123,9 +120,6 @@ export default function Sentinel() {
     triggered: false,
   });
 
-  const isVisibleRef = useRef(isDocumentVisible);
-  isVisibleRef.current = isDocumentVisible;
-
   const currentColorRef = useRef({
     coreR: DEFAULT_THEME.core.r, coreG: DEFAULT_THEME.core.g, coreB: DEFAULT_THEME.core.b, coreA: DEFAULT_THEME.core.a,
     midR:  DEFAULT_THEME.mid.r,  midG:  DEFAULT_THEME.mid.g,  midB:  DEFAULT_THEME.mid.b,  midA:  DEFAULT_THEME.mid.a,
@@ -134,7 +128,7 @@ export default function Sentinel() {
   });
 
   useEffect(() => {
-    if (prefersReducedMotion || isDisabled) return;
+    if (prefersReducedMotion) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -296,10 +290,6 @@ export default function Sentinel() {
 
     const draw = () => {
       if (!ctx) return;
-      if (!isVisibleRef.current) {
-        rafRef.current = requestAnimationFrame(draw);
-        return;
-      }
       ctx.clearRect(0, 0, width, height);
       const s = stateRef.current;
 
@@ -441,13 +431,9 @@ export default function Sentinel() {
           rippleRef.current.active = false;
         }
       }
-      // Sleepy loop check
-      // Sleepy loop check
-      // Visibility pause handled at top of draw.
       rafRef.current = requestAnimationFrame(draw);
     };
 
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(draw);
 
     return () => {
@@ -457,9 +443,9 @@ export default function Sentinel() {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       sectionObserver.disconnect();
     };
-  }, [prefersReducedMotion, isDisabled]);
+  }, [prefersReducedMotion]);
 
-  if (prefersReducedMotion || isDisabled) return null;
+  if (prefersReducedMotion) return null;
 
   return (
     <canvas

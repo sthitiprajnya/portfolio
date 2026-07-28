@@ -309,9 +309,3 @@ speak("Test voice message");
 
 **Status:** Ready for PR & Testing  
 **Estimated Performance Gain:** 35-40% bundle reduction + improved loading UX
-
-## Sentinel Canvas Optimisations (Lazy Loading and Visibility)
-- **Lazy Loading**: `Sentinel.tsx` is dynamically imported in `layout.tsx` using `next/dynamic` with `ssr: false`. This ensures the heavy Three.js/Canvas runtime does not block First Contentful Paint.
-- **Visibility Optimiser**: A global `VisibilityOptimiserProvider` manages document visibility state based on the Page Visibility API (`document.hidden`). `Sentinel` uses the provided hook to detect when the tab is hidden and pauses its internal requestAnimationFrame (rAF) loops entirely to conserve CPU.
-- **Opt-out mechanisms**: Heavy canvas animations can be disabled via the environment variable `NEXT_PUBLIC_DISABLE_CANVAS=true` or runtime URL query parameter `?no3d=1`.
-- **useCardTilt Optimisation**: Mouse movement interactions in `useCardTilt.ts` are batched via `requestAnimationFrame` ensuring deterministic cleanup to prevent main-thread churning under sustained movement.

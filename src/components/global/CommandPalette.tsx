@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { NAV_LINKS } from '@/components/sections/Navigation'; // Will export this from Navigation.tsx
@@ -64,10 +64,15 @@ export function CommandPalette() {
     }
   }, [isOpen]);
 
-  const filteredLinks = NAV_LINKS.filter(link =>
-    link.label.toLowerCase().includes(query.toLowerCase()) ||
-    link.id.toLowerCase().includes(query.toLowerCase())
-  );
+  // ⚡ Bolt: Memoize filteredLinks to prevent redundant O(N) string processing on every render,
+  // particularly useful as user types query where multiple renders occur.
+  const filteredLinks = useMemo(() => {
+    const lowerQuery = query.toLowerCase();
+    return NAV_LINKS.filter(link =>
+      link.label.toLowerCase().includes(lowerQuery) ||
+      link.id.toLowerCase().includes(lowerQuery)
+    );
+  }, [query]);
 
   useEffect(() => {
     setSelectedIndex(0);

@@ -14,17 +14,19 @@ import { Hero }                 from '@/components/sections/Hero';
 import { SmoothScrollProvider } from '@/components/providers/SmoothScrollProvider';
 import { CursorProvider }       from '@/components/providers/CursorProvider';
 import { BackToTop }            from '@/components/ui/BackToTop';
-import { About } from '@/components/sections/About';
-import { Skills } from '@/components/sections/Skills';
-import { Experience } from '@/components/sections/Experience';
-import { Projects } from '@/components/sections/Projects';
-import { WriteupsStub } from '@/components/sections/WriteupsStub';
-import { Certifications } from '@/components/sections/Certifications';
-import { CTFStats } from '@/components/sections/CTFStats';
-import { GitHubStats } from '@/components/sections/GitHubStats';
-import { ResumePanel } from '@/components/sections/ResumePanel';
-import { Contact } from '@/components/sections/Contact';
-import { Footer } from '@/components/sections/Footer';
+// ⚡ Bolt: Dynamically import all below-the-fold components to reduce the
+// initial Next.js JavaScript bundle size and improve Time to Interactive (TTI).
+const About = dynamic(() => import('@/components/sections/About').then(mod => ({ default: mod.About })));
+const Skills = dynamic(() => import('@/components/sections/Skills').then(mod => ({ default: mod.Skills })));
+const Experience = dynamic(() => import('@/components/sections/Experience').then(mod => ({ default: mod.Experience })));
+const Projects = dynamic(() => import('@/components/sections/Projects').then(mod => ({ default: mod.Projects })));
+const WriteupsStub = dynamic(() => import('@/components/sections/WriteupsStub').then(mod => ({ default: mod.WriteupsStub })));
+const Certifications = dynamic(() => import('@/components/sections/Certifications').then(mod => ({ default: mod.Certifications })));
+const CTFStats = dynamic(() => import('@/components/sections/CTFStats').then(mod => ({ default: mod.CTFStats })));
+const GitHubStats = dynamic(() => import('@/components/sections/GitHubStats').then(mod => ({ default: mod.GitHubStats })));
+const ResumePanel = dynamic(() => import('@/components/sections/ResumePanel').then(mod => ({ default: mod.ResumePanel })));
+const Contact = dynamic(() => import('@/components/sections/Contact').then(mod => ({ default: mod.Contact })));
+const Footer = dynamic(() => import('@/components/sections/Footer').then(mod => ({ default: mod.Footer })));
 
 export default function Home() {
   return (

@@ -269,6 +269,7 @@ export function Contact() {
                 </div>
               )}
 
+              {/* Honeypot field - visually hidden but real to bots */}
               {/* Security: Honeypot field to deter automated bot submissions */}
               {/* Honeypot field for bot deterrence */}
               <input

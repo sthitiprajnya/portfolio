@@ -257,6 +257,17 @@ export function Contact() {
                 autoComplete="off"
               />
 
+              {/* Security: visually hidden honeypot field to deter bots */}
+              <input
+                type="text"
+                name="hp_field"
+                value={form.hp_field}
+                onChange={handleChange}
+                tabIndex={-1}
+                aria-hidden="true"
+                className="opacity-0 w-0 h-0 absolute pointer-events-none"
+              />
+
               {/* Success overlay */}
               {status === 'sent' && (
                 <div className="p-4 border border-green/50 rounded-md bg-green-ghost">

@@ -21,3 +21,6 @@
 ## 2025-06-01 - Heading Hierarchy Stability
 **Learning:** Decorative typography (like glitch text) often breaks the logical document structure for screen readers if not properly hidden and complemented with SR-only headings.
 **Action:** Use `sr-only` classes for H1s when the visual primary title is highly stylized or animated.
+## 2026-07-08 - Input Character Counters & A11y
+**Learning:** Using aria-live on character counters creates screen reader spam on every keystroke. Using clsx for aria-describedby requires '|| undefined' to avoid empty target errors.
+**Action:** Always visually and programmatically link counters using aria-describedby and avoid aria-live on counters.

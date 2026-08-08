@@ -106,6 +106,7 @@ export function Projects() {
                     : "bg-transparent border-border text-text-secondary hover:text-cyan hover:border-cyan/50"
                 )}
                 aria-label={`Filter by ${filter.label} (${count} projects)`}
+                title={`Filter by ${filter.label} (${count} projects)`}
               >
                 <span>{filter.label}</span>
                 <span className={clsx(

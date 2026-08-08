@@ -275,6 +275,8 @@ export function Hero() {
                 aria-haspopup="dialog"
                 aria-controls="intel-modal"
                 aria-expanded={activeIntel === msg}
+                aria-label={`View intel for ${msg}`}
+                title={`View intel for ${msg}`}
                 className="font-mono text-[0.65rem] text-text-secondary tracking-wide hover:text-cyan hover:underline cursor-pointer outline-none focus-visible:text-cyan focus-visible:underline glass-pill px-3 py-1 border-[var(--glass-border)]"
               >
                 {msg}

@@ -20,6 +20,8 @@ export function TerminalWindow({ lines, className }: TerminalWindowProps) {
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
   const [currentCharIndex, setCurrentCharIndex] = useState(0);
   const [started, setStarted] = useState(false);
+  // BOLT: Pause setTimeout animations when document is hidden to save CPU
+  const [isVisible, setIsVisible] = useState(true);
   const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
   const prefersReducedMotion = usePrefersReducedMotion();
 
@@ -30,7 +32,19 @@ export function TerminalWindow({ lines, className }: TerminalWindowProps) {
   }, [inView, started]);
 
   useEffect(() => {
-    if (!started || prefersReducedMotion) return;
+    const handleVisibilityChange = () => {
+      setIsVisible(!document.hidden);
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    // Set initial state
+    setIsVisible(!document.hidden);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!started || prefersReducedMotion || !isVisible) return;
 
     if (currentLineIndex < lines.length) {
       const currentLine = lines[currentLineIndex];
@@ -56,7 +70,7 @@ export function TerminalWindow({ lines, className }: TerminalWindowProps) {
         return () => clearTimeout(timeout);
       }
     }
-  }, [currentLineIndex, currentCharIndex, started, lines, prefersReducedMotion]);
+  }, [currentLineIndex, currentCharIndex, started, lines, prefersReducedMotion, isVisible]);
 
   return (
     <div

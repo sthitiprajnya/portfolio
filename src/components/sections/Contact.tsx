@@ -251,10 +251,6 @@ export function Contact() {
                 aria-hidden="true"
                 autoComplete="off"
                 className="opacity-0 w-0 h-0 absolute pointer-events-none"
-                className="opacity-0 w-0 h-0 absolute pointer-events-none"
-                tabIndex={-1}
-                aria-hidden="true"
-                autoComplete="off"
               />
 
               {/* Success overlay */}

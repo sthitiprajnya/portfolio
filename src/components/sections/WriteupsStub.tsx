@@ -74,11 +74,16 @@ function DecryptingTitle({ text, trigger, delay }: { text: string; trigger: bool
   useEffect(() => {
     if (!trigger) return;
 
-    const timeoutId: NodeJS.Timeout = setTimeout(() => {
-      let iteration = 0;
+    let timeoutId: NodeJS.Timeout;
+    let interval: NodeJS.Timeout | null = null;
+    let iteration = 0;
     const maxIterations = 15;
 
-      const interval = setInterval(() => {
+    // BOLT: Define animation logic separately so it can be paused/resumed
+    const startDecryptionLoop = () => {
+      if (interval || iteration >= maxIterations) return;
+
+      interval = setInterval(() => {
         setDisplayText(
           text
             .split('')
@@ -92,15 +97,43 @@ function DecryptingTitle({ text, trigger, delay }: { text: string; trigger: bool
         );
 
         if (iteration >= maxIterations) {
-          clearInterval(interval);
+          if (interval) clearInterval(interval);
+          interval = null;
           setDisplayText(text);
           setIsDecrypted(true);
         }
         iteration += 1;
       }, 50);
+    };
+
+    const stopDecryptionLoop = () => {
+      if (interval) {
+        clearInterval(interval);
+        interval = null;
+      }
+    };
+
+    // BOLT: Add visibilitychange handler to pause interval when tab is inactive, saving background CPU
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopDecryptionLoop();
+      } else {
+        startDecryptionLoop();
+      }
+    };
+
+    timeoutId = setTimeout(() => {
+      if (!document.hidden) {
+        startDecryptionLoop();
+      }
+      document.addEventListener('visibilitychange', handleVisibilityChange);
     }, delay);
 
-    return () => clearTimeout(timeoutId);
+    return () => {
+      clearTimeout(timeoutId);
+      stopDecryptionLoop();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [trigger, text, delay]);
 
   return (

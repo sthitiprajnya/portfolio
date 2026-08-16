@@ -291,6 +291,7 @@ export function Contact() {
               <CyberButton
                 type="submit"
                 disabled={status === 'transmitting' || status === 'sent'}
+                title={status === 'transmitting' ? 'Message is currently transmitting...' : status === 'sent' ? 'Message has already been delivered' : undefined}
                 color={status === 'error' ? 'cyan' : status === 'sent' ? 'green' : 'cyan'}
                 className={clsx(
                   'w-full mt-4',

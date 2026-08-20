@@ -227,32 +227,6 @@ function MetadataPanel({ inView }: { inView: boolean }) {
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
-    let timer: NodeJS.Timeout | null = null;
-
-    const startAnimation = () => {
-      if (timer) return;
-      if (currentVisibleRef.current >= META_LINES.length) return;
-
-      timer = setInterval(() => {
-        let currentVisible = currentVisibleRef.current;
-        if (currentVisible >= META_LINES.length) {
-          stopAnimation();
-          return;
-        }
-        const line = metaLinesRef.current[currentVisible];
-        if (line) {
-          line.classList.remove('opacity-0', '-translate-x-2');
-          line.classList.add('opacity-100', 'translate-x-0', 'text-green/90');
-        }
-        currentVisible++;
-        currentVisibleRef.current = currentVisible;
-      }, 300);
-    };
-
-    const stopAnimation = () => {
-      if (timer) {
-        clearInterval(timer);
-        timer = null;
       }
     };
 
@@ -262,10 +236,6 @@ function MetadataPanel({ inView }: { inView: boolean }) {
         stopTimer();
       } else {
         startTimer();
-      if (document.hidden) {
-        stopAnimation();
-      } else {
-        startAnimation();
       }
     };
 
@@ -276,13 +246,6 @@ function MetadataPanel({ inView }: { inView: boolean }) {
 
     return () => {
       stopTimer();
-      startAnimation();
-    }
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      stopAnimation();
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [prefersReducedMotion, inView]);

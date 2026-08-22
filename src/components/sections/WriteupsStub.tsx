@@ -74,17 +74,22 @@ function DecryptingTitle({ text, trigger, delay }: { text: string; trigger: bool
   useEffect(() => {
     if (!trigger) return;
 
-    const timeoutId: NodeJS.Timeout = setTimeout(() => {
-      let iteration = 0;
+    let timeoutId: NodeJS.Timeout;
+    let interval: NodeJS.Timeout | null = null;
+
+    // ⚡ Bolt: Hoisted string split to avoid per-frame GC pressure and redundant array allocations
+    const charsArray = text.split('');
+    let iteration = 0;
     const maxIterations = 15;
 
-      const interval = setInterval(() => {
+    const startAnimation = () => {
+      if (interval) return;
+      interval = setInterval(() => {
         setDisplayText(
-          text
-            .split('')
+          charsArray
             .map((char, index) => {
-              if (index < (iteration / maxIterations) * text.length) {
-                return text[index];
+              if (index < (iteration / maxIterations) * charsArray.length) {
+                return char;
               }
               return chars[Math.floor(Math.random() * chars.length)];
             })
@@ -92,15 +97,45 @@ function DecryptingTitle({ text, trigger, delay }: { text: string; trigger: bool
         );
 
         if (iteration >= maxIterations) {
-          clearInterval(interval);
+          if (interval) clearInterval(interval);
+          interval = null;
           setDisplayText(text);
           setIsDecrypted(true);
         }
         iteration += 1;
       }, 50);
+    };
+
+    const stopAnimation = () => {
+      if (interval) {
+        clearInterval(interval);
+        interval = null;
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      // ⚡ Bolt: Pause animation when tab is inactive to save CPU and battery
+      if (document.hidden) {
+        stopAnimation();
+      } else {
+        if (iteration < maxIterations) {
+          startAnimation();
+        }
+      }
+    };
+
+    timeoutId = setTimeout(() => {
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      if (!document.hidden) {
+        startAnimation();
+      }
     }, delay);
 
-    return () => clearTimeout(timeoutId);
+    return () => {
+      clearTimeout(timeoutId);
+      stopAnimation();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [trigger, text, delay]);
 
   return (

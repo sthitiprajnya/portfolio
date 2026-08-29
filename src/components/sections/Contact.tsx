@@ -247,10 +247,6 @@ export function Contact() {
                 name="hp_field"
                 value={form.hp_field}
                 onChange={handleChange}
-                tabIndex={-1}
-                aria-hidden="true"
-                autoComplete="off"
-                className="opacity-0 w-0 h-0 absolute pointer-events-none"
                 className="opacity-0 w-0 h-0 absolute pointer-events-none"
                 tabIndex={-1}
                 aria-hidden="true"

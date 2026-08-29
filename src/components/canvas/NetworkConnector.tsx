@@ -207,7 +207,12 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
   }, [prefersReducedMotion, inView]);
 
   if (prefersReducedMotion) {
-    return null;
+    return (
+      <div
+        className={`absolute inset-0 pointer-events-none z-0 ${className || ''}`}
+        style={{ backgroundImage: 'radial-gradient(circle at center, rgba(0,245,255,0.05) 0%, transparent 70%)' }}
+      />
+    );
   }
 
   return (

@@ -249,7 +249,12 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
   }, [prefersReducedMotion, inView]);
 
   if (prefersReducedMotion) {
-    return null;
+    return (
+      <div
+        className={clsx("absolute inset-0 pointer-events-none z-0 bg-[url('/portfolio/images/matrix-fallback.png')] bg-repeat opacity-5", className)}
+        style={{ opacity, backgroundImage: 'linear-gradient(rgba(0,245,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,245,255,0.05) 1px, transparent 1px)', backgroundSize: '20px 20px' }}
+      />
+    );
   }
 
   return (

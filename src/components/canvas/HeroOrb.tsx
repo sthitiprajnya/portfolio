@@ -282,6 +282,12 @@ export default function HeroOrb() {
     };
   }, [inView, prefersReducedMotion]);
 
+  if (prefersReducedMotion) {
+    return (
+      <div className="absolute inset-0 w-full h-full pointer-events-none z-0 bg-[radial-gradient(ellipse_at_center,rgba(0,245,255,0.1)_0%,rgba(0,0,0,0)_60%)]" aria-hidden="true" />
+    );
+  }
+
   return (
     <canvas
       ref={setRefs}

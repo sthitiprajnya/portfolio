@@ -307,17 +307,20 @@ body {
   will-change: transform;
 }
 
-.ticker-track:hover {
+.ticker-track:hover,
+.ticker-track:focus-within,
+.ticker-track:active {
   animation-play-state: paused;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .ticker-track {
-    animation: none;
+    animation: none !important;
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     padding: 8px;
+    white-space: normal;
   }
 }
 

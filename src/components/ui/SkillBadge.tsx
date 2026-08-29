@@ -142,8 +142,8 @@ export const SkillBadge = React.memo(function SkillBadge({
             />
           ) : (
             <div
-              className="w-6 h-6 rounded-card flex items-center justify-center text-[0.65rem] font-bold tracking-widest bg-black/40 border border-border backdrop-blur-sm"
-              style={{ color: COLOR_MAP[color], borderColor: `${COLOR_MAP[color]}40` }}
+              className="w-10 h-10 rounded-card flex items-center justify-center text-xs font-mono font-bold tracking-widest bg-black/80 border border-dashed backdrop-blur-sm transition-all"
+              style={{ color: COLOR_MAP[color], borderColor: `${COLOR_MAP[color]}80`, boxShadow: `inset 0 0 10px ${COLOR_MAP[color]}20` }}
             >
               {icon.substring(0, 2).toUpperCase()}
             </div>
@@ -155,21 +155,21 @@ export const SkillBadge = React.memo(function SkillBadge({
         {name}
       </span>
 
-      {/* Tooltip */}
+      {/* Tooltip (Desktop Hover / Mobile Static) */}
       <div
         id={tooltipId}
         role="tooltip"
-        className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-3 glass rounded-card opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-visible:opacity-100 group-focus-visible:visible transition-all duration-200 z-50 pointer-events-none translate-y-2 group-hover:translate-y-0 group-focus-visible:translate-y-0 relative overflow-hidden"
+        className="mt-3 md:mt-0 md:absolute md:bottom-full md:left-1/2 md:-translate-x-1/2 md:mb-2 w-full md:w-48 p-3 glass md:rounded-card md:opacity-0 md:invisible md:group-hover:opacity-100 md:group-hover:visible md:group-focus-visible:opacity-100 md:group-focus-visible:visible transition-all duration-200 z-50 md:pointer-events-none md:translate-y-2 md:group-hover:translate-y-0 md:group-focus-visible:translate-y-0 relative overflow-hidden border border-[var(--glass-border)] md:border-none rounded-sm"
       >
-        <div className="font-mono text-[0.6rem] text-cyan font-bold mb-1 tracking-widest">{name}</div>
-        <div className="flex justify-between items-center mb-2 font-mono text-[0.6rem]">
+        <div className="font-mono text-[0.6rem] text-cyan font-bold mb-1 tracking-widest hidden md:block">{name}</div>
+        <div className="flex justify-between items-center mb-2 md:mb-2 font-mono text-[0.6rem]">
            <span className="text-text-secondary">EXP: <span className="text-white">{experience || 'N/A'}</span></span>
            <span className="text-text-secondary">LVL: <span className="text-white">{proficiency}%</span></span>
         </div>
-        <p className="font-body text-xs text-text-secondary leading-snug">
+        <p className="font-body text-xs text-text-secondary leading-snug hidden md:block">
           {description || 'No description available.'}
         </p>
-        <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-border" />
+        <div className="hidden md:block absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-border" />
       </div>
     </div>
   );

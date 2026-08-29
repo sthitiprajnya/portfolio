@@ -66,6 +66,19 @@ export function WriteupsStub() {
 
 // ── Sub-components ─────────────────────────────────────────────
 
+// Deterministic stand-in for the pre-decryption scramble. Must stay pure so it
+// is safe to call during render (and renders identically on server and client).
+const SCRAMBLE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#@&$%!<>?';
+
+function deterministicScramble(text: string): string {
+  return text
+    .split('')
+    .map((char, index) =>
+      char === ' ' ? ' ' : SCRAMBLE_CHARS[(char.charCodeAt(0) + index) % SCRAMBLE_CHARS.length]
+    )
+    .join('');
+}
+
 function DecryptingTitle({ text, trigger, delay }: { text: string; trigger: boolean; delay: number }) {
   const [displayText, setDisplayText] = useState('');
   const [isDecrypted, setIsDecrypted] = useState(false);
@@ -109,7 +122,7 @@ function DecryptingTitle({ text, trigger, delay }: { text: string; trigger: bool
         isDecrypted ? 'text-white blur-0' : 'text-text-secondary blur-[2px] font-mono'
       } group-hover:blur-0 group-hover:text-white`}
     >
-      {displayText || text.replace(/./g, () => chars[Math.floor(Math.random() * chars.length)])}
+      {displayText || deterministicScramble(text)}
     </h3>
   );
 }

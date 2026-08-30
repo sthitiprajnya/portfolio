@@ -96,14 +96,13 @@ export function Skills() {
   };
 
   const { totalFilteredSkills, filteredCategories } = useMemo(() => {
-    const categories = SKILLS.map(category => ({
-      ...category,
-      filteredSkills: category.skills.filter(s => activeTab === 'ALL' || s.domain === activeTab),
-    })).filter(cat => cat.filteredSkills.length > 0);
-    return {
-      totalFilteredSkills: categories.reduce((sum, cat) => sum + cat.filteredSkills.length, 0),
-      filteredCategories: categories,
-    };
+    let count = 0;
+    const categories = SKILLS.map(category => {
+      const filteredSkills = category.skills.filter(s => activeTab === 'ALL' || s.domain === activeTab);
+      count += filteredSkills.length;
+      return { ...category, filteredSkills };
+    }).filter(cat => cat.filteredSkills.length > 0);
+    return { totalFilteredSkills: count, filteredCategories: categories };
   }, [activeTab]);
 
   return (

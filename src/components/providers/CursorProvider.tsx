@@ -1,7 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
-import { useCoarsePointer } from '@/hooks/useCoarsePointer';
 
 interface CursorProviderProps {
   children: React.ReactNode;
@@ -20,7 +20,7 @@ interface CursorProviderProps {
  *    to event handlers, keeping the RAF loop focused strictly on interpolation.
  */
 export function CursorProvider({ children }: CursorProviderProps) {
-  const isTouchDevice = useCoarsePointer();
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
   const prefersReducedMotion = usePrefersReducedMotion();
 
   const dotRef = useRef<HTMLDivElement>(null);
@@ -35,57 +35,58 @@ export function CursorProvider({ children }: CursorProviderProps) {
   const isActive = useRef(false);
 
   useEffect(() => {
-    if (isTouchDevice || prefersReducedMotion) return;
+    setIsTouchDevice(window.matchMedia('(pointer: coarse)').matches);
+  }, []);
 
-    // Both live inside the effect: `render` recurses into itself (hoisted function
-    // declaration), and `wake` needs no gating flags because the effect only runs
-    // while a fine pointer and motion are available.
-    function render() {
-      // Lerp for smooth follow
-      const dx = mousePos.current.x - ringPos.current.x;
-      const dy = mousePos.current.y - ringPos.current.y;
+  const render = useCallback(() => {
+    // Lerp for smooth follow
+    const dx = mousePos.current.x - ringPos.current.x;
+    const dy = mousePos.current.y - ringPos.current.y;
 
-      const LERP = 0.15;
-      ringPos.current.x += dx * LERP;
-      ringPos.current.y += dy * LERP;
+    const LERP = 0.15;
+    ringPos.current.x += dx * LERP;
+    ringPos.current.y += dy * LERP;
 
-      if (dotRef.current) {
-        const dotScale = isClicking.current ? 0.75 : 1;
-        dotRef.current.style.transform = `translate3d(calc(${mousePos.current.x}px - 50%), calc(${mousePos.current.y}px - 50%), 0) scale(${dotScale})`;
-        if (!isInitial.current) dotRef.current.style.opacity = '1';
-      }
+    if (dotRef.current) {
+      const dotScale = isClicking.current ? 0.75 : 1;
+      dotRef.current.style.transform = `translate3d(calc(${mousePos.current.x}px - 50%), calc(${mousePos.current.y}px - 50%), 0) scale(${dotScale})`;
+      if (!isInitial.current) dotRef.current.style.opacity = '1';
+    }
 
-      if (ringRef.current) {
-        const scale = isClicking.current ? 0.5 : isHovering.current ? 1.5 : 1;
-        ringRef.current.style.transform = `translate3d(calc(${ringPos.current.x}px - 50%), calc(${ringPos.current.y}px - 50%), 0) scale(${scale})`;
+    if (ringRef.current) {
+      const scale = isClicking.current ? 0.5 : isHovering.current ? 1.5 : 1;
+      ringRef.current.style.transform = `translate3d(calc(${ringPos.current.x}px - 50%), calc(${ringPos.current.y}px - 50%), 0) scale(${scale})`;
 
-        if (!isInitial.current) {
-          ringRef.current.style.opacity = '1';
-          if (isHovering.current) {
-            ringRef.current.classList.add('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]');
-          } else {
-            ringRef.current.classList.remove('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]');
-          }
+      if (!isInitial.current) {
+        ringRef.current.style.opacity = '1';
+        if (isHovering.current) {
+          ringRef.current.classList.add('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]');
+        } else {
+          ringRef.current.classList.remove('bg-cyan/10', 'border-transparent', 'backdrop-blur-[2px]');
         }
       }
-
-      // BOLT: Sleep check - if the ring has caught up and state is stable, stop the loop.
-      const distSq = dx * dx + dy * dy;
-      if (distSq < 0.001 && !isInitial.current) {
-        ringPos.current.x = mousePos.current.x;
-        ringPos.current.y = mousePos.current.y;
-        rafId.current = null;
-        isActive.current = false;
-      } else {
-        rafId.current = requestAnimationFrame(render);
-      }
     }
 
-    function wake() {
-      if (isActive.current) return;
-      isActive.current = true;
+    // BOLT: Sleep check - if the ring has caught up and state is stable, stop the loop.
+    const distSq = dx * dx + dy * dy;
+    if (distSq < 0.001 && !isInitial.current) {
+      ringPos.current.x = mousePos.current.x;
+      ringPos.current.y = mousePos.current.y;
+      rafId.current = null;
+      isActive.current = false;
+    } else {
       rafId.current = requestAnimationFrame(render);
     }
+  }, []);
+
+  const wake = useCallback(() => {
+    if (isActive.current || isTouchDevice || prefersReducedMotion) return;
+    isActive.current = true;
+    rafId.current = requestAnimationFrame(render);
+  }, [isTouchDevice, prefersReducedMotion, render]);
+
+  useEffect(() => {
+    if (isTouchDevice || prefersReducedMotion) return;
 
     const handleMouseMove = (e: MouseEvent) => {
       mousePos.current = { x: e.clientX, y: e.clientY };
@@ -134,8 +135,6 @@ export function CursorProvider({ children }: CursorProviderProps) {
       window.removeEventListener('mousedown', handleMouseDown);
       window.removeEventListener('mouseup', handleMouseUp);
       if (rafId.current !== null) cancelAnimationFrame(rafId.current);
-      rafId.current = null;
-      isActive.current = false;
     };
   }, [isTouchDevice, prefersReducedMotion]);
 

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { SectionTitle } from '@/components/ui/SectionTitle';
@@ -26,9 +26,6 @@ const FILTER_COUNTS = FILTERS.reduce((acc, filter) => {
     : PROJECTS.filter(p => p.category === filter.id).length;
   return acc;
 }, {} as Record<string, number>);
-
-const matchesFilter = (project: Project, filter: string) =>
-  filter === 'all' || project.category === filter;
 
 export function Projects() {
   const [activeFilter, setActiveFilter] = useState('all');
@@ -63,9 +60,9 @@ export function Projects() {
     }
   };
 
-  // Small static array — plain filtering per render is cheaper than the manual
-  // memo bookkeeping (and lets the React Compiler optimize the component at all).
-  const filteredProjects = PROJECTS.filter(p => matchesFilter(p, activeFilter));
+  const filteredProjects = useMemo(() => PROJECTS.filter(p =>
+    activeFilter === 'all' ? true : p.category === activeFilter
+  ), [activeFilter]);
 
   return (
     <section

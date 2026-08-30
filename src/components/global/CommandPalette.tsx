@@ -74,11 +74,9 @@ export function CommandPalette() {
     );
   }, [query]);
 
-  // Keep the highlighted option valid for the current result set without an effect:
-  // adjust state during render (React's recommended pattern for derived state resets).
-  if (selectedIndex >= filteredLinks.length) {
+  useEffect(() => {
     setSelectedIndex(0);
-  }
+  }, [query]);
 
   // UX: Auto-scroll selected item into view during keyboard navigation
   useEffect(() => {
@@ -206,7 +204,10 @@ export function CommandPalette() {
               <span className="text-text-secondary text-xs font-mono bg-black/50 px-2 py-1 rounded-card border border-border/50" aria-hidden="true">ESC</span>
             </div>
 
-            {/* Accessibility: result count announced once, above, via the aria-live region */}
+            {/* Accessibility: Announce result count */}
+            <div className="sr-only" aria-live="polite">
+              {query ? `${filteredLinks.length} results found for ${query}` : ''}
+            </div>
 
             <div
               id="command-palette-listbox"

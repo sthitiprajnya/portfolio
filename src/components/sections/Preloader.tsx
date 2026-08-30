@@ -9,13 +9,13 @@ export function Preloader() {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    // Check if booted in this session
-    if (sessionStorage.getItem('booted') === 'true') {
-      setIsVisible(false);
-      return;
-    }
-
     const sequence = async () => {
+      // Skip the boot animation if it already played in this tab session
+      if (sessionStorage.getItem('booted') === 'true') {
+        setIsVisible(false);
+        return;
+      }
+
       // Stage 0: 0-120ms (Blinking cursor)
       await new Promise(r => setTimeout(r, 120));
       setStage(1); // SYSTEM BOOT
@@ -184,7 +184,6 @@ function Typewriter({ text, speed = 40 }: { text: string; speed?: number }) {
   const [displayedText, setDisplayedText] = useState('');
 
   useEffect(() => {
-    setDisplayedText('');
     let currentIndex = 0;
     let timeoutId: NodeJS.Timeout;
 

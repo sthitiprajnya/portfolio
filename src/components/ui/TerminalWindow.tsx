@@ -19,12 +19,18 @@ interface TerminalWindowProps {
 export function TerminalWindow({ lines, className }: TerminalWindowProps) {
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
   const [currentCharIndex, setCurrentCharIndex] = useState(0);
-  // triggerOnce keeps inView true once scrolled into view, so it doubles as the "started" flag
+  const [started, setStarted] = useState(false);
   const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
   const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
-    if (!inView || prefersReducedMotion) return;
+    if (inView && !started) {
+      setStarted(true);
+    }
+  }, [inView, started]);
+
+  useEffect(() => {
+    if (!started || prefersReducedMotion) return;
 
     if (currentLineIndex < lines.length) {
       const currentLine = lines[currentLineIndex];
@@ -50,7 +56,7 @@ export function TerminalWindow({ lines, className }: TerminalWindowProps) {
         return () => clearTimeout(timeout);
       }
     }
-  }, [currentLineIndex, currentCharIndex, inView, lines, prefersReducedMotion]);
+  }, [currentLineIndex, currentCharIndex, started, lines, prefersReducedMotion]);
 
   return (
     <div

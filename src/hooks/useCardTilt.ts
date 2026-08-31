@@ -1,6 +1,11 @@
 import { useMotionValue, useSpring } from 'framer-motion';
 import { useRef, useEffect } from 'react';
 
+// navigator.deviceMemory is a non-standard Device Memory API (Chromium-only)
+interface NavigatorWithDeviceMemory extends Navigator {
+  deviceMemory?: number;
+}
+
 export function useCardTilt() {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -19,7 +24,7 @@ export function useCardTilt() {
 
     // Disable tilt on touch devices or low-memory devices to avoid unnecessary work
     const isTouch = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
-    const deviceMemory = typeof navigator !== 'undefined' && (navigator as any).deviceMemory ? (navigator as any).deviceMemory : 8;
+    const deviceMemory = (navigator as NavigatorWithDeviceMemory).deviceMemory ?? 8;
     const isLowEnd = deviceMemory < 2;
     if (isTouch || isLowEnd) return;
 
@@ -69,7 +74,7 @@ export function useCardTilt() {
       mouseY.set(e.clientY - currentTop);
 
       el.style.setProperty('--mouse-x', `${e.clientX - currentLeft}px`);
-      el.style.setProperty('--mouse-y', `${e.clientY - currentLeft ? e.clientX - currentLeft : -1000}px`);
+      el.style.setProperty('--mouse-y', `${e.clientY - currentTop}px`);
     };
 
     const handleMouseMove = (e: MouseEvent) => {

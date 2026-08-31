@@ -6,15 +6,10 @@ import { LogoBadge } from '@/components/ui/LogoBadge';
 
 const MatrixRain = lazy(() => import('@/components/canvas/MatrixRain'));
 
-// Decorative session counter: derived deterministically from the calendar day so it
-// stays stable across refreshes (and server/client) without storing anything.
-const VISITOR_COUNT = (() => {
-  const today = new Date();
-  return 4280 + today.getUTCMonth() * 120 + today.getUTCDate() * 15;
-})();
-
 export function Footer() {
   const year = new Date().getFullYear();
+  // Using a mock session logged value or random number generator between 1000 and 5000 for aesthetics
+  const [visitorCount, setVisitorCount] = React.useState(0);
   const [copied, setCopied] = React.useState(false);
 
   const handleCopyEmail = async () => {
@@ -22,6 +17,13 @@ export function Footer() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  React.useEffect(() => {
+    // Generate a stable-ish random number based on today's date so it doesn't jump crazily on every refresh, but grows slowly
+    const today = new Date();
+    const base = 4280 + (today.getMonth() * 120) + today.getDate() * 15;
+    setVisitorCount(base + Math.floor(Math.random() * 5));
+  }, []);
 
   return (
     <footer className="relative bg-black h-[160px] pb-6 pt-2 flex flex-col items-center justify-center border-t-2 border-transparent">
@@ -110,11 +112,10 @@ export function Footer() {
           <span
             role="status"
             aria-label="Logged sessions count"
-            suppressHydrationWarning
             className="flex items-center gap-2 px-2 py-0.5 bg-green/5 border border-green/20 rounded-card font-bold text-green shadow-[var(--glow-green-sm)]"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-green animate-pulse" aria-hidden="true"></span>
-            SESSIONS_LOGGED: {VISITOR_COUNT.toString().padStart(4, '0')}
+            SESSIONS_LOGGED: {visitorCount.toString().padStart(4, '0')}
           </span>
         </div>
       </div>

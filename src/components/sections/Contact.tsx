@@ -240,19 +240,6 @@ export function Contact() {
                 className="opacity-0 absolute w-0 h-0 pointer-events-none"
               />
 
-              {/* Security: visually hidden honeypot field for bot detection */}
-              {/* Security: Honeypot field for bot mitigation */}
-              <input
-                type="text"
-                name="hp_field"
-                value={form.hp_field}
-                onChange={handleChange}
-                className="opacity-0 w-0 h-0 absolute pointer-events-none"
-                tabIndex={-1}
-                aria-hidden="true"
-                autoComplete="off"
-              />
-
               {/* Success overlay */}
               {status === 'sent' && (
                 <div className="p-4 border border-green/50 rounded-md bg-green-ghost">
@@ -264,20 +251,6 @@ export function Contact() {
                   </div>
                 </div>
               )}
-
-              {/* Honeypot field - visually hidden but real to bots */}
-              {/* Security: Honeypot field to deter automated bot submissions */}
-              {/* Honeypot field for bot deterrence */}
-              <input
-                type="text"
-                name="hp_field"
-                value={form.hp_field}
-                onChange={handleChange}
-                className="opacity-0 w-0 h-0 absolute pointer-events-none"
-                tabIndex={-1}
-                aria-hidden="true"
-                autoComplete="off"
-              />
 
               <FloatingInput id="from_name"  name="from_name"  type="text"  label="Name"             value={form.from_name}  onChange={handleChange} error={errors.from_name}  required maxLength={100} />
               <FloatingInput id="from_email" name="from_email" type="email" label="Email"            value={form.from_email} onChange={handleChange} error={errors.from_email} required maxLength={100} />

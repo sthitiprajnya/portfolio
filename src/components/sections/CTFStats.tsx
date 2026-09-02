@@ -93,7 +93,7 @@ export function CTFStats() {
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                   <LogoBadge
-                    src="/portfolio/logos/wargames/hackthebox.svg"
+                    src="/logos/wargames/hackthebox.svg"
                     alt="HackTheBox"
                     width={32}
                     height={32}

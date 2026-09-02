@@ -35,14 +35,10 @@ const RADIUS = 28;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 const ICON_PATHS: Record<string, string> = {
-  burpsuite:   'tools/burp-suite.svg',
-  nessus:      'tools/nessus.svg',
   kali:        'tools/kalilinux.svg',
   metasploit:  'tools/metasploit.svg',
   nmap:        'tools/nmap.png',
-  nuclei:      'tools/nuclei.svg',
   wireshark:   'tools/wireshark.svg',
-  frida:       'tools/frida.png',
   zap:         'tools/owasp.svg',
   owasp:       'tools/owasp.svg',
   postman:     'tools/postman.svg',
@@ -54,9 +50,6 @@ const ICON_PATHS: Record<string, string> = {
   bash:        'scripting/bash.svg',
   powershell:  'scripting/powershell.svg',
   mitre:       'frameworks/mitre.png',
-  pcidss:      'frameworks/pcidss.jpg',
-  nist:        'frameworks/nist.png',
-  wazuh:       'siem/wazuh.svg',
   zabbix:      'siem/zabbix.png',
 };
 
@@ -134,7 +127,7 @@ export const SkillBadge = React.memo(function SkillBadge({
         <div className="relative z-10 flex items-center justify-center pointer-events-none">
           {KNOWN_ICONS.has(icon) ? (
             <LogoBadge
-              src={`/portfolio/logos/${ICON_PATHS[icon]}`}
+              src={`/logos/${ICON_PATHS[icon]}`}
               alt={name}
               width={20}
               height={20}

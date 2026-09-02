@@ -18,7 +18,7 @@ export const PERSONAL: PersonalInfo = {
   availability:   true,
   currentRole:    'Information Security Engineer',
   currentCompany: 'iServeU Technology Pvt. Ltd.',
-  resumeUrl:      '/portfolio/resume/Sthitaprajna_Biswal_Resume.pdf',
+  resumeUrl:      '/resume/Sthitaprajna_Biswal_Resume.pdf',
 };
 
 export const HERO_ROLES: string[] = [
@@ -312,16 +312,12 @@ export const CERTIFICATIONS: Certification[] = [
  * Centralized here to decouple logo logic from UI components.
  */
 export const CERT_ISSUER_LOGOS: Record<string, string> = {
-  'Cisco Systems':              '/portfolio/logos/certs/cisco.svg',
-  'Cisco':                      '/portfolio/logos/certs/cisco.svg',
-  'eLearnSecurity':             '/portfolio/logos/certs/cisco.svg',
-  'INE Security':               '/portfolio/logos/certs/cisco.svg',
-  'TCM Security':               '/portfolio/logos/certs/tcm.png',
-  'EC-Council':                 '/portfolio/logos/certs/eccouncil.svg',
-  'OpenEDG Python Institute':   '/portfolio/logos/certs/openedg.png',
-  'CRAW Security':              '/portfolio/logos/certs/craw.png',
-  'ISC2':                       '/portfolio/logos/certs/isc2.png',
-  'KodeKloud':                  '/portfolio/logos/cloud/docker.svg',
+  'Cisco Systems':  '/logos/certs/cisco.svg',
+  'Cisco':          '/logos/certs/cisco.svg',
+  'eLearnSecurity': '/logos/certs/cisco.svg',
+  'INE Security':   '/logos/certs/cisco.svg',
+  'EC-Council':     '/logos/certs/eccouncil.svg',
+  'KodeKloud':      '/logos/cloud/docker.svg',
 };
 
 export const UPCOMING_CERTIFICATIONS: Certification[] = [

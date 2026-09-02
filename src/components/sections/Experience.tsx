@@ -228,7 +228,7 @@ const ExperienceCard = React.memo(function ExperienceCard({ experience, isFirst 
             {experience.id === 'iserveU' && (
               <div className="hidden sm:block mt-1">
                 <LogoBadge
-                  src="/portfolio/logos/employer/iserveu.png"
+                  src="/logos/employer/iserveu.png"
                   alt={experience.company}
                   width={40}
                   height={40}

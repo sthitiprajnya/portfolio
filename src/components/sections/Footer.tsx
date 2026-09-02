@@ -103,9 +103,9 @@ export function Footer() {
           <span className="hidden md:inline">|</span>
           <span className="flex items-center gap-2">
             Built with
-            <LogoBadge src="/portfolio/logos/footer/nextjs.svg" alt="Next.js" width={16} height={16} className="invert dark:invert-0 opacity-80" />
+            <LogoBadge src="/logos/footer/nextjs.svg" alt="Next.js" width={16} height={16} className="invert dark:invert-0 opacity-80" />
             · Deployed on
-            <LogoBadge src="/portfolio/logos/footer/githubpages.svg" alt="GitHub Pages" width={16} height={16} className="invert dark:invert-0 opacity-80" />
+            <LogoBadge src="/logos/footer/githubpages.svg" alt="GitHub Pages" width={16} height={16} className="invert dark:invert-0 opacity-80" />
             · © {year}
           </span>
           <span className="hidden md:inline">|</span>

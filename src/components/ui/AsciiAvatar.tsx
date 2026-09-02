@@ -275,7 +275,7 @@ export function AsciiAvatar({ className }: AsciiAvatarProps) {
         {/* Human View */}
         <div className={clsx("absolute inset-0 transition-opacity duration-500", isHuman ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none")}>
           <Image
-            src="/portfolio/images/profile.jpg"
+            src="/images/profile.jpg"
             alt="Sthitaprajna Biswal"
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

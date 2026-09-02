@@ -136,14 +136,14 @@ export default function RootLayout({
                           lower.includes('<embed') ||
                           lower.includes('<object') ||
                           lower.includes('<applet') ||
-                          lower.includes('<meta') ||
+
                           lower.includes('<form') ||
                           lower.includes('<iframe') ||
                           lower.includes('<frame') ||
                           lower.includes('<frameset') ||
                           lower.includes('<template') ||
                           lower.includes('<math') ||
-                          lower.includes('<svg') ||
+
                           lower.includes('<details') ||
                           lower.includes('<animate') ||
                           lower.includes('<animatemotion') ||
@@ -152,14 +152,14 @@ export default function RootLayout({
                           lower.includes('<set') ||
                           lower.includes('<use') ||
                           lower.includes('<portal') ||
-                          lower.includes('<link') ||
-                          lower.includes('<style') ||
+
+
                           lower.includes('<audio') ||
                           lower.includes('<video') ||
-                          lower.includes('<source') ||
+
                           lower.includes('<track') ||
-                          lower.includes('<img') ||
-                          lower.includes('<picture') ||
+
+
                           lower.includes('<area') ||
                           lower.includes('<map') ||
                           lower.includes('<input') ||
@@ -180,7 +180,7 @@ export default function RootLayout({
                         ) {
                           console.warn('Blocked dangerous HTML pattern in Trusted Types default policy:', s.slice(0, 50) + '...');
                           return s
-                            .replace(/<(script|base|embed|object|applet|meta|form|iframe|frame|frameset|template|math|svg|details|animate|animatemotion|mpath|discard|set|use|portal|link|style|audio|video|source|track|img|picture|area|map|input|keygen|dialog|marquee|isindex|layer|basefont|blink)/gi, '<blocked-$1')
+                            .replace(/<(script|base|embed|object|applet|form|iframe|frame|frameset|template|math|details|animate|animatemotion|mpath|discard|set|use|portal|audio|video|track|area|map|input|keygen|dialog|marquee|isindex|layer|basefont|blink)/gi, '<blocked-$1')
                             .replace(/(javascript|data|vbscript|file)[\\s\\x00-\\x1f]*:/gi, 'blocked-$1:')
                             .replace(/(^|[\\s\\x00-\\x1f\\/])on[a-z]+([\\s\\x00-\\x1f]*)=/gi, (match, p1) => p1 + 'blocked-on' + match.slice(p1.length + 2))
                             .replace(/(^|[\\s\\x00-\\x1f\\/])(formaction|srcdoc|srcset|style|action|background|bgcolor|xlink:href|autofocus|contenteditable|sandbox|allow)([\\s\\x00-\\x1f]*=|\\s|\\/|>|$)/gi, '$1blocked-$2$3');

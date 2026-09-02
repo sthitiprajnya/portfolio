@@ -1,4 +1,3 @@
-"use client";
 import React from 'react';
 import clsx from 'clsx';
 import { SectionTitle } from '@/components/ui/SectionTitle';
@@ -70,7 +69,7 @@ export function Certifications() {
   );
 }
 
-const CertCard = React.memo(function CertCard({ cert }: { cert: typeof CERTIFICATIONS[0] }) {
+function CertCard({ cert }: { cert: typeof CERTIFICATIONS[0] }) {
   const style = CERT_COLOR_MAP[cert.color];
 
   return (
@@ -121,7 +120,7 @@ const CertCard = React.memo(function CertCard({ cert }: { cert: typeof CERTIFICA
               {cert.year}
             </span>
 
-            {cert.verifyUrl && cert.verifyUrl !== '#' ? (
+            {cert.verifyUrl ? (
               <a
                 href={cert.verifyUrl}
                 target="_blank" rel="noopener noreferrer"
@@ -139,19 +138,10 @@ const CertCard = React.memo(function CertCard({ cert }: { cert: typeof CERTIFICA
               >
                 VERIFY <span aria-hidden="true" className="ml-1.5 text-[10px]">↗</span>
               </a>
-            ) : (
-              <span className="font-mono text-[0.65rem] text-text-muted uppercase tracking-widest flex items-center px-3 py-1.5 border border-transparent">
-                VERIFY <span aria-hidden="true" className="ml-1.5 text-[10px]">↗</span>
-              </span>
-            )}
+            ) : null}
           </div>
-          {cert.verifyUrl === '#' && (
-            <span className="font-mono text-[0.55rem] text-amber text-right mt-1" data-verify-url="#">
-              [VERIFICATION URL — UPDATE BEFORE LAUNCH]
-            </span>
-          )}
         </div>
       </div>
     </div>
   );
-});
+}

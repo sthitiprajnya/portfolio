@@ -2,12 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
-import { useSmoothScroll } from '@/components/providers/SmoothScrollProvider';
 
 export const BackToTop = () => {
   const [isVisible, setIsVisible] = useState(false);
   const reducedMotion = usePrefersReducedMotion();
-  const lenis = useSmoothScroll();
 
   useEffect(() => {
     const toggle = () => setIsVisible(window.scrollY > 400);
@@ -17,11 +15,7 @@ export const BackToTop = () => {
   }, []);
 
   const scroll = () => {
-    if (lenis && !reducedMotion) {
-      lenis.scrollTo(0);
-    } else {
-      window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
-    }
+    window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
     // Accessibility: Transfer focus back to the hero section after scroll completes
     setTimeout(() => {
       document.getElementById('hero')?.focus({ preventScroll: true });

@@ -296,15 +296,15 @@ export const PROJECTS: Project[] = [
 export const CERTIFICATIONS: Certification[] = [
   { id: 'ejpt',     name: 'eJPT v2',                            issuer: 'eLearnSecurity',          year: 2024, color: 'cyan',   status: 'active', verifyUrl: 'https://my.ine.com/certificate/', expiry: '2027-05-10' },
   { id: 'peh',      name: 'Practical Ethical Hacker (PEH)',     issuer: 'TCM Security',             year: 2024, color: 'green',  status: 'active', verifyUrl: 'https://certifications.tcm-sec.com/', expiry: 'No expiry' },
-  { id: 'icca',     name: 'INE Certified Cloud Associate',      issuer: 'INE Security',             year: 2024, color: 'amber',  status: 'active', verifyUrl: '#', expiry: '2027-08-15' },
-  { id: 'cyberops', name: 'CyberOps Associate',                 issuer: 'Cisco Systems',            year: 2023, color: 'cyan',   status: 'active', verifyUrl: '#', expiry: '2026-11-20' },
-  { id: 'ccna',     name: 'CCNA v1.7',                          issuer: 'Cisco Systems',            year: 2023, color: 'cyan',   status: 'active', verifyUrl: '#', expiry: '2026-06-12' },
-  { id: 'ehe',      name: 'Ethical Hacking Essentials (EHE)',   issuer: 'EC-Council',               year: 2023, color: 'violet', status: 'active', verifyUrl: '#', expiry: '2026-03-05' },
-  { id: 'nde',      name: 'Network Defence Essentials (NDE)',   issuer: 'EC-Council',               year: 2023, color: 'violet', status: 'active', verifyUrl: '#', expiry: '2026-04-18' },
-  { id: 'dfe',      name: 'Digital Forensics Essentials (DFE)', issuer: 'EC-Council',               year: 2023, color: 'violet', status: 'active', verifyUrl: '#', expiry: '2026-05-22' },
-  { id: 'cybersec', name: 'Cybersecurity Essentials',           issuer: 'Cisco',                    year: 2022, color: 'cyan',   status: 'active', verifyUrl: '#', expiry: 'No expiry' },
-  { id: 'pcap',     name: 'PCAP — Python Certified',            issuer: 'OpenEDG Python Institute', year: 2023, color: 'green',  status: 'active', verifyUrl: '#', expiry: 'No expiry' },
-  { id: 'kali',     name: 'Basic to Advanced Kali Linux',       issuer: 'CRAW Security',            year: 2023, color: 'green',  status: 'active', verifyUrl: '#', expiry: 'No expiry' },
+  { id: 'icca',     name: 'INE Certified Cloud Associate',      issuer: 'INE Security',             year: 2024, color: 'amber',  status: 'active', verifyUrl: '', expiry: '2027-08-15' },
+  { id: 'cyberops', name: 'CyberOps Associate',                 issuer: 'Cisco Systems',            year: 2023, color: 'cyan',   status: 'active', verifyUrl: '', expiry: '2026-11-20' },
+  { id: 'ccna',     name: 'CCNA v1.7',                          issuer: 'Cisco Systems',            year: 2023, color: 'cyan',   status: 'active', verifyUrl: '', expiry: '2026-06-12' },
+  { id: 'ehe',      name: 'Ethical Hacking Essentials (EHE)',   issuer: 'EC-Council',               year: 2023, color: 'violet', status: 'active', verifyUrl: '', expiry: '2026-03-05' },
+  { id: 'nde',      name: 'Network Defence Essentials (NDE)',   issuer: 'EC-Council',               year: 2023, color: 'violet', status: 'active', verifyUrl: '', expiry: '2026-04-18' },
+  { id: 'dfe',      name: 'Digital Forensics Essentials (DFE)', issuer: 'EC-Council',               year: 2023, color: 'violet', status: 'active', verifyUrl: '', expiry: '2026-05-22' },
+  { id: 'cybersec', name: 'Cybersecurity Essentials',           issuer: 'Cisco',                    year: 2022, color: 'cyan',   status: 'active', verifyUrl: '', expiry: 'No expiry' },
+  { id: 'pcap',     name: 'PCAP — Python Certified',            issuer: 'OpenEDG Python Institute', year: 2023, color: 'green',  status: 'active', verifyUrl: '', expiry: 'No expiry' },
+  { id: 'kali',     name: 'Basic to Advanced Kali Linux',       issuer: 'CRAW Security',            year: 2023, color: 'green',  status: 'active', verifyUrl: '', expiry: 'No expiry' },
 ];
 
 /**

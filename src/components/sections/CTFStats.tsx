@@ -51,9 +51,9 @@ const RADAR_OPTIONS = {
   animation: { duration: 2000 }
 };
 
-import type { ChartData, ChartOptions } from 'chart.js';
 
-function RadarChartWrapper({ data, options }: { data: ChartData<'radar'>, options: ChartOptions<'radar'> }) {
+
+function RadarChartWrapper({ data, options }: { data: any, options: any }) {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
   return (
     <div ref={ref} className="w-full h-full flex justify-center items-center">

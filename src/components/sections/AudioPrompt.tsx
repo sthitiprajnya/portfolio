@@ -172,7 +172,7 @@ export default function AudioPrompt({ onComplete }: AudioPromptProps) {
                   disabled={!voicesLoaded}
                   className="w-full bg-void border border-cyan/50 text-text-primary font-mono text-sm p-3 rounded appearance-none focus:outline-none focus:border-cyan focus:shadow-[0_0_10px_rgba(0,245,255,0.3)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {availableVoices.map((voice) => (
+                  {availableVoices.map((voice: string) => (
                     <option key={voice} value={voice}>{voice}</option>
                   ))}
                 </select>

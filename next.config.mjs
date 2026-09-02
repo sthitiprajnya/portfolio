@@ -30,8 +30,10 @@ const nextConfig = {
 
   reactStrictMode: true,
 
+  transpilePackages: ['next-image-export-optimizer'],
+
   experimental: {
-    optimizePackageImports: ['framer-motion', 'chart.js', 'react-chartjs-2', 'clsx', 'tailwind-merge'],
+    optimizePackageImports: ['framer-motion', 'clsx', 'tailwind-merge'],
   },
 };
 

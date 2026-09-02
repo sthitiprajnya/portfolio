@@ -6,7 +6,7 @@
   "scripts": {
     "prebuild": "echo 'Logos downloaded'",
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && next-image-export-optimizer",
     "start": "next start",
     "lint": "eslint . --max-warnings 0",
     "type-check": "tsc --noEmit",
@@ -59,6 +59,7 @@
     "globals": "^17.6.0",
     "intersection-observer": "^0.12.2",
     "jsdom": "^29.1.1",
+    "next-image-export-optimizer": "^1.20.1",
     "playwright": "^1.60.0",
     "postcss": "^8.5.15",
     "prettier": "^3.8.3",

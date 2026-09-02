@@ -11,7 +11,6 @@ import { Navigation }           from '@/components/sections/Navigation';
 import { CommandPalette }       from '@/components/global/CommandPalette';
 import { ScrollProgress }       from '@/components/global/ScrollProgress';
 import { Hero }                 from '@/components/sections/Hero';
-import { SmoothScrollProvider } from '@/components/providers/SmoothScrollProvider';
 import { CursorProvider }       from '@/components/providers/CursorProvider';
 import { BackToTop }            from '@/components/ui/BackToTop';
 // ⚡ Bolt: Dynamically import all below-the-fold components to reduce the
@@ -34,30 +33,28 @@ export default function Home() {
       <Preloader />
 
       <CursorProvider>
-        <SmoothScrollProvider>
-          <ScrollProgress />
-          <BackToTop />
-          <CommandPalette />
-          <Navigation />
+        <ScrollProgress />
+        <BackToTop />
+        <CommandPalette />
+        <Navigation />
 
-          <main id="main-content" tabIndex={-1} className="outline-none">
-            <Hero />
-            <About />
-            <Skills />
-            <Experience />
-            <Projects />
-            <WriteupsStub />
-            <Certifications />
-            {/* Section 06 — War Games: CTF / HackTheBox activity */}
-            <CTFStats />
-            <GitHubStats />
-            {/* Section 08 — Classified File: resume panel + download CTA */}
-            <ResumePanel />
-            <Contact />
-          </main>
+        <main id="main-content" tabIndex={-1} className="outline-none">
+          <Hero />
+          <About />
+          <Skills />
+          <Experience />
+          <Projects />
+          <WriteupsStub />
+          <Certifications />
+          {/* Section 06 — War Games: CTF / HackTheBox activity */}
+          <CTFStats />
+          <GitHubStats />
+          {/* Section 08 — Classified File: resume panel + download CTA */}
+          <ResumePanel />
+          <Contact />
+        </main>
 
-          <Footer />
-        </SmoothScrollProvider>
+        <Footer />
       </CursorProvider>
     </>
   );

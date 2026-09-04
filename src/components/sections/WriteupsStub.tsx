@@ -74,33 +74,51 @@ function DecryptingTitle({ text, trigger, delay }: { text: string; trigger: bool
   useEffect(() => {
     if (!trigger) return;
 
+    // BOLT: Replaced setInterval with requestAnimationFrame for smoother performance
+    // and to automatically pause rendering when the tab is not visible, saving CPU.
+    let animationFrameId: number;
     const timeoutId: NodeJS.Timeout = setTimeout(() => {
       let iteration = 0;
-    const maxIterations = 15;
+      const maxIterations = 15;
+      let lastTime = 0;
 
-      const interval = setInterval(() => {
-        setDisplayText(
-          text
-            .split('')
-            .map((char, index) => {
-              if (index < (iteration / maxIterations) * text.length) {
-                return text[index];
-              }
-              return chars[Math.floor(Math.random() * chars.length)];
-            })
-            .join('')
-        );
+      const animate = (time: number) => {
+        if (!lastTime) lastTime = time;
+        const progress = time - lastTime;
 
-        if (iteration >= maxIterations) {
-          clearInterval(interval);
+        // Update every 50ms (throttle to match original visual speed)
+        if (progress > 50) {
+          setDisplayText(
+            text
+              .split('')
+              .map((char, index) => {
+                if (index < (iteration / maxIterations) * text.length) {
+                  return text[index];
+                }
+                return chars[Math.floor(Math.random() * chars.length)];
+              })
+              .join('')
+          );
+
+          iteration += 1;
+          lastTime = time;
+        }
+
+        if (iteration < maxIterations) {
+          animationFrameId = requestAnimationFrame(animate);
+        } else {
           setDisplayText(text);
           setIsDecrypted(true);
         }
-        iteration += 1;
-      }, 50);
+      };
+
+      animationFrameId = requestAnimationFrame(animate);
     }, delay);
 
-    return () => clearTimeout(timeoutId);
+    return () => {
+      clearTimeout(timeoutId);
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    };
   }, [trigger, text, delay]);
 
   return (

@@ -74,11 +74,12 @@ function DecryptingTitle({ text, trigger, delay }: { text: string; trigger: bool
   useEffect(() => {
     if (!trigger) return;
 
+    let intervalId: NodeJS.Timeout | null = null;
     const timeoutId: NodeJS.Timeout = setTimeout(() => {
       let iteration = 0;
     const maxIterations = 15;
 
-      const interval = setInterval(() => {
+      intervalId = setInterval(() => {
         setDisplayText(
           text
             .split('')
@@ -92,7 +93,7 @@ function DecryptingTitle({ text, trigger, delay }: { text: string; trigger: bool
         );
 
         if (iteration >= maxIterations) {
-          clearInterval(interval);
+          if (intervalId) clearInterval(intervalId);
           setDisplayText(text);
           setIsDecrypted(true);
         }
@@ -100,7 +101,11 @@ function DecryptingTitle({ text, trigger, delay }: { text: string; trigger: bool
       }, 50);
     }, delay);
 
-    return () => clearTimeout(timeoutId);
+    return () => {
+      clearTimeout(timeoutId);
+      // BOLT: Added cleanup for interval to prevent memory leaks and background CPU usage when component unmounts
+      if (intervalId) clearInterval(intervalId);
+    };
   }, [trigger, text, delay]);
 
   return (

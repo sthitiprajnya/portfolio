@@ -179,6 +179,7 @@ export function CommandPalette() {
                 aria-autocomplete="list"
                 aria-activedescendant={filteredLinks[selectedIndex] ? `option-${filteredLinks[selectedIndex].id}` : undefined}
                 aria-label="Search site sections"
+                title="Search site sections"
                 className="flex-1 bg-transparent border-none outline-none text-white font-mono placeholder-text-secondary/50 focus:ring-0"
                 placeholder="Jump to section... (Type to filter)"
                 value={query}

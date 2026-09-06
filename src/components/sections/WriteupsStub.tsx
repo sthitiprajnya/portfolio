@@ -74,33 +74,67 @@ function DecryptingTitle({ text, trigger, delay }: { text: string; trigger: bool
   useEffect(() => {
     if (!trigger) return;
 
-    const timeoutId: NodeJS.Timeout = setTimeout(() => {
-      let iteration = 0;
+    let interval: NodeJS.Timeout | null = null;
+    let isCancelled = false;
+    let iteration = 0;
     const maxIterations = 15;
 
-      const interval = setInterval(() => {
-        setDisplayText(
-          text
-            .split('')
-            .map((char, index) => {
-              if (index < (iteration / maxIterations) * text.length) {
-                return text[index];
-              }
-              return chars[Math.floor(Math.random() * chars.length)];
-            })
-            .join('')
-        );
+    const startInterval = () => {
+      if (!interval && !isCancelled && iteration < maxIterations) {
+        interval = setInterval(() => {
+          setDisplayText(
+            text
+              .split('')
+              .map((char, index) => {
+                if (index < (iteration / maxIterations) * text.length) {
+                  return text[index];
+                }
+                return chars[Math.floor(Math.random() * chars.length)];
+              })
+              .join('')
+          );
 
-        if (iteration >= maxIterations) {
-          clearInterval(interval);
-          setDisplayText(text);
-          setIsDecrypted(true);
+          if (iteration >= maxIterations) {
+            if (interval) clearInterval(interval);
+            interval = null;
+            setDisplayText(text);
+            setIsDecrypted(true);
+          }
+          iteration += 1;
+        }, 50);
+      }
+    };
+
+    const stopInterval = () => {
+      if (interval) {
+        clearInterval(interval);
+        interval = null;
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopInterval();
+      } else {
+        startInterval();
+      }
+    };
+
+    const timeoutId: NodeJS.Timeout = setTimeout(() => {
+      if (!isCancelled) {
+        if (!document.hidden) {
+          startInterval();
         }
-        iteration += 1;
-      }, 50);
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+      }
     }, delay);
 
-    return () => clearTimeout(timeoutId);
+    return () => {
+      isCancelled = true;
+      clearTimeout(timeoutId);
+      stopInterval();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [trigger, text, delay]);
 
   return (

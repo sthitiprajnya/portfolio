@@ -28,6 +28,7 @@ export function Contact() {
   const [errors, setErrors]   = useState<Partial<typeof form>>({});
   const [status, setStatus]   = useState<Status>('idle');
   const [emailCopied, setEmailCopied] = useState(false);
+  const fallbackLastSubmissionRef = useRef<string | null>(null);
 
   const handleCopyEmail = async () => {
     try {
@@ -74,7 +75,19 @@ export function Contact() {
     // Security: Basic submission cooldown (60 seconds) to prevent spamming
     const LAST_SUBMISSION_KEY = 'last_submission_time';
     const COOLDOWN_MS = 60 * 1000;
-    const lastSubmission = localStorage.getItem(LAST_SUBMISSION_KEY);
+
+    let lastSubmission: string | null = null;
+    try {
+      lastSubmission = localStorage.getItem(LAST_SUBMISSION_KEY);
+    } catch (e) {
+      // Fallback if storage is disabled/restricted
+      try {
+        lastSubmission = fallbackLastSubmissionRef.current || sessionStorage.getItem(LAST_SUBMISSION_KEY);
+      } catch (e2) {
+        lastSubmission = fallbackLastSubmissionRef.current;
+      }
+    }
+
     const now = Date.now();
 
     if (lastSubmission && now - parseInt(lastSubmission) < COOLDOWN_MS) {
@@ -85,7 +98,15 @@ export function Contact() {
     }
 
     // Security: Set cooldown synchronously to prevent race conditions from concurrent script submissions
-    localStorage.setItem(LAST_SUBMISSION_KEY, now.toString());
+    try {
+      localStorage.setItem(LAST_SUBMISSION_KEY, now.toString());
+    } catch (e) {
+      try {
+        sessionStorage.setItem(LAST_SUBMISSION_KEY, now.toString());
+      } catch (e2) {
+        fallbackLastSubmissionRef.current = now.toString();
+      }
+    }
     setStatus('transmitting');
 
     try {

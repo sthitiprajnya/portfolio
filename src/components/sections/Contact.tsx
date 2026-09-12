@@ -161,7 +161,7 @@ export function Contact() {
                       : "border-border text-text-muted hover:border-cyan hover:text-cyan group-hover/email:border-cyan/50"
                   )}
                   aria-label={emailCopied ? "Email copied to clipboard" : "Copy email address"}
-                  title="Copy email address"
+                  title={emailCopied ? "Email copied to clipboard" : "Copy email address"}
                 >
                   {emailCopied ? (
                     <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

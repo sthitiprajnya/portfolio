@@ -48,6 +48,11 @@ export async function fetchGitHubStats(): Promise<GitHubStats> {
     cached = localStorage.getItem(CACHE_KEY);
   } catch (e) {
     console.warn('Failed to access GitHub stats cache from storage.', e);
+    try {
+      cached = sessionStorage.getItem(CACHE_KEY);
+    } catch (err) {
+      cached = (window as any)[CACHE_KEY] || null;
+    }
   }
 
   if (cached) {
@@ -150,6 +155,11 @@ export async function fetchGitHubStats(): Promise<GitHubStats> {
       localStorage.setItem(CACHE_KEY, JSON.stringify(stats));
     } catch (e) {
       console.warn('Failed to save GitHub stats to storage cache.', e);
+      try {
+        sessionStorage.setItem(CACHE_KEY, JSON.stringify(stats));
+      } catch (err) {
+        (window as any)[CACHE_KEY] = JSON.stringify(stats);
+      }
     }
     return stats;
   } catch (error) {

@@ -10,7 +10,25 @@ export function Preloader() {
 
   useEffect(() => {
     // Check if booted in this session
-    if (sessionStorage.getItem('booted') === 'true') {
+    let isBooted = false;
+    try {
+      if (sessionStorage.getItem('booted') === 'true') {
+        isBooted = true;
+      }
+    } catch (e) {
+      console.warn("sessionStorage access restricted", e);
+      try {
+        if (localStorage.getItem('booted') === 'true') {
+          isBooted = true;
+        }
+      } catch (err) {
+        if ((window as any)['booted'] === 'true') {
+          isBooted = true;
+        }
+      }
+    }
+
+    if (isBooted) {
       setIsVisible(false);
       return;
     }
@@ -71,7 +89,16 @@ export function Preloader() {
       setStage(11); // Trigger exit animation
 
       await new Promise(r => setTimeout(r, 500));
-      sessionStorage.setItem('booted', 'true');
+      try {
+        sessionStorage.setItem('booted', 'true');
+      } catch (e) {
+        console.warn("sessionStorage access restricted", e);
+        try {
+          localStorage.setItem('booted', 'true');
+        } catch (err) {
+          (window as any)['booted'] = 'true';
+        }
+      }
       setIsVisible(false); // Unmount
     };
 

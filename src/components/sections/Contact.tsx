@@ -74,8 +74,20 @@ export function Contact() {
     // Security: Basic submission cooldown (60 seconds) to prevent spamming
     const LAST_SUBMISSION_KEY = 'last_submission_time';
     const COOLDOWN_MS = 60 * 1000;
-    const lastSubmission = localStorage.getItem(LAST_SUBMISSION_KEY);
     const now = Date.now();
+    let lastSubmission: string | null = null;
+
+    // Security: Wrap storage access in try/catch to prevent unhandled exceptions in strict privacy modes
+    try {
+      lastSubmission = localStorage.getItem(LAST_SUBMISSION_KEY);
+    } catch (err) {
+      try {
+        lastSubmission = sessionStorage.getItem(LAST_SUBMISSION_KEY);
+      } catch (innerErr) {
+        // Fallback to window variable if both local and session storage are disabled
+        lastSubmission = (window as any)[LAST_SUBMISSION_KEY] || null;
+      }
+    }
 
     if (lastSubmission && now - parseInt(lastSubmission) < COOLDOWN_MS) {
       const remaining = Math.ceil((COOLDOWN_MS - (now - parseInt(lastSubmission))) / 1000);
@@ -85,7 +97,16 @@ export function Contact() {
     }
 
     // Security: Set cooldown synchronously to prevent race conditions from concurrent script submissions
-    localStorage.setItem(LAST_SUBMISSION_KEY, now.toString());
+    try {
+      localStorage.setItem(LAST_SUBMISSION_KEY, now.toString());
+    } catch (err) {
+      try {
+        sessionStorage.setItem(LAST_SUBMISSION_KEY, now.toString());
+      } catch (innerErr) {
+        (window as any)[LAST_SUBMISSION_KEY] = now.toString();
+      }
+    }
+
     setStatus('transmitting');
 
     try {

@@ -178,6 +178,7 @@ export function Navigation() {
               className="text-text-secondary p-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card"
               aria-label="Search site sections"
               title="Search site sections"
+              aria-keyshortcuts="/ ?"
               aria-haspopup="dialog"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

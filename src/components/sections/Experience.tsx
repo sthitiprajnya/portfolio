@@ -283,6 +283,7 @@ const ExperienceCard = React.memo(function ExperienceCard({ experience, isFirst 
                   id={`tab-${experience.id}-${sub.id}`}
                   title={sub.label}
                   role="tab"
+                  aria-label={`View ${sub.label} role details for ${experience.company}`}
                   aria-selected={isOpen}
                   aria-controls={`panel-${experience.id}-${sub.id}`}
                   tabIndex={isOpen ? 0 : -1}

@@ -74,11 +74,16 @@ function DecryptingTitle({ text, trigger, delay }: { text: string; trigger: bool
   useEffect(() => {
     if (!trigger) return;
 
-    const timeoutId: NodeJS.Timeout = setTimeout(() => {
-      let iteration = 0;
+    let timeoutId: NodeJS.Timeout | null = null;
+    let intervalId: NodeJS.Timeout | null = null;
+    let iteration = 0;
     const maxIterations = 15;
+    let started = false;
 
-      const interval = setInterval(() => {
+    // ⚡ Bolt: Implement visibility-aware interval to pause the typing animation when the tab is hidden, saving CPU/battery.
+    const startInterval = () => {
+      if (intervalId) return;
+      intervalId = setInterval(() => {
         setDisplayText(
           text
             .split('')
@@ -92,15 +97,44 @@ function DecryptingTitle({ text, trigger, delay }: { text: string; trigger: bool
         );
 
         if (iteration >= maxIterations) {
-          clearInterval(interval);
+          if (intervalId) clearInterval(intervalId);
           setDisplayText(text);
           setIsDecrypted(true);
         }
         iteration += 1;
       }, 50);
+    };
+
+    const stopInterval = () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    };
+
+    timeoutId = setTimeout(() => {
+      started = true;
+      if (!document.hidden) {
+        startInterval();
+      }
     }, delay);
 
-    return () => clearTimeout(timeoutId);
+    const handleVisibilityChange = () => {
+      if (!started) return;
+      if (document.hidden) {
+        stopInterval();
+      } else if (iteration < maxIterations) {
+        startInterval();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      stopInterval();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [trigger, text, delay]);
 
   return (

@@ -74,11 +74,16 @@ function DecryptingTitle({ text, trigger, delay }: { text: string; trigger: bool
   useEffect(() => {
     if (!trigger) return;
 
-    const timeoutId: NodeJS.Timeout = setTimeout(() => {
-      let iteration = 0;
+    let timeoutId: NodeJS.Timeout | null = null;
+    let interval: NodeJS.Timeout | null = null;
+    let iteration = 0;
     const maxIterations = 15;
+    let isDelayDone = false;
+    let isFinished = false;
 
-      const interval = setInterval(() => {
+    const startInterval = () => {
+      if (interval || isFinished) return;
+      interval = setInterval(() => {
         setDisplayText(
           text
             .split('')
@@ -92,15 +97,47 @@ function DecryptingTitle({ text, trigger, delay }: { text: string; trigger: bool
         );
 
         if (iteration >= maxIterations) {
-          clearInterval(interval);
+          stopInterval();
           setDisplayText(text);
           setIsDecrypted(true);
+          isFinished = true;
         }
         iteration += 1;
       }, 50);
+    };
+
+    const stopInterval = () => {
+      if (interval) {
+        clearInterval(interval);
+        interval = null;
+      }
+    };
+
+    // ⚡ Bolt: Pause animation when tab is inactive to save CPU and battery
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopInterval();
+      } else {
+        if (isDelayDone && !isFinished) {
+          startInterval();
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    timeoutId = setTimeout(() => {
+      isDelayDone = true;
+      if (!document.hidden) {
+        startInterval();
+      }
     }, delay);
 
-    return () => clearTimeout(timeoutId);
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      stopInterval();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [trigger, text, delay]);
 
   return (

@@ -74,18 +74,27 @@ export function Contact() {
     // Security: Basic submission cooldown (60 seconds) to prevent spamming
     const LAST_SUBMISSION_KEY = 'last_submission_time';
     const COOLDOWN_MS = 60 * 1000;
-    const lastSubmission = localStorage.getItem(LAST_SUBMISSION_KEY);
     const now = Date.now();
 
-    if (lastSubmission && now - parseInt(lastSubmission) < COOLDOWN_MS) {
-      const remaining = Math.ceil((COOLDOWN_MS - (now - parseInt(lastSubmission))) / 1000);
-      setErrors({ message: `Submission rate limited. Please wait ${remaining}s.` });
-      setStatus('error');
-      return;
+    try {
+      const lastSubmission = localStorage.getItem(LAST_SUBMISSION_KEY);
+      if (lastSubmission && now - parseInt(lastSubmission) < COOLDOWN_MS) {
+        const remaining = Math.ceil((COOLDOWN_MS - (now - parseInt(lastSubmission))) / 1000);
+        setErrors({ message: `Submission rate limited. Please wait ${remaining}s.` });
+        setStatus('error');
+        return;
+      }
+    } catch (e) {
+      console.warn("Storage access failed, skipping client-side rate limit check.");
     }
 
     // Security: Set cooldown synchronously to prevent race conditions from concurrent script submissions
-    localStorage.setItem(LAST_SUBMISSION_KEY, now.toString());
+    try {
+      localStorage.setItem(LAST_SUBMISSION_KEY, now.toString());
+    } catch (e) {
+      console.warn("Storage access failed, cannot set client-side rate limit.");
+    }
+
     setStatus('transmitting');
 
     try {

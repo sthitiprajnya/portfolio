@@ -140,6 +140,7 @@ export function Skills() {
                       : 'border-border text-text-secondary hover:border-cyan/50 hover:text-white'
                   )}
                   aria-label={`Filter by ${tab}`}
+                  title={`Filter by ${tab}`}
                 >
                   {tab}
                 </button>

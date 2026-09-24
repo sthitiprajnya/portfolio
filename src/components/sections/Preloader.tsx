@@ -10,7 +10,14 @@ export function Preloader() {
 
   useEffect(() => {
     // Check if booted in this session
-    if (sessionStorage.getItem('booted') === 'true') {
+    let isBooted = false;
+    try {
+      if (sessionStorage.getItem('booted') === 'true') isBooted = true;
+    } catch (e) {
+      if ((window as any)._hasBooted === true) isBooted = true;
+    }
+
+    if (isBooted) {
       setIsVisible(false);
       return;
     }
@@ -71,7 +78,11 @@ export function Preloader() {
       setStage(11); // Trigger exit animation
 
       await new Promise(r => setTimeout(r, 500));
-      sessionStorage.setItem('booted', 'true');
+      try {
+        sessionStorage.setItem('booted', 'true');
+      } catch (e) {
+        (window as any)._hasBooted = true;
+      }
       setIsVisible(false); // Unmount
     };
 

@@ -1,7 +1,10 @@
 "use client";
 import React from 'react';
-import { TypeAnimation } from 'react-type-animation';
+import dynamic from 'next/dynamic';
 import clsx from 'clsx';
+
+// ⚡ Bolt: Dynamically import TypeAnimation to reduce initial bundle size (~50KB)
+const TypeAnimation = dynamic(() => import('react-type-animation').then(mod => mod.TypeAnimation), { ssr: false });
 
 interface TypewriterTextProps {
   sequence: (string | number)[];

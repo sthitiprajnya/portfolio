@@ -127,3 +127,6 @@
 ## 2026-06-28 - [Optimizing Idle Animation Loops via Page Visibility]
 **Learning:** Continuous `setInterval` loops used for visual effects (like the 120ms and 300ms animations in `AsciiAvatar.tsx`) continue running in the background even when the tab is not visible, consuming unnecessary CPU cycles and draining battery on mobile devices.
 **Action:** Always wrap background `setInterval` visual updates with a `visibilitychange` event listener to clear the interval when `document.hidden` is true and restart it when the tab becomes visible.
+## 2026-09-25 - Dynamic Imports for Animation Libraries
+**Learning:** Statically importing heavy animation libraries like `react-type-animation` and `react-countup` at the top of Next.js components inflates the initial JavaScript bundle size, which delays hydration and Time to Interactive (TTI) for the entire application, even if the components are small or render conditionally.
+**Action:** Always use Next.js's `dynamic` import with `ssr: false` to lazy-load client-side-only animation libraries that aren't critical for the initial static HTML paint.

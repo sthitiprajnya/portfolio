@@ -5,11 +5,13 @@ import { GlitchText }    from '@/components/ui/GlitchText';
 import { TypewriterText } from '@/components/ui/TypewriterText';
 import { CyberButton }   from '@/components/ui/CyberButton';
 import { PERSONAL, HERO_ROLES, HERO_STATS, HERO_TICKER } from '@/data/portfolio';
-import CountUp from 'react-countup';
 import { useInView } from 'react-intersection-observer';
 import { AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { useScrollTo } from '@/hooks/useScrollTo';
+
+// ⚡ Bolt: Dynamically import CountUp to reduce initial bundle size (~40KB)
+const CountUp = dynamic(() => import('react-countup').then(mod => mod.default), { ssr: false });
 import { useScrollLock } from '@/hooks/useScrollLock';
 
 const MatrixRain = lazy(() => import('@/components/canvas/MatrixRain'));

@@ -289,6 +289,11 @@ export default function Sentinel() {
     const timer = setTimeout(updateTargetCache, 1000);
 
     const draw = () => {
+      // BOLT: "Sleepy" Loop Optimization - Cancel requestAnimationFrame when out of view/hidden
+      if (document.hidden) {
+        return;
+      }
+
       if (!ctx) return;
       ctx.clearRect(0, 0, width, height);
       const s = stateRef.current;
@@ -434,11 +439,29 @@ export default function Sentinel() {
       rafRef.current = requestAnimationFrame(draw);
     };
 
-    rafRef.current = requestAnimationFrame(draw);
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        if (rafRef.current) {
+          cancelAnimationFrame(rafRef.current);
+          rafRef.current = 0;
+        }
+      } else {
+        if (!rafRef.current) {
+          rafRef.current = requestAnimationFrame(draw);
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    if (!document.hidden) {
+      rafRef.current = requestAnimationFrame(draw);
+    }
 
     return () => {
       window.removeEventListener('resize', resize);
       window.removeEventListener('scroll', onScroll);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       clearTimeout(timer);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       sectionObserver.disconnect();

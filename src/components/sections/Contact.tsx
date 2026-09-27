@@ -74,8 +74,18 @@ export function Contact() {
     // Security: Basic submission cooldown (60 seconds) to prevent spamming
     const LAST_SUBMISSION_KEY = 'last_submission_time';
     const COOLDOWN_MS = 60 * 1000;
-    const lastSubmission = localStorage.getItem(LAST_SUBMISSION_KEY);
     const now = Date.now();
+    let lastSubmission: string | null = null;
+
+    try {
+      lastSubmission = localStorage.getItem(LAST_SUBMISSION_KEY);
+    } catch (err) {
+      try {
+        lastSubmission = sessionStorage.getItem(LAST_SUBMISSION_KEY);
+      } catch (e) {
+        lastSubmission = (window as any).__fallback_last_submission_time || null;
+      }
+    }
 
     if (lastSubmission && now - parseInt(lastSubmission) < COOLDOWN_MS) {
       const remaining = Math.ceil((COOLDOWN_MS - (now - parseInt(lastSubmission))) / 1000);
@@ -85,7 +95,15 @@ export function Contact() {
     }
 
     // Security: Set cooldown synchronously to prevent race conditions from concurrent script submissions
-    localStorage.setItem(LAST_SUBMISSION_KEY, now.toString());
+    try {
+      localStorage.setItem(LAST_SUBMISSION_KEY, now.toString());
+    } catch (err) {
+      try {
+        sessionStorage.setItem(LAST_SUBMISSION_KEY, now.toString());
+      } catch (e) {
+        (window as any).__fallback_last_submission_time = now.toString();
+      }
+    }
     setStatus('transmitting');
 
     try {

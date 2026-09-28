@@ -252,8 +252,8 @@ export function Contact() {
                 </div>
               )}
 
-              <FloatingInput id="from_name"  name="from_name"  type="text"  label="Name"             value={form.from_name}  onChange={handleChange} error={errors.from_name}  required maxLength={100} />
-              <FloatingInput id="from_email" name="from_email" type="email" label="Email"            value={form.from_email} onChange={handleChange} error={errors.from_email} required maxLength={100} />
+              <FloatingInput id="from_name"  name="from_name"  type="text"  label="Name"             value={form.from_name}  onChange={handleChange} error={errors.from_name}  required maxLength={100} autoComplete="name" />
+              <FloatingInput id="from_email" name="from_email" type="email" label="Email"            value={form.from_email} onChange={handleChange} error={errors.from_email} required maxLength={100} autoComplete="email" />
               <FloatingInput id="subject"    name="subject"    type="text"  label="Subject (optional)" value={form.subject}   onChange={handleChange} maxLength={200} />
               <FloatingTextarea id="message" name="message" label="Message" value={form.message} onChange={handleChange} error={errors.message} required maxLength={2000} />
 
@@ -295,16 +295,17 @@ interface FloatingInputProps {
   value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string; required?: boolean;
   maxLength?: number;
+  autoComplete?: string;
 }
 
-function FloatingInput({ id, name, type, label, value, onChange, error, required, maxLength }: FloatingInputProps) {
+function FloatingInput({ id, name, type, label, value, onChange, error, required, maxLength, autoComplete }: FloatingInputProps) {
   const charCount = value?.length || 0;
 
   return (
     <div className="relative">
       <input
         id={id} name={name} type={type} value={value} onChange={onChange}
-        required={required} maxLength={maxLength}
+        required={required} maxLength={maxLength} autoComplete={autoComplete}
         aria-required={required} aria-invalid={!!error}
         aria-describedby={clsx(
           error && `${id}-error`,

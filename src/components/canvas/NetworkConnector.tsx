@@ -92,12 +92,26 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       mouseRef.current.active = false;
     };
 
+    // BOLT: "Sleepy" Loop Optimization - Cancel requestAnimationFrame when out of view
+    // to eliminate background CPU overhead. The loop automatically restarts when visible again.
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(animationFrameId);
+      } else if (inView && !prefersReducedMotion) {
+        draw();
+      }
+    };
+
     window.addEventListener('resize', resize, { passive: true });
     window.addEventListener('mousemove', onMouseMove, { passive: true });
     window.addEventListener('mouseleave', onMouseLeave, { passive: true });
+    document.addEventListener('visibilitychange', handleVisibilityChange, { passive: true });
     resize();
 
     const draw = () => {
+      if (!inView || document.hidden) {
+        return;
+      }
       ctx.clearRect(0, 0, width, height);
       // BOLT: Clear bucket arrays at the start of each frame to prevent coordinate accumulation and memory leaks.
       clearBuckets();
@@ -202,6 +216,7 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseleave', onMouseLeave);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       cancelAnimationFrame(animationFrameId);
     };
   }, [prefersReducedMotion, inView]);

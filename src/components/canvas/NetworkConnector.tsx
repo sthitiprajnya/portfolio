@@ -95,9 +95,22 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
     window.addEventListener('resize', resize, { passive: true });
     window.addEventListener('mousemove', onMouseMove, { passive: true });
     window.addEventListener('mouseleave', onMouseLeave, { passive: true });
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(animationFrameId);
+      } else {
+        animationFrameId = requestAnimationFrame(draw);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     resize();
 
     const draw = () => {
+      // ⚡ Bolt: "Sleepy" Loop Optimization - Cancel requestAnimationFrame when document is hidden to eliminate background CPU overhead. The loop automatically restarts when visibility changes.
+      if (document.hidden) return;
+
       ctx.clearRect(0, 0, width, height);
       // BOLT: Clear bucket arrays at the start of each frame to prevent coordinate accumulation and memory leaks.
       clearBuckets();
@@ -202,6 +215,7 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseleave', onMouseLeave);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       cancelAnimationFrame(animationFrameId);
     };
   }, [prefersReducedMotion, inView]);

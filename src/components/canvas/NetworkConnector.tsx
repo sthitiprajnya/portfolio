@@ -34,8 +34,14 @@ const B5_SQ = Math.pow(MAX_DISTANCE * (1 / 6), 2);
 export default function NetworkConnector({ className }: NetworkConnectorProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const { ref: inViewRef, inView } = useInView({ threshold: 0 });
+  const inViewCurrentRef = useRef(inView);
   const mouseRef = useRef({ x: 0, y: 0, active: false });
   const prefersReducedMotion = usePrefersReducedMotion();
+
+  // Keep the ref in sync with the state so the requestAnimationFrame loop can access it
+  useEffect(() => {
+    inViewCurrentRef.current = inView;
+  }, [inView]);
 
   // Combine refs for the canvas element
   const setRefs = (node: HTMLCanvasElement | null) => {
@@ -98,6 +104,12 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
     resize();
 
     const draw = () => {
+      // BOLT: "Sleepy" Loop Optimization - Cancel requestAnimationFrame when out of view to eliminate background CPU overhead.
+      if (!inViewCurrentRef.current) {
+        animationFrameId = requestAnimationFrame(draw);
+        return;
+      }
+
       ctx.clearRect(0, 0, width, height);
       // BOLT: Clear bucket arrays at the start of each frame to prevent coordinate accumulation and memory leaks.
       clearBuckets();

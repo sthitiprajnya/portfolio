@@ -127,3 +127,6 @@
 ## 2026-06-28 - [Optimizing Idle Animation Loops via Page Visibility]
 **Learning:** Continuous `setInterval` loops used for visual effects (like the 120ms and 300ms animations in `AsciiAvatar.tsx`) continue running in the background even when the tab is not visible, consuming unnecessary CPU cycles and draining battery on mobile devices.
 **Action:** Always wrap background `setInterval` visual updates with a `visibilitychange` event listener to clear the interval when `document.hidden` is true and restart it when the tab becomes visible.
+## 2026-08-20 - [Sleepy Canvas Optimization]
+**Learning:** For continuous `requestAnimationFrame` canvas drawing functions, a simple `if (!inView) return;` effectively halts execution when scrolled off-screen. However, when the browser tab is hidden, the canvas can still consume background processing cycles if the intersection observer (which determines `inView`) doesn't update or if background throttling is inconsistent across browsers.
+**Action:** In addition to `!inView`, always check `document.hidden` inside the hot animation loop (e.g. `if (!inView || document.hidden) return;`) and use a `visibilitychange` event listener to explicitly `cancelAnimationFrame` and `requestAnimationFrame` based on the document visibility state to achieve true zero-cost idle state.

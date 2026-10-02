@@ -92,12 +92,23 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       mouseRef.current.active = false;
     };
 
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(animationFrameId);
+      } else {
+        animationFrameId = requestAnimationFrame(draw);
+      }
+    };
+
     window.addEventListener('resize', resize, { passive: true });
     window.addEventListener('mousemove', onMouseMove, { passive: true });
     window.addEventListener('mouseleave', onMouseLeave, { passive: true });
+    document.addEventListener('visibilitychange', onVisibilityChange);
     resize();
 
     const draw = () => {
+      if (!inView || document.hidden) return;
+
       ctx.clearRect(0, 0, width, height);
       // BOLT: Clear bucket arrays at the start of each frame to prevent coordinate accumulation and memory leaks.
       clearBuckets();
@@ -202,6 +213,7 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseleave', onMouseLeave);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
       cancelAnimationFrame(animationFrameId);
     };
   }, [prefersReducedMotion, inView]);

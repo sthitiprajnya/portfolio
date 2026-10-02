@@ -10,9 +10,13 @@ export function Preloader() {
 
   useEffect(() => {
     // Check if booted in this session
-    if (sessionStorage.getItem('booted') === 'true') {
-      setIsVisible(false);
-      return;
+    try {
+      if (sessionStorage.getItem('booted') === 'true') {
+        setIsVisible(false);
+        return;
+      }
+    } catch (e) {
+      console.warn('Failed to access sessionStorage:', e);
     }
 
     const sequence = async () => {
@@ -71,7 +75,11 @@ export function Preloader() {
       setStage(11); // Trigger exit animation
 
       await new Promise(r => setTimeout(r, 500));
-      sessionStorage.setItem('booted', 'true');
+      try {
+        sessionStorage.setItem('booted', 'true');
+      } catch (e) {
+        console.warn('Failed to access sessionStorage:', e);
+      }
       setIsVisible(false); // Unmount
     };
 

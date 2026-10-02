@@ -210,7 +210,7 @@ export default function HeroOrb() {
 
     function tick(now: number) {
       // BOLT: "Sleepy" Loop Optimization - Cancel requestAnimationFrame when out of view to eliminate background CPU overhead. The loop automatically restarts when inView triggers a re-render.
-      if (!inView) {
+      if (!inView || document.hidden) {
         return;
       }
 
@@ -267,7 +267,17 @@ export default function HeroOrb() {
       rafRef.current = requestAnimationFrame(tick);
     }
 
-    if (inView) {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(rafRef.current);
+      } else if (inView) {
+        lastTime = performance.now();
+        rafRef.current = requestAnimationFrame(tick);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    if (inView && !document.hidden) {
       rafRef.current = requestAnimationFrame(tick);
     }
 
@@ -279,6 +289,7 @@ export default function HeroOrb() {
       window.removeEventListener('touchstart', onTouchMove);
       window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('touchend', onTouchEnd);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [inView, prefersReducedMotion]);
 

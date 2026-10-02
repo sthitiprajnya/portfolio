@@ -98,6 +98,9 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
     resize();
 
     const draw = () => {
+      if (document.hidden) {
+        return;
+      }
       ctx.clearRect(0, 0, width, height);
       // BOLT: Clear bucket arrays at the start of each frame to prevent coordinate accumulation and memory leaks.
       clearBuckets();
@@ -196,13 +199,25 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       animationFrameId = requestAnimationFrame(draw);
     };
 
-    draw();
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(animationFrameId);
+      } else if (inView) {
+        animationFrameId = requestAnimationFrame(draw);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    if (!document.hidden) {
+      draw();
+    }
 
     return () => {
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseleave', onMouseLeave);
       cancelAnimationFrame(animationFrameId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [prefersReducedMotion, inView]);
 

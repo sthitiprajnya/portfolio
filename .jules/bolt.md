@@ -127,3 +127,6 @@
 ## 2026-06-28 - [Optimizing Idle Animation Loops via Page Visibility]
 **Learning:** Continuous `setInterval` loops used for visual effects (like the 120ms and 300ms animations in `AsciiAvatar.tsx`) continue running in the background even when the tab is not visible, consuming unnecessary CPU cycles and draining battery on mobile devices.
 **Action:** Always wrap background `setInterval` visual updates with a `visibilitychange` event listener to clear the interval when `document.hidden` is true and restart it when the tab becomes visible.
+## 2026-08-20 - [Fixing Huge Delta Time Jump on RAF Resume]
+**Learning:** When stopping and restarting a requestAnimationFrame loop using the Page Visibility API (document.hidden), a massive time delta can accumulate between when the loop was paused and when it resumed. If the animation physics rely on this delta time, the animation can glitch dramatically when the tab is restored because it tries to simulate minutes or hours of movement in a single frame.
+**Action:** When waking or resuming a sleepy requestAnimationFrame loop, always reset its last timestamp tracker (e.g., lastTime = performance.now()) before calling requestAnimationFrame again.

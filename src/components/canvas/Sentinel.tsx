@@ -288,7 +288,18 @@ export default function Sentinel() {
 
     const timer = setTimeout(updateTargetCache, 1000);
 
-    const draw = () => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(rafRef.current);
+      } else {
+        rafRef.current = requestAnimationFrame(draw);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    const draw = (now) => {
+      if (document.hidden) return;
+
       if (!ctx) return;
       ctx.clearRect(0, 0, width, height);
       const s = stateRef.current;
@@ -442,6 +453,7 @@ export default function Sentinel() {
       clearTimeout(timer);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       sectionObserver.disconnect();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [prefersReducedMotion]);
 

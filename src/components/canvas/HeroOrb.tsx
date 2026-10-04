@@ -268,6 +268,8 @@ export default function HeroOrb() {
     }
 
     if (inView) {
+      // BOLT: Reset lastTime when the component comes back into view to prevent a massive dt jump
+      lastTime = performance.now();
       rafRef.current = requestAnimationFrame(tick);
     }
 

@@ -32,7 +32,7 @@ export function CommandPalette() {
         e.target instanceof HTMLTextAreaElement ||
         (e.target as HTMLElement).isContentEditable;
 
-      if ((e.key === '?' || e.key === '/') && !isOpen && !isInput) {
+      if (((e.key === '?' || e.key === '/') && !isOpen && !isInput) || (e.key === 'k' && (e.ctrlKey || e.metaKey))) {
         e.preventDefault();
         handleOpen();
       }

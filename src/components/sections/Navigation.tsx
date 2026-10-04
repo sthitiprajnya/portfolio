@@ -128,14 +128,14 @@ export function Navigation() {
               className="flex items-center gap-3 px-3 py-1.5 rounded-card border border-border text-text-secondary hover:text-cyan hover:border-cyan hover:shadow-[var(--glow-cyan-sm)] transition-all outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black group"
               aria-label="Search site sections"
               title="Search site sections"
-              aria-keyshortcuts="/ ?"
+              aria-keyshortcuts="Control+K Meta+K / ?"
               aria-haspopup="dialog"
             >
               <svg className="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               <span className="font-mono text-[0.65rem] uppercase tracking-widest opacity-60 group-hover:opacity-100 transition-opacity">Search</span>
-              <kbd className="font-mono text-[0.6rem] bg-black/50 px-1.5 py-0.5 rounded border border-border/50 opacity-40 group-hover:opacity-100 transition-opacity">[/]</kbd>
+              <kbd className="font-mono text-[0.6rem] bg-black/50 px-1.5 py-0.5 rounded border border-border/50 opacity-40 group-hover:opacity-100 transition-opacity hidden md:inline-block">⌘K</kbd>
             </button>
 
             <ul className="flex items-center space-x-4 xl:space-x-6">

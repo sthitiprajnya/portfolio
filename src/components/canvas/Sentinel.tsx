@@ -289,7 +289,7 @@ export default function Sentinel() {
     const timer = setTimeout(updateTargetCache, 1000);
 
     const draw = () => {
-      if (!ctx) return;
+      if (!ctx || document.hidden) return;
       ctx.clearRect(0, 0, width, height);
       const s = stateRef.current;
 
@@ -434,9 +434,23 @@ export default function Sentinel() {
       rafRef.current = requestAnimationFrame(draw);
     };
 
-    rafRef.current = requestAnimationFrame(draw);
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      } else {
+        lastYRef.current = window.scrollY; // Reset to avoid large jumps on resume
+        rafRef.current = requestAnimationFrame(draw);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    if (!document.hidden) {
+      rafRef.current = requestAnimationFrame(draw);
+    }
 
     return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('resize', resize);
       window.removeEventListener('scroll', onScroll);
       clearTimeout(timer);

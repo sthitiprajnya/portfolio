@@ -41,7 +41,7 @@ interface AsciiAvatarProps {
 }
 
 // BOLT: Extracting the face animation to a sub-component to prevent re-rendering the entire Avatar card every 120ms.
-function AsciiFace({ inView }: { inView: boolean }) {
+const AsciiFace = React.memo(function AsciiFace({ inView }: { inView: boolean }) {
   const prefersReducedMotion = usePrefersReducedMotion();
   // BOLT: Optimize AsciiFace animation by using refs and direct DOM manipulation
   // instead of React state. This prevents React from continuously reconciling
@@ -131,10 +131,10 @@ function AsciiFace({ inView }: { inView: boolean }) {
       )}
     </>
   );
-}
+});
 
 // BOLT: Extracting the metadata animation to a sub-component to prevent re-rendering the entire Avatar card every 300ms.
-function MetadataPanel({ inView }: { inView: boolean }) {
+const MetadataPanel = React.memo(function MetadataPanel({ inView }: { inView: boolean }) {
   const prefersReducedMotion = usePrefersReducedMotion();
   const metaLinesRef = useRef<(HTMLDivElement | null)[]>([]);
   const currentVisibleRef = useRef(0);
@@ -220,7 +220,7 @@ function MetadataPanel({ inView }: { inView: boolean }) {
       ))}
     </div>
   );
-}
+});
 
 export function AsciiAvatar({ className }: AsciiAvatarProps) {
   const [isHuman, setIsHuman] = useState(false);

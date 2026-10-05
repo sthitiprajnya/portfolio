@@ -98,6 +98,7 @@ export function Projects() {
                 onKeyDown={(e) => handleKeyDown(e, idx)}
                 role="tab"
                 aria-selected={isActive}
+                aria-controls="projects-grid"
                 tabIndex={isActive ? 0 : -1}
                 className={clsx(
                   "font-mono text-xs uppercase tracking-widest px-5 py-2 transition-all duration-300 rounded-card border outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black flex items-center gap-2 group",
@@ -123,6 +124,7 @@ export function Projects() {
 
         {/* Project Grid */}
         <motion.div
+          id="projects-grid"
           layout={!prefersReducedMotion}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         >

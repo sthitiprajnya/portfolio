@@ -243,6 +243,7 @@ export function CommandPalette() {
               ) : (
                 <div className="px-4 py-8 text-center text-text-secondary font-mono text-sm">
                   NO_MATCHES_FOUND
+                  <p className="text-xs opacity-60 mt-2">Try searching for "projects", "skills", or "contact"</p>
                 </div>
               )}
             </div>

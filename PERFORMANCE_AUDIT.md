@@ -32,16 +32,14 @@ Your portfolio is built with modern, performant technologies. However, several o
 - Lazy-load Three.js only on sections that need 3D (e.g., background effect, specific component).
 - Consider lightweight alternatives: `react-spring`, `motion` (Framer's core).
 
-### 2. **No Image Optimization**
-- **Problem:** If using external images (portfolio previews, profile pics), no next/image component detected.
-- **Impact:** Unoptimized images = slower LCP, higher bandwidth.
-- **Priority:** HIGH
+### 2. **Image Optimization (Static Export Constraint)**
+- **Problem:** The portfolio uses a static export (`output: 'export'`) for GitHub Pages, which requires disabling Next.js image optimization (`unoptimized: true`).
+- **Impact:** Images are served unoptimized by the framework.
+- **Priority:** ACCEPTED RISK
 
 **Solutions:**
-- Audit all image usage in `src/components/sections/`.
-- Replace all `<img>` with `<Image>` from `next/image`.
-- Set `priority` for above-the-fold images.
-- Use WebP/AVIF with fallbacks.
+- Pre-optimize all images locally before adding them to `public/`.
+- Use standard HTML optimization techniques or external CDNs rather than relying on Next.js runtime optimization.
 
 ### 3. **Client-Side Heavy Rendering**
 - **Problem:** No evidence of Server Components or SSG optimization for static sections.

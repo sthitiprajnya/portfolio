@@ -16,8 +16,9 @@ const nextConfig = {
   // GitHub Pages serves files with a trailing slash, so /about becomes /about/index.html
   trailingSlash: true,
 
-  // Next.js image optimisation requires a running server, which GitHub Pages doesn't have.
-  // Disabling it means <img> tags are used directly instead of the <Image /> component pipeline.
+  // Next.js image optimization requires a running Node.js server, which GitHub Pages doesn't have.
+  // We disable it (`unoptimized: true`) so that <img> tags are used instead of the Next.js optimization pipeline.
+  // This is a deliberate compromise required by the 'export' output mode for static hosting.
   images: {
     unoptimized: true,
   },

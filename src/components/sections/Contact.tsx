@@ -9,6 +9,8 @@ import { PERSONAL } from '@/data/portfolio';
 
 type Status = 'idle' | 'transmitting' | 'sent' | 'error';
 
+let fallbackLastSubmissionTime: string | null = null;
+
 // BOLT: Removed static import of emailjs. It is now dynamically imported on submit
 // to reduce the initial JavaScript bundle size.
 
@@ -74,7 +76,16 @@ export function Contact() {
     // Security: Basic submission cooldown (60 seconds) to prevent spamming
     const LAST_SUBMISSION_KEY = 'last_submission_time';
     const COOLDOWN_MS = 60 * 1000;
-    const lastSubmission = localStorage.getItem(LAST_SUBMISSION_KEY);
+    let lastSubmission: string | null = null;
+    try {
+      lastSubmission = localStorage.getItem(LAST_SUBMISSION_KEY);
+    } catch (e) {
+      try {
+        lastSubmission = sessionStorage.getItem(LAST_SUBMISSION_KEY);
+      } catch (err) {
+        lastSubmission = fallbackLastSubmissionTime;
+      }
+    }
     const now = Date.now();
 
     if (lastSubmission && now - parseInt(lastSubmission) < COOLDOWN_MS) {
@@ -85,7 +96,15 @@ export function Contact() {
     }
 
     // Security: Set cooldown synchronously to prevent race conditions from concurrent script submissions
-    localStorage.setItem(LAST_SUBMISSION_KEY, now.toString());
+    try {
+      localStorage.setItem(LAST_SUBMISSION_KEY, now.toString());
+    } catch (e) {
+      try {
+        sessionStorage.setItem(LAST_SUBMISSION_KEY, now.toString());
+      } catch (err) {
+        fallbackLastSubmissionTime = now.toString();
+      }
+    }
     setStatus('transmitting');
 
     try {

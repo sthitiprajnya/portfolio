@@ -12,14 +12,11 @@ This PR implements comprehensive performance optimizations and enhances the voic
 #### Image Optimization
 ```typescript
 images: {
-  unoptimized: false, // Enable Next.js image optimization
-  formats: ['image/avif', 'image/webp'],
-  remotePatterns: [...] // Whitelist external image domains
+  unoptimized: true, // Disabled for static export
 }
 ```
-- Enables automatic image optimization with WebP/AVIF formats
-- Configures remote image domains for GitHub stats badges
-- Reduces image payload by 40-60% with modern formats
+- Image optimization is intentionally disabled to support full static export (`output: 'export'`) for GitHub Pages hosting.
+- Requires standard `<img>` tags or unoptimized `<Image>` usage.
 
 #### Bundle Optimization
 ```typescript
@@ -184,7 +181,7 @@ npm run perf:lighthouse
 |-----------|--------|-------|---------|
 | JavaScript | ~480-520KB | ~320-380KB | 30-40% |
 | CSS | 30-40KB | 15-25KB | 50% |
-| Images | Unoptimized | WebP/AVIF | 40-60% |
+| Images | Static Export | Unoptimized | 0% (Accepted Risk) |
 | **Total** | **510-560KB** | **335-405KB** | **35-40%** |
 
 ### Core Web Vitals Targets

@@ -67,15 +67,32 @@ export function Contact() {
     // Security: Honeypot check
     if (form.hp_field) {
       console.warn("Honeypot triggered. Bot suspected.");
-      setStatus('sent'); // Silently fail by pretending to send
+      return; // Silently do nothing. No status update, no form reset.
+    }
+
+    const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || process.env.VITE_EMAILJS_SERVICE_ID;
+    const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || process.env.VITE_EMAILJS_TEMPLATE_ID;
+    const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || process.env.VITE_EMAILJS_PUBLIC_KEY;
+
+    if (!serviceId || !templateId || !publicKey) {
+      console.error("EmailJS environment variables are missing.");
+      setStatus('error');
       return;
     }
+
+    if (!formRef.current) return;
 
     // Security: Basic submission cooldown (60 seconds) to prevent spamming
     const LAST_SUBMISSION_KEY = 'last_submission_time';
     const COOLDOWN_MS = 60 * 1000;
-    const lastSubmission = localStorage.getItem(LAST_SUBMISSION_KEY);
     const now = Date.now();
+    let lastSubmission = null;
+
+    try {
+      lastSubmission = localStorage.getItem(LAST_SUBMISSION_KEY);
+    } catch (e) {
+      console.warn('Failed to read rate limit from localStorage.', e);
+    }
 
     if (lastSubmission && now - parseInt(lastSubmission) < COOLDOWN_MS) {
       const remaining = Math.ceil((COOLDOWN_MS - (now - parseInt(lastSubmission))) / 1000);
@@ -84,32 +101,11 @@ export function Contact() {
       return;
     }
 
-    // Security: Set cooldown synchronously to prevent race conditions from concurrent script submissions
-    localStorage.setItem(LAST_SUBMISSION_KEY, now.toString());
     setStatus('transmitting');
 
     try {
-      const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || process.env.VITE_EMAILJS_SERVICE_ID;
-      const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || process.env.VITE_EMAILJS_TEMPLATE_ID;
-      const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || process.env.VITE_EMAILJS_PUBLIC_KEY;
-
-      if (!serviceId || !templateId || !publicKey) {
-        console.error("EmailJS environment variables are missing.");
-        setStatus('error');
-        return;
-      }
-
-      if (!formRef.current) return;
-
       // ⚡ Bolt: Dynamically import heavy @emailjs/browser SDK (~15KB) only when the form is submitted
       // to reduce the initial JavaScript bundle size and improve page load performance.
-      // ⚡ Bolt: Dynamically import heavy third-party SDK to reduce initial bundle size
-      // ⚡ Bolt: Dynamically import EmailJS to reduce initial bundle size and avoid blocking the main thread
-      // BOLT: Dynamically importing @emailjs/browser to significantly reduce the Next.js
-      // initial JavaScript bundle size, deferring the load until the user actually submits the form.
-      // ⚡ Bolt: Dynamically import heavy EmailJS SDK only when needed to reduce initial bundle size
-      // BOLT: Dynamically import emailjs only when the user submits the form.
-      // This prevents the EmailJS SDK from blocking the main thread during initial page load.
       const emailjs = (await import('@emailjs/browser')).default;
 
       await emailjs.sendForm(
@@ -118,6 +114,13 @@ export function Contact() {
         formRef.current,
         publicKey
       );
+
+      // Only set cooldown upon successful submission
+      try {
+        localStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
+      } catch (e) {
+        console.warn('Failed to write rate limit to localStorage.', e);
+      }
 
       setStatus('sent');
       setForm({ from_name: '', from_email: '', subject: '', message: '', hp_field: '' });

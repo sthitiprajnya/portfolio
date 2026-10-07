@@ -1,4 +1,4 @@
-const CACHE_KEY   = 'github_stats_cache';
+const CACHE_KEY   = 'github_stats_cache_v1';
 const CACHE_TTL   = 60 * 60 * 1000;
 const GITHUB_USER = 'sthitiprajnya';
 
@@ -53,14 +53,25 @@ export async function fetchGitHubStats(): Promise<GitHubStats> {
   if (cached) {
     try {
       const parsed: GitHubStats = JSON.parse(cached);
-      if (Date.now() - parsed.fetchedAt < CACHE_TTL) return parsed;
+      // Validate schema minimally before using cache
+      if (
+        parsed &&
+        typeof parsed === 'object' &&
+        typeof parsed.followers === 'number' &&
+        typeof parsed.publicRepos === 'number' &&
+        typeof parsed.fetchedAt === 'number' &&
+        Date.now() - parsed.fetchedAt < CACHE_TTL
+      ) {
+        return parsed;
+      }
     } catch (e) {
       console.warn('Failed to parse cached GitHub stats, clearing cache.', e);
-      try {
-        localStorage.removeItem(CACHE_KEY);
-      } catch {
-        // Ignore
-      }
+    }
+    // If we reach here, the cache was invalid or expired. Clear it.
+    try {
+      localStorage.removeItem(CACHE_KEY);
+    } catch {
+      // Ignore
     }
   }
 

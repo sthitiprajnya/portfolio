@@ -9,6 +9,9 @@ import { PERSONAL } from '@/data/portfolio';
 
 type Status = 'idle' | 'transmitting' | 'sent' | 'error';
 
+// Fallback for strict privacy settings where both localStorage and sessionStorage are blocked
+let fallbackLastSubmissionTime: string | null = null;
+
 // BOLT: Removed static import of emailjs. It is now dynamically imported on submit
 // to reduce the initial JavaScript bundle size.
 
@@ -91,7 +94,12 @@ export function Contact() {
     try {
       lastSubmission = localStorage.getItem(LAST_SUBMISSION_KEY);
     } catch (e) {
-      console.warn('Failed to read rate limit from localStorage.', e);
+      try {
+        lastSubmission = sessionStorage.getItem(LAST_SUBMISSION_KEY);
+      } catch (e2) {
+        lastSubmission = fallbackLastSubmissionTime;
+        console.warn('Failed to read rate limit from storage, using memory fallback.', e2);
+      }
     }
 
     if (lastSubmission && now - parseInt(lastSubmission) < COOLDOWN_MS) {
@@ -119,7 +127,12 @@ export function Contact() {
       try {
         localStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
       } catch (e) {
-        console.warn('Failed to write rate limit to localStorage.', e);
+        try {
+          sessionStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
+        } catch (e2) {
+          fallbackLastSubmissionTime = Date.now().toString();
+          console.warn('Failed to write rate limit to storage, using memory fallback.', e2);
+        }
       }
 
       setStatus('sent');

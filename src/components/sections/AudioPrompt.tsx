@@ -183,13 +183,13 @@ export default function AudioPrompt({ onComplete }: AudioPromptProps) {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex-1" onClick={voicesLoaded ? handleEnableAudio : undefined}>
-                 <CyberButton color="cyan" className="w-full justify-center" disabled={!voicesLoaded}>
+              <div className="flex-1">
+                 <CyberButton color="cyan" className="w-full justify-center" disabled={!voicesLoaded} onClick={voicesLoaded ? handleEnableAudio : undefined}>
                     {voicesLoaded ? '[ENABLE AUDIO]' : '[INITIALIZING]'}
                  </CyberButton>
               </div>
-              <div className="flex-1" onClick={handleSkip}>
-                  <CyberButton color="amber" className="w-full justify-center">
+              <div className="flex-1">
+                  <CyberButton color="amber" className="w-full justify-center" onClick={handleSkip}>
                     [SKIP]
                   </CyberButton>
               </div>

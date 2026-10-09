@@ -9,6 +9,8 @@ import { PERSONAL } from '@/data/portfolio';
 
 type Status = 'idle' | 'transmitting' | 'sent' | 'error';
 
+let fallbackLastSubmission: string | null = null;
+
 // BOLT: Removed static import of emailjs. It is now dynamically imported on submit
 // to reduce the initial JavaScript bundle size.
 
@@ -66,7 +68,6 @@ export function Contact() {
 
     // Security: Honeypot check
     if (form.hp_field) {
-      console.warn("Honeypot triggered. Bot suspected.");
       return; // Silently do nothing. No status update, no form reset.
     }
 
@@ -91,7 +92,11 @@ export function Contact() {
     try {
       lastSubmission = localStorage.getItem(LAST_SUBMISSION_KEY);
     } catch (e) {
-      console.warn('Failed to read rate limit from localStorage.', e);
+      try {
+        lastSubmission = sessionStorage.getItem(LAST_SUBMISSION_KEY);
+      } catch (e2) {
+        lastSubmission = fallbackLastSubmission;
+      }
     }
 
     if (lastSubmission && now - parseInt(lastSubmission) < COOLDOWN_MS) {
@@ -99,6 +104,17 @@ export function Contact() {
       setErrors({ message: `Submission rate limited. Please wait ${remaining}s.` });
       setStatus('error');
       return;
+    }
+
+    const currentTimestamp = Date.now().toString();
+    try {
+      localStorage.setItem(LAST_SUBMISSION_KEY, currentTimestamp);
+    } catch (e) {
+      try {
+        sessionStorage.setItem(LAST_SUBMISSION_KEY, currentTimestamp);
+      } catch (e2) {
+        fallbackLastSubmission = currentTimestamp;
+      }
     }
 
     setStatus('transmitting');
@@ -114,13 +130,6 @@ export function Contact() {
         formRef.current,
         publicKey
       );
-
-      // Only set cooldown upon successful submission
-      try {
-        localStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
-      } catch (e) {
-        console.warn('Failed to write rate limit to localStorage.', e);
-      }
 
       setStatus('sent');
       setForm({ from_name: '', from_email: '', subject: '', message: '', hp_field: '' });

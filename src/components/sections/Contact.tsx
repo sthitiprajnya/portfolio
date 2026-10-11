@@ -1,4 +1,11 @@
 "use client";
+
+declare global {
+  interface Window {
+    __lastSubmissionTime?: string | null;
+  }
+}
+
 import React, { useState, useRef } from 'react';
 import clsx from 'clsx';
 import { SectionTitle } from '@/components/ui/SectionTitle';
@@ -91,7 +98,13 @@ export function Contact() {
     try {
       lastSubmission = localStorage.getItem(LAST_SUBMISSION_KEY);
     } catch (e) {
-      console.warn('Failed to read rate limit from localStorage.', e);
+      console.warn('Failed to read rate limit from localStorage, falling back to sessionStorage.', e);
+      try {
+        lastSubmission = sessionStorage.getItem(LAST_SUBMISSION_KEY);
+      } catch (e2) {
+        console.warn('Failed to read rate limit from sessionStorage, falling back to window.', e2);
+        lastSubmission = window.__lastSubmissionTime || null;
+      }
     }
 
     if (lastSubmission && now - parseInt(lastSubmission) < COOLDOWN_MS) {
@@ -119,7 +132,13 @@ export function Contact() {
       try {
         localStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
       } catch (e) {
-        console.warn('Failed to write rate limit to localStorage.', e);
+        console.warn('Failed to write rate limit to localStorage, falling back to sessionStorage.', e);
+        try {
+          sessionStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
+        } catch (e2) {
+          console.warn('Failed to write rate limit to sessionStorage, falling back to window.', e2);
+          window.__lastSubmissionTime = Date.now().toString();
+        }
       }
 
       setStatus('sent');

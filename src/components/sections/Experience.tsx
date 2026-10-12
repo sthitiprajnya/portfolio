@@ -263,7 +263,7 @@ const ExperienceCard = React.memo(function ExperienceCard({ experience, isFirst 
             {experience.awards.map((award, i) => (
               <div key={i} className="relative overflow-hidden group/award flex-1 flex flex-col items-center justify-center p-4 glass rounded-card border border-amber/30 hover:border-amber/60 transition-all duration-300">
                 <div className="absolute inset-0 bg-gradient-to-br from-amber/10 to-transparent opacity-0 group-hover/award:opacity-100 transition-opacity duration-300" />
-                <span className="text-3xl mb-2 drop-shadow-[0_0_8px_rgba(255,179,0,0.5)] transform group-hover/award:scale-110 transition-transform duration-300">🏆</span>
+                <span role="img" aria-label="Award" className="text-3xl mb-2 drop-shadow-[0_0_8px_rgba(255,179,0,0.5)] transform group-hover/award:scale-110 transition-transform duration-300">🏆</span>
                 <span className="font-heading font-bold text-amber text-sm tracking-wide text-center uppercase">{award}</span>
               </div>
             ))}

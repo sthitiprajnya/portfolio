@@ -224,6 +224,8 @@ export function CommandPalette() {
                       id={`option-${link.id}`}
                       role="option"
                       aria-selected={isSelected}
+                      aria-posinset={i + 1}
+                      aria-setsize={filteredLinks.length}
                       tabIndex={-1}
                       className={clsx(
                         'w-full text-left px-4 py-3 rounded-card flex items-center justify-between font-mono text-sm transition-colors',

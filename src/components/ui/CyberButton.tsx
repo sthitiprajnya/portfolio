@@ -61,8 +61,9 @@ export const CyberButton = React.forwardRef<HTMLButtonElement | HTMLAnchorElemen
 
   if (as === 'a') {
     const { ...anchorProps } = props as React.AnchorHTMLAttributes<HTMLAnchorElement>;
+    const isDisabled = (props as any).disabled;
     return (
-      <a ref={ref as React.Ref<HTMLAnchorElement>} className={baseClasses} {...anchorProps}>
+      <a ref={ref as React.Ref<HTMLAnchorElement>} className={baseClasses} aria-disabled={isDisabled} {...anchorProps}>
         {innerContent}
       </a>
     );
@@ -70,7 +71,7 @@ export const CyberButton = React.forwardRef<HTMLButtonElement | HTMLAnchorElemen
 
   const { type, ...buttonProps } = props as React.ButtonHTMLAttributes<HTMLButtonElement>;
   return (
-    <button ref={ref as React.Ref<HTMLButtonElement>} type={type || 'button'} className={baseClasses} {...buttonProps}>
+    <button ref={ref as React.Ref<HTMLButtonElement>} type={type || 'button'} className={baseClasses} aria-disabled={buttonProps.disabled} {...buttonProps}>
       {innerContent}
     </button>
   );

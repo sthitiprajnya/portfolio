@@ -92,6 +92,11 @@ export function Contact() {
       lastSubmission = localStorage.getItem(LAST_SUBMISSION_KEY);
     } catch (e) {
       console.warn('Failed to read rate limit from localStorage.', e);
+      try {
+        lastSubmission = sessionStorage.getItem(LAST_SUBMISSION_KEY);
+      } catch (e2) {
+        console.warn('Failed to read rate limit from sessionStorage.', e2);
+      }
     }
 
     if (lastSubmission && now - parseInt(lastSubmission) < COOLDOWN_MS) {
@@ -102,6 +107,18 @@ export function Contact() {
     }
 
     setStatus('transmitting');
+
+    // Set cooldown synchronously before the async submission to prevent race conditions
+    try {
+      localStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
+    } catch (e) {
+      console.warn('Failed to write rate limit to localStorage.', e);
+      try {
+        sessionStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
+      } catch (e2) {
+        console.warn('Failed to write rate limit to sessionStorage.', e2);
+      }
+    }
 
     try {
       // ⚡ Bolt: Dynamically import heavy @emailjs/browser SDK (~15KB) only when the form is submitted
@@ -114,13 +131,6 @@ export function Contact() {
         formRef.current,
         publicKey
       );
-
-      // Only set cooldown upon successful submission
-      try {
-        localStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
-      } catch (e) {
-        console.warn('Failed to write rate limit to localStorage.', e);
-      }
 
       setStatus('sent');
       setForm({ from_name: '', from_email: '', subject: '', message: '', hp_field: '' });

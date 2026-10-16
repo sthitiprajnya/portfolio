@@ -12,6 +12,9 @@ type Status = 'idle' | 'transmitting' | 'sent' | 'error';
 // BOLT: Removed static import of emailjs. It is now dynamically imported on submit
 // to reduce the initial JavaScript bundle size.
 
+// Global fallback for rate limiting if both localStorage and sessionStorage are unavailable/blocked.
+let windowRateLimitFallback: string | null = null;
+
 // This form uses EmailJS to send emails directly from the browser.
 // EmailJS is dynamically imported inside handleSubmit to reduce initial bundle size.
 export function Contact() {
@@ -66,7 +69,6 @@ export function Contact() {
 
     // Security: Honeypot check
     if (form.hp_field) {
-      console.warn("Honeypot triggered. Bot suspected.");
       return; // Silently do nothing. No status update, no form reset.
     }
 
@@ -91,7 +93,11 @@ export function Contact() {
     try {
       lastSubmission = localStorage.getItem(LAST_SUBMISSION_KEY);
     } catch (e) {
-      console.warn('Failed to read rate limit from localStorage.', e);
+      try {
+        lastSubmission = sessionStorage.getItem(LAST_SUBMISSION_KEY);
+      } catch (e2) {
+        lastSubmission = windowRateLimitFallback;
+      }
     }
 
     if (lastSubmission && now - parseInt(lastSubmission) < COOLDOWN_MS) {
@@ -102,6 +108,19 @@ export function Contact() {
     }
 
     setStatus('transmitting');
+
+    // Security: Record the rate limit timestamp synchronously before the asynchronous API call
+    // to prevent race conditions where multiple requests could be fired simultaneously.
+    const submissionTime = Date.now().toString();
+    try {
+      localStorage.setItem(LAST_SUBMISSION_KEY, submissionTime);
+    } catch (e) {
+      try {
+        sessionStorage.setItem(LAST_SUBMISSION_KEY, submissionTime);
+      } catch (e2) {
+        windowRateLimitFallback = submissionTime;
+      }
+    }
 
     try {
       // ⚡ Bolt: Dynamically import heavy @emailjs/browser SDK (~15KB) only when the form is submitted
@@ -114,13 +133,6 @@ export function Contact() {
         formRef.current,
         publicKey
       );
-
-      // Only set cooldown upon successful submission
-      try {
-        localStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
-      } catch (e) {
-        console.warn('Failed to write rate limit to localStorage.', e);
-      }
 
       setStatus('sent');
       setForm({ from_name: '', from_email: '', subject: '', message: '', hp_field: '' });

@@ -7,6 +7,7 @@ import { CyberButton } from '../ui/CyberButton';
 
 const Terminal = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
+    aria-hidden="true"
     {...props}
     xmlns="http://www.w3.org/2000/svg"
     width="24"

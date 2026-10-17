@@ -1,213 +1,57 @@
-# Portfolio Performance Audit & Optimization Roadmap
+# Portfolio Performance Audit
 
-**Date:** May 31, 2026  
-**Current Stack:** Next.js 16 + TypeScript + React 19 + Tailwind CSS + Three.js + GSAP + Framer Motion
+**Audit date:** 2026-10-17
+**Site:** <https://sthitiprajnya.github.io/portfolio/>
+**Repository:** `sthitiprajnya/portfolio`
+**Current frontend:** Next.js 16, React 19, TypeScript, Tailwind CSS 3, Framer Motion, custom Canvas 2D effects.
 
----
+## Executive summary
 
-## Executive Summary
+The reported lag was reproducible as sustained idle CPU use in headless Chromium. The largest measured source was continuous motion: three hero canvases, a cursor `requestAnimationFrame` loop that did not sleep until a mouse event, and dozens of CSS animations running across both visible and off-screen sections. The page had 46 CSS animations in the initial browser trace.
 
-Your portfolio is built with modern, performant technologies. However, several optimization opportunities exist to improve loading speeds, Core Web Vitals, and overall user experience—especially given the heavy dependencies (3D graphics, animations, email service).
+The site now caps canvas drawing, cancels a leaked MatrixRain resize handler, avoids starting the custom-cursor loop before pointer movement, and uses one page-level activity provider. After 10 seconds without pointer, keyboard, touch, wheel, or scroll input, that provider suspends CSS animation and the decorative canvas/avatar/glitch work. Any new activity resumes it. The user's `prefers-reduced-motion` setting remains honored.
 
-**Current Metrics to Target:**
-- Lighthouse Score: 90+ (Core Web Vitals)
-- First Contentful Paint (FCP): < 1.5s
-- Largest Contentful Paint (LCP): < 2.5s
-- Cumulative Layout Shift (CLS): < 0.1
-- Time to Interactive (TTI): < 3.5s
-- Bundle Size: < 250KB (gzipped)
+## Findings and changes
 
----
+1. **Custom cursor spun continuously before first pointer movement.** `CursorProvider` called `wake()` on mount while `isInitial` was still true; its normal stop condition required a mouse move, so an unattended page kept scheduling frames. The mount wake was removed and an initial-state guard added. The custom cursor starts only after real pointer input.
 
-## 🔴 Critical Issues
+2. **Continuous canvas work was not budgeted.** MatrixRain and NetworkConnector now cap drawing at 24 fps; HeroOrb caps at 30 fps. Observer ref callbacks are stable. HeroOrb no longer asks the browser to promote a full-screen canvas to a transform layer it never transforms.
 
-### 1. **Heavy Animation Libraries (GSAP + Framer Motion + Three.js)**
-- **Problem:** Three.js alone adds ~150KB (gzipped). GSAP (~35KB) and Framer Motion (~40KB) are duplicative for many effects.
-- **Impact:** Significant JavaScript payload increases FCP/LCP.
-- **Priority:** HIGH
+3. **MatrixRain left an anonymous resize listener attached.** The old registration created a new callback that cleanup could not remove, and repeated glyph-cache work during resize. It now registers and removes the same `resize` function and performs one cache refresh per resize.
 
-**Solutions:**
-- Use Framer Motion as the primary animation library (more React-friendly, smaller ecosystem).
-- Replace GSAP with Framer Motion where possible.
-- Lazy-load Three.js only on sections that need 3D (e.g., background effect, specific component).
-- Consider lightweight alternatives: `react-spring`, `motion` (Framer's core).
+4. **Motion was running while the visitor was idle.** A central provider pauses all CSS animations—including those in off-screen sections—and shares its active/idle state with visible decorative canvas loops, the ASCII-avatar timers, and GlitchText. It wakes on pointer, keyboard, touch, wheel, or scroll input; it also pauses when the tab is hidden. Motion resumes on the next interaction.
 
-### 2. **Image Optimization (Static Export Constraint)**
-- **Problem:** The portfolio uses a static export (`output: 'export'`) for GitHub Pages, which requires disabling Next.js image optimization (`unoptimized: true`).
-- **Impact:** Images are served unoptimized by the framework.
-- **Priority:** ACCEPTED RISK
+## Measurement evidence
 
-**Solutions:**
-- Pre-optimize all images locally before adding them to `public/`.
-- Use standard HTML optimization techniques or external CDNs rather than relying on Next.js runtime optimization.
+The same local static export, served at the GitHub Pages `/portfolio/` base path, was opened in clean headless Chromium sessions. Browser-process CPU is reported as percent of one logical CPU core; these figures are a comparative sandbox diagnostic, not a Lighthouse score or a promise for every device.
 
-### 3. **Client-Side Heavy Rendering**
-- **Problem:** No evidence of Server Components or SSG optimization for static sections.
-- **Impact:** Higher hydration time, potential layout shifts.
-- **Priority:** MEDIUM-HIGH
+| State | Sample 1 | Sample 2 |
+| --- | ---: | ---: |
+| Before changes; 15-second idle browser samples | 106.2% | 102.1% |
+| After changes; waited 13 seconds, then sampled 15 seconds idle | 15.8% | 15.0% |
 
-**Solutions:**
-- Migrate static sections to Server Components.
-- Use `'use client'` only where interactivity is essential.
-- Leverage `Suspense` for streaming static content.
+The two-sample mean fell from 104.15% to 15.4% (about an **85% reduction**). Browser instrumentation also observed 46 running CSS animations before the idle pause, zero while idle, and 45 resumed after pointer activity. The local browser session produced no uncaught page errors during the instrumentation pass.
 
-### 4. **Oversized Chart Library (Chart.js)**
-- **Problem:** chart.js + react-chartjs-2 = ~50KB gzipped (if used).
-- **Impact:** Unnecessary bloat if charts are simple.
-- **Priority:** MEDIUM
+## Verification
 
-**Solutions:**
-- Audit actual chart usage.
-- Consider SVG-based charts or `recharts` (more tree-shakeable).
-- Lazy-load chart components on demand.
+- `npm run lint` — passed with zero warnings.
+- `npm run type-check` — passed.
+- `npm test` — 44 tests passed across 18 files, including frame-budget, cursor-startup, idle-wakeup, and resize-listener cleanup regressions.
+- `npm run build` — passed; static export and image optimization completed.
+- Local preview and Chromium processes used for measurement were stopped after the checks; no preview service remains running.
 
----
+The repository's previous production-only audit was clean (`npm audit --omit=dev`: 0 vulnerabilities). This performance change did not modify dependencies.
 
-## 🟡 High-Priority Optimizations
+## Tailwind 3 / PostCSS development advisories
 
-### 5. **CSS Bundle Optimization**
-- **Problem:** Tailwind CSS may have unused utility classes in production build.
-- **Impact:** Larger CSS payload.
-- **Priority:** MEDIUM-HIGH
+The full development dependency audit previously reported **7 findings (5 high, 2 moderate)** in the Tailwind 3/PostCSS toolchain. These are build/development dependencies; the production-only audit was clean. They still matter to developer machines and CI, so keep the full `npm audit` visible rather than suppressing it.
 
-**Solutions:**
-- Ensure Tailwind purging is aggressive in `tailwind.config.ts`.
-- Use CSS Modules for component-scoped styles.
-- Audit global CSS for duplicates/unused rules.
+**Preferred durable resolution:** schedule a separate Tailwind CSS 3-to-4 migration. Follow Tailwind's official [upgrade guide](https://tailwindcss.com/docs/upgrade-guide), adopt the v4 PostCSS integration, review custom theme/plugin/config usage, then compare representative pages at desktop and mobile widths and run clean install, lint, tests, static build, and `npm audit`. This is a major CSS-toolchain migration and should not be mixed into a performance patch without visual regression review. See also the [Tailwind CSS v4 announcement](https://tailwindcss.com/blog/tailwindcss-v4).
 
-### 6. **Font Loading (No `next/font` Detected)**
-- **Problem:** Using system fonts or potentially slow external fonts without optimization.
-- **Impact:** Potential layout shift (CLS), slower FCP.
-- **Priority:** MEDIUM
+**Short-term option if remaining on Tailwind 3:** test package-manager overrides for the affected transitive packages against the patched releases identified during the registry/advisory review (`braces` 3.0.4 and `postcss-selector-parser` 7.1.6). First confirm every dependency path with `npm explain`/`pnpm why`; apply only compatible overrides, regenerate both lockfiles, then verify `npm ci --legacy-peer-deps`, lint, tests, build, and the full audit. Do not apply `npm audit fix --force` blindly or assume an override is safe merely because it silences the audit.
 
-**Solutions:**
-- Use `next/font` for local or Google Fonts with `font-display: swap`.
-- Preload critical fonts in `<head>`.
-- Subset fonts to used characters only.
+**Advisory/source references:** [braces advisory GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm), [PostCSS selector parser advisory GHSA-rj75-hqrm-r3gf](https://osv.dev/GHSA-rj75-hqrm-r3gf), [NVD CVE-2026-93687](https://nvd.nist.gov/vuln/detail/CVE-2026-93687), and the [Tailwind maintainers' discussion](https://github.com/tailwindlabs/tailwindcss/issues/19327).
 
-### 7. **Lenis Smooth Scroll Library**
-- **Problem:** Smooth scroll adds ~10KB, can conflict with native scroll performance.
-- **Impact:** Minor bundle impact; potential jank on low-end devices.
-- **Priority:** LOW-MEDIUM
+## Remaining limitations
 
-**Solutions:**
-- Measure actual impact on CLS/FCP before removing.
-- Consider CSS `scroll-behavior: smooth` as a lightweight alternative if smooth scroll is secondary.
-- Ensure Lenis is lazy-loaded if not on all pages.
-
-### 8. **EmailJS Dependency**
-- **Problem:** Adds network overhead for contact form validation.
-- **Impact:** Contact form may cause network waterfall.
-- **Priority:** MEDIUM
-
-**Solutions:**
-- Lazy-load EmailJS only on the contact section.
-- Prefetch/preconnect to EmailJS CDN.
-- Add request debouncing/throttling.
-
----
-
-## 🟢 Medium-Priority Improvements
-
-### 9. **SEO & Metadata**
-- **Status:** ✅ Good! Layout.tsx has comprehensive metadata + JSON-LD.
-- **Opportunity:** Add dynamic Open Graph images, structured data for skills/experience.
-- **Priority:** LOW-MEDIUM
-
-**Solutions:**
-- Add `next-sitemap` for automatic sitemap generation.
-- Generate dynamic OG images for social sharing.
-- Validate structured data with Google Rich Results Test.
-
-### 10. **Build Output & Static Export**
-- **Status:** ✅ Good! Using `output: 'export'` for GitHub Pages.
-- **Opportunity:** Verify all API calls are eliminated; no fallback to SSR.
-- **Priority:** LOW
-
-**Solutions:**
-- Audit `next.config.ts` for non-static routes.
-- Test build output in `out/` directory locally.
-- Ensure no dynamic routes breaking static export.
-
-### 11. **Accessibility & Core Web Vitals**
-- **Status:** Partially good (skip-to-content link present).
-- **Opportunity:** Audit focus management, ARIA labels, keyboard navigation.
-- **Priority:** MEDIUM
-
-**Solutions:**
-- Run axe DevTools audit.
-- Ensure all interactive elements are keyboard-accessible.
-- Test with screen readers (NVDA, VoiceOver).
-
-### 12. **Caching & CDN**
-- **Status:** Deploying to GitHub Pages (limited caching control).
-- **Opportunity:** Use Cloudflare as CDN reverse proxy for better caching, edge optimization, and performance analytics.
-- **Priority:** MEDIUM
-
-**Solutions:**
-- Add custom `_headers` or `_redirects` for GitHub Pages caching.
-- Consider Cloudflare free tier for DDoS protection + caching.
-- Set aggressive HTTP cache headers (`Cache-Control: max-age=31536000` for immutable assets).
-
----
-
-## 📊 Bundle Size Analysis Recommendations
-
-**Current Estimated Bundle Breakdown:**
-```
-three.js:                 ~150 KB (gzipped)
-gsap:                      ~35 KB (gzipped)
-framer-motion:            ~40 KB (gzipped)
-react-three-fiber:        ~20 KB (gzipped)
-@react-three/drei:        ~30 KB (gzipped)
-chart.js + react-chartjs: ~50 KB (gzipped)
-emailjs:                  ~15 KB (gzipped)
-Lenis:                    ~10 KB (gzipped)
-React + React-DOM:       ~115 KB (gzipped)
-Tailwind CSS (purged):   ~15-25 KB (gzipped)
-────────────────────────────────────
-TOTAL ESTIMATE:          ~480-520 KB (gzipped)
-
-**Goal:** < 250 KB (gzipped) for fast initial load
-```
-
----
-
-## 🎯 Optimization Priorities (Ranked)
-
-| Priority | Task | Effort | Impact | Timeline |
-|----------|------|--------|--------|----------|
-| 🔴 P1    | Lazy-load Three.js + consolidate animation libraries | Medium | HIGH | 1-2 days |
-| 🔴 P1    | Audit & optimize all images with next/image | Medium | HIGH | 1 day |
-| 🔴 P1    | Migrate to Server Components where possible | Medium | MEDIUM-HIGH | 2 days |
-| 🟡 P2    | Optimize Tailwind CSS & audit unused utilities | Low | MEDIUM | 2-4 hours |
-| 🟡 P2    | Implement next/font for typography | Low | MEDIUM | 1 hour |
-| 🟡 P2    | Lazy-load EmailJS & chart libraries | Low | MEDIUM | 2 hours |
-| 🟢 P3    | Migrate Lenis to CSS scroll-behavior (if possible) | Low | LOW | 1 hour |
-| 🟢 P3    | Add Cloudflare CDN reverse proxy | Low | LOW | 30 min |
-| 🟢 P3    | Generate dynamic OG images & sitemap | Low | MEDIUM | 2-3 hours |
-| 🟢 P4    | Full accessibility audit | Medium | MEDIUM | 3-4 hours |
-
----
-
-## 📝 Next Steps
-
-1. **Run Lighthouse & Pagespeed Insights** on current portfolio.
-2. **Profile bundle size** using `@next/bundle-analyzer`.
-3. **Implement P1 optimizations** (animation consolidation + image optimization).
-4. **Re-audit** and measure improvements.
-5. **Iterate** through P2 & P3 optimizations based on impact.
-
----
-
-## 🔗 Resources
-
-- [Next.js Performance Docs](https://nextjs.org/docs/app/building-your-application/optimizing)
-- [Web Vitals Guide](https://web.dev/vitals/)
-- [Bundle Analyzer](https://www.npmjs.com/package/@next/bundle-analyzer)
-- [Lighthouse](https://developers.google.com/web/tools/lighthouse)
-- [Pagespeed Insights](https://pagespeed.web.dev/)
-
----
-
-**Next Action:** Review recommendations and prioritize based on current Lighthouse scores. Suggest starting with **Lazy-loading Three.js** and **Image Optimization** for the fastest wins.
+The CPU comparison is a controlled local headless-Chromium comparison on this sandbox; confirm subjective smoothness on a normal laptop and phone after deployment. The full development dependency advisories remain until either the compatible overrides are validated or the Tailwind 4 migration is completed. No EmailJS values were read or included in this report.

@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useCallback } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { useAnimationActivity } from '@/hooks/useAnimationActivity';
+import { createFrameGate } from '@/lib/canvasFrame';
 
 interface NetworkConnectorProps {
   className?: string;
@@ -36,21 +38,22 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
   const { ref: inViewRef, inView } = useInView({ threshold: 0 });
   const mouseRef = useRef({ x: 0, y: 0, active: false });
   const prefersReducedMotion = usePrefersReducedMotion();
+  const isAnimationActive = useAnimationActivity(inView && !prefersReducedMotion);
 
   // Combine refs for the canvas element
-  const setRefs = (node: HTMLCanvasElement | null) => {
+  const setRefs = useCallback((node: HTMLCanvasElement | null) => {
     canvasRef.current = node;
     inViewRef(node);
-  };
+  }, [inViewRef]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas || prefersReducedMotion || !inView) return;
+    if (!canvas || prefersReducedMotion || !inView || !isAnimationActive) return;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let animationFrameId: number;
+    let animationFrameId = 0;
     let width: number;
     let height: number;
     let numNodes = DEFAULT_NUM_NODES;
@@ -97,7 +100,14 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
     window.addEventListener('mouseleave', onMouseLeave, { passive: true });
     resize();
 
-    const draw = () => {
+    const shouldDrawFrame = createFrameGate(24);
+    const draw = (timestamp: number) => {
+      if (!inView) return;
+      if (!shouldDrawFrame(timestamp)) {
+        animationFrameId = requestAnimationFrame(draw);
+        return;
+      }
+
       ctx.clearRect(0, 0, width, height);
       // BOLT: Clear bucket arrays at the start of each frame to prevent coordinate accumulation and memory leaks.
       clearBuckets();
@@ -196,7 +206,7 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       animationFrameId = requestAnimationFrame(draw);
     };
 
-    draw();
+    animationFrameId = requestAnimationFrame(draw);
 
     return () => {
       window.removeEventListener('resize', resize);
@@ -204,7 +214,7 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       window.removeEventListener('mouseleave', onMouseLeave);
       cancelAnimationFrame(animationFrameId);
     };
-  }, [prefersReducedMotion, inView]);
+  }, [prefersReducedMotion, inView, isAnimationActive]);
 
   if (prefersReducedMotion) {
     return (

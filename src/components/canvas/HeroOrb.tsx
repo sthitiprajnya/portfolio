@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { useAnimationActivity } from '@/hooks/useAnimationActivity';
+import { createFrameGate } from '@/lib/canvasFrame';
 
 interface OrbState {
   // Lissajous base position
@@ -62,16 +64,17 @@ export default function HeroOrb() {
   const rafRef = useRef<number>(0);
   const { ref: inViewRef, inView } = useInView({ threshold: 0 });
   const prefersReducedMotion = usePrefersReducedMotion();
+  const isAnimationActive = useAnimationActivity(inView && !prefersReducedMotion);
 
   // Combine refs for the canvas element
-  const setRefs = (node: HTMLCanvasElement | null) => {
+  const setRefs = useCallback((node: HTMLCanvasElement | null) => {
     canvasRef.current = node;
     inViewRef(node);
-  };
+  }, [inViewRef]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas || !inView || prefersReducedMotion) return;
+    if (!canvas || !inView || prefersReducedMotion || !isAnimationActive) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
@@ -207,13 +210,16 @@ export default function HeroOrb() {
 
     // ── Animation loop ───────────────────────────────────────────────
     let lastTime = 0;
+    const shouldDrawFrame = createFrameGate(30);
 
     function tick(now: number) {
-      // BOLT: "Sleepy" Loop Optimization - Cancel requestAnimationFrame when out of view to eliminate background CPU overhead. The loop automatically restarts when inView triggers a re-render.
-      if (!inView) {
+      if (!inView) return;
+      if (!shouldDrawFrame(now)) {
+        rafRef.current = requestAnimationFrame(tick);
         return;
       }
 
+      // BOLT: "Sleepy" Loop Optimization - Cancel requestAnimationFrame when out of view to eliminate background CPU overhead. The loop automatically restarts when inView triggers a re-render.
       const dt = Math.min(now - lastTime, 32); // cap at ~30fps min
       lastTime  = now;
 
@@ -280,7 +286,7 @@ export default function HeroOrb() {
       window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('touchend', onTouchEnd);
     };
-  }, [inView, prefersReducedMotion]);
+  }, [inView, prefersReducedMotion, isAnimationActive]);
 
   if (prefersReducedMotion) {
     return (
@@ -291,8 +297,7 @@ export default function HeroOrb() {
   return (
     <canvas
       ref={setRefs}
-      className="absolute inset-0 w-full h-full pointer-events-none will-change-transform z-0"
-      style={{ willChange: 'transform' }}
+      className="absolute inset-0 w-full h-full pointer-events-none z-0"
       aria-hidden="true"
       role="presentation"
     />

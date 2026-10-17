@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import clsx from 'clsx';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { useAnimationActivity } from '@/hooks/useAnimationActivity';
 import Image from 'next/image';
 import { sitePath } from '@/lib/sitePath';
 import { useInView } from 'react-intersection-observer';
@@ -44,6 +45,7 @@ interface AsciiAvatarProps {
 // BOLT: Extracting the face animation to a sub-component to prevent re-rendering the entire Avatar card every 120ms.
 function AsciiFace({ inView }: { inView: boolean }) {
   const prefersReducedMotion = usePrefersReducedMotion();
+  const isAnimationActive = useAnimationActivity(inView && !prefersReducedMotion);
   // BOLT: Optimize AsciiFace animation by using refs and direct DOM manipulation
   // instead of React state. This prevents React from continuously reconciling
   // and re-rendering the component every 120ms.
@@ -53,7 +55,7 @@ function AsciiFace({ inView }: { inView: boolean }) {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    if (prefersReducedMotion || !inView) {
+    if (prefersReducedMotion || !inView || !isAnimationActive) {
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
@@ -106,7 +108,7 @@ function AsciiFace({ inView }: { inView: boolean }) {
       stopTimer();
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [prefersReducedMotion, inView]);
+  }, [prefersReducedMotion, inView, isAnimationActive]);
 
   return (
     <>
@@ -124,7 +126,7 @@ function AsciiFace({ inView }: { inView: boolean }) {
           {line}
         </div>
       ))}
-      {!prefersReducedMotion && (
+      {!prefersReducedMotion && isAnimationActive && (
         <div
           className="absolute left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan/40 to-transparent pointer-events-none"
           style={{ animation: 'scan-sweep 3s linear infinite' }}
@@ -137,12 +139,13 @@ function AsciiFace({ inView }: { inView: boolean }) {
 // BOLT: Extracting the metadata animation to a sub-component to prevent re-rendering the entire Avatar card every 300ms.
 function MetadataPanel({ inView }: { inView: boolean }) {
   const prefersReducedMotion = usePrefersReducedMotion();
+  const isAnimationActive = useAnimationActivity(inView && !prefersReducedMotion);
   const metaLinesRef = useRef<(HTMLDivElement | null)[]>([]);
   const currentVisibleRef = useRef(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    if (prefersReducedMotion || !inView) {
+    if (prefersReducedMotion || !inView || !isAnimationActive) {
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
@@ -202,7 +205,7 @@ function MetadataPanel({ inView }: { inView: boolean }) {
       stopTimer();
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [prefersReducedMotion, inView]);
+  }, [prefersReducedMotion, inView, isAnimationActive]);
 
   return (
     <div className="border-t border-[var(--glass-border)] bg-[rgba(0,0,0,0.6)] px-3 pt-2 pb-3 space-y-[2px] relative z-10">

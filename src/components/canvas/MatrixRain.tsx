@@ -3,6 +3,8 @@ import React, { useRef, useEffect, useCallback } from 'react';
 import clsx from 'clsx';
 import { useInView } from 'react-intersection-observer';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { useAnimationActivity } from '@/hooks/useAnimationActivity';
+import { createFrameGate } from '@/lib/canvasFrame';
 
 interface MatrixRainProps {
   className?: string;
@@ -48,6 +50,7 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
   const canvasElementRef = useRef<HTMLCanvasElement | null>(null);
   const { ref: inViewRef, inView } = useInView({ threshold: 0 });
   const prefersReducedMotion = usePrefersReducedMotion();
+  const isAnimationActive = useAnimationActivity(inView && !prefersReducedMotion);
 
   // BOLT: Use a callback ref to properly handle dual-ref requirement (canvas access + IntersectionObserver)
   const setRefs = useCallback((node: HTMLCanvasElement | null) => {
@@ -57,12 +60,12 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
 
   useEffect(() => {
     const canvas = canvasElementRef.current;
-    if (!canvas || prefersReducedMotion || !inView) return;
+    if (!canvas || prefersReducedMotion || !inView || !isAnimationActive) return;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let animationFrameId: number;
+    let animationFrameId = 0;
     let width: number;
     let height: number;
 
@@ -141,15 +144,18 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
     let glitchTimeoutId: ReturnType<typeof setTimeout>;
     const glitchIndices: number[] = [];
 
-    window.addEventListener('resize', () => {
-      resize();
-      updateGlyphCache();
-    }, { passive: true });
+    window.addEventListener('resize', resize, { passive: true });
     resize();
 
-    const draw = () => {
+    const shouldDrawFrame = createFrameGate(24);
+    const draw = (timestamp: number) => {
       // BOLT: "Sleepy" Loop Optimization - Cancel requestAnimationFrame when out of view to eliminate background CPU overhead. The loop automatically restarts when inView triggers a re-render.
       if (!inView) {
+        return;
+      }
+
+      if (!shouldDrawFrame(timestamp)) {
+        animationFrameId = requestAnimationFrame(draw);
         return;
       }
 
@@ -237,16 +243,14 @@ export default function MatrixRain({ className, opacity = 0.055 }: MatrixRainPro
     };
 
     scheduleGlitch();
-    if (inView) {
-      draw();
-    }
+    if (inView) animationFrameId = requestAnimationFrame(draw);
 
     return () => {
       window.removeEventListener('resize', resize);
       cancelAnimationFrame(animationFrameId);
       clearTimeout(glitchTimeoutId);
     };
-  }, [prefersReducedMotion, inView]);
+  }, [prefersReducedMotion, inView, isAnimationActive]);
 
   if (prefersReducedMotion) {
     return (

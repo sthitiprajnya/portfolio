@@ -39,6 +39,12 @@ export function CursorProvider({ children }: CursorProviderProps) {
   }, []);
 
   const render = useCallback(() => {
+    if (isInitial.current) {
+      rafId.current = null;
+      isActive.current = false;
+      return;
+    }
+
     // Lerp for smooth follow
     const dx = mousePos.current.x - ringPos.current.x;
     const dy = mousePos.current.y - ringPos.current.y;
@@ -126,8 +132,6 @@ export function CursorProvider({ children }: CursorProviderProps) {
     window.addEventListener('mouseover', handleMouseOver, { passive: true });
     window.addEventListener('mousedown', handleMouseDown, { passive: true });
     window.addEventListener('mouseup', handleMouseUp, { passive: true });
-
-    wake();
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);

@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { useAnimationActivity } from '@/hooks/useAnimationActivity';
 import { useInView } from 'react-intersection-observer';
 import clsx from 'clsx';
 
@@ -14,11 +15,12 @@ export function GlitchText({ children, className, style }: GlitchTextProps) {
   const [isGlitching, setIsGlitching] = useState(false);
   const prefersReducedMotion = usePrefersReducedMotion();
   const { ref, inView } = useInView({ threshold: 0 });
+  const isAnimationActive = useAnimationActivity(inView && !prefersReducedMotion);
 
   // BOLT: Only schedule background glitches when the component is in the viewport
   // to prevent unnecessary state updates and re-renders when the user has scrolled past.
   useEffect(() => {
-    if (prefersReducedMotion || !inView) return;
+    if (prefersReducedMotion || !inView || !isAnimationActive) return;
 
     const scheduleNextGlitch = () => {
       const delay = Math.floor(Math.random() * (15000 - 8000 + 1)) + 8000;
@@ -32,7 +34,7 @@ export function GlitchText({ children, className, style }: GlitchTextProps) {
     let timeoutId = scheduleNextGlitch();
 
     return () => clearTimeout(timeoutId);
-  }, [prefersReducedMotion, inView]);
+  }, [prefersReducedMotion, inView, isAnimationActive]);
 
   if (prefersReducedMotion) {
     return <span className={className} style={style}>{children}</span>;

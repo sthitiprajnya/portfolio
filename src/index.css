@@ -313,6 +313,12 @@ body {
   animation-play-state: paused;
 }
 
+html[data-animation-idle='true'] *,
+html[data-animation-idle='true'] *::before,
+html[data-animation-idle='true'] *::after {
+  animation-play-state: paused !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ticker-track {
     animation: none !important;

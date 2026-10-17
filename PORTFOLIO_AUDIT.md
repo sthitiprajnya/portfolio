@@ -28,7 +28,7 @@ For the reported idle lag, fixed a cursor animation loop that started on mount, 
 | Built-site browser checks | Pages subpath loads; idle state pauses CSS animations (46 to 0 in browser instrumentation), pointer activity resumes motion; mobile dialog and base-path checks passed in the earlier site audit |
 | Idle CPU comparison | Two 15-second Chromium samples after 13 seconds idle fell from 106.2% / 102.1% to 15.8% / 15.0% of one logical CPU core, about 85% lower; sandbox diagnostic, not a Lighthouse/device guarantee |
 | Background process cleanup | Local preview server and browser measurement processes stopped; no active background task remains |
-| GitHub Pages deployment | The latest performance changes are being published through the repository's normal GitHub Actions workflow; verify its run before treating them as live |
+| GitHub Pages deployment | [Run 39039455182](https://github.com/sthitiprajnya/portfolio/actions/runs/39039455182) passed quality gates, EmailJS validation, static export, and deployment. Public homepage and idle-provider bundle both returned HTTP 200 |
 
 ## Outstanding items / limitations
 

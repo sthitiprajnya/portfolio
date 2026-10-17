@@ -38,6 +38,7 @@ The two-sample mean fell from 104.15% to 15.4% (about an **85% reduction**). Bro
 - `npm run type-check` — passed.
 - `npm test` — 44 tests passed across 18 files, including frame-budget, cursor-startup, idle-wakeup, and resize-listener cleanup regressions.
 - `npm run build` — passed; static export and image optimization completed.
+- [GitHub Pages run 39039455182](https://github.com/sthitiprajnya/portfolio/actions/runs/39039455182) — type, lint, tests, production audit, EmailJS validation, export, and deployment all passed. The live homepage and bundle containing the idle-provider marker returned HTTP 200.
 - Local preview and Chromium processes used for measurement were stopped after the checks; no preview service remains running.
 
 The repository's previous production-only audit was clean (`npm audit --omit=dev`: 0 vulnerabilities). This performance change did not modify dependencies.
@@ -54,4 +55,4 @@ The full development dependency audit previously reported **7 findings (5 high, 
 
 ## Remaining limitations
 
-The CPU comparison is a controlled local headless-Chromium comparison on this sandbox; confirm subjective smoothness on a normal laptop and phone after deployment. The full development dependency advisories remain until either the compatible overrides are validated or the Tailwind 4 migration is completed. No EmailJS values were read or included in this report.
+The CPU comparison is a controlled local headless-Chromium comparison on this sandbox; it is not a Lighthouse score or a guarantee for every device, so subjective smoothness should also be checked on a normal laptop and phone. The full development dependency advisories remain until either the compatible overrides are validated or the Tailwind 4 migration is completed. No EmailJS values were read or included in this report.

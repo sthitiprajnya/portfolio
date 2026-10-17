@@ -91,7 +91,11 @@ export function Contact() {
     try {
       lastSubmission = localStorage.getItem(LAST_SUBMISSION_KEY);
     } catch (e) {
-      console.warn('Failed to read rate limit from localStorage.', e);
+      try {
+        lastSubmission = sessionStorage.getItem(LAST_SUBMISSION_KEY);
+      } catch (err) {
+        lastSubmission = (window as any)[LAST_SUBMISSION_KEY] || null;
+      }
     }
 
     if (lastSubmission && now - parseInt(lastSubmission) < COOLDOWN_MS) {
@@ -108,6 +112,17 @@ export function Contact() {
       // to reduce the initial JavaScript bundle size and improve page load performance.
       const emailjs = (await import('@emailjs/browser')).default;
 
+      // 🛡️ Sentinel: Set cooldown before awaiting external call to prevent race condition
+      try {
+        localStorage.setItem(LAST_SUBMISSION_KEY, now.toString());
+      } catch (e) {
+        try {
+          sessionStorage.setItem(LAST_SUBMISSION_KEY, now.toString());
+        } catch (err) {
+          (window as any)[LAST_SUBMISSION_KEY] = now.toString();
+        }
+      }
+
       await emailjs.sendForm(
         serviceId,
         templateId,
@@ -115,19 +130,22 @@ export function Contact() {
         publicKey
       );
 
-      // Only set cooldown upon successful submission
-      try {
-        localStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
-      } catch (e) {
-        console.warn('Failed to write rate limit to localStorage.', e);
-      }
-
       setStatus('sent');
       setForm({ from_name: '', from_email: '', subject: '', message: '', hp_field: '' });
       setTimeout(() => setStatus('idle'), 6000);
     } catch (error) {
       console.error("EmailJS Error:", error);
       setStatus('error');
+      // Revert cooldown on error to allow immediate retry
+      try {
+        localStorage.removeItem(LAST_SUBMISSION_KEY);
+      } catch (e) {
+        try {
+          sessionStorage.removeItem(LAST_SUBMISSION_KEY);
+        } catch (err) {
+          delete (window as any)[LAST_SUBMISSION_KEY];
+        }
+      }
     }
   };
 

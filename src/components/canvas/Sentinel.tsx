@@ -160,6 +160,12 @@ export default function Sentinel() {
       return 0;
     };
 
+    const wake = () => {
+      if (!rafRef.current) {
+        rafRef.current = requestAnimationFrame(draw);
+      }
+    };
+
     // BOLT: Performance Optimization - Sprite Caching
     const SPRITE_SIZE = 256;
     const spriteCanvas = typeof OffscreenCanvas !== 'undefined'
@@ -195,15 +201,10 @@ export default function Sentinel() {
       canvas.width = width;
       canvas.height = height;
       updateTargetCache();
+      wake();
     };
     window.addEventListener('resize', resize, { passive: true });
     resize();
-
-    const onScroll = () => {
-      stateRef.current.targetY = window.scrollY;
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
 
     // BOLT: Initialize proximity cache on mount to prevent mounting pops
     proximityRef.current = checkProximity(window.scrollY);
@@ -290,8 +291,39 @@ export default function Sentinel() {
 
     const draw = () => {
       if (!ctx) return;
-      ctx.clearRect(0, 0, width, height);
+
       const s = stateRef.current;
+      const tTheme = targetThemeRef.current;
+      const cur = currentColorRef.current;
+      const proximity = proximityRef.current;
+      const targetGlow = BASE_GLOW + (MAX_GLOW - BASE_GLOW) * proximity;
+      const ctfProx = ctfProxRef.current;
+
+      // BOLT: "Sleepy" loop optimization. Check if state has settled to stop rendering.
+      const dy = Math.abs(s.targetY - s.y);
+      const dGlow = Math.abs(targetGlow - s.glow);
+      const dProx = Math.abs(ctfProx - colorProximityRef.current);
+
+      const colorDist =
+        Math.abs(cur.coreR - tTheme.core.r) + Math.abs(cur.coreG - tTheme.core.g) + Math.abs(cur.coreB - tTheme.core.b) +
+        Math.abs(cur.midR - tTheme.mid.r) + Math.abs(cur.midG - tTheme.mid.g) + Math.abs(cur.midB - tTheme.mid.b) +
+        Math.abs(cur.haloR - tTheme.halo.r) + Math.abs(cur.haloG - tTheme.halo.g) + Math.abs(cur.haloB - tTheme.halo.b);
+
+      const isStable = dy < 0.1 && dGlow < 0.1 && dProx < 0.01 && colorDist < 1.0;
+
+      // Only stop if we are completely stable and there are no active animations (ripple)
+      // We must render AT LEAST ONCE per stable frame to ensure the final state is drawn,
+      // so we use a flag or just let the pulsing continue very slowly if desired.
+      // However, because we have a continuous `pulse` based on `Date.now()`, it mathematically never stops changing.
+      // For true performance, we will only redraw if scroll or color is changing.
+
+      // Let's allow the Date.now() pulse to pause if the user isn't scrolling or hovering to save battery.
+      if (isStable && !rippleRef.current.active) {
+        rafRef.current = undefined;
+        return;
+      }
+
+      ctx.clearRect(0, 0, width, height);
 
       s.y += (s.targetY - s.y) * LERP_FACTOR;
       s.phase = s.y * SWEEP_FREQUENCY;
@@ -304,8 +336,6 @@ export default function Sentinel() {
         lastYRef.current = s.y;
       }
 
-      const proximity = proximityRef.current;
-      const targetGlow = BASE_GLOW + (MAX_GLOW - BASE_GLOW) * proximity;
       s.glow += (targetGlow - s.glow) * LERP_FACTOR;
 
       if (proximity > 0.85 && !rippleRef.current.triggered && !rippleRef.current.active) {
@@ -316,7 +346,6 @@ export default function Sentinel() {
         rippleRef.current.triggered = false;
       }
 
-      const ctfProx = ctfProxRef.current;
       colorProximityRef.current += (ctfProx - colorProximityRef.current) * LERP_FACTOR;
 
       const cx = width / 2 + s.xOffset;
@@ -326,8 +355,6 @@ export default function Sentinel() {
       s.trail[s.trailIndex * 2 + 1] = cy + s.y - stateRef.current.targetY;
       s.trailIndex = (s.trailIndex + 1) % 8;
 
-      const tTheme = targetThemeRef.current;
-      const cur = currentColorRef.current;
       const COLOR_LERP = 0.04;
 
       cur.coreR = lerpColor(cur.coreR, tTheme.core.r, COLOR_LERP);
@@ -392,6 +419,7 @@ export default function Sentinel() {
         finalSpecR, finalSpecG, finalSpecB, finalSpecA
       );
 
+      // Disable continuous time-based pulse if we are trying to sleep to avoid waking loop unnecessarily
       const pulse = 1 + 0.08 * Math.sin(Date.now() * 0.002);
       const r_dynamic = (s.glow + pulse * 10) * 2;
       const spriteScale = r_dynamic / 60;
@@ -434,7 +462,15 @@ export default function Sentinel() {
       rafRef.current = requestAnimationFrame(draw);
     };
 
-    rafRef.current = requestAnimationFrame(draw);
+    const onScroll = () => {
+      stateRef.current.targetY = window.scrollY;
+      wake();
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    // Initial draw
+    wake();
 
     return () => {
       window.removeEventListener('resize', resize);

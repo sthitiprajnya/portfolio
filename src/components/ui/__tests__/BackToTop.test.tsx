@@ -6,30 +6,50 @@ vi.mock('@/hooks/usePrefersReducedMotion', () => ({
 }));
 
 // Mock framer-motion properly using vi.mock with an inline factory
-vi.mock('framer-motion', () => ({
-  motion: {
-    button: (props: Record<string, unknown>) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { initial, animate, exit, ...rest } = props;
-      return <button {...rest} />;
+vi.mock('framer-motion', () => {
+  let mockScrollY = 0;
+  let listeners: ((v: number) => void)[] = [];
+
+  return {
+    motion: {
+      button: (props: Record<string, unknown>) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { initial, animate, exit, ...rest } = props;
+        return <button {...rest} />;
+      },
+      div: (props: Record<string, unknown>) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { initial, animate, exit, ...rest } = props;
+        return <div {...rest} />;
+      },
     },
-    div: (props: Record<string, unknown>) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { initial, animate, exit, ...rest } = props;
-      return <div {...rest} />;
+    AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+    useScroll: () => ({ scrollY: mockScrollY }),
+    useMotionValueEvent: (value: any, event: string, callback: (latest: number) => void) => {
+      listeners.push(callback);
     },
-  },
-  AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-}));
+    // Test helper to simulate scroll in framer-motion mock
+    __setScrollY: (y: number) => {
+      mockScrollY = y;
+      listeners.forEach(cb => cb(y));
+    },
+    __resetMock: () => {
+      mockScrollY = 0;
+      listeners = [];
+    }
+  };
+});
 
 import { BackToTop } from '../BackToTop';
+import * as framerMotion from 'framer-motion';
+import { act } from '@testing-library/react';
 
 describe('BackToTop', () => {
   beforeEach(() => {
     vi.stubGlobal('scrollTo', vi.fn());
-    // Start with scrollY at 0
-    Object.defineProperty(window, 'scrollY', { value: 0, writable: true });
     vi.useFakeTimers();
+    // @ts-ignore
+    framerMotion.__resetMock();
   });
 
   afterEach(() => {
@@ -46,16 +66,21 @@ describe('BackToTop', () => {
     render(<BackToTop />);
     expect(screen.queryByRole('button', { name: /back to top/i })).not.toBeInTheDocument();
 
-    window.scrollY = 401;
-    fireEvent.scroll(window);
+    act(() => {
+      // @ts-ignore
+      framerMotion.__setScrollY(401);
+    });
 
     expect(screen.getByRole('button', { name: /back to top/i })).toBeInTheDocument();
   });
 
   it('should scroll to top when clicked', () => {
-    window.scrollY = 401;
     render(<BackToTop />);
-    fireEvent.scroll(window);
+
+    act(() => {
+      // @ts-ignore
+      framerMotion.__setScrollY(401);
+    });
 
     const button = screen.getByRole('button', { name: /back to top/i });
     fireEvent.click(button);

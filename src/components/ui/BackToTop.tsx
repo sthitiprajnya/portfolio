@@ -1,18 +1,19 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 export const BackToTop = () => {
   const [isVisible, setIsVisible] = useState(false);
   const reducedMotion = usePrefersReducedMotion();
+  const { scrollY } = useScroll();
 
-  useEffect(() => {
-    const toggle = () => setIsVisible(window.scrollY > 400);
-    // BOLT: Add passive listener to high-frequency scroll event to improve scroll performance
-    window.addEventListener('scroll', toggle, { passive: true });
-    return () => window.removeEventListener('scroll', toggle);
-  }, []);
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    const shouldBeVisible = latest > 400;
+    if (shouldBeVisible !== isVisible) {
+      setIsVisible(shouldBeVisible);
+    }
+  });
 
   const scroll = () => {
     window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });

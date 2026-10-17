@@ -79,26 +79,44 @@ export function Experience() {
       calculateTarget();
     };
 
+    let currentProgress = 0;
+    let targetProgress = 0;
+
+    const draw = () => {
+      // Lerp towards target
+      const diff = targetProgress - currentProgress;
+
+      if (Math.abs(diff) > 0.001) {
+        currentProgress += diff * 0.15; // Smoothness factor
+        timeline.style.transform = `scaleY(${currentProgress})`;
+        rafId = requestAnimationFrame(draw);
+      } else {
+        currentProgress = targetProgress;
+        timeline.style.transform = `scaleY(${currentProgress})`;
+        rafId = null;
+      }
+    };
+
     const calculateTarget = () => {
       const scrollY = window.scrollY;
       const center = cachedWindowHeight / 2;
       const currentRectTop = cachedTop - scrollY;
       const distanceScrolled = center - currentRectTop;
 
-      let progress = 0;
       if (cachedHeight > 0) {
-        progress = distanceScrolled / cachedHeight;
+        targetProgress = distanceScrolled / cachedHeight;
+      } else {
+        targetProgress = 0;
       }
-      progress = Math.min(1, Math.max(0, progress));
+      targetProgress = Math.min(1, Math.max(0, targetProgress));
 
-      timeline.style.transform = `scaleY(${progress})`;
-      rafId = null;
+      if (!rafId) {
+        rafId = requestAnimationFrame(draw);
+      }
     };
 
     const onScroll = () => {
-      if (!rafId) {
-        rafId = requestAnimationFrame(calculateTarget);
-      }
+      calculateTarget();
     };
 
     const resizeObserver = new ResizeObserver(() => {

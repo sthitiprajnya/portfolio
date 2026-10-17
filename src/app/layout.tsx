@@ -113,13 +113,14 @@ export default function RootLayout({
       <head>
         <meta
           httpEquiv="Content-Security-Policy"
-          content="default-src 'self'; script-src 'self' 'unsafe-inline'; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://images.unsplash.com https://ghchart.rshah.org https://image.github.io; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.github.com https://api.emailjs.com; form-action 'self'; object-src 'none'; base-uri 'none'; manifest-src 'self'; worker-src 'none'; upgrade-insecure-requests; frame-ancestors 'none';"
+          content="default-src 'self'; script-src 'self' 'unsafe-inline'; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://images.unsplash.com https://ghchart.rshah.org https://image.github.io; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.github.com https://api.emailjs.com; form-action 'self'; object-src 'none'; base-uri 'none'; manifest-src 'self'; worker-src 'none'; upgrade-insecure-requests;"
         />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLdString }}
         />
         <link rel="security" href="/portfolio/.well-known/security.txt" />
+        <link rel="icon" type="image/svg+xml" href="/portfolio/favicon.svg" />
         <link rel="preload" href="/portfolio/og-image.webp" as="image" />
       </head>
       <body>

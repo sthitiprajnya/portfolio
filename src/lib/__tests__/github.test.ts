@@ -11,16 +11,14 @@ describe('fetchGitHubStats', () => {
     vi.clearAllMocks();
     localStorage.clear();
 
-    // Default fetch mock response
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve([])
-    });
+    mockFetch
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ followers: 0, public_repos: 0 }) })
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve([]) });
   });
 
   it('should handle unparseable JSON in localStorage gracefully', async () => {
     // Arrange: Set corrupted data in localStorage
-    localStorage.setItem('github_stats_cache_v1', '{ invalid json ]');
+    localStorage.setItem('github_stats_cache_v2', '{ invalid json ]');
 
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
@@ -34,7 +32,7 @@ describe('fetchGitHubStats', () => {
     expect(mockFetch).toHaveBeenCalled();
 
     // Check that localStorage was overwritten with valid JSON
-    const newCache = localStorage.getItem('github_stats_cache_v1');
+    const newCache = localStorage.getItem('github_stats_cache_v2');
     expect(newCache).not.toBeNull();
     // It should now be parseable JSON
     expect(() => JSON.parse(newCache!)).not.toThrow();

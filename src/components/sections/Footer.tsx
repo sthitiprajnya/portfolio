@@ -3,13 +3,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import React, { lazy, Suspense } from 'react';
 import { PERSONAL } from '@/data/portfolio';
 import { LogoBadge } from '@/components/ui/LogoBadge';
+import { sitePath } from '@/lib/sitePath';
 
 const MatrixRain = lazy(() => import('@/components/canvas/MatrixRain'));
 
 export function Footer() {
   const year = new Date().getFullYear();
-  // Using a mock session logged value or random number generator between 1000 and 5000 for aesthetics
-  const [visitorCount, setVisitorCount] = React.useState(0);
   const [copied, setCopied] = React.useState(false);
 
   const handleCopyEmail = async () => {
@@ -17,13 +16,6 @@ export function Footer() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
-  React.useEffect(() => {
-    // Generate a stable-ish random number based on today's date so it doesn't jump crazily on every refresh, but grows slowly
-    const today = new Date();
-    const base = 4280 + (today.getMonth() * 120) + today.getDate() * 15;
-    setVisitorCount(base + Math.floor(Math.random() * 5));
-  }, []);
 
   return (
     <footer className="relative bg-black h-[160px] pb-6 pt-2 flex flex-col items-center justify-center border-t-2 border-transparent">
@@ -103,19 +95,19 @@ export function Footer() {
           <span className="hidden md:inline">|</span>
           <span className="flex items-center gap-2">
             Built with
-            <LogoBadge src="/logos/footer/nextjs.svg" alt="Next.js" width={16} height={16} className="invert dark:invert-0 opacity-80" />
+            <LogoBadge src={sitePath('/logos/footer/nextjs.svg')} alt="Next.js" width={16} height={16} className="invert dark:invert-0 opacity-80" />
             · Deployed on
-            <LogoBadge src="/logos/footer/githubpages.svg" alt="GitHub Pages" width={16} height={16} className="invert dark:invert-0 opacity-80" />
+            <LogoBadge src={sitePath('/logos/footer/githubpages.svg')} alt="GitHub Pages" width={16} height={16} className="invert dark:invert-0 opacity-80" />
             · © {year}
           </span>
           <span className="hidden md:inline">|</span>
           <span
             role="status"
-            aria-label="Logged sessions count"
+            aria-label="Website status"
             className="flex items-center gap-2 px-2 py-0.5 bg-green/5 border border-green/20 rounded-card font-bold text-green shadow-[var(--glow-green-sm)]"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-green animate-pulse" aria-hidden="true"></span>
-            SESSIONS_LOGGED: {visitorCount.toString().padStart(4, '0')}
+            SITE_STATUS: ONLINE
           </span>
         </div>
       </div>

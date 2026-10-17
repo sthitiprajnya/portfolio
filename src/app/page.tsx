@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import dynamic from 'next/dynamic';
 
 // ⚡ Bolt: Dynamically import Preloader to defer loading of framer-motion and reduce initial bundle size
@@ -19,7 +18,6 @@ const About = dynamic(() => import('@/components/sections/About').then(mod => ({
 const Skills = dynamic(() => import('@/components/sections/Skills').then(mod => ({ default: mod.Skills })));
 const Experience = dynamic(() => import('@/components/sections/Experience').then(mod => ({ default: mod.Experience })));
 const Projects = dynamic(() => import('@/components/sections/Projects').then(mod => ({ default: mod.Projects })));
-const WriteupsStub = dynamic(() => import('@/components/sections/WriteupsStub').then(mod => ({ default: mod.WriteupsStub })));
 const Certifications = dynamic(() => import('@/components/sections/Certifications').then(mod => ({ default: mod.Certifications })));
 const CTFStats = dynamic(() => import('@/components/sections/CTFStats').then(mod => ({ default: mod.CTFStats })));
 const GitHubStats = dynamic(() => import('@/components/sections/GitHubStats').then(mod => ({ default: mod.GitHubStats })));
@@ -44,7 +42,6 @@ export default function Home() {
           <Skills />
           <Experience />
           <Projects />
-          <WriteupsStub />
           <Certifications />
           {/* Section 06 — War Games: CTF / HackTheBox activity */}
           <CTFStats />

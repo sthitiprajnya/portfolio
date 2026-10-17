@@ -204,12 +204,6 @@ export default function Sentinel() {
       wake();
     };
     window.addEventListener('resize', resize, { passive: true });
-    resize();
-
-    // BOLT: Initialize proximity cache on mount to prevent mounting pops
-    proximityRef.current = checkProximity(window.scrollY);
-    ctfProxRef.current = checkCtfProximity(window.scrollY);
-    lastYRef.current = window.scrollY;
 
     const sectionObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -461,6 +455,12 @@ export default function Sentinel() {
       }
       rafRef.current = requestAnimationFrame(draw);
     };
+
+    // Draw is initialized before resize wakes the animation loop.
+    resize();
+    proximityRef.current = checkProximity(window.scrollY);
+    ctfProxRef.current = checkCtfProximity(window.scrollY);
+    lastYRef.current = window.scrollY;
 
     const onScroll = () => {
       stateRef.current.targetY = window.scrollY;

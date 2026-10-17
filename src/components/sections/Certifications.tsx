@@ -4,6 +4,7 @@ import { SectionTitle } from '@/components/ui/SectionTitle';
 import { ScrollReveal, fadeSlideUp, containerStagger } from '@/components/ui/ScrollReveal';
 import { CERTIFICATIONS, UPCOMING_CERTIFICATIONS, CERT_ISSUER_LOGOS } from '@/data/portfolio';
 import { LogoBadge } from '@/components/ui/LogoBadge';
+import { sitePath } from '@/lib/sitePath';
 
 // BOLT: Hoist static configurations to module level to avoid redundant allocations on every render
 const CERT_COLOR_MAP = {
@@ -52,7 +53,7 @@ export function Certifications() {
                      <span className="font-mono text-[0.6rem] uppercase tracking-widest text-text-muted bg-[rgba(0,245,255,0.05)] px-2 py-0.5 rounded-pill glass-pill">LOCKED</span>
                    </div>
                    <h4 className="font-heading font-bold text-text-secondary group-hover:text-white transition-colors">{cert.name}</h4>
-                   <p className="font-mono text-[0.65rem] text-text-muted mt-2">Target: {cert.year}</p>
+                   <p className="font-mono text-[0.65rem] text-text-muted mt-2">Status: {cert.status}</p>
                 </div>
               ))}
             </div>
@@ -61,7 +62,7 @@ export function Certifications() {
 
         <ScrollReveal variants={fadeSlideUp} delay={0.6}>
           <p className="font-mono text-[0.75rem] text-text-muted text-center mt-12 opacity-60">
-            All certifications independently verified. Click VERIFY on any badge to confirm credentials via issuing authority.
+            Credential details are shown as supplied. Issuer links are provided only where a direct verification page is available.
           </p>
         </ScrollReveal>
       </div>
@@ -84,7 +85,7 @@ function CertCard({ cert }: { cert: typeof CERTIFICATIONS[0] }) {
         <div className="flex justify-between items-start mb-6 h-14">
           <div className="relative h-full flex items-center justify-center" role="img" aria-label={`${cert.issuer} logo`}>
             <LogoBadge
-              src={CERT_ISSUER_LOGOS[cert.issuer] || ''}
+              src={CERT_ISSUER_LOGOS[cert.issuer] ? sitePath(CERT_ISSUER_LOGOS[cert.issuer]) : ''}
               alt={cert.issuer}
               width={80}
               height={28}
@@ -93,11 +94,20 @@ function CertCard({ cert }: { cert: typeof CERTIFICATIONS[0] }) {
             />
           </div>
 
-          {cert.status === 'active' && (
+          {cert.status !== 'in-progress' && (
              <div className="flex flex-col items-end gap-1">
-               <div className="flex items-center space-x-1 bg-green/10 border border-green/20 px-2 py-0.5 rounded-full">
-                 <span className="w-1.5 h-1.5 rounded-full bg-green animate-pulse" />
-                 <span className="font-mono text-[0.55rem] uppercase text-green tracking-widest font-bold">Active</span>
+               <div className={clsx(
+                 "flex items-center space-x-1 px-2 py-0.5 rounded-full border",
+                 cert.status === 'active' ? "bg-green/10 border-green/20" : "bg-amber/10 border-amber/30"
+               )}>
+                 <span aria-hidden="true" className={clsx(
+                   "w-1.5 h-1.5 rounded-full",
+                   cert.status === 'active' ? "bg-green animate-pulse" : "bg-amber"
+                 )} />
+                 <span className={clsx(
+                   "font-mono text-[0.55rem] uppercase tracking-widest font-bold",
+                   cert.status === 'active' ? "text-green" : "text-amber"
+                 )}>{cert.status}</span>
                </div>
                {cert.expiry && (
                  <span className="font-mono text-[0.55rem] text-text-muted mt-1">Exp: {cert.expiry}</span>

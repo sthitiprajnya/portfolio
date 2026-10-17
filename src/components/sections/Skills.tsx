@@ -5,13 +5,8 @@ import { SkillBadge } from '@/components/ui/SkillBadge';
 import { ScrollReveal, fadeSlideUp, containerStagger } from '@/components/ui/ScrollReveal';
 import { SKILLS } from '@/data/portfolio';
 import clsx from 'clsx';
-import dynamic from 'next/dynamic';
 import { useInView } from 'react-intersection-observer';
-
-const RadarChart = dynamic(() => import('@/components/ui/RadarChart'), {
-  ssr: false,
-  loading: () => <div className="w-full h-full flex items-center justify-center font-mono text-[0.6rem] text-text-muted animate-pulse">LOADING_DATA_VIZ...</div>
-});
+import RadarChart, { type RadarChartData } from '@/components/ui/RadarChart';
 
 // Generate flat list of tags for marquee outside component to avoid redundant allocations on every render
 const MARQUEE_TAGS = [
@@ -29,7 +24,7 @@ const DOUBLED_MARQUEE_ROW_1 = [...MARQUEE_TAGS, ...MARQUEE_TAGS];
 const DOUBLED_MARQUEE_ROW_2 = [...MARQUEE_TAGS].reverse().concat([...MARQUEE_TAGS].reverse());
 
 // BOLT: Hoist static data and configurations to avoid redundant allocations on every render
-const RADAR_DATA = {
+const RADAR_DATA: RadarChartData = {
   labels: ['Offensive', 'Cloud Security', 'Automation', 'Compliance', 'Network Analysis', 'Incident Response'],
   datasets: [
     {
@@ -37,27 +32,10 @@ const RADAR_DATA = {
       data: [90, 85, 88, 80, 85, 82], // Aggregated scores
       backgroundColor: 'rgba(0, 245, 255, 0.2)',
       borderColor: 'rgba(0, 245, 255, 1)',
-      borderWidth: 2,
       pointBackgroundColor: 'rgba(0, 245, 255, 1)',
       pointBorderColor: '#fff',
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: 'rgba(0, 245, 255, 1)',
     },
   ],
-};
-
-const RADAR_OPTIONS = {
-  scales: {
-    r: {
-      angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
-      grid: { color: 'rgba(255, 255, 255, 0.1)' },
-      pointLabels: { color: '#7FA8C4', font: { family: 'JetBrains Mono', size: 10 } },
-      ticks: { display: false, min: 0, max: 100 },
-    },
-  },
-  plugins: { legend: { display: false } },
-  maintainAspectRatio: false,
-  animation: { duration: 2000 }
 };
 
 const SKILLS_TABS: ('ALL' | 'OFFENSIVE' | 'CLOUD' | 'AUTOMATION' | 'COMPLIANCE')[] = ['ALL', 'OFFENSIVE', 'CLOUD', 'AUTOMATION', 'COMPLIANCE'];
@@ -96,12 +74,11 @@ export function Skills() {
   };
 
   const { totalFilteredSkills, filteredCategories } = useMemo(() => {
-    let count = 0;
     const categories = SKILLS.map(category => {
       const filteredSkills = category.skills.filter(s => activeTab === 'ALL' || s.domain === activeTab);
-      count += filteredSkills.length;
       return { ...category, filteredSkills };
     }).filter(cat => cat.filteredSkills.length > 0);
+    const count = categories.reduce((total, category) => total + category.filteredSkills.length, 0);
     return { totalFilteredSkills: count, filteredCategories: categories };
   }, [activeTab]);
 
@@ -160,10 +137,7 @@ export function Skills() {
                [ DOMAIN_PROFICIENCY_RADAR ]
              </div>
              {chartInView && (
-               <RadarChart
-                 data={RADAR_DATA}
-                 options={RADAR_OPTIONS}
-               />
+                <RadarChart data={RADAR_DATA} />
              )}
           </div>
         </div>

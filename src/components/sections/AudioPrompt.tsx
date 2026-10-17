@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAudio } from '../providers/AudioProvider';
 import { CyberButton } from '../ui/CyberButton';
@@ -31,6 +31,26 @@ export default function AudioPrompt({ onComplete }: AudioPromptProps) {
   const { currentVoice, setCurrentVoice, availableVoices, setAudioEnabled } = useAudio();
   const [isClosing, setIsClosing] = useState(false);
   const [voicesLoaded, setVoicesLoaded] = useState(false);
+
+  const finish = useCallback(() => {
+    setIsClosing(true);
+    setTimeout(onComplete, 500);
+  }, [onComplete]);
+
+  const handleSkip = useCallback(() => {
+    setAudioEnabled(false);
+    finish();
+  }, [finish, setAudioEnabled]);
+
+  const handleEnableAudio = useCallback(() => {
+    if (!voicesLoaded) return;
+    setAudioEnabled(true);
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      const utterance = new SpeechSynthesisUtterance('');
+      window.speechSynthesis.speak(utterance);
+    }
+    finish();
+  }, [finish, setAudioEnabled, voicesLoaded]);
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
@@ -65,30 +85,7 @@ export default function AudioPrompt({ onComplete }: AudioPromptProps) {
             window.speechSynthesis.removeEventListener('voiceschanged', checkVoices);
         }
     };
-  }, [voicesLoaded]);
-
-  const handleEnableAudio = () => {
-    if (!voicesLoaded) return;
-    setAudioEnabled(true);
-    // Initialize speech synthesis silently to circumvent autoplay policies
-    if (typeof window !== 'undefined' && window.speechSynthesis) {
-        const u = new SpeechSynthesisUtterance('');
-        window.speechSynthesis.speak(u);
-    }
-    finish();
-  };
-
-  const handleSkip = () => {
-    setAudioEnabled(false);
-    finish();
-  };
-
-  const finish = () => {
-    setIsClosing(true);
-    setTimeout(() => {
-      onComplete();
-    }, 500); // Wait for closing animation
-  };
+  }, [handleSkip, voicesLoaded]);
 
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -137,7 +134,7 @@ export default function AudioPrompt({ onComplete }: AudioPromptProps) {
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isClosing]);
+  }, [handleSkip, isClosing]);
 
   return (
     <AnimatePresence>

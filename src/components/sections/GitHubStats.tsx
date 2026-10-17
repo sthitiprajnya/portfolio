@@ -7,77 +7,23 @@ import CountUp from 'react-countup';
 import useSWR from 'swr';
 import Image from 'next/image';
 import { useState } from 'react';
-
-const fetcher = async (url: string) => {
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), 5000);
-  try {
-    const res = await fetch(url, { signal: controller.signal });
-    return await res.json();
-  } finally {
-    clearTimeout(id);
-  }
-};
-
-const TOP_REPOS = [
-  {
-    name: 'VAPT-Automation',
-    description: 'Automated vulnerability scanning pipeline leveraging Burp Suite Pro REST API and custom Python scripts.',
-    language: 'Python',
-    url: 'https://github.com/sthitiprajnya/VAPT-Automation',
-    stars: 18,
-    forks: 5
-  },
-  {
-    name: 'GCP-Hardening-Scripts',
-    description: 'Collection of Bash scripts to automatically audit and harden GCP environments according to CIS benchmarks.',
-    language: 'Bash',
-    url: 'https://github.com/sthitiprajnya/GCP-Hardening-Scripts',
-    stars: 12,
-    forks: 4
-  },
-  {
-    name: 'Wazuh-SIEM-Rules',
-    description: 'Custom decoders and rules for Wazuh to detect advanced persistent threats and anomalous activity.',
-    language: 'XML',
-    url: 'https://github.com/sthitiprajnya/Wazuh-SIEM-Rules',
-    stars: 8,
-    forks: 3
-  },
-  {
-    name: 'DLP-Pipeline',
-    description: 'Data Loss Prevention (DLP) mechanism integrated into CI/CD to prevent sensitive data leaks.',
-    language: 'Python',
-    url: 'https://github.com/sthitiprajnya/DLP-Pipeline',
-    stars: 4,
-    forks: 2
-  }
-];
-
-const GITHUB_FALLBACK = { public_repos: 18, followers: 12, following: 0 };
+import { fetchGitHubStats } from '@/lib/github';
 
 export function GitHubStats() {
   const [heatmapError, setHeatmapError] = useState(false);
   const { data: githubData } = useSWR(
-    'https://api.github.com/users/sthitiprajnya',
-    fetcher,
+    'portfolio-github-stats',
+    fetchGitHubStats,
     {
       revalidateOnFocus: false,
       dedupingInterval: 3_600_000, // 1 hour
-      fallbackData: GITHUB_FALLBACK,
     }
   );
 
-  const stats = React.useMemo(() => ({
-    publicRepos: githubData?.public_repos || 18,
-    totalStars: 42,
-    totalForks: 14,
-    followers: githubData?.followers || 12,
-    commits: 852,
-    prs: 43,
-    issues: 12,
-    topRepos: TOP_REPOS
-  }), [githubData]);
+  const topLanguages = Object.entries(githubData?.languages ?? {})
+    .sort(([, first], [, second]) => second - first)
+    .slice(0, 4);
+  const totalLanguageRepos = topLanguages.reduce((sum, [, count]) => sum + count, 0);
 
   return (
     <section
@@ -93,10 +39,10 @@ export function GitHubStats() {
 
             {/* Top Stats Row */}
             <ScrollReveal variants={containerStagger} className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <StatCard label="Public Repos" value={stats.publicRepos} />
-              <StatCard label="Total Stars" value={stats.totalStars} />
-              <StatCard label="Total Forks" value={stats.totalForks} />
-              <StatCard label="Followers" value={stats.followers} />
+              <StatCard label="Public Repos" value={githubData?.available ? githubData.publicRepos : undefined} />
+              <StatCard label="Total Stars" value={githubData?.available ? githubData.totalStars : undefined} />
+              <StatCard label="Total Forks" value={githubData?.available ? githubData.totalForks : undefined} />
+              <StatCard label="Followers" value={githubData?.available ? githubData.followers : undefined} />
             </ScrollReveal>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -128,38 +74,18 @@ export function GitHubStats() {
                          [HEATMAP_API_UNAVAILABLE] <br /> Showing static representation
                        </div>
                      )}
-                     {/* Top languages bar */}
+                     {/* Languages measured from repositories currently returned by GitHub. */}
                      <div className="w-full mt-4 px-4">
                        <div className="flex justify-between font-mono text-[0.65rem] text-text-muted mb-1">
-                         <span>TOP_LANGUAGES</span>
+                         <span>LANGUAGES_BY_REPOSITORY</span>
                        </div>
                        <div className="h-2 w-full flex rounded-card overflow-hidden">
-                         <div className="bg-[#3572A5] h-full" style={{ width: '60%' }} title="Python 60%"></div>
-                         <div className="bg-[#89e051] h-full" style={{ width: '25%' }} title="Bash 25%"></div>
-                         <div className="bg-[#89e051] h-full opacity-70" style={{ width: '15%' }} title="Shell 15%"></div>
+                         {topLanguages.map(([language, count], index) => (
+                           <div key={language} className={index % 2 ? 'bg-green/70 h-full' : 'bg-cyan h-full'} style={{ width: `${totalLanguageRepos ? (count / totalLanguageRepos) * 100 : 0}%` }} title={`${language}: ${count} repositories`} />
+                         ))}
                        </div>
                        <div className="flex justify-between font-mono text-[0.55rem] text-text-muted mt-1 uppercase">
-                         <span>Python 60%</span>
-                         <span>Bash 25%</span>
-                         <span>Shell 15%</span>
-                       </div>
-                     </div>
-
-                     <div className="mt-4 grid grid-cols-3 gap-6 w-full text-center border-t border-[var(--glass-border)] pt-6 relative z-10">
-                       <div>
-                         <div className="font-mono text-xl text-cyan font-bold mb-1" aria-hidden="true"><CountUp end={stats.commits} duration={2.5} enableScrollSpy scrollSpyOnce /></div>
-                         <span className="sr-only">{stats.commits} Commits</span>
-                         <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest">Commits</div>
-                       </div>
-                       <div>
-                         <div className="font-mono text-xl text-green font-bold mb-1" aria-hidden="true"><CountUp end={stats.prs} duration={2.5} enableScrollSpy scrollSpyOnce /></div>
-                         <span className="sr-only">{stats.prs} Pull Requests</span>
-                         <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest">Pull Requests</div>
-                       </div>
-                       <div>
-                         <div className="font-mono text-xl text-amber font-bold mb-1" aria-hidden="true"><CountUp end={stats.issues} duration={2.5} enableScrollSpy scrollSpyOnce /></div>
-                         <span className="sr-only">{stats.issues} Issues</span>
-                         <div className="font-mono text-[0.6rem] text-text-muted uppercase tracking-widest">Issues</div>
+                         {topLanguages.length ? topLanguages.map(([language, count]) => <span key={language}>{language} · {count}</span>) : <span>Waiting for public repository data</span>}
                        </div>
                      </div>
                   </div>
@@ -174,9 +100,9 @@ export function GitHubStats() {
                   </h3>
 
                   <div className="flex flex-col space-y-4 flex-grow relative z-10">
-                    {stats.topRepos.map((repo, idx) => (
+                    {(githubData?.topRepos ?? []).map((repo) => (
                       <a
-                        key={idx}
+                        key={repo.name}
                         href={repo.url}
                         target="_blank" rel="noopener noreferrer"
 
@@ -207,6 +133,9 @@ export function GitHubStats() {
                         )}
                       </a>
                     ))}
+                    {!githubData?.topRepos.length && (
+                      <p className="font-mono text-xs text-text-muted">Repository data will appear when GitHub&apos;s public API is reachable.</p>
+                    )}
 
                   </div>
                 </div>
@@ -218,13 +147,13 @@ export function GitHubStats() {
   );
 }
 
-const StatCard = React.memo(function StatCard({ label, value }: { label: string, value: number }) {
+const StatCard = React.memo(function StatCard({ label, value }: { label: string, value?: number }) {
   return (
     <div className="p-6 flex flex-col items-center justify-center text-center glass rounded-card relative overflow-hidden">
       <div className="font-display text-3xl text-cyan mb-2 relative z-10" aria-hidden="true">
-        <CountUp end={value} duration={2} enableScrollSpy scrollSpyOnce />
+        {value === undefined ? '—' : <CountUp end={value} duration={2} enableScrollSpy scrollSpyOnce />}
       </div>
-      <span className="sr-only">{value} {label}</span>
+      <span className="sr-only">{value === undefined ? `Loading ${label}` : `${value} ${label}`}</span>
       <div className="font-mono text-[0.65rem] uppercase tracking-widest text-text-muted relative z-10">
         {label}
       </div>

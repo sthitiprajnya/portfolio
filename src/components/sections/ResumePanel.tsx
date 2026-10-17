@@ -7,6 +7,7 @@ import { SectionTitle } from '@/components/ui/SectionTitle';
 import { CyberButton }  from '@/components/ui/CyberButton';
 import { ScrollReveal, fadeSlideUp, fadeSlideLeft, containerStagger } from '@/components/ui/ScrollReveal';
 import { PERSONAL, RESUME_HIGHLIGHTS } from '@/data/portfolio';
+import { sitePath } from '@/lib/sitePath';
 
 const RESUME_SHA256 = 'f4a9f24d314dd2a6869c505d896746a84561e97392e77d1a53c6b8adcbc06c91';
 
@@ -37,7 +38,7 @@ export function ResumePanel() {
   };
 
   const handleCopyLink = async () => {
-    const fullUrl = `${window.location.origin}${PERSONAL.resumeUrl}`;
+    const fullUrl = `${window.location.origin}${sitePath(PERSONAL.resumeUrl)}`;
     handleCopy(fullUrl);
     setLinkCopied(true);
     setTimeout(() => setLinkCopied(false), 2000);
@@ -92,7 +93,7 @@ export function ResumePanel() {
                     VERIFIED
                   </span>
                   <span className="px-2 py-0.5 border border-amber/50 text-amber font-mono text-[0.55rem] uppercase tracking-widest rounded-card">
-                    2025
+                    2026
                   </span>
                 </div>
               </div>
@@ -101,7 +102,7 @@ export function ResumePanel() {
               <div ref={iframeRef} className="w-full bg-[rgba(0,0,0,0.4)] relative z-10 min-h-[600px] flex items-center justify-center">
                 {inView ? (
                   <iframe
-                    src={PERSONAL.resumeUrl}
+                    src={sitePath(PERSONAL.resumeUrl)}
                     className="w-full h-[600px] border-none"
                     title="Resume PDF"
                     sandbox=""
@@ -122,7 +123,7 @@ export function ResumePanel() {
               {/* Footer stamp */}
               <div className="px-6 py-4 border-t border-[var(--glass-border)] flex flex-col md:flex-row justify-between items-center bg-[rgba(0,0,0,0.6)] gap-4 relative z-10">
                 <div className="text-[0.6rem] text-text-muted font-mono text-center md:text-left">
-                  DOC_ID: <RedactedText text="SB-RESUME-2025-v3" label="document ID" handleCopy={handleCopy} />
+                  DOC_ID: <RedactedText text="SB-RESUME-2026" label="document ID" handleCopy={handleCopy} />
                   <br className="md:hidden" />
                   <span className="hidden md:inline"> · </span>SHA256: <RedactedText text={RESUME_SHA256} label="SHA256 hash" handleCopy={handleCopy} />
                 </div>
@@ -169,7 +170,7 @@ export function ResumePanel() {
 
                 <CyberButton
                   as="a"
-                  href={PERSONAL.resumeUrl}
+                  href={sitePath(PERSONAL.resumeUrl)}
                   download
                   color="green"
                   className="w-full justify-center rounded-pill glass"
@@ -228,8 +229,8 @@ export function ResumePanel() {
 
                 {/* Audit trail label */}
                 <div className="mt-4 text-center font-mono text-[0.6rem] text-text-muted flex items-center justify-center gap-2 relative z-10">
-                  <span className="opacity-60">Last updated:</span>
-                  <span className="text-white">June 2025</span>
+                  <span className="opacity-60">PDF built:</span>
+                  <span className="text-white">May 10, 2026</span>
                   <span className="opacity-40">|</span>
                   <span className="opacity-60">PDF (&lt;2MB)</span>
                 </div>

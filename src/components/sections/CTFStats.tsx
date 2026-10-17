@@ -5,13 +5,9 @@ import { SectionTitle }  from '@/components/ui/SectionTitle';
 import { ScrollReveal, fadeSlideUp, fadeSlideLeft } from '@/components/ui/ScrollReveal';
 import { useInView }     from 'react-intersection-observer';
 import { CTF_PROFILE }   from '@/data/portfolio';
-import dynamic from 'next/dynamic';
 import { LogoBadge } from '@/components/ui/LogoBadge';
-
-const RadarChart = dynamic(() => import('@/components/ui/RadarChart'), {
-  ssr: false,
-  loading: () => <div className="w-full h-full flex items-center justify-center font-mono text-[0.6rem] text-text-muted animate-pulse">LOADING_DATA_VIZ...</div>
-});
+import { sitePath } from '@/lib/sitePath';
+import RadarChart, { type RadarChartData } from '@/components/ui/RadarChart';
 
 // BOLT: Hoist static configurations and data transformations to module level
 const HTB_STATS = [
@@ -23,7 +19,7 @@ const HTB_STATS = [
   { label: 'Competitions',  value: CTF_PROFILE.competitions.length },
 ];
 
-const RADAR_DATA = {
+const RADAR_DATA: RadarChartData = {
   labels: CTF_PROFILE.attackCategories.map(c => c.label.split(' ')[0]),
   datasets: [{
     label: 'Proficiency',
@@ -35,29 +31,11 @@ const RADAR_DATA = {
   }]
 };
 
-const RADAR_OPTIONS = {
-  scales: {
-    r: {
-      angleLines: { color: 'rgba(255,255,255,0.1)' },
-      grid: { color: 'rgba(255,255,255,0.1)' },
-      pointLabels: { color: '#7FA8C4', font: { family: 'JetBrains Mono', size: 9 } },
-      ticks: { display: false },
-      suggestedMin: 0,
-      suggestedMax: 100
-    }
-  },
-  plugins: { legend: { display: false } },
-  maintainAspectRatio: false,
-  animation: { duration: 2000 }
-};
-
-
-
-function RadarChartWrapper({ data, options }: { data: any, options: any }) {
+function RadarChartWrapper({ data }: { data: RadarChartData }) {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
   return (
     <div ref={ref} className="w-full h-full flex justify-center items-center">
-      {inView && <RadarChart data={data} options={options} />}
+      {inView && <RadarChart data={data} />}
     </div>
   );
 }
@@ -93,7 +71,7 @@ export function CTFStats() {
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                   <LogoBadge
-                    src="/logos/wargames/hackthebox.svg"
+                    src={sitePath('/logos/wargames/hackthebox.svg')}
                     alt="HackTheBox"
                     width={32}
                     height={32}
@@ -165,7 +143,7 @@ export function CTFStats() {
 
                  {/* Hexagonal Radar Chart mapped from same data */}
                  <div className="h-[240px] relative flex justify-center items-center">
-                   <RadarChartWrapper data={RADAR_DATA} options={RADAR_OPTIONS} />
+                   <RadarChartWrapper data={RADAR_DATA} />
                  </div>
               </div>
             </div>

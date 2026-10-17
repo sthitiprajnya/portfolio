@@ -15,13 +15,16 @@ describe('fetchGitHubStats', () => {
   });
 
   it('should return fallback data if window is undefined', async () => {
-    // In vitest/jsdom environment, window is usually defined.
-    // This test might be tricky if we can't easily mock window being undefined.
-    // However, we can check if it returns data.
+    vi.stubGlobal('window', undefined);
+    const stats = await fetchGitHubStats();
+    expect(stats.available).toBe(false);
+    expect(stats.publicRepos).toBe(0);
+    expect(fetch).not.toHaveBeenCalled();
   });
 
   it('should return cached data if available and not expired', async () => {
     const cachedData = {
+      available: true,
       followers: 10,
       publicRepos: 5,
       totalStars: 100,
@@ -59,6 +62,7 @@ describe('fetchGitHubStats', () => {
     const stats = await fetchGitHubStats();
 
     expect(stats.followers).toBe(20);
+    expect(stats.available).toBe(true);
     expect(stats.publicRepos).toBe(15);
     expect(stats.totalStars).toBe(15);
     expect(stats.totalForks).toBe(5);
@@ -73,6 +77,7 @@ describe('fetchGitHubStats', () => {
     vi.mocked(fetch).mockRejectedValue(new Error('Network error'));
 
     const stats = await fetchGitHubStats();
-    expect(stats.publicRepos).toBe(10); // Fallback data publicRepos is 10
+    expect(stats.available).toBe(false);
+    expect(stats.publicRepos).toBe(0);
   });
 });

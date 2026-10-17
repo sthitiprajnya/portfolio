@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { LogoBadge } from '@/components/ui/LogoBadge';
+import { sitePath } from '@/lib/sitePath';
 
 interface SkillBadgeProps {
   name: string;
@@ -127,7 +128,7 @@ export const SkillBadge = React.memo(function SkillBadge({
         <div className="relative z-10 flex items-center justify-center pointer-events-none">
           {KNOWN_ICONS.has(icon) ? (
             <LogoBadge
-              src={`/logos/${ICON_PATHS[icon]}`}
+              src={sitePath(`/logos/${ICON_PATHS[icon]}`)}
               alt={name}
               width={20}
               height={20}

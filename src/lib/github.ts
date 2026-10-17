@@ -1,8 +1,9 @@
-const CACHE_KEY   = 'github_stats_cache_v1';
+const CACHE_KEY   = 'github_stats_cache_v2';
 const CACHE_TTL   = 60 * 60 * 1000;
 const GITHUB_USER = 'sthitiprajnya';
 
 export interface GitHubStats {
+  available:   boolean;
   followers:   number;
   publicRepos: number;
   totalStars:  number;
@@ -31,11 +32,12 @@ export interface GitHubApiRepo {
 }
 
 const GITHUB_FALLBACK_DATA: GitHubStats = {
+  available: false,
   followers: 0,
-  publicRepos: 10,
+  publicRepos: 0,
   totalStars: 0,
   totalForks: 0,
-  languages: { Python: 4, Shell: 3, JavaScript: 2 },
+  languages: {},
   topRepos: [],
   fetchedAt: Date.now(),
 };
@@ -57,6 +59,7 @@ export async function fetchGitHubStats(): Promise<GitHubStats> {
       if (
         parsed &&
         typeof parsed === 'object' &&
+        parsed.available === true &&
         typeof parsed.followers === 'number' &&
         typeof parsed.publicRepos === 'number' &&
         typeof parsed.fetchedAt === 'number' &&
@@ -148,6 +151,7 @@ export async function fetchGitHubStats(): Promise<GitHubStats> {
     }));
 
     const stats: GitHubStats = {
+      available: true,
       followers: user.followers,
       publicRepos: user.public_repos,
       totalStars,

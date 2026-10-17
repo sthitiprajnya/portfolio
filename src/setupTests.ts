@@ -40,13 +40,13 @@ if (typeof window.SpeechSynthesisUtterance === 'undefined') {
     rate: number;
     voice: SpeechSynthesisVoice | null;
     volume: number;
-    onstart: null | ((this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => any);
-    onend: null | ((this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => any);
-    onerror: null | ((this: SpeechSynthesisUtterance, ev: SpeechSynthesisErrorEvent) => any);
-    onpause: null | ((this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => any);
-    onresume: null | ((this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => any);
-    onmark: null | ((this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => any);
-    onboundary: null | ((this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => any);
+    onstart: null | ((this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => void);
+    onend: null | ((this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => void);
+    onerror: null | ((this: SpeechSynthesisUtterance, ev: SpeechSynthesisErrorEvent) => void);
+    onpause: null | ((this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => void);
+    onresume: null | ((this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => void);
+    onmark: null | ((this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => void);
+    onboundary: null | ((this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => void);
 
     constructor(text?: string) {
       this.text = text || '';
@@ -63,5 +63,5 @@ if (typeof window.SpeechSynthesisUtterance === 'undefined') {
       this.onmark = null;
       this.onboundary = null;
     }
-  } as any;
+  } as unknown as typeof SpeechSynthesisUtterance;
 }

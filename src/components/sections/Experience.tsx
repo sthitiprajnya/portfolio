@@ -6,6 +6,7 @@ import { SectionTitle } from '@/components/ui/SectionTitle';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { LogoBadge } from '@/components/ui/LogoBadge';
 import { EXPERIENCE } from '@/data/portfolio';
+import { sitePath } from '@/lib/sitePath';
 
 // BOLT: Hoist static configurations and regexes to module level to avoid redundant allocations on every render
 const ACTIVE_COLOR_MAP = {
@@ -246,7 +247,7 @@ const ExperienceCard = React.memo(function ExperienceCard({ experience, isFirst 
             {experience.id === 'iserveU' && (
               <div className="hidden sm:block mt-1">
                 <LogoBadge
-                  src="/logos/employer/iserveu.png"
+                  src={sitePath('/logos/employer/iserveu.png')}
                   alt={experience.company}
                   width={40}
                   height={40}

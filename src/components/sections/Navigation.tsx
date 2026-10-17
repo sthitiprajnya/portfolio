@@ -6,6 +6,7 @@ import { CyberButton } from '@/components/ui/CyberButton';
 import { PERSONAL }    from '@/data/portfolio';
 import { useScrollTo } from '@/hooks/useScrollTo';
 import { useScrollLock } from '@/hooks/useScrollLock';
+import { sitePath } from '@/lib/sitePath';
 
 export const NAV_LINKS = [
   { label: 'About',     id: 'about'          },
@@ -28,21 +29,47 @@ export function Navigation() {
   const [activeSection,  setActiveSection]  = useState('hero');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const closeMenuButtonRef = useRef<HTMLButtonElement>(null);
+  const openMenuButtonRef = useRef<HTMLButtonElement>(null);
+  const wasMobileMenuOpen = useRef(false);
   const scrollToInternal = useScrollTo();
 
   useScrollLock(mobileMenuOpen);
 
-  // UX Enhancement: Handle Escape key to close mobile menu
   useEffect(() => {
+    if (!mobileMenuOpen) {
+      if (wasMobileMenuOpen.current) openMenuButtonRef.current?.focus();
+      wasMobileMenuOpen.current = false;
+      return;
+    }
+
+    wasMobileMenuOpen.current = true;
+    closeMenuButtonRef.current?.focus();
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && mobileMenuOpen) {
+      if (e.key === 'Escape') {
+        e.preventDefault();
         setMobileMenuOpen(false);
+        return;
+      }
+      if (e.key !== 'Tab') return;
+
+      const focusable = mobileMenuRef.current?.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusable?.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
       }
     };
 
-    if (mobileMenuOpen) {
-      window.addEventListener('keydown', handleKeyDown);
-    }
+    window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
@@ -159,7 +186,7 @@ export function Navigation() {
               })}
             </ul>
 
-            <CyberButton as="a" href={PERSONAL.resumeUrl} download color="green" className="py-2 px-4 text-[0.7rem]" aria-label="Download Resume (CV)" title="Download Resume (CV)">
+            <CyberButton as="a" href={sitePath(PERSONAL.resumeUrl)} download color="green" className="py-2 px-4 text-[0.7rem]" aria-label="Download Resume (CV)" title="Download Resume (CV)">
               <span className="flex items-center gap-2">
                 CV
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -186,6 +213,7 @@ export function Navigation() {
             </button>
 
             <button
+              ref={openMenuButtonRef}
               className="text-cyan p-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card"
               onClick={() => setMobileMenuOpen(true)}
               aria-expanded={mobileMenuOpen}
@@ -207,8 +235,10 @@ export function Navigation() {
         {mobileMenuOpen && (
           <motion.div
             id="mobile-menu"
+            ref={mobileMenuRef}
             role="dialog"
             aria-modal="true"
+            aria-labelledby="mobile-menu-title"
             initial={{ opacity: 0, x: '100%' }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: '100%' }}
@@ -216,8 +246,8 @@ export function Navigation() {
             className="fixed inset-0 z-[60] bg-black border-l border-border flex flex-col p-8 lg:hidden overflow-y-auto"
           >
             <div className="flex justify-between items-center mb-10">
-              <span className="font-display font-bold text-white tracking-widest text-sm">SYSTEM_MENU</span>
-              <button onClick={() => setMobileMenuOpen(false)} className="text-cyan p-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card" aria-label="Close navigation menu" title="Close navigation menu">
+              <span id="mobile-menu-title" className="font-display font-bold text-white tracking-widest text-sm">SYSTEM_MENU</span>
+              <button ref={closeMenuButtonRef} onClick={() => setMobileMenuOpen(false)} className="text-cyan p-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-card" aria-label="Close navigation menu" title="Close navigation menu">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
@@ -248,7 +278,7 @@ export function Navigation() {
             </div>
 
             <motion.div className="mt-auto pt-8" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
-              <CyberButton as="a" href={PERSONAL.resumeUrl} download color="green" className="w-full" aria-label="Download Resume (CV)" title="Download Resume (CV)">
+              <CyberButton as="a" href={sitePath(PERSONAL.resumeUrl)} download color="green" className="w-full" aria-label="Download Resume (CV)" title="Download Resume (CV)">
                 DOWNLOAD_CV
               </CyberButton>
             </motion.div>

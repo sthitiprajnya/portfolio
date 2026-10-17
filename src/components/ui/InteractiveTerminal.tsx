@@ -26,12 +26,13 @@ export function InteractiveTerminal({ className }: { className?: string }) {
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const endOfTerminalRef = useRef<HTMLDivElement>(null);
+  const terminalOutputRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { ref } = useInView({ threshold: 0.1, triggerOnce: true });
 
   const scrollToBottom = (behavior: ScrollBehavior = 'auto') => {
-    endOfTerminalRef.current?.scrollIntoView({ behavior });
+    const terminal = terminalOutputRef.current;
+    terminal?.scrollTo({ top: terminal.scrollHeight, behavior });
   };
 
   useEffect(() => {
@@ -219,6 +220,7 @@ export function InteractiveTerminal({ className }: { className?: string }) {
         <div className="mx-auto text-[0.65rem] text-text-muted">sthitaprajna@kali ~</div>
       </div>
       <div
+        ref={terminalOutputRef}
         className="p-4 leading-relaxed overflow-y-auto flex-grow scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent"
         aria-live="polite"
         aria-atomic="false"
@@ -249,7 +251,6 @@ export function InteractiveTerminal({ className }: { className?: string }) {
             />
           </div>
         )}
-        <div ref={endOfTerminalRef} />
       </div>
     </div>
   );

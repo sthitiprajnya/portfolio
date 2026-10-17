@@ -3,6 +3,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import clsx from 'clsx';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import Image from 'next/image';
+import { sitePath } from '@/lib/sitePath';
 import { useInView } from 'react-intersection-observer';
 
 // The avatar renders as a terminal "biometric ID scan" using JetBrains Mono,
@@ -275,7 +276,7 @@ export function AsciiAvatar({ className }: AsciiAvatarProps) {
         {/* Human View */}
         <div className={clsx("absolute inset-0 transition-opacity duration-500", isHuman ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none")}>
           <Image
-            src="/images/profile.jpg"
+            src={sitePath('/images/profile.jpg')}
             alt="Sthitaprajna Biswal"
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

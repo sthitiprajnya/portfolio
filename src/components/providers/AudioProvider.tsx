@@ -2,22 +2,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-type VoicePreset = {
-  name: string;
-  rate: number;
-  pitch: number;
-  voiceFilter: (voice: SpeechSynthesisVoice) => boolean;
-};
-
-const VOICE_PRESETS: Record<string, VoicePreset> = {
-  'System Default': {
-    name: 'System Default',
-    rate: 1.0,
-    pitch: 1.0,
-    voiceFilter: (v) => true,
-  },
-};
-
 interface AudioContextType {
   currentVoice: string;
   setCurrentVoice: (voice: string) => void;

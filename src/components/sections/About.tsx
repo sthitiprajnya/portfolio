@@ -9,6 +9,7 @@ import { ABOUT_BIO, ABOUT_STATS, PERSONAL } from '@/data/portfolio';
 import { useInView } from 'react-intersection-observer';
 import { CyberButton } from '@/components/ui/CyberButton';
 import { TypewriterText } from '@/components/ui/TypewriterText';
+import { sitePath } from '@/lib/sitePath';
 
 export function About() {
   const { ref: bioRef, inView: bioInView } = useInView({ triggerOnce: true, threshold: 0.2 });
@@ -62,7 +63,7 @@ export function About() {
             </div>
 
             <ScrollReveal variants={fadeSlideUp} delay={0.2} className="flex gap-4">
-              <CyberButton as="a" href={PERSONAL.resumeUrl} download color="cyan">
+              <CyberButton as="a" href={sitePath(PERSONAL.resumeUrl)} download color="cyan">
                 DOWNLOAD_CV
               </CyberButton>
             </ScrollReveal>

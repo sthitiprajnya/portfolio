@@ -7,11 +7,14 @@
 - [ ] Set **Source** to **GitHub Actions**
 - [ ] Verify domain/URL settings
 
-### 2. GitHub Secrets Setup
-Add these in **Settings** → **Secrets and variables** → **Actions**:
-- [ ] `NEXT_PUBLIC_EMAILJS_SERVICE_ID` - Your EmailJS Service ID
-- [ ] `NEXT_PUBLIC_EMAILJS_TEMPLATE_ID` - Your EmailJS Template ID
-- [ ] `NEXT_PUBLIC_EMAILJS_PUBLIC_KEY` - Your EmailJS Public Key
+### 2. EmailJS Actions Settings
+Add the keys in **Settings** → **Secrets and variables** → **Actions** (repository settings or the `github-pages` environment). Values may be Actions secrets or variables. The workflow accepts either naming set:
+
+- [ ] `NEXT_PUBLIC_EMAILJS_SERVICE_ID` or `VITE_EMAILJS_SERVICE_ID` - Your EmailJS Service ID
+- [ ] `NEXT_PUBLIC_EMAILJS_TEMPLATE_ID` or `VITE_EMAILJS_TEMPLATE_ID` - Your EmailJS Template ID
+- [ ] `NEXT_PUBLIC_EMAILJS_PUBLIC_KEY` or `VITE_EMAILJS_PUBLIC_KEY` - Your EmailJS Public Key
+
+The Vite-style names are mapped to the Next.js build variables automatically.
 
 Get these from [EmailJS Console](https://dashboard.emailjs.com/)
 

@@ -46,12 +46,12 @@ jobs:
 
       - name: Validate EmailJS configuration
         env:
-          NEXT_PUBLIC_EMAILJS_SERVICE_ID: ${{ secrets.NEXT_PUBLIC_EMAILJS_SERVICE_ID || vars.NEXT_PUBLIC_EMAILJS_SERVICE_ID }}
-          NEXT_PUBLIC_EMAILJS_TEMPLATE_ID: ${{ secrets.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || vars.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID }}
-          NEXT_PUBLIC_EMAILJS_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || vars.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY }}
+          NEXT_PUBLIC_EMAILJS_SERVICE_ID: ${{ secrets.NEXT_PUBLIC_EMAILJS_SERVICE_ID || secrets.VITE_EMAILJS_SERVICE_ID || vars.NEXT_PUBLIC_EMAILJS_SERVICE_ID || vars.VITE_EMAILJS_SERVICE_ID }}
+          NEXT_PUBLIC_EMAILJS_TEMPLATE_ID: ${{ secrets.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || secrets.VITE_EMAILJS_TEMPLATE_ID || vars.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || vars.VITE_EMAILJS_TEMPLATE_ID }}
+          NEXT_PUBLIC_EMAILJS_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || secrets.VITE_EMAILJS_PUBLIC_KEY || vars.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || vars.VITE_EMAILJS_PUBLIC_KEY }}
         run: |
           if [ -z "$NEXT_PUBLIC_EMAILJS_SERVICE_ID" ] || [ -z "$NEXT_PUBLIC_EMAILJS_TEMPLATE_ID" ] || [ -z "$NEXT_PUBLIC_EMAILJS_PUBLIC_KEY" ]; then
-            echo "::error::EmailJS is not configured. Set the service ID, template ID, and public key as Actions secrets or variables."
+            echo "::error::EmailJS is not configured. Set NEXT_PUBLIC_EMAILJS_* or VITE_EMAILJS_* values as Actions secrets or variables."
             exit 1
           fi
 
@@ -60,9 +60,9 @@ jobs:
       - name: Build Next.js static export
         run: npm run build
         env:
-          NEXT_PUBLIC_EMAILJS_SERVICE_ID: ${{ secrets.NEXT_PUBLIC_EMAILJS_SERVICE_ID || vars.NEXT_PUBLIC_EMAILJS_SERVICE_ID }}
-          NEXT_PUBLIC_EMAILJS_TEMPLATE_ID: ${{ secrets.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || vars.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID }}
-          NEXT_PUBLIC_EMAILJS_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || vars.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY }}
+          NEXT_PUBLIC_EMAILJS_SERVICE_ID: ${{ secrets.NEXT_PUBLIC_EMAILJS_SERVICE_ID || secrets.VITE_EMAILJS_SERVICE_ID || vars.NEXT_PUBLIC_EMAILJS_SERVICE_ID || vars.VITE_EMAILJS_SERVICE_ID }}
+          NEXT_PUBLIC_EMAILJS_TEMPLATE_ID: ${{ secrets.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || secrets.VITE_EMAILJS_TEMPLATE_ID || vars.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || vars.VITE_EMAILJS_TEMPLATE_ID }}
+          NEXT_PUBLIC_EMAILJS_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || secrets.VITE_EMAILJS_PUBLIC_KEY || vars.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || vars.VITE_EMAILJS_PUBLIC_KEY }}
 
       # Upload the `out/` directory — NOT `dist/` (that was the Vite artefact)
       - name: Upload Pages artifact

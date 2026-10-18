@@ -2,7 +2,7 @@
 
 **Audited project:** `sthitiprajnya/portfolio`  
 **Published URL:** <https://sthitiprajnya.github.io/portfolio/>  
-**Audit date:** 2026-10-17
+**Audit date:** 2026-10-18
 
 ## Work completed
 
@@ -14,24 +14,29 @@ Improved the mobile navigation as a keyboard-contained dialog with Escape dismis
 
 Updated Next.js and Sharp, corrected the React Hooks lint toolchain, removed the unused image-optimizer configuration and deprecated IntersectionObserver polyfill, and synchronized npm/pnpm lockfiles. Added CI gates for lint, tests, and production dependency audit. The workflow accepts EmailJS settings from GitHub Actions Secrets or Variables under either `NEXT_PUBLIC_EMAILJS_*` or the supplied `VITE_EMAILJS_*` names; it maps the latter into Next.js build variables and checks all three values before build/deploy.
 
-For the reported idle lag, fixed a cursor animation loop that started on mount, capped the continuous canvas effects at 24–30 fps, fixed MatrixRain's resize-listener leak, and introduced a page-level idle activity provider. After 10 seconds without user input it pauses CSS motion and stops eligible decorative canvas/avatar/glitch work; pointer, keyboard, touch, wheel, or scroll input resumes motion. Reduced-motion preferences remain supported. Detailed methodology and Tailwind advisory guidance are in [PERFORMANCE_AUDIT.md](./PERFORMANCE_AUDIT.md).
+For the reported idle lag, fixed a cursor animation loop that started on mount, capped continuous canvas effects at 24–30 fps, fixed MatrixRain's resize-listener leak, and introduced a page-level activity provider. After 10 seconds without activity it pauses CSS motion and stops eligible decorative canvas/avatar/glitch work; pointer, keyboard, touch, wheel, or scroll input resumes motion. Reduced-motion preferences remain supported.
+
+The hero typewriter now uses a finite, timer-driven implementation that clears its pending timeout immediately when the page becomes idle or the component unmounts. The uninterruptible `react-type-animation` dependency was removed and both lockfiles were updated. The About biography is static, server-rendered text with a one-shot reveal rather than long character-by-character animations. This preserves a complete, meaningful hero role while avoiding a lingering animation callback.
 
 ## Verification
 
 | Check | Result |
 | --- | --- |
+| Clean dependency install (`npm ci --legacy-peer-deps`) | Passed |
 | Strict lint (`npm run lint`) | Passed, zero warnings |
 | Type check (`npm run type-check`) | Passed |
-| Unit tests (`npm test`) | 44 passed across 18 files |
+| Unit tests (`npm test`) | 53 passed across 21 files |
 | Static export (`npm run build`) | Passed, including image optimization |
-| Production dependency audit (`npm audit --omit=dev`) | Previously passed with 0 vulnerabilities; no dependencies changed in the performance patch |
-| Built-site browser checks | Pages subpath loads; idle state pauses CSS animations (46 to 0 in browser instrumentation), pointer activity resumes motion; mobile dialog and base-path checks passed in the earlier site audit |
-| Idle CPU comparison | Two 15-second Chromium samples after 13 seconds idle fell from 106.2% / 102.1% to 15.8% / 15.0% of one logical CPU core, about 85% lower; sandbox diagnostic, not a Lighthouse/device guarantee |
-| Background process cleanup | Local preview server and browser measurement processes stopped; no active background task remains |
-| GitHub Pages deployment | [Run 39039455182](https://github.com/sthitiprajnya/portfolio/actions/runs/39039455182) passed quality gates, EmailJS validation, static export, and deployment. Public homepage and idle-provider bundle both returned HTTP 200 |
+| Production dependency audit (`npm audit --omit=dev`) | 0 vulnerabilities |
+| Full dependency audit (`npm audit`) | 7 development-tool findings remain (5 high, 2 moderate); see recommendations below and in [PERFORMANCE_AUDIT.md](./PERFORMANCE_AUDIT.md) |
+| Pages subpath and prerendered content | Local production export returned HTTP 200 at `/portfolio/`; About biography is present in exported HTML |
+| Fresh, untouched-page idle check | At 13.1 seconds with no input, idle state was active, hero showed “Application VAPT Specialist.”, About text was present, and there were no page errors |
+| Production RAF soak | 0 callbacks in both 15-second windows after idle; hero remained on the meaningful first role |
+| Accessibility and mobile checks | Keyboard-contained navigation, Escape dismissal, focus wrapping/restoration, reduced-motion fallback, static accessible chart, and base-path behavior covered by checks/tests |
+| Process cleanup | Temporary local preview servers and Playwright sessions were closed after verification |
 
 ## Outstanding items / limitations
 
-The full development-dependency audit previously reported **7 issues (5 high, 2 moderate)** in the Tailwind 3/PostCSS-related toolchain. Production dependencies audited cleanly. The recommended resolution is a planned Tailwind 4 migration with visual regression tests; a short-term alternative is carefully tested overrides for the affected transitive packages. See the exact steps and advisory source links in [PERFORMANCE_AUDIT.md](./PERFORMANCE_AUDIT.md).
+The full development-dependency audit reports **7 issues (5 high, 2 moderate)** in the Tailwind 3/PostCSS-related toolchain. Production dependencies audit cleanly. These advisories affect development/build tooling and still matter to developer machines and CI. The recommended resolution is a planned Tailwind 4 migration with visual regression tests; a short-term alternative is carefully tested overrides for the affected transitive packages. See the exact steps and advisory source links in [PERFORMANCE_AUDIT.md](./PERFORMANCE_AUDIT.md).
 
-No EmailJS secret values were inspected or copied. The provided names `VITE_EMAILJS_PUBLIC_KEY`, `VITE_EMAILJS_SERVICE_ID`, and `VITE_EMAILJS_TEMPLATE_ID` are mapped at build time to the Next.js client variables.
+No EmailJS secret values were inspected or copied. The supplied names `VITE_EMAILJS_PUBLIC_KEY`, `VITE_EMAILJS_SERVICE_ID`, and `VITE_EMAILJS_TEMPLATE_ID` are mapped at build time to the Next.js client variables.

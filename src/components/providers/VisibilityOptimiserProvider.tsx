@@ -5,7 +5,7 @@ import { initVisibilityOptimiser } from '@/lib/visibilityOptimiser';
 
 export function VisibilityOptimiserProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    initVisibilityOptimiser();
+    return initVisibilityOptimiser();
   }, []);
 
   return <>{children}</>;

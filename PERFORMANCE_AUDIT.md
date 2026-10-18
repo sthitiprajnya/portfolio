@@ -1,15 +1,17 @@
 # Portfolio Performance Audit
 
-**Audit date:** 2026-10-17
+**Audit date:** 2026-10-18
+
 **Site:** <https://sthitiprajnya.github.io/portfolio/>
+
 **Repository:** `sthitiprajnya/portfolio`
 **Current frontend:** Next.js 16, React 19, TypeScript, Tailwind CSS 3, Framer Motion, custom Canvas 2D effects.
 
 ## Executive summary
 
-The reported lag was reproducible as sustained idle CPU use in headless Chromium. The largest measured source was continuous motion: three hero canvases, a cursor `requestAnimationFrame` loop that did not sleep until a mouse event, and dozens of CSS animations running across both visible and off-screen sections. The page had 46 CSS animations in the initial browser trace.
+The reported lag was reproducible as sustained idle CPU use in headless Chromium. The largest measured sources were continuous motion: three hero canvases, a cursor `requestAnimationFrame` loop that did not sleep until a mouse event, and CSS animations running across visible and off-screen sections. The page had 46 CSS animations in the initial browser trace.
 
-The site now caps canvas drawing, cancels a leaked MatrixRain resize handler, avoids starting the custom-cursor loop before pointer movement, and uses one page-level activity provider. After 10 seconds without pointer, keyboard, touch, wheel, or scroll input, that provider suspends CSS animation and the decorative canvas/avatar/glitch work. Any new activity resumes it. The user's `prefers-reduced-motion` setting remains honored.
+Canvas drawing is rate-limited, MatrixRain's resize listener is cleaned up, the custom-cursor loop does not start before pointer input, and a shared activity provider pauses CSS motion and eligible decorative loops after 10 seconds without activity. The hero typewriter no longer depends on a library whose pending RAF work could outlive its React component: it uses finite `setTimeout` steps with cancellation on idle/unmount. Long About paragraphs are static, server-rendered copy with one-shot reveals. Reduced-motion preferences remain honored.
 
 ## Findings and changes
 
@@ -19,33 +21,45 @@ The site now caps canvas drawing, cancels a leaked MatrixRain resize handler, av
 
 3. **MatrixRain left an anonymous resize listener attached.** The old registration created a new callback that cleanup could not remove, and repeated glyph-cache work during resize. It now registers and removes the same `resize` function and performs one cache refresh per resize.
 
-4. **Motion was running while the visitor was idle.** A central provider pauses all CSS animations—including those in off-screen sections—and shares its active/idle state with visible decorative canvas loops, the ASCII-avatar timers, and GlitchText. It wakes on pointer, keyboard, touch, wheel, or scroll input; it also pauses when the tab is hidden. Motion resumes on the next interaction.
+4. **Motion was running while the visitor was idle.** A central provider pauses CSS animations—including those in off-screen sections—and shares its active/idle state with visible decorative canvas loops, the ASCII-avatar timers, and GlitchText. It wakes on pointer, keyboard, touch, wheel, or scroll input; it also pauses when the tab is hidden. Motion resumes on the next interaction. A fresh page with no input was verified to enter idle state after the 10-second inactivity timer (observed by 13.1 seconds).
+
+5. **The third-party typewriter could continue work after unmount.** Removing its infinite repeat bounded the old sequence but still left a short RAF tail. The final implementation uses a finite local timer sequence; its pending timeout is cleared immediately on idle/unmount, and its regression tests cover finite completion, cancellation, static idle/reduced-motion fallback, and accessible labeling. The unused `react-type-animation` dependency was removed from both lockfiles. About biography copy is static in the exported HTML rather than typed character-by-character.
 
 ## Measurement evidence
 
-The same local static export, served at the GitHub Pages `/portfolio/` base path, was opened in clean headless Chromium sessions. Browser-process CPU is reported as percent of one logical CPU core; these figures are a comparative sandbox diagnostic, not a Lighthouse score or a promise for every device.
+The initial CPU comparison below is a historical controlled sandbox diagnostic from the earlier performance pass, before the final custom typewriter replacement. It is not a Lighthouse score or a guarantee for every device.
 
-| State | Sample 1 | Sample 2 |
+| Historical state | Sample 1 | Sample 2 |
 | --- | ---: | ---: |
-| Before changes; 15-second idle browser samples | 106.2% | 102.1% |
-| After changes; waited 13 seconds, then sampled 15 seconds idle | 15.8% | 15.0% |
+| Before performance changes; 15-second idle browser samples | 106.2% | 102.1% |
+| After the initial idle/canvas changes; waited 13 seconds, then sampled 15 seconds idle | 15.8% | 15.0% |
 
-The two-sample mean fell from 104.15% to 15.4% (about an **85% reduction**). Browser instrumentation also observed 46 running CSS animations before the idle pause, zero while idle, and 45 resumed after pointer activity. The local browser session produced no uncaught page errors during the instrumentation pass.
+The historical two-sample mean fell from 104.15% to 15.4% (about an **85% reduction**). Browser instrumentation observed 46 running CSS animations before the idle pause, zero while idle, and 45 resumed after pointer activity. The current final code received an additional RAF-specific soak rather than claiming those older CPU figures as a new measurement.
+
+| Final production-export check | Result |
+| --- | --- |
+| Fresh page with no interaction | Idle marker set by 13.1 seconds; hero settled to “Application VAPT Specialist.”; no page errors |
+| RAF window immediately after the page entered idle | 0 callbacks over 15 seconds |
+| Second settled idle RAF window | 0 callbacks over the next 15 seconds |
+| Idle-page content | About biography present; hero role remains legible and complete |
+
+The soak used the local static export served under the same `/portfolio/` subpath as GitHub Pages. It also exercised scroll activity before the idle windows to verify the active-to-idle transition. The untouched-page check separately verified that the timeout starts without a prior interaction.
 
 ## Verification
 
+- `npm ci --legacy-peer-deps` — passed from the updated npm lockfile.
 - `npm run lint` — passed with zero warnings.
 - `npm run type-check` — passed.
-- `npm test` — 44 tests passed across 18 files, including frame-budget, cursor-startup, idle-wakeup, and resize-listener cleanup regressions.
+- `npm test` — 53 tests passed across 21 files, including finite typewriter completion and immediate timeout-cancellation regressions.
 - `npm run build` — passed; static export and image optimization completed.
-- [GitHub Pages run 39039455182](https://github.com/sthitiprajnya/portfolio/actions/runs/39039455182) — type, lint, tests, production audit, EmailJS validation, export, and deployment all passed. The live homepage and bundle containing the idle-provider marker returned HTTP 200.
-- Local preview and Chromium processes used for measurement were stopped after the checks; no preview service remains running.
-
-The repository's previous production-only audit was clean (`npm audit --omit=dev`: 0 vulnerabilities). This performance change did not modify dependencies.
+- `npm audit --omit=dev` — 0 vulnerabilities.
+- `npm audit` — 7 development-tool findings remain (5 high, 2 moderate); see below.
+- Local static preview at `/portfolio/` returned HTTP 200. The final idle screenshot showed a complete hero, meaningful role text, and no page errors.
+- Temporary local preview server and Playwright sessions were stopped after verification.
 
 ## Tailwind 3 / PostCSS development advisories
 
-The full development dependency audit previously reported **7 findings (5 high, 2 moderate)** in the Tailwind 3/PostCSS toolchain. These are build/development dependencies; the production-only audit was clean. They still matter to developer machines and CI, so keep the full `npm audit` visible rather than suppressing it.
+The full development dependency audit reports **7 findings (5 high, 2 moderate)** in the Tailwind 3/PostCSS toolchain. These are build/development dependencies; the production-only audit is clean. They still matter to developer machines and CI, so keep the full `npm audit` visible rather than suppressing it.
 
 **Preferred durable resolution:** schedule a separate Tailwind CSS 3-to-4 migration. Follow Tailwind's official [upgrade guide](https://tailwindcss.com/docs/upgrade-guide), adopt the v4 PostCSS integration, review custom theme/plugin/config usage, then compare representative pages at desktop and mobile widths and run clean install, lint, tests, static build, and `npm audit`. This is a major CSS-toolchain migration and should not be mixed into a performance patch without visual regression review. See also the [Tailwind CSS v4 announcement](https://tailwindcss.com/blog/tailwindcss-v4).
 

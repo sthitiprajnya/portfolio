@@ -3,9 +3,14 @@ import { render } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import Sentinel from '../Sentinel';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { useAnimationActivity } from '@/hooks/useAnimationActivity';
 
 vi.mock('@/hooks/usePrefersReducedMotion', () => ({
   usePrefersReducedMotion: vi.fn(),
+}));
+
+vi.mock('@/hooks/useAnimationActivity', () => ({
+  useAnimationActivity: vi.fn(),
 }));
 
 describe('Sentinel Component', () => {
@@ -14,6 +19,7 @@ describe('Sentinel Component', () => {
 
   beforeEach(() => {
     (usePrefersReducedMotion as unknown as ReturnType<typeof vi.fn>).mockReturnValue(false);
+    vi.mocked(useAnimationActivity).mockReturnValue(true);
 
     mockRequestAnimationFrame = vi.spyOn(window, 'requestAnimationFrame').mockImplementation(() => 1);
     vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {});
@@ -67,5 +73,26 @@ describe('Sentinel Component', () => {
   it('calls requestAnimationFrame to start the loop', () => {
     render(<Sentinel />);
     expect(mockRequestAnimationFrame).toHaveBeenCalled();
+  });
+
+  it('does not start the canvas loop while page motion is idle', () => {
+    vi.mocked(useAnimationActivity).mockReturnValue(false);
+
+    render(<Sentinel />);
+
+    expect(mockRequestAnimationFrame).not.toHaveBeenCalled();
+  });
+
+  it('cancels while idle and restarts when page activity resumes', () => {
+    const { rerender } = render(<Sentinel />);
+    const initialFrameCount = mockRequestAnimationFrame.mock.calls.length;
+
+    vi.mocked(useAnimationActivity).mockReturnValue(false);
+    rerender(<Sentinel />);
+    expect(mockRequestAnimationFrame).toHaveBeenCalledTimes(initialFrameCount);
+
+    vi.mocked(useAnimationActivity).mockReturnValue(true);
+    rerender(<Sentinel />);
+    expect(mockRequestAnimationFrame).toHaveBeenCalledTimes(initialFrameCount + 1);
   });
 });

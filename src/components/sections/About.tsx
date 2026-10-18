@@ -6,14 +6,10 @@ import { InteractiveTerminal } from '@/components/ui/InteractiveTerminal';
 import { SectionTitle }  from '@/components/ui/SectionTitle';
 import { ScrollReveal, fadeSlideUp, containerStagger } from '@/components/ui/ScrollReveal';
 import { ABOUT_BIO, ABOUT_STATS, PERSONAL } from '@/data/portfolio';
-import { useInView } from 'react-intersection-observer';
 import { CyberButton } from '@/components/ui/CyberButton';
-import { TypewriterText } from '@/components/ui/TypewriterText';
 import { sitePath } from '@/lib/sitePath';
 
 export function About() {
-  const { ref: bioRef, inView: bioInView } = useInView({ triggerOnce: true, threshold: 0.2 });
-
   return (
     <section
       id="about"
@@ -54,11 +50,11 @@ export function About() {
 
           {/* ── Right column: bio + terminal + stats ── */}
           <div className="order-1 lg:order-2 space-y-8">
-            <div ref={bioRef} className="space-y-6">
-              {bioInView && ABOUT_BIO.map((paragraph, i) => (
-                <p key={i} className="font-body text-text-secondary leading-relaxed">
-                  <TypewriterText sequence={[paragraph]} speed={10} cursor={i === ABOUT_BIO.length - 1} />
-                </p>
+            <div className="space-y-6">
+              {ABOUT_BIO.map((paragraph, i) => (
+                <ScrollReveal key={i} variants={fadeSlideUp} delay={i * 0.12}>
+                  <p className="font-body text-text-secondary leading-relaxed">{paragraph}</p>
+                </ScrollReveal>
               ))}
             </div>
 

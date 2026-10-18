@@ -11,7 +11,6 @@ import { CommandPalette }       from '@/components/global/CommandPalette';
 import { ScrollProgress }       from '@/components/global/ScrollProgress';
 import { Hero }                 from '@/components/sections/Hero';
 import { CursorProvider }       from '@/components/providers/CursorProvider';
-import { AnimationActivityProvider } from '@/components/providers/AnimationActivityProvider';
 import { BackToTop }            from '@/components/ui/BackToTop';
 // ⚡ Bolt: Dynamically import all below-the-fold components to reduce the
 // initial Next.js JavaScript bundle size and improve Time to Interactive (TTI).
@@ -31,7 +30,6 @@ export default function Home() {
     <>
       <Preloader />
 
-      <AnimationActivityProvider>
       <CursorProvider>
         <ScrollProgress />
         <BackToTop />
@@ -55,7 +53,6 @@ export default function Home() {
 
         <Footer />
       </CursorProvider>
-      </AnimationActivityProvider>
     </>
   );
 }

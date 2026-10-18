@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { useAnimationActivity } from '@/hooks/useAnimationActivity';
 
 interface OrbState {
   y: number; // Current scroll Y position
@@ -91,8 +92,9 @@ const LERP_FACTOR = 0.1; // Smoothness of scroll follow
 
 export default function Sentinel() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rafRef = useRef<number>(undefined);
+  const rafRef = useRef<number | undefined>(undefined);
   const prefersReducedMotion = usePrefersReducedMotion();
+  const isAnimationActive = useAnimationActivity();
   const targetCacheRef = useRef<TargetCache[]>([]);
   const ctfCenterYRef = useRef<number | null>(null);
 
@@ -128,7 +130,7 @@ export default function Sentinel() {
   });
 
   useEffect(() => {
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion || !isAnimationActive) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -161,7 +163,7 @@ export default function Sentinel() {
     };
 
     const wake = () => {
-      if (!rafRef.current) {
+      if (rafRef.current === undefined) {
         rafRef.current = requestAnimationFrame(draw);
       }
     };
@@ -284,6 +286,7 @@ export default function Sentinel() {
     const timer = setTimeout(updateTargetCache, 1000);
 
     const draw = () => {
+      rafRef.current = undefined;
       if (!ctx) return;
 
       const s = stateRef.current;
@@ -456,6 +459,9 @@ export default function Sentinel() {
       rafRef.current = requestAnimationFrame(draw);
     };
 
+    // Track the current scroll position before waking after an idle pause.
+    stateRef.current.targetY = window.scrollY;
+
     // Draw is initialized before resize wakes the animation loop.
     resize();
     proximityRef.current = checkProximity(window.scrollY);
@@ -476,10 +482,11 @@ export default function Sentinel() {
       window.removeEventListener('resize', resize);
       window.removeEventListener('scroll', onScroll);
       clearTimeout(timer);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (rafRef.current !== undefined) cancelAnimationFrame(rafRef.current);
+      rafRef.current = undefined;
       sectionObserver.disconnect();
     };
-  }, [prefersReducedMotion]);
+  }, [prefersReducedMotion, isAnimationActive]);
 
   if (prefersReducedMotion) return null;
 

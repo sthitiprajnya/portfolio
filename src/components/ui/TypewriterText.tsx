@@ -1,15 +1,19 @@
 "use client";
-import React from 'react';
-import { TypeAnimation } from 'react-type-animation';
+
+import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
+import { useAnimationActivity } from '@/hooks/useAnimationActivity';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+
+type TypewriterSequenceItem = string | number;
+type TypewriterWrapper = 'span' | 'div' | 'p';
 
 interface TypewriterTextProps {
-  sequence: (string | number)[];
+  sequence: TypewriterSequenceItem[];
   className?: string;
-  wrapper?: 'span' | 'div' | 'p';
+  wrapper?: TypewriterWrapper;
   cursor?: boolean;
-  repeat?: number;
-  speed?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53 | 54 | 55 | 56 | 57 | 58 | 59 | 60 | 61 | 62 | 63 | 64 | 65 | 66 | 67 | 68 | 69 | 70 | 71 | 72 | 73 | 74 | 75 | 76 | 77 | 78 | 79 | 80 | 81 | 82 | 83 | 84 | 85 | 86 | 87 | 88 | 89 | 90 | 91 | 92 | 93 | 94 | 95 | 96 | 97 | 98 | 99;
+  speed?: number;
 }
 
 export function TypewriterText({
@@ -17,18 +21,109 @@ export function TypewriterText({
   className,
   wrapper = 'span',
   cursor = true,
-  repeat = Infinity,
-  speed = 40
+  speed = 40,
 }: TypewriterTextProps) {
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const isAnimationActive = useAnimationActivity(!prefersReducedMotion);
+  const accessibleText = sequence.find((item): item is string => typeof item === 'string') ?? '';
+  const classes = clsx('inline-block', className);
+
+  if (!isAnimationActive) {
+    const StaticWrapper = wrapper;
+    return <StaticWrapper className={classes}>{accessibleText}</StaticWrapper>;
+  }
+
   return (
-    <TypeAnimation
+    <AnimatedTypewriter
       sequence={sequence}
+      accessibleText={accessibleText}
+      className={classes}
       wrapper={wrapper}
       cursor={cursor}
-      repeat={repeat}
       speed={speed}
-      className={clsx("inline-block", className)}
-      aria-live="polite"
     />
+  );
+}
+
+interface AnimatedTypewriterProps {
+  sequence: TypewriterSequenceItem[];
+  accessibleText: string;
+  className: string;
+  wrapper: TypewriterWrapper;
+  cursor: boolean;
+  speed: number;
+}
+
+function AnimatedTypewriter({
+  sequence,
+  accessibleText,
+  className,
+  wrapper,
+  cursor,
+  speed,
+}: AnimatedTypewriterProps) {
+  const [displayedText, setDisplayedText] = useState(accessibleText);
+  const sequenceRef = useRef(sequence);
+  sequenceRef.current = sequence;
+
+  useEffect(() => {
+    const activeSequence = sequenceRef.current;
+    const firstStringIndex = activeSequence.findIndex((item) => typeof item === 'string');
+    let sequenceIndex = firstStringIndex === 0 ? 1 : 0;
+    let currentText = accessibleText;
+    let timeoutId: number | undefined;
+    let cancelled = false;
+    const characterDelay = Math.max(1, Math.abs(100 - speed));
+
+    const scheduleStep = (delay: number) => {
+      timeoutId = window.setTimeout(step, delay);
+    };
+
+    const step = () => {
+      if (cancelled || sequenceIndex >= activeSequence.length) return;
+
+      const item = activeSequence[sequenceIndex];
+      if (typeof item === 'number') {
+        sequenceIndex += 1;
+        scheduleStep(Math.max(0, item));
+        return;
+      }
+
+      const currentCharacters = Array.from(currentText);
+      const targetCharacters = Array.from(item);
+
+      if (!item.startsWith(currentText) && currentCharacters.length > 0) {
+        currentCharacters.pop();
+        currentText = currentCharacters.join('');
+        setDisplayedText(currentText);
+        scheduleStep(characterDelay);
+        return;
+      }
+
+      if (currentCharacters.length < targetCharacters.length) {
+        currentText = targetCharacters.slice(0, currentCharacters.length + 1).join('');
+        setDisplayedText(currentText);
+        scheduleStep(characterDelay);
+        return;
+      }
+
+      sequenceIndex += 1;
+      scheduleStep(0);
+    };
+
+    scheduleStep(0);
+
+    return () => {
+      cancelled = true;
+      if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+    };
+  }, [accessibleText, sequence, speed]);
+
+  const AnimatedWrapper = wrapper;
+  return (
+    <AnimatedWrapper className={className} aria-label={accessibleText} aria-live="off">
+      {displayedText}
+      {cursor && <span className="ml-0.5 inline-block animate-pulse text-cyan" aria-hidden="true">|</span>}
+    </AnimatedWrapper>
   );
 }

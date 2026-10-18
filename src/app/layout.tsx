@@ -62,6 +62,7 @@ export const viewport: Viewport = {
 
 import { FaviconBlinkProvider } from '@/components/providers/FaviconBlinkProvider';
 import { VisibilityOptimiserProvider } from '@/components/providers/VisibilityOptimiserProvider';
+import { AnimationActivityProvider } from '@/components/providers/AnimationActivityProvider';
 import Sentinel from '@/components/canvas/Sentinel';
 
 export default function RootLayout({
@@ -131,12 +132,14 @@ export default function RootLayout({
           Skip to content
         </a>
         <div id="root">
-          <VisibilityOptimiserProvider>
-            <FaviconBlinkProvider>
-              <Sentinel />
-              {children}
-            </FaviconBlinkProvider>
-          </VisibilityOptimiserProvider>
+          <AnimationActivityProvider>
+            <VisibilityOptimiserProvider>
+              <FaviconBlinkProvider>
+                <Sentinel />
+                {children}
+              </FaviconBlinkProvider>
+            </VisibilityOptimiserProvider>
+          </AnimationActivityProvider>
         </div>
       </body>
     </html>

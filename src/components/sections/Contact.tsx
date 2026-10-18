@@ -17,6 +17,20 @@ type Status = 'idle' | 'transmitting' | 'sent' | 'error';
 export function Contact() {
   const formRef = useRef<HTMLFormElement>(null);
 
+  const emailCopiedTimeoutRef = useRef<number | null>(null);
+  const statusResetTimeoutRef = useRef<number | null>(null);
+
+  React.useEffect(() => {
+    return () => {
+      if (emailCopiedTimeoutRef.current !== null) {
+        window.clearTimeout(emailCopiedTimeoutRef.current);
+      }
+      if (statusResetTimeoutRef.current !== null) {
+        window.clearTimeout(statusResetTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const [form, setForm] = useState({
     from_name:  '',
     from_email: '',
@@ -33,7 +47,13 @@ export function Contact() {
     try {
       await navigator.clipboard.writeText(PERSONAL.email);
       setEmailCopied(true);
-      setTimeout(() => setEmailCopied(false), 2000);
+      if (emailCopiedTimeoutRef.current !== null) {
+        window.clearTimeout(emailCopiedTimeoutRef.current);
+      }
+      emailCopiedTimeoutRef.current = window.setTimeout(() => {
+        setEmailCopied(false);
+        emailCopiedTimeoutRef.current = null;
+      }, 2000);
     } catch (err) {
       console.error('Failed to copy email:', err);
     }
@@ -124,7 +144,13 @@ export function Contact() {
 
       setStatus('sent');
       setForm({ from_name: '', from_email: '', subject: '', message: '', hp_field: '' });
-      setTimeout(() => setStatus('idle'), 6000);
+      if (statusResetTimeoutRef.current !== null) {
+        window.clearTimeout(statusResetTimeoutRef.current);
+      }
+      statusResetTimeoutRef.current = window.setTimeout(() => {
+        setStatus('idle');
+        statusResetTimeoutRef.current = null;
+      }, 6000);
     } catch (error) {
       console.error("EmailJS Error:", error);
       setStatus('error');
@@ -245,12 +271,23 @@ export function Contact() {
 
               {/* Success overlay */}
               {status === 'sent' && (
-                <div className="p-4 border border-green/50 rounded-md bg-green-ghost">
+                <div role="status" aria-live="polite" aria-atomic="true" className="p-4 border border-green/50 rounded-md bg-green-ghost">
                   <div className="font-mono text-sm text-green font-bold mb-1">
                     ✓ TRANSMISSION_SUCCESSFUL
                   </div>
                   <div className="font-mono text-[0.7rem] text-text-secondary">
-                    Your message has been securely delivered. I will respond shortly.
+                    Your message has been sent. I will respond shortly.
+                  </div>
+                </div>
+              )}
+
+              {status === 'error' && !errors.message && (
+                <div role="alert" aria-atomic="true" className="p-4 border border-red/50 rounded-md bg-red/10">
+                  <div className="font-mono text-sm text-red font-bold mb-1">
+                    MESSAGE_NOT_SENT
+                  </div>
+                  <div className="font-mono text-[0.7rem] text-text-secondary">
+                    The message could not be sent. Please retry or use the email address shown here.
                   </div>
                 </div>
               )}

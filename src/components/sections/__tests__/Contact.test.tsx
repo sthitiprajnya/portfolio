@@ -32,10 +32,25 @@ vi.mock('react-intersection-observer', () => ({
 describe('Contact Component - Error Handling', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorage.clear();
     // Setup environment variables for test
     vi.stubEnv('NEXT_PUBLIC_EMAILJS_SERVICE_ID', 'test_service_id');
     vi.stubEnv('NEXT_PUBLIC_EMAILJS_TEMPLATE_ID', 'test_template_id');
     vi.stubEnv('NEXT_PUBLIC_EMAILJS_PUBLIC_KEY', 'test_public_key');
+  });
+
+  it('announces successful sends through an accessible status region', async () => {
+    (emailjs.sendForm as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ status: 200, text: 'OK' });
+
+    render(<Contact />);
+
+    fireEvent.change(screen.getByRole('textbox', { name: /^Name/i }), { target: { value: 'John Doe' } });
+    const emailInput = document.querySelector('input[name="from_email"]');
+    if (emailInput) fireEvent.change(emailInput, { target: { value: 'john@example.com' } });
+    fireEvent.change(screen.getByRole('textbox', { name: /^Message/i }), { target: { value: 'Hello world' } });
+    fireEvent.click(screen.getByRole('button', { name: /TRANSMIT_MESSAGE/i }));
+
+    expect(await screen.findByRole('status')).toHaveTextContent('Your message has been sent. I will respond shortly.');
   });
 
   it('should handle emailjs.sendForm errors and set status to error', async () => {
@@ -72,6 +87,7 @@ describe('Contact Component - Error Handling', () => {
     // Check that button color/class is updated for error state
     const button = screen.getByRole('button', { name: /RETRY_TRANSMISSION/i });
     expect(button).toHaveClass('border-red text-red hover:bg-red');
+    expect(screen.getByRole('alert')).toHaveTextContent('The message could not be sent.');
 
     consoleSpy.mockRestore();
   });

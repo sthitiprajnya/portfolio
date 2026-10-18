@@ -55,7 +55,14 @@ The soak used the local static export served under the same `/portfolio/` subpat
 - `npm audit --omit=dev` — 0 vulnerabilities.
 - `npm audit` — 7 development-tool findings remain (5 high, 2 moderate); see below.
 - Local static preview at `/portfolio/` returned HTTP 200. The final idle screenshot showed a complete hero, meaningful role text, and no page errors.
+- Live Pages smoke check returned HTTP 200, with the hero/About content, `/portfolio/` asset references, favicon, and a referenced JavaScript asset all verified.
 - Temporary local preview server and Playwright sessions were stopped after verification.
+
+## CI runner and artifact compatibility
+
+The first successful deployment emitted nonblocking warnings because the workflow's older actions targeted the deprecated Node 20 action runtime and because GitHub is transitioning `ubuntu-latest` to Ubuntu 26. The workflow was refreshed to use Node 24-compatible action definitions (`checkout@v7`, `setup-node@v7`, `deploy-pages@v5`, and the `upload-artifact@v7` dependency of `upload-pages-artifact@v5`) [1] [2] [3] [4] [5]. It pins `ubuntu-24.04` to avoid a silent runner-image change during GitHub's announced migration window [6].
+
+The Pages artifact action defaults to excluding hidden files, so the workflow explicitly sets `include-hidden-files: true`. The static export contains `.well-known/security.txt`; the option preserves that security contact file in the uploaded artifact [3].
 
 ## Tailwind 3 / PostCSS development advisories
 
@@ -65,8 +72,17 @@ The full development dependency audit reports **7 findings (5 high, 2 moderate)*
 
 **Short-term option if remaining on Tailwind 3:** test package-manager overrides for the affected transitive packages against the patched releases identified during the registry/advisory review (`braces` 3.0.4 and `postcss-selector-parser` 7.1.6). First confirm every dependency path with `npm explain`/`pnpm why`; apply only compatible overrides, regenerate both lockfiles, then verify `npm ci --legacy-peer-deps`, lint, tests, build, and the full audit. Do not apply `npm audit fix --force` blindly or assume an override is safe merely because it silences the audit.
 
-**Advisory/source references:** [braces advisory GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm), [PostCSS selector parser advisory GHSA-rj75-hqrm-r3gf](https://osv.dev/GHSA-rj75-hqrm-r3gf), [NVD CVE-2026-93687](https://nvd.nist.gov/vuln/detail/CVE-2026-93687), and the [Tailwind maintainers' discussion](https://github.com/tailwindlabs/tailwindcss/issues/19327).
+**Advisory/source links:** [braces advisory GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm), [PostCSS selector parser advisory GHSA-rj75-hqrm-r3gf](https://osv.dev/GHSA-rj75-hqrm-r3gf), [NVD CVE-2026-93687](https://nvd.nist.gov/vuln/detail/CVE-2026-93687), and the [Tailwind maintainers' discussion](https://github.com/tailwindlabs/tailwindcss/issues/19327).
 
 ## Remaining limitations
 
 The CPU comparison is a controlled local headless-Chromium comparison on this sandbox; it is not a Lighthouse score or a guarantee for every device, so subjective smoothness should also be checked on a normal laptop and phone. The full development dependency advisories remain until either the compatible overrides are validated or the Tailwind 4 migration is completed. No EmailJS values were read or included in this report.
+
+## References
+
+[1]: https://github.com/actions/checkout/blob/v7/action.yml "Checkout v7 action definition"
+[2]: https://github.com/actions/setup-node/blob/v7/action.yml "Setup Node v7 action definition"
+[3]: https://github.com/actions/upload-pages-artifact/blob/v5/action.yml "Upload Pages artifact v5 action definition"
+[4]: https://github.com/actions/upload-artifact/blob/v7/action.yml "Upload artifact v7 action definition"
+[5]: https://github.com/actions/deploy-pages/blob/v5/action.yml "Deploy Pages v5 action definition"
+[6]: https://github.com/actions/runner-images/issues/14748 "Ubuntu 26.04 latest-runner migration announcement"

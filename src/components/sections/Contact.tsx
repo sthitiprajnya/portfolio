@@ -275,6 +275,11 @@ export function Contact() {
                 name="cc_email"
                 value={form.from_email}
               />
+              <input
+                type="hidden"
+                name="reply_to"
+                value={form.from_email}
+              />
 
               {/* Success overlay */}
               {status === 'sent' && (

@@ -269,10 +269,10 @@ export function Contact() {
                 className="opacity-0 absolute w-0 h-0 pointer-events-none"
               />
 
-              {/* CC/Reply-To field to allow sending a copy to the user */}
+              {/* Destination field to allow routing the email to the user */}
               <input
                 type="hidden"
-                name="cc_email"
+                name="to_email"
                 value={form.from_email}
               />
 

@@ -80,6 +80,7 @@ export function InteractiveTerminal({ className }: { className?: string }) {
             onClick={() => handleCommand(cmd)}
             className="text-cyan hover:underline focus:underline outline-none"
             title={`Run ${cmd}`}
+            aria-label={`Run command: ${cmd}`}
           >
             {cmd}
           </button>

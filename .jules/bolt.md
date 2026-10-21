@@ -127,3 +127,7 @@
 ## 2026-06-28 - [Optimizing Idle Animation Loops via Page Visibility]
 **Learning:** Continuous `setInterval` loops used for visual effects (like the 120ms and 300ms animations in `AsciiAvatar.tsx`) continue running in the background even when the tab is not visible, consuming unnecessary CPU cycles and draining battery on mobile devices.
 **Action:** Always wrap background `setInterval` visual updates with a `visibilitychange` event listener to clear the interval when `document.hidden` is true and restart it when the tab becomes visible.
+
+## 2023-10-21 - [Blinking Favicon Background Work Optimization]
+**Learning:** Polling mechanisms running via `setInterval` for small visual features like a blinking favicon (e.g. `useFaviconBlink.ts`) continue to run in the background indefinitely, consuming CPU cycles even when the tab is inactive.
+**Action:** Always wrap non-critical polling background interval hooks with visibility checks (e.g., `document.addEventListener('visibilitychange')`) to pause execution when the tab is hidden and resume when it becomes visible.

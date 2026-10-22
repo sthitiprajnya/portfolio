@@ -456,7 +456,15 @@ export default function Sentinel() {
           rippleRef.current.active = false;
         }
       }
-      rafRef.current = requestAnimationFrame(draw);
+
+      // BOLT: Sleepy loop optimization.
+      // Cancel RAF if the scroll target has been reached and there is no active interaction ripple,
+      // avoiding idle CPU consumption when visually static.
+      if (Math.abs(stateRef.current.y - stateRef.current.targetY) < 0.1 && !rippleRef.current.active) {
+         rafRef.current = undefined;
+      } else {
+         rafRef.current = requestAnimationFrame(draw);
+      }
     };
 
     // Track the current scroll position before waking after an idle pause.

@@ -38,7 +38,8 @@ export function ScrollProgress() {
       }
 
       // Wake up the animation loop if it's sleeping
-      if (rafId === null) {
+      // BOLT: Only wake up if there is a meaningful difference.
+      if (rafId === null && Math.abs(targetScaleY - currentScaleY) > 0.0001) {
         rafId = requestAnimationFrame(draw);
       }
     };

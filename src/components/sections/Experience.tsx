@@ -111,7 +111,10 @@ export function Experience() {
       }
       targetProgress = Math.min(1, Math.max(0, targetProgress));
 
-      if (!rafId) {
+      // BOLT: Only wake up the animation loop if there is a meaningful difference.
+      // This prevents redundant DOM updates and layout thrashing on every scroll event
+      // when outside the Experience section (clamped to 0 or 1).
+      if (!rafId && Math.abs(targetProgress - currentProgress) > 0.001) {
         rafId = requestAnimationFrame(draw);
       }
     };

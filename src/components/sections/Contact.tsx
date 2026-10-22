@@ -128,19 +128,19 @@ export function Contact() {
       // to reduce the initial JavaScript bundle size and improve page load performance.
       const emailjs = (await import('@emailjs/browser')).default;
 
+      // 🛡️ Sentinel: Set cooldown before awaiting the async submission to prevent race condition bypasses
+      try {
+        localStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
+      } catch (e) {
+        console.warn('Failed to write rate limit to localStorage.', e);
+      }
+
       await emailjs.sendForm(
         serviceId,
         templateId,
         formRef.current,
         publicKey
       );
-
-      // Only set cooldown upon successful submission
-      try {
-        localStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
-      } catch (e) {
-        console.warn('Failed to write rate limit to localStorage.', e);
-      }
 
       setStatus('sent');
       setForm({ from_name: '', from_email: '', subject: '', message: '', hp_field: '' });

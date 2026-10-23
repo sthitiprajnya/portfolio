@@ -274,6 +274,8 @@ export default function HeroOrb() {
     }
 
     if (inView) {
+      // Reset lastTime to avoid massive dt jump after sleep
+      lastTime = performance.now();
       rafRef.current = requestAnimationFrame(tick);
     }
 

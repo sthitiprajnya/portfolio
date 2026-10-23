@@ -144,11 +144,17 @@ export default function Sentinel() {
       let maxProximity = 0;
       const viewportCenterY = currentY + height / 2;
       const cache = targetCacheRef.current;
+
+      // BOLT: Optimize proximity check by early exiting if maximum proximity is reached
+      // or using binary search if the cache was sorted (cache is small, so we just use an early exit here).
       for (let i = 0; i < cache.length; i++) {
         const dist = Math.abs(cache[i].centerY - viewportCenterY);
         if (dist < 300) {
           const proximity = 1 - (dist / 300);
-          if (proximity > maxProximity) maxProximity = proximity;
+          if (proximity > maxProximity) {
+              maxProximity = proximity;
+              if (maxProximity > 0.99) break; // Early exit: can't get closer than ~1
+          }
         }
       }
       return maxProximity;

@@ -26,9 +26,24 @@ export function useFaviconBlink() {
       isBlank = !isBlank;
     };
 
+    let intervalId = setInterval(updateFavicon, 800);
     updateFavicon();
-    const intervalId = setInterval(updateFavicon, 800);
 
-    return () => clearInterval(intervalId);
+    const handleVisibilityChange = () => {
+      // BOLT: Pause polling interval when tab is hidden to save CPU
+      if (document.hidden) {
+        clearInterval(intervalId);
+      } else {
+        updateFavicon();
+        intervalId = setInterval(updateFavicon, 800);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [isAnimationActive]);
 }

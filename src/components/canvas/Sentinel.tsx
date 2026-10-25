@@ -88,7 +88,6 @@ const VIOLET_THEME = PARSED_SECTION_THEMES.about;
 
 const SWEEP_AMPLITUDE = 60; // Max horizontal pixel offset
 const SWEEP_FREQUENCY = 0.005; // Frequency of sine wave relative to scroll
-const LERP_FACTOR = 0.1; // Smoothness of scroll follow
 
 export default function Sentinel() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -97,6 +96,7 @@ export default function Sentinel() {
   const isAnimationActive = useAnimationActivity();
   const targetCacheRef = useRef<TargetCache[]>([]);
   const ctfCenterYRef = useRef<number | null>(null);
+  const lastTimeRef = useRef<number>(0);
 
   const stateRef = useRef<OrbState>({
     y: 0,
@@ -164,6 +164,7 @@ export default function Sentinel() {
 
     const wake = () => {
       if (rafRef.current === undefined) {
+        lastTimeRef.current = performance.now();
         rafRef.current = requestAnimationFrame(draw);
       }
     };
@@ -285,9 +286,15 @@ export default function Sentinel() {
 
     const timer = setTimeout(updateTargetCache, 1000);
 
-    const draw = () => {
+    const draw = (time: number) => {
       rafRef.current = undefined;
       if (!ctx) return;
+
+      const dt = time - lastTimeRef.current;
+      lastTimeRef.current = time;
+
+      const decay = 1 - Math.exp(-0.006 * dt);
+      const colorDecay = 1 - Math.exp(-0.0025 * dt);
 
       const s = stateRef.current;
       const tTheme = targetThemeRef.current;
@@ -322,7 +329,7 @@ export default function Sentinel() {
 
       ctx.clearRect(0, 0, width, height);
 
-      s.y += (s.targetY - s.y) * LERP_FACTOR;
+      s.y += (s.targetY - s.y) * decay;
       s.phase = s.y * SWEEP_FREQUENCY;
       s.xOffset = Math.sin(s.phase) * SWEEP_AMPLITUDE;
 
@@ -333,7 +340,7 @@ export default function Sentinel() {
         lastYRef.current = s.y;
       }
 
-      s.glow += (targetGlow - s.glow) * LERP_FACTOR;
+      s.glow += (targetGlow - s.glow) * decay;
 
       if (proximity > 0.85 && !rippleRef.current.triggered && !rippleRef.current.active) {
         rippleRef.current.active = true;
@@ -343,7 +350,7 @@ export default function Sentinel() {
         rippleRef.current.triggered = false;
       }
 
-      colorProximityRef.current += (ctfProx - colorProximityRef.current) * LERP_FACTOR;
+      colorProximityRef.current += (ctfProx - colorProximityRef.current) * decay;
 
       const cx = width / 2 + s.xOffset;
       const cy = height / 2;
@@ -352,24 +359,23 @@ export default function Sentinel() {
       s.trail[s.trailIndex * 2 + 1] = cy + s.y - stateRef.current.targetY;
       s.trailIndex = (s.trailIndex + 1) % 8;
 
-      const COLOR_LERP = 0.04;
 
-      cur.coreR = lerpColor(cur.coreR, tTheme.core.r, COLOR_LERP);
-      cur.coreG = lerpColor(cur.coreG, tTheme.core.g, COLOR_LERP);
-      cur.coreB = lerpColor(cur.coreB, tTheme.core.b, COLOR_LERP);
-      cur.coreA = lerpColor(cur.coreA, tTheme.core.a, COLOR_LERP);
-      cur.midR = lerpColor(cur.midR, tTheme.mid.r, COLOR_LERP);
-      cur.midG = lerpColor(cur.midG, tTheme.mid.g, COLOR_LERP);
-      cur.midB = lerpColor(cur.midB, tTheme.mid.b, COLOR_LERP);
-      cur.midA = lerpColor(cur.midA, tTheme.mid.a, COLOR_LERP);
-      cur.haloR = lerpColor(cur.haloR, tTheme.halo.r, COLOR_LERP);
-      cur.haloG = lerpColor(cur.haloG, tTheme.halo.g, COLOR_LERP);
-      cur.haloB = lerpColor(cur.haloB, tTheme.halo.b, COLOR_LERP);
-      cur.haloA = lerpColor(cur.haloA, tTheme.halo.a, COLOR_LERP);
-      cur.specR = lerpColor(cur.specR, tTheme.specular.r, COLOR_LERP);
-      cur.specG = lerpColor(cur.specG, tTheme.specular.g, COLOR_LERP);
-      cur.specB = lerpColor(cur.specB, tTheme.specular.b, COLOR_LERP);
-      cur.specA = lerpColor(cur.specA, tTheme.specular.a, COLOR_LERP);
+      cur.coreR = lerpColor(cur.coreR, tTheme.core.r, colorDecay);
+      cur.coreG = lerpColor(cur.coreG, tTheme.core.g, colorDecay);
+      cur.coreB = lerpColor(cur.coreB, tTheme.core.b, colorDecay);
+      cur.coreA = lerpColor(cur.coreA, tTheme.core.a, colorDecay);
+      cur.midR = lerpColor(cur.midR, tTheme.mid.r, colorDecay);
+      cur.midG = lerpColor(cur.midG, tTheme.mid.g, colorDecay);
+      cur.midB = lerpColor(cur.midB, tTheme.mid.b, colorDecay);
+      cur.midA = lerpColor(cur.midA, tTheme.mid.a, colorDecay);
+      cur.haloR = lerpColor(cur.haloR, tTheme.halo.r, colorDecay);
+      cur.haloG = lerpColor(cur.haloG, tTheme.halo.g, colorDecay);
+      cur.haloB = lerpColor(cur.haloB, tTheme.halo.b, colorDecay);
+      cur.haloA = lerpColor(cur.haloA, tTheme.halo.a, colorDecay);
+      cur.specR = lerpColor(cur.specR, tTheme.specular.r, colorDecay);
+      cur.specG = lerpColor(cur.specG, tTheme.specular.g, colorDecay);
+      cur.specB = lerpColor(cur.specB, tTheme.specular.b, colorDecay);
+      cur.specA = lerpColor(cur.specA, tTheme.specular.a, colorDecay);
 
       const p = colorProximityRef.current;
 

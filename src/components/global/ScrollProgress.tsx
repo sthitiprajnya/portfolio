@@ -20,7 +20,7 @@ export function ScrollProgress() {
     // Smoothness interpolation (spring-like damping)
     let currentScaleY = 0;
     let targetScaleY = 0;
-    const LERP_FACTOR = 0.15; // Lower is smoother/slower, higher is snappier
+    let lastTime = 0;
 
     // Cache scroll height to avoid expensive layout thrashing in the scroll/RAF loop
     const updateDimensions = () => {
@@ -39,6 +39,7 @@ export function ScrollProgress() {
 
       // Wake up the animation loop if it's sleeping
       if (rafId === null) {
+        lastTime = performance.now();
         rafId = requestAnimationFrame(draw);
       }
     };
@@ -47,13 +48,18 @@ export function ScrollProgress() {
       calculateTarget();
     };
 
-    const draw = () => {
+    const draw = (time: number) => {
+      const dt = time - lastTime;
+      lastTime = time;
+
       // Interpolate for smooth spring-like feel
       const diff = targetScaleY - currentScaleY;
 
       // Only update DOM if the difference is meaningful, to save CPU
       if (Math.abs(diff) > 0.0001) {
-        currentScaleY += diff * LERP_FACTOR;
+        // Frame-rate independent decay (0.01 roughly equals former 0.15 lerp at 60fps)
+        const decay = 1 - Math.exp(-0.01 * dt);
+        currentScaleY += diff * decay;
         // Optimization: direct DOM manipulation bypasses React state
         bar.style.transform = `scaleY(${currentScaleY})`;
         rafId = requestAnimationFrame(draw);

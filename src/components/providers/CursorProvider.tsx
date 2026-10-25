@@ -33,25 +33,30 @@ export function CursorProvider({ children }: CursorProviderProps) {
   const isInitial = useRef(true);
   const rafId = useRef<number | null>(null);
   const isActive = useRef(false);
+  const lastTimeRef = useRef<number>(0);
 
   useEffect(() => {
     setIsTouchDevice(window.matchMedia('(pointer: coarse)').matches);
   }, []);
 
-  const render = useCallback(() => {
+  const render = useCallback((time: number) => {
     if (isInitial.current) {
       rafId.current = null;
       isActive.current = false;
       return;
     }
 
+    const dt = time - lastTimeRef.current;
+    lastTimeRef.current = time;
+
     // Lerp for smooth follow
     const dx = mousePos.current.x - ringPos.current.x;
     const dy = mousePos.current.y - ringPos.current.y;
 
-    const LERP = 0.15;
-    ringPos.current.x += dx * LERP;
-    ringPos.current.y += dy * LERP;
+    // Frame-rate independent decay (0.01 approx equals 0.15 lerp at 60fps)
+    const decay = 1 - Math.exp(-0.01 * dt);
+    ringPos.current.x += dx * decay;
+    ringPos.current.y += dy * decay;
 
     if (dotRef.current) {
       const dotScale = isClicking.current ? 0.75 : 1;
@@ -88,6 +93,7 @@ export function CursorProvider({ children }: CursorProviderProps) {
   const wake = useCallback(() => {
     if (isActive.current || isTouchDevice || prefersReducedMotion) return;
     isActive.current = true;
+    lastTimeRef.current = performance.now();
     rafId.current = requestAnimationFrame(render);
   }, [isTouchDevice, prefersReducedMotion, render]);
 

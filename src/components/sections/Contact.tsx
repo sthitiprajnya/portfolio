@@ -128,19 +128,18 @@ export function Contact() {
       // to reduce the initial JavaScript bundle size and improve page load performance.
       const emailjs = (await import('@emailjs/browser')).default;
 
+      try {
+        localStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
+      } catch (e) {
+        console.warn('Failed to write rate limit to localStorage.', e);
+      }
+
       await emailjs.sendForm(
         serviceId,
         templateId,
         formRef.current,
         publicKey
       );
-
-      // Only set cooldown upon successful submission
-      try {
-        localStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
-      } catch (e) {
-        console.warn('Failed to write rate limit to localStorage.', e);
-      }
 
       setStatus('sent');
       setForm({ from_name: '', from_email: '', subject: '', message: '', hp_field: '' });
@@ -153,6 +152,11 @@ export function Contact() {
       }, 6000);
     } catch (error) {
       console.error("EmailJS Error:", error);
+      try {
+        localStorage.removeItem(LAST_SUBMISSION_KEY);
+      } catch (e) {
+        console.warn('Failed to remove rate limit from localStorage.', e);
+      }
       setStatus('error');
     }
   };

@@ -127,3 +127,7 @@
 ## 2026-06-28 - [Optimizing Idle Animation Loops via Page Visibility]
 **Learning:** Continuous `setInterval` loops used for visual effects (like the 120ms and 300ms animations in `AsciiAvatar.tsx`) continue running in the background even when the tab is not visible, consuming unnecessary CPU cycles and draining battery on mobile devices.
 **Action:** Always wrap background `setInterval` visual updates with a `visibilitychange` event listener to clear the interval when `document.hidden` is true and restart it when the tab becomes visible.
+
+## 2026-08-20 - [Short-Circuit Array Scanning in RAF Loops]
+**Learning:** Iterating through arrays in continuous `requestAnimationFrame` loops (e.g., scanning all elements for a maximum proximity or opacity calculation) wastes CPU cycles if the theoretical maximum or a threshold condition is already reached early in the array.
+**Action:** Always implement short-circuit logic (e.g., `if (maxProximity >= 0.99) break;`) in iterative calculations within hot loops to prematurely exit the loop once the maximum possible or required state is confirmed, saving redundant iterations.

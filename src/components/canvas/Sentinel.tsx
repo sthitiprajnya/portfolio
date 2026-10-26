@@ -148,7 +148,11 @@ export default function Sentinel() {
         const dist = Math.abs(cache[i].centerY - viewportCenterY);
         if (dist < 300) {
           const proximity = 1 - (dist / 300);
-          if (proximity > maxProximity) maxProximity = proximity;
+          if (proximity > maxProximity) {
+            maxProximity = proximity;
+            // BOLT: Short-circuit iterative array scanning once the theoretical maximum proximity is effectively reached
+            if (maxProximity >= 0.99) break;
+          }
         }
       }
       return maxProximity;

@@ -30,6 +30,30 @@ describe('useFaviconBlink', () => {
     expect(document.querySelector("link[rel~='icon']")?.getAttribute('href')).toBe('/portfolio/favicon.svg');
   });
 
+  it('pauses and resumes interval based on document visibility', () => {
+    const setIntervalSpy = vi.spyOn(globalThis, 'setInterval');
+    const clearIntervalSpy = vi.spyOn(globalThis, 'clearInterval');
+
+    // Explicitly mock document.hidden as false initially
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => false });
+
+    renderHook(() => useFaviconBlink());
+
+    expect(setIntervalSpy).toHaveBeenCalledTimes(1);
+
+    // Simulate tab becoming hidden
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
+    document.dispatchEvent(new Event('visibilitychange'));
+
+    expect(clearIntervalSpy).toHaveBeenCalledTimes(1);
+
+    // Simulate tab becoming visible again
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => false });
+    document.dispatchEvent(new Event('visibilitychange'));
+
+    expect(setIntervalSpy).toHaveBeenCalledTimes(2);
+  });
+
   it('clears its interval and restores the static icon when activity pauses', () => {
     const setIntervalSpy = vi.spyOn(globalThis, 'setInterval');
     const clearIntervalSpy = vi.spyOn(globalThis, 'clearInterval');

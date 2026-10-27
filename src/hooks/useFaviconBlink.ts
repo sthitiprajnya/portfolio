@@ -26,9 +26,39 @@ export function useFaviconBlink() {
       isBlank = !isBlank;
     };
 
-    updateFavicon();
-    const intervalId = setInterval(updateFavicon, 800);
+    let intervalId: ReturnType<typeof setInterval> | null = null;
 
-    return () => clearInterval(intervalId);
+    const startTimer = () => {
+      if (!intervalId) {
+        updateFavicon();
+        intervalId = setInterval(updateFavicon, 800);
+      }
+    };
+
+    const stopTimer = () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopTimer();
+      } else {
+        startTimer();
+      }
+    };
+
+    if (!document.hidden) {
+      startTimer();
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      stopTimer();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [isAnimationActive]);
 }

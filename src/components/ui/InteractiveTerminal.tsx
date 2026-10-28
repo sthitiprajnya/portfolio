@@ -78,8 +78,8 @@ export function InteractiveTerminal({ className }: { className?: string }) {
         const CommandLink = ({ cmd }: { cmd: string }) => (
           <button
             onClick={() => handleCommand(cmd)}
-            className="text-cyan hover:underline focus:underline outline-none"
-            title={`Run ${cmd}`}
+            className="text-cyan hover:underline focus:underline outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-sm"
+            title={`Run ${cmd}`} aria-label={`Run ${cmd} command`}
           >
             {cmd}
           </button>

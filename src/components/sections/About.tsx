@@ -59,7 +59,7 @@ export function About() {
             </div>
 
             <ScrollReveal variants={fadeSlideUp} delay={0.2} className="flex gap-4">
-              <CyberButton as="a" href={sitePath(PERSONAL.resumeUrl)} download color="cyan">
+              <CyberButton as="a" href={sitePath(PERSONAL.resumeUrl)} download color="cyan" aria-label="Download Resume (CV)" title="Download Resume (CV)">
                 DOWNLOAD_CV
               </CyberButton>
             </ScrollReveal>

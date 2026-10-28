@@ -175,6 +175,8 @@ export function ResumePanel() {
                   color="green"
                   className="w-full justify-center rounded-pill glass"
                   onClick={handleDownload}
+                  aria-label="Download Resume (CV)"
+                  title="Download Resume (CV)"
                 >
                   <span className="flex items-center space-x-2">
                     {downloadStarted ? (

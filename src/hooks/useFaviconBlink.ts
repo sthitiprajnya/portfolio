@@ -21,14 +21,49 @@ export function useFaviconBlink() {
     }
 
     let isBlank = false;
+    let intervalId: ReturnType<typeof setInterval> | null = null;
+
     const updateFavicon = () => {
       link.href = isBlank ? SVG_BLANK : SVG_CURSOR;
       isBlank = !isBlank;
     };
 
-    updateFavicon();
-    const intervalId = setInterval(updateFavicon, 800);
+    const startTimer = () => {
+      if (!intervalId) {
+        updateFavicon();
+        intervalId = setInterval(updateFavicon, 800);
+      }
+    };
 
-    return () => clearInterval(intervalId);
+    const stopTimer = () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+        // BOLT: Ensure favicon isn't left blank when tab goes to background
+        link.href = SVG_CURSOR;
+        isBlank = false;
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      // BOLT: Optimization - Pause the 800ms favicon update interval when the tab is inactive
+      // to eliminate unnecessary background DOM updates and save CPU cycles.
+      if (document.hidden) {
+        stopTimer();
+      } else {
+        startTimer();
+      }
+    };
+
+    if (!document.hidden) {
+      startTimer();
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      stopTimer();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [isAnimationActive]);
 }

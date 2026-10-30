@@ -43,4 +43,26 @@ describe('useFaviconBlink', () => {
     expect(document.querySelector("link[rel~='icon']")?.getAttribute('href')).toBe('/portfolio/favicon.svg');
     unmount();
   });
+
+  it('pauses polling when document is hidden', () => {
+    const setIntervalSpy = vi.spyOn(globalThis, 'setInterval');
+    const clearIntervalSpy = vi.spyOn(globalThis, 'clearInterval');
+    const { unmount } = renderHook(() => useFaviconBlink());
+
+    expect(setIntervalSpy).toHaveBeenCalled();
+
+    // Simulate tab hiding
+    Object.defineProperty(document, 'hidden', { value: true, configurable: true });
+    document.dispatchEvent(new Event('visibilitychange'));
+
+    expect(clearIntervalSpy).toHaveBeenCalled();
+
+    // Simulate tab showing
+    Object.defineProperty(document, 'hidden', { value: false, configurable: true });
+    document.dispatchEvent(new Event('visibilitychange'));
+
+    expect(setIntervalSpy).toHaveBeenCalledTimes(2);
+
+    unmount();
+  });
 });

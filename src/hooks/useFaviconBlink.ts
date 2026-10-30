@@ -21,14 +21,45 @@ export function useFaviconBlink() {
     }
 
     let isBlank = false;
+    let intervalId: ReturnType<typeof setInterval> | null = null;
+
     const updateFavicon = () => {
       link.href = isBlank ? SVG_BLANK : SVG_CURSOR;
       isBlank = !isBlank;
     };
 
-    updateFavicon();
-    const intervalId = setInterval(updateFavicon, 800);
+    const start = () => {
+      if (!intervalId) {
+        updateFavicon();
+        intervalId = setInterval(updateFavicon, 800);
+      }
+    };
 
-    return () => clearInterval(intervalId);
+    const stop = () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      // BOLT: Pause setInterval polling when tab is inactive to save CPU cycles
+      if (document.hidden) {
+        stop();
+      } else {
+        start();
+      }
+    };
+
+    if (!document.hidden) {
+      start();
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      stop();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [isAnimationActive]);
 }

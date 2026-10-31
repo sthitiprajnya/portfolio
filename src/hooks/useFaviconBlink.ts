@@ -26,9 +26,39 @@ export function useFaviconBlink() {
       isBlank = !isBlank;
     };
 
-    updateFavicon();
-    const intervalId = setInterval(updateFavicon, 800);
+    let intervalId: NodeJS.Timeout | null = null;
 
-    return () => clearInterval(intervalId);
+    const startTimer = () => {
+      if (!intervalId) {
+        intervalId = setInterval(updateFavicon, 800);
+      }
+    };
+
+    const stopTimer = () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      // BOLT: Pause animation when tab is inactive to save CPU and battery
+      if (document.hidden) {
+        stopTimer();
+      } else {
+        startTimer();
+      }
+    };
+
+    updateFavicon();
+    if (!document.hidden) {
+      startTimer();
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      stopTimer();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [isAnimationActive]);
 }

@@ -12,6 +12,7 @@ describe('useFaviconBlink', () => {
     vi.useFakeTimers();
     document.head.querySelectorAll("link[rel~='icon']").forEach((link) => link.remove());
     vi.mocked(useAnimationActivity).mockReturnValue(true);
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => false });
   });
 
   afterEach(() => {
@@ -41,6 +42,27 @@ describe('useFaviconBlink', () => {
 
     expect(clearIntervalSpy).toHaveBeenCalled();
     expect(document.querySelector("link[rel~='icon']")?.getAttribute('href')).toBe('/portfolio/favicon.svg');
+    unmount();
+  });
+
+  it('pauses and resumes interval on visibility change', () => {
+    const setIntervalSpy = vi.spyOn(globalThis, 'setInterval');
+    const clearIntervalSpy = vi.spyOn(globalThis, 'clearInterval');
+    const { unmount } = renderHook(() => useFaviconBlink());
+
+    expect(setIntervalSpy).toHaveBeenCalledTimes(1);
+
+    // Simulate tab hidden
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
+    document.dispatchEvent(new Event('visibilitychange'));
+
+    expect(clearIntervalSpy).toHaveBeenCalledTimes(1);
+
+    // Simulate tab visible
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => false });
+    document.dispatchEvent(new Event('visibilitychange'));
+
+    expect(setIntervalSpy).toHaveBeenCalledTimes(2);
     unmount();
   });
 });

@@ -308,7 +308,7 @@ const ExperienceCard = React.memo(function ExperienceCard({ experience, isFirst 
                   onClick={() => setOpenSection(sub.id)}
                   onKeyDown={(e) => handleKeyDown(e, idx)}
                   className={clsx(
-                    "px-4 py-2 font-mono text-[0.65rem] tracking-widest uppercase transition-all rounded-card border-b-2 outline-none focus-visible:ring-2",
+                    "px-4 py-2 font-mono text-[0.65rem] tracking-widest uppercase transition-all rounded-card border-b-2 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black",
                     isOpen
                       ? ACTIVE_COLOR_MAP[sub.color]
                       : "border-transparent text-text-secondary hover:text-white hover:bg-[rgba(255,255,255,0.05)]"

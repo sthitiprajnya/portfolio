@@ -124,6 +124,13 @@ export function Contact() {
     setStatus('transmitting');
 
     try {
+      // Security: Set rate limit synchronously before async call to prevent race condition
+      try {
+        localStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
+      } catch (e) {
+        console.warn('Failed to write rate limit to localStorage.', e);
+      }
+
       // ⚡ Bolt: Dynamically import heavy @emailjs/browser SDK (~15KB) only when the form is submitted
       // to reduce the initial JavaScript bundle size and improve page load performance.
       const emailjs = (await import('@emailjs/browser')).default;
@@ -135,13 +142,6 @@ export function Contact() {
         publicKey
       );
 
-      // Only set cooldown upon successful submission
-      try {
-        localStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
-      } catch (e) {
-        console.warn('Failed to write rate limit to localStorage.', e);
-      }
-
       setStatus('sent');
       setForm({ from_name: '', from_email: '', subject: '', message: '', hp_field: '' });
       if (statusResetTimeoutRef.current !== null) {
@@ -152,6 +152,12 @@ export function Contact() {
         statusResetTimeoutRef.current = null;
       }, 6000);
     } catch (error) {
+      // Security: Remove rate limit on failure to prevent locking out legitimate users on network errors
+      try {
+        localStorage.removeItem(LAST_SUBMISSION_KEY);
+      } catch (e) {
+        console.warn('Failed to remove rate limit from localStorage.', e);
+      }
       console.error("EmailJS Error:", error);
       setStatus('error');
     }

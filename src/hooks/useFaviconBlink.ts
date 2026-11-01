@@ -27,8 +27,27 @@ export function useFaviconBlink() {
     };
 
     updateFavicon();
-    const intervalId = setInterval(updateFavicon, 800);
+    let intervalId: NodeJS.Timeout | null = setInterval(updateFavicon, 800);
 
-    return () => clearInterval(intervalId);
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        if (intervalId) clearInterval(intervalId);
+        intervalId = null;
+      } else {
+        if (!intervalId) intervalId = setInterval(updateFavicon, 800);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    // BOLT: Check initial visibility state to avoid starting background work when booting in background tab
+    if (document.hidden && intervalId) {
+       clearInterval(intervalId);
+       intervalId = null;
+    }
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [isAnimationActive]);
 }

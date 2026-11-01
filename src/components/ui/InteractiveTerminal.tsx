@@ -78,7 +78,7 @@ export function InteractiveTerminal({ className }: { className?: string }) {
         const CommandLink = ({ cmd }: { cmd: string }) => (
           <button
             onClick={() => handleCommand(cmd)}
-            className="text-cyan hover:underline focus:underline outline-none"
+            className="text-cyan hover:underline focus:underline outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-sm px-1 -mx-1"
             title={`Run ${cmd}`}
           >
             {cmd}

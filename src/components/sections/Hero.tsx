@@ -277,7 +277,7 @@ export function Hero() {
                 aria-haspopup="dialog"
                 aria-controls="intel-modal"
                 aria-expanded={activeIntel === msg}
-                className="font-mono text-[0.65rem] text-text-secondary tracking-wide hover:text-cyan hover:underline cursor-pointer outline-none focus-visible:text-cyan focus-visible:underline glass-pill px-3 py-1 border-[var(--glass-border)]"
+                className="font-mono text-[0.65rem] text-text-secondary tracking-wide hover:text-cyan hover:underline cursor-pointer outline-none focus-visible:text-cyan focus-visible:underline focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black glass-pill px-3 py-1 border-[var(--glass-border)]"
               >
                 {msg}
               </button>

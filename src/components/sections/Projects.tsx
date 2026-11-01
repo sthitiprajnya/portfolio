@@ -297,7 +297,7 @@ const ProjectCard = React.memo(function ProjectCard({ project, index }: { projec
                   aria-controls={`methodology-${project.id}`}
                   aria-label={showMethodology ? `Hide methodology for ${project.title}` : `View methodology for ${project.title}`}
                   title={showMethodology ? `Hide methodology for ${project.title}` : `View methodology for ${project.title}`}
-                  className="w-full flex items-center justify-between p-2.5 bg-[rgba(0,245,255,0.05)] hover:bg-[rgba(0,245,255,0.1)] transition-colors font-mono text-[0.65rem] text-text-secondary uppercase tracking-widest outline-none focus-visible:ring-2 focus-visible:ring-cyan"
+                  className="w-full flex items-center justify-between p-2.5 bg-[rgba(0,245,255,0.05)] hover:bg-[rgba(0,245,255,0.1)] transition-colors font-mono text-[0.65rem] text-text-secondary uppercase tracking-widest outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black"
                 >
                   <span>{showMethodology ? 'HIDE_METHODOLOGY' : 'VIEW_METHODOLOGY'}</span>
                   <motion.svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" animate={{ rotate: showMethodology ? 180 : 0 }} aria-hidden="true">

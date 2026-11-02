@@ -112,6 +112,10 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       // BOLT: Clear bucket arrays at the start of each frame to prevent coordinate accumulation and memory leaks.
       clearBuckets();
 
+      // BOLT: Short-circuit the array scan for connections by sorting nodes by X coordinate.
+      // This allows us to break early from the inner loop once horizontal distance exceeds MAX_DISTANCE.
+      nodes.sort((a, b) => a.x - b.x);
+
       // BOLT: Replace forEach with for-loop and batch arc drawing into a single fill() call
       ctx.fillStyle = NODE_COLOR;
       ctx.beginPath();
@@ -159,10 +163,11 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
         const nodeA = nodes[i];
         for (let j = i + 1; j < numNodes; j++) {
           const nodeB = nodes[j];
-          const dx = nodeA.x - nodeB.x;
+          const dx = nodeB.x - nodeA.x; // Always positive since array is sorted by X
 
-          // Early exit for horizontal distance
-          if (dx > MAX_DISTANCE || dx < -MAX_DISTANCE) continue;
+          // BOLT: Short-circuit the array scan. Since nodes are sorted by X, if this node
+          // is too far horizontally, all subsequent nodes will be even further.
+          if (dx > MAX_DISTANCE) break;
 
           const dy = nodeA.y - nodeB.y;
 

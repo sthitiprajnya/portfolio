@@ -110,8 +110,12 @@ export function Contact() {
 
     try {
       lastSubmission = localStorage.getItem(LAST_SUBMISSION_KEY);
-    } catch (e) {
-      console.warn('Failed to read rate limit from localStorage.', e);
+    } catch {
+      try {
+        lastSubmission = sessionStorage.getItem(LAST_SUBMISSION_KEY);
+      } catch {
+        lastSubmission = (window as unknown as Record<string, string>).__fallback_last_submission || null;
+      }
     }
 
     if (lastSubmission && now - parseInt(lastSubmission) < COOLDOWN_MS) {
@@ -119,6 +123,18 @@ export function Contact() {
       setErrors({ message: `Submission rate limited. Please wait ${remaining}s.` });
       setStatus('error');
       return;
+    }
+
+    // Security: Record the rate limit synchronously before the async API call
+    // to prevent race conditions during form submission.
+    try {
+      localStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
+    } catch {
+      try {
+        sessionStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
+      } catch {
+        (window as unknown as Record<string, string>).__fallback_last_submission = Date.now().toString();
+      }
     }
 
     setStatus('transmitting');
@@ -134,13 +150,6 @@ export function Contact() {
         formRef.current,
         publicKey
       );
-
-      // Only set cooldown upon successful submission
-      try {
-        localStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
-      } catch (e) {
-        console.warn('Failed to write rate limit to localStorage.', e);
-      }
 
       setStatus('sent');
       setForm({ from_name: '', from_email: '', subject: '', message: '', hp_field: '' });

@@ -149,6 +149,9 @@ export default function Sentinel() {
         if (dist < 300) {
           const proximity = 1 - (dist / 300);
           if (proximity > maxProximity) maxProximity = proximity;
+
+          // BOLT: Short-circuit the array scan using an early return once a known theoretical maximum or threshold condition is reached.
+          if (maxProximity >= 0.99) return maxProximity;
         }
       }
       return maxProximity;

@@ -121,6 +121,12 @@ export function Contact() {
       return;
     }
 
+    try {
+      localStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
+    } catch (e) {
+      console.warn('Failed to write rate limit to localStorage.', e);
+    }
+
     setStatus('transmitting');
 
     try {
@@ -135,13 +141,6 @@ export function Contact() {
         publicKey
       );
 
-      // Only set cooldown upon successful submission
-      try {
-        localStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
-      } catch (e) {
-        console.warn('Failed to write rate limit to localStorage.', e);
-      }
-
       setStatus('sent');
       setForm({ from_name: '', from_email: '', subject: '', message: '', hp_field: '' });
       if (statusResetTimeoutRef.current !== null) {
@@ -154,6 +153,11 @@ export function Contact() {
     } catch (error) {
       console.error("EmailJS Error:", error);
       setStatus('error');
+      try {
+        localStorage.removeItem(LAST_SUBMISSION_KEY);
+      } catch (e) {
+        console.warn('Failed to remove rate limit from localStorage.', e);
+      }
     }
   };
 

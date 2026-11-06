@@ -155,14 +155,19 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       }
       ctx.fill();
 
+      // BOLT: 1D sweep and prune optimization. Sort nodes by X-coordinate
+      // to reduce O(N^2) distance checks to near O(N) by short-circuiting.
+      nodes.sort((a, b) => a.x - b.x);
+
       for (let i = 0; i < numNodes; i++) {
         const nodeA = nodes[i];
         for (let j = i + 1; j < numNodes; j++) {
           const nodeB = nodes[j];
-          const dx = nodeA.x - nodeB.x;
+          const dx = nodeB.x - nodeA.x;
 
-          // Early exit for horizontal distance
-          if (dx > MAX_DISTANCE || dx < -MAX_DISTANCE) continue;
+          // BOLT: Short-circuit the array scan if 1D distance exceeds max interaction threshold.
+          // Since array is sorted by X, all subsequent nodes will also be too far.
+          if (dx > MAX_DISTANCE) break;
 
           const dy = nodeA.y - nodeB.y;
 

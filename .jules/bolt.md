@@ -127,3 +127,7 @@
 ## 2026-06-28 - [Optimizing Idle Animation Loops via Page Visibility]
 **Learning:** Continuous `setInterval` loops used for visual effects (like the 120ms and 300ms animations in `AsciiAvatar.tsx`) continue running in the background even when the tab is not visible, consuming unnecessary CPU cycles and draining battery on mobile devices.
 **Action:** Always wrap background `setInterval` visual updates with a `visibilitychange` event listener to clear the interval when `document.hidden` is true and restart it when the tab becomes visible.
+
+## 2026-11-06 - [Spatial Partitioning Short-Circuit Optimization]
+**Learning:** In N-body or particle systems (like `NetworkConnector.tsx`) where we check distance between all pairs (O(N²) complexity), brute-forcing the check for every node pair wastes CPU cycles on nodes that are far apart, especially in high-frequency `requestAnimationFrame` loops.
+**Action:** Sort the array of nodes by one spatial coordinate (e.g., X axis) before the inner loop. This allows short-circuiting the inner loop with a `break` statement as soon as the X-distance exceeds the maximum threshold, significantly reducing the number of comparisons.

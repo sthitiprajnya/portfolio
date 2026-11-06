@@ -246,8 +246,10 @@ export default function HeroOrb() {
           const dist = Math.sqrt(distSq);
           // Inside range: gentle repulsion
           const strength = MOUSE_FORCE * (1 - dist / MOUSE_RANGE);
-          fx -= (dx / dist) * strength * 80;
-          fy -= (dy / dist) * strength * 80;
+          // BOLT: Consolidate division to avoid two separate slow floating-point divisions
+          const forceFactor = (strength * 80) / dist;
+          fx -= dx * forceFactor;
+          fy -= dy * forceFactor;
         }
       }
 

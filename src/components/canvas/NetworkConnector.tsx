@@ -124,11 +124,13 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
           const dx = node.x - mouseRef.current.x;
           const dy = node.y - mouseRef.current.y;
           const distSq = dx * dx + dy * dy;
-          if (distSq < 14400) { // 120 * 120
+          if (distSq < 14400 && distSq > 0.1) { // 120 * 120
+            // BOLT: Approximate force calculation avoiding Math.sqrt where possible, or just optimize division
             const dist = Math.sqrt(distSq);
             const force = 0.8 * (1 - dist / 120);
-            node.vx += (dx / dist) * force;
-            node.vy += (dy / dist) * force;
+            const f = force / dist;
+            node.vx += dx * f;
+            node.vy += dy * f;
           }
         }
 
@@ -155,14 +157,17 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       }
       ctx.fill();
 
+      // BOLT: Short-circuit the array scan for O(N^2) distance checks using 1D sweep and prune spatial partitioning.
+      nodes.sort((a, b) => a.x - b.x);
+
       for (let i = 0; i < numNodes; i++) {
         const nodeA = nodes[i];
         for (let j = i + 1; j < numNodes; j++) {
           const nodeB = nodes[j];
-          const dx = nodeA.x - nodeB.x;
+          const dx = nodeB.x - nodeA.x; // Guaranteed >= 0 due to sorting
 
           // Early exit for horizontal distance
-          if (dx > MAX_DISTANCE || dx < -MAX_DISTANCE) continue;
+          if (dx > MAX_DISTANCE) break;
 
           const dy = nodeA.y - nodeB.y;
 

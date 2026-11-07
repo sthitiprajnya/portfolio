@@ -78,3 +78,8 @@
 **Vulnerability:** A race condition in the contact form's client-side rate limiting logic allowed attackers to submit multiple requests in the same execution tick, bypassing the 60-second cooldown and potentially exhausting the EmailJS API quota.
 **Learning:** React state updates (setStatus) are asynchronous. If a rate limit cooldown is enforced using localStorage, the storage must be updated synchronously at the very beginning of the submission handler, rather than waiting for the asynchronous API call to complete.
 **Prevention:** Always write cooldown timestamps to synchronous storage (localStorage) immediately upon triggering an action, rather than inside a then block or after an await.
+
+## 2026-11-07 - Email Spam / Open Relay vector via visitor-controlled CC field
+**Vulnerability:** The contact form included a hidden `cc_email` field that was bound directly to the visitor's email input.
+**Learning:** If the EmailJS template maps this visitor-controlled input to a CC or To field, it allows an attacker to supply a victim's email address and send them arbitrary messages using the site's trusted email infrastructure. This acts as an open relay for spam or phishing.
+**Prevention:** Never map visitor-controlled inputs to a `to` or `cc` field unless there are robust server-side protections (like verified authentication or explicit opt-in confirmation). Only map visitor-controlled email inputs to the `reply_to` field.

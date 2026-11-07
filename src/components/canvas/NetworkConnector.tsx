@@ -155,14 +155,21 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       }
       ctx.fill();
 
+      // BOLT: Short-circuit O(N²) interaction checks by sorting nodes along X-axis
+      // (1D Sweep and Prune). When distance exceeds max, we break the inner loop early.
+      nodes.sort((a, b) => a.x - b.x);
+
       for (let i = 0; i < numNodes; i++) {
         const nodeA = nodes[i];
         for (let j = i + 1; j < numNodes; j++) {
           const nodeB = nodes[j];
           const dx = nodeA.x - nodeB.x;
 
-          // Early exit for horizontal distance
-          if (dx > MAX_DISTANCE || dx < -MAX_DISTANCE) continue;
+          // Since nodes are sorted by X, if nodeB is too far to the right,
+          // all subsequent nodes will also be too far.
+          if (dx < -MAX_DISTANCE) break;
+          // Early exit for horizontal distance if nodeA is somehow further right (shouldn't happen with sorted but good to keep)
+          if (dx > MAX_DISTANCE) continue;
 
           const dy = nodeA.y - nodeB.y;
 

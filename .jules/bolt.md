@@ -127,3 +127,7 @@
 ## 2026-06-28 - [Optimizing Idle Animation Loops via Page Visibility]
 **Learning:** Continuous `setInterval` loops used for visual effects (like the 120ms and 300ms animations in `AsciiAvatar.tsx`) continue running in the background even when the tab is not visible, consuming unnecessary CPU cycles and draining battery on mobile devices.
 **Action:** Always wrap background `setInterval` visual updates with a `visibilitychange` event listener to clear the interval when `document.hidden` is true and restart it when the tab becomes visible.
+
+## 2026-08-16 - [1D Sweep and Prune for Distance Checks]
+**Learning:** Checking distances between all pairs of nodes in an animation loop takes O(N²) time. If you sort the nodes by one axis (like X-coordinate) first, you can early-exit the inner loop as soon as the 1D distance exceeds your interaction threshold, since all remaining nodes will also be too far. This reduces the time complexity towards O(N log N).
+**Action:** When implementing particle systems or network graphs that require distance checks, apply a 1D 'sweep and prune' optimization. Sort the array, use a `break` to short-circuit the inner loop, and ensure you compute absolute distance or enforce order (e.g. `b - a`) to prevent false positives.

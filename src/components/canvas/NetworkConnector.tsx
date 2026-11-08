@@ -155,14 +155,18 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       }
       ctx.fill();
 
+      // BOLT: 1D Sweep and Prune Spatial Partitioning Optimization
+      // Sort nodes by X-coordinate to short-circuit the O(N^2) inner loop distance check
+      nodes.sort((a, b) => a.x - b.x);
+
       for (let i = 0; i < numNodes; i++) {
         const nodeA = nodes[i];
         for (let j = i + 1; j < numNodes; j++) {
           const nodeB = nodes[j];
-          const dx = nodeA.x - nodeB.x;
+          const dx = nodeB.x - nodeA.x; // nodeB.x is guaranteed to be >= nodeA.x
 
-          // Early exit for horizontal distance
-          if (dx > MAX_DISTANCE || dx < -MAX_DISTANCE) continue;
+          // BOLT: Short-circuit array scan since all subsequent nodes will be further than MAX_DISTANCE on the X-axis
+          if (dx > MAX_DISTANCE) break;
 
           const dy = nodeA.y - nodeB.y;
 

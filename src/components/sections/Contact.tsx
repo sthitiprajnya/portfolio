@@ -123,6 +123,13 @@ export function Contact() {
 
     setStatus('transmitting');
 
+    // Security: Set cooldown synchronously *before* async API call to prevent race condition bypasses
+    try {
+      localStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
+    } catch (e) {
+      console.warn('Failed to write rate limit to localStorage.', e);
+    }
+
     try {
       // ⚡ Bolt: Dynamically import heavy @emailjs/browser SDK (~15KB) only when the form is submitted
       // to reduce the initial JavaScript bundle size and improve page load performance.
@@ -134,13 +141,6 @@ export function Contact() {
         formRef.current,
         publicKey
       );
-
-      // Only set cooldown upon successful submission
-      try {
-        localStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
-      } catch (e) {
-        console.warn('Failed to write rate limit to localStorage.', e);
-      }
 
       setStatus('sent');
       setForm({ from_name: '', from_email: '', subject: '', message: '', hp_field: '' });
@@ -154,6 +154,12 @@ export function Contact() {
     } catch (error) {
       console.error("EmailJS Error:", error);
       setStatus('error');
+      // Revert cooldown on failure so users aren't penalized for network errors
+      try {
+        localStorage.removeItem(LAST_SUBMISSION_KEY);
+      } catch (e) {
+        console.warn('Failed to remove rate limit from localStorage.', e);
+      }
     }
   };
 
@@ -269,12 +275,7 @@ export function Contact() {
                 className="opacity-0 absolute w-0 h-0 pointer-events-none"
               />
 
-              {/* CC/Reply-To field to allow sending a copy to the user */}
-              <input
-                type="hidden"
-                name="cc_email"
-                value={form.from_email}
-              />
+              {/* Reply-To field to allow replying to the user (Security: never map user input to cc/to fields to prevent open-relay spam) */}
               <input
                 type="hidden"
                 name="reply_to"

@@ -220,7 +220,7 @@ const ProjectCard = React.memo(function ProjectCard({ project, index }: { projec
                 href={project.githubUrl}
                 target="_blank" rel="noopener noreferrer"
 
-                className="text-text-muted hover:text-white transition-colors ml-4 flex-shrink-0"
+                className="text-text-muted hover:text-white transition-colors ml-4 flex-shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-sm"
                 aria-label={`View ${project.title} on GitHub`}
                 title={`View ${project.title} on GitHub`}
                 onClick={(e) => e.stopPropagation()}

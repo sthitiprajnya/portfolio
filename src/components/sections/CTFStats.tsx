@@ -116,7 +116,7 @@ export function CTFStats() {
 
                 aria-label="View HackTheBox Profile in a new tab"
                 title="View HackTheBox Profile in a new tab"
-                className="mt-6 flex items-center justify-center space-x-2 w-full py-2.5 border border-cyan/30 text-cyan font-mono text-xs uppercase tracking-widest rounded-pill hover:bg-cyan hover:text-black transition-all hover:shadow-[var(--glow-cyan-sm)]"
+                className="mt-6 flex items-center justify-center space-x-2 w-full py-2.5 border border-cyan/30 text-cyan font-mono text-xs uppercase tracking-widest rounded-pill hover:bg-cyan hover:text-black transition-all hover:shadow-[var(--glow-cyan-sm)] outline-none focus-visible:ring-2 focus-visible:ring-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-black"
               >
                 <span>VIEW HTB PROFILE</span>
                 <span aria-hidden="true" className="text-[10px]">↗</span>

@@ -1,0 +1,4 @@
+1. Sort `nodes` array by `x` coordinate using `nodes.sort((a, b) => a.x - b.x);` just before the O(N^2) inner loop in `src/components/canvas/NetworkConnector.tsx`.
+2. Inside the inner loop of the O(N^2) check, change `dx` to `nodeB.x - nodeA.x` and add an early exit condition `if (dx > MAX_DISTANCE) break;` for the 1D sweep and prune spatial partitioning technique. The `// BOLT:` comment must be added.
+3. Complete pre commit steps to ensure proper testing, verification, review, and reflection are done.
+4. Submit PR.

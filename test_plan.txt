@@ -1,0 +1,85 @@
+`NetworkConnector.tsx` has O(N²) calculation inside `requestAnimationFrame`:
+```typescript
+      for (let i = 0; i < numNodes; i++) {
+        const nodeA = nodes[i];
+        for (let j = i + 1; j < numNodes; j++) {
+          const nodeB = nodes[j];
+          const dx = nodeA.x - nodeB.x;
+
+          // Early exit for horizontal distance
+          if (dx > MAX_DISTANCE || dx < -MAX_DISTANCE) continue;
+```
+Wait, my memory says:
+"When optimizing O(N²) distance checks (e.g., N-body or particle systems) within requestAnimationFrame loops, apply a 1D 'sweep and prune' spatial partitioning technique: sort the entities by one axis (e.g., X-coordinate) and short-circuit the inner loop with a break statement when the 1D distance exceeds the maximum interaction threshold."
+
+Aha! `NetworkConnector.tsx` is exactly doing this O(N²) check.
+I can apply 1D sweep and prune.
+
+"sort the entities by one axis (e.g., X-coordinate) and short-circuit the inner loop with a break statement when the 1D distance exceeds the maximum interaction threshold."
+
+So in `NetworkConnector.tsx`:
+```typescript
+      // BOLT: Sort nodes by X coordinate for 1D sweep and prune
+      nodes.sort((a, b) => a.x - b.x);
+
+      for (let i = 0; i < numNodes; i++) {
+        const nodeA = nodes[i];
+        for (let j = i + 1; j < numNodes; j++) {
+          const nodeB = nodes[j];
+          const dx = nodeB.x - nodeA.x; // since sorted, nodeB.x is >= nodeA.x
+
+          // BOLT: Short-circuit the array scan for O(N^2) distance check using 1D sweep and prune
+          if (dx > MAX_DISTANCE) break;
+
+          const dy = nodeA.y - nodeB.y;
+          if (dy > MAX_DISTANCE || dy < -MAX_DISTANCE) continue;
+
+          const d2 = dx * dx + dy * dy;
+
+          if (d2 < MAX_DISTANCE_SQ) {
+```
+
+Wait, `dx = nodeA.x - nodeB.x` is originally used, so `dx` could be negative.
+If I sort them by `x`, then `nodeB.x >= nodeA.x`, so `dx = nodeA.x - nodeB.x <= 0`.
+But if I just write:
+```typescript
+          const dx = nodeB.x - nodeA.x;
+
+          // BOLT: Short-circuit the array scan using 1D sweep and prune spatial partitioning.
+          if (dx > MAX_DISTANCE) break;
+```
+
+Let's double check this.
+In `NetworkConnector.tsx` around line 152:
+```typescript
+        ctx.moveTo(node.x + radius, node.y);
+        ctx.arc(node.x, node.y, Math.max(0.1, radius), 0, Math.PI * 2);
+      }
+      ctx.fill();
+
+      // BOLT: Sort nodes by X-coordinate for 1D sweep and prune
+      nodes.sort((a, b) => a.x - b.x);
+
+      for (let i = 0; i < numNodes; i++) {
+        const nodeA = nodes[i];
+        for (let j = i + 1; j < numNodes; j++) {
+          const nodeB = nodes[j];
+          const dx = nodeB.x - nodeA.x;
+
+          // BOLT: Short-circuit the array scan (1D sweep and prune) when the X-distance exceeds the interaction threshold.
+          if (dx > MAX_DISTANCE) break;
+
+          const dy = nodeA.y - nodeB.y;
+
+          // Early exit for vertical distance
+          if (dy > MAX_DISTANCE || dy < -MAX_DISTANCE) continue;
+```
+Wait, the memory rule:
+"When optimizing O(N²) distance checks (e.g., N-body or particle systems) within requestAnimationFrame loops, apply a 1D 'sweep and prune' spatial partitioning technique: sort the entities by one axis (e.g., X-coordinate) and short-circuit the inner loop with a break statement when the 1D distance exceeds the maximum interaction threshold."
+And:
+"When implementing performance optimizations under the 'Bolt' persona, always include inline comments in the code explaining the optimization (e.g., `// BOLT: Short-circuit the array scan...`). Failing to add these explanatory comments violates the strict persona boundaries and will result in a code review failure."
+
+So I need to:
+1. Sort `nodes` array by `x` coordinate just before the O(N^2) loop.
+2. In the inner loop, calculate `dx = nodeB.x - nodeA.x`.
+3. Add `// BOLT: Short-circuit the array scan using 1D sweep and prune spatial partitioning` and `break` if `dx > MAX_DISTANCE`.

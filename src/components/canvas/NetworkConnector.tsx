@@ -155,14 +155,19 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       }
       ctx.fill();
 
+      // BOLT: Optimize O(N²) distance checks using a 1D "sweep and prune" spatial partitioning technique.
+      // Sort the nodes by their X-coordinate to short-circuit the inner loop with a break
+      // when the 1D horizontal distance exceeds the maximum interaction threshold.
+      nodes.sort((a, b) => a.x - b.x);
+
       for (let i = 0; i < numNodes; i++) {
         const nodeA = nodes[i];
         for (let j = i + 1; j < numNodes; j++) {
           const nodeB = nodes[j];
-          const dx = nodeA.x - nodeB.x;
+          const dx = nodeB.x - nodeA.x;
 
           // Early exit for horizontal distance
-          if (dx > MAX_DISTANCE || dx < -MAX_DISTANCE) continue;
+          if (dx > MAX_DISTANCE) break;
 
           const dy = nodeA.y - nodeB.y;
 

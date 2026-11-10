@@ -155,14 +155,19 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       }
       ctx.fill();
 
+      // BOLT: 1D sweep and prune spatial partitioning. Sort nodes by X-coordinate to reduce O(N²) distance checks.
+      nodes.sort((a, b) => a.x - b.x);
+
       for (let i = 0; i < numNodes; i++) {
         const nodeA = nodes[i];
         for (let j = i + 1; j < numNodes; j++) {
           const nodeB = nodes[j];
           const dx = nodeA.x - nodeB.x;
 
-          // Early exit for horizontal distance
-          if (dx > MAX_DISTANCE || dx < -MAX_DISTANCE) continue;
+          // BOLT: Short-circuit the array scan because nodes are sorted by X.
+          if (-dx > MAX_DISTANCE) break;
+          // Early exit for horizontal distance if dx is positive
+          if (dx > MAX_DISTANCE) continue;
 
           const dy = nodeA.y - nodeB.y;
 

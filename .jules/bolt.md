@@ -127,3 +127,6 @@
 ## 2026-06-28 - [Optimizing Idle Animation Loops via Page Visibility]
 **Learning:** Continuous `setInterval` loops used for visual effects (like the 120ms and 300ms animations in `AsciiAvatar.tsx`) continue running in the background even when the tab is not visible, consuming unnecessary CPU cycles and draining battery on mobile devices.
 **Action:** Always wrap background `setInterval` visual updates with a `visibilitychange` event listener to clear the interval when `document.hidden` is true and restart it when the tab becomes visible.
+## 2026-11-10 - [Sweep and Prune for N-Body Performance]
+**Learning:** O(N^2) distance calculations in dense particle systems (like the NetworkConnector) cause exponential CPU bottlenecks, particularly on mobile devices.
+**Action:** Always short-circuit O(N^2) inner loops using a 1D spatial sort (sweep and prune). Sorting particles by one axis allows early exit from the inner loop, changing performance characteristics from O(N^2) towards O(N log N) in sparse areas.

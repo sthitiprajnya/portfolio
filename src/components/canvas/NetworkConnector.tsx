@@ -155,14 +155,17 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       }
       ctx.fill();
 
+      // BOLT: Short-circuit the array scan for O(N^2) distance checks using 1D 'sweep and prune'.
+      // Sorting nodes by X-coordinate allows us to break the inner loop early when horizontal distance exceeds the threshold.
+      nodes.sort((a, b) => a.x - b.x);
+
       for (let i = 0; i < numNodes; i++) {
         const nodeA = nodes[i];
         for (let j = i + 1; j < numNodes; j++) {
           const nodeB = nodes[j];
-          const dx = nodeA.x - nodeB.x;
+          const dx = nodeB.x - nodeA.x;
 
-          // Early exit for horizontal distance
-          if (dx > MAX_DISTANCE || dx < -MAX_DISTANCE) continue;
+          if (dx > MAX_DISTANCE) break;
 
           const dy = nodeA.y - nodeB.y;
 

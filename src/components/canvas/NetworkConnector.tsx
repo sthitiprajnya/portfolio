@@ -59,6 +59,7 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
     let numNodes = DEFAULT_NUM_NODES;
 
     let nodes: Node[] = [];
+    let sortedNodes: Node[] = [];
     // BOLT: Pre-allocate bucket arrays and reuse them across frames to minimize garbage collection (GC) pressure.
     const buckets: number[][] = [[], [], [], [], [], []];
     const clearBuckets = () => {
@@ -67,14 +68,17 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
 
     const initNodes = () => {
       nodes = [];
+      sortedNodes = [];
       for (let i = 0; i < numNodes; i++) {
-        nodes.push({
+        const node = {
           x: Math.random() * width,
           y: Math.random() * height,
           vx: (Math.random() - 0.5) * 1.5,
           vy: (Math.random() - 0.5) * 1.5,
           phase: Math.random() * Math.PI * 2,
-        });
+        };
+        nodes.push(node);
+        sortedNodes.push(node);
       }
     };
 
@@ -155,14 +159,21 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       }
       ctx.fill();
 
+      // BOLT: Short-circuit the array scan using a 1D 'sweep and prune' spatial partitioning technique.
+      // We sort a pre-allocated array to avoid mutating the original array in-place, preserving stable order.
       for (let i = 0; i < numNodes; i++) {
-        const nodeA = nodes[i];
-        for (let j = i + 1; j < numNodes; j++) {
-          const nodeB = nodes[j];
-          const dx = nodeA.x - nodeB.x;
+        sortedNodes[i] = nodes[i];
+      }
+      sortedNodes.sort((a, b) => a.x - b.x);
 
-          // Early exit for horizontal distance
-          if (dx > MAX_DISTANCE || dx < -MAX_DISTANCE) continue;
+      for (let i = 0; i < numNodes; i++) {
+        const nodeA = sortedNodes[i];
+        for (let j = i + 1; j < numNodes; j++) {
+          const nodeB = sortedNodes[j];
+          const dx = nodeB.x - nodeA.x;
+
+          // Early exit for horizontal distance - short-circuit the inner loop since array is sorted by X-coordinate
+          if (dx > MAX_DISTANCE) break;
 
           const dy = nodeA.y - nodeB.y;
 

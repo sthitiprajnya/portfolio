@@ -123,6 +123,13 @@ export function Contact() {
 
     setStatus('transmitting');
 
+    // 🛡️ Sentinel: Set cooldown synchronously to prevent race conditions during async import/network request.
+    try {
+      localStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
+    } catch (e) {
+      console.warn('Failed to write rate limit to localStorage.', e);
+    }
+
     try {
       // ⚡ Bolt: Dynamically import heavy @emailjs/browser SDK (~15KB) only when the form is submitted
       // to reduce the initial JavaScript bundle size and improve page load performance.
@@ -134,13 +141,6 @@ export function Contact() {
         formRef.current,
         publicKey
       );
-
-      // Only set cooldown upon successful submission
-      try {
-        localStorage.setItem(LAST_SUBMISSION_KEY, Date.now().toString());
-      } catch (e) {
-        console.warn('Failed to write rate limit to localStorage.', e);
-      }
 
       setStatus('sent');
       setForm({ from_name: '', from_email: '', subject: '', message: '', hp_field: '' });
@@ -154,6 +154,12 @@ export function Contact() {
     } catch (error) {
       console.error("EmailJS Error:", error);
       setStatus('error');
+      // 🛡️ Sentinel: Revert the rate limit cooldown if the submission fails so the user can try again.
+      try {
+        localStorage.removeItem(LAST_SUBMISSION_KEY);
+      } catch {
+        // Ignore
+      }
     }
   };
 

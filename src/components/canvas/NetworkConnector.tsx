@@ -155,14 +155,17 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       }
       ctx.fill();
 
+      // BOLT: 1D sweep and prune spatial partitioning on X-axis
+      nodes.sort((a, b) => a.x - b.x);
+
       for (let i = 0; i < numNodes; i++) {
         const nodeA = nodes[i];
         for (let j = i + 1; j < numNodes; j++) {
           const nodeB = nodes[j];
           const dx = nodeA.x - nodeB.x;
 
-          // Early exit for horizontal distance
-          if (dx > MAX_DISTANCE || dx < -MAX_DISTANCE) continue;
+          // BOLT: Short-circuit the inner loop since nodes are sorted by X-axis
+          if (dx < -MAX_DISTANCE) break;
 
           const dy = nodeA.y - nodeB.y;
 

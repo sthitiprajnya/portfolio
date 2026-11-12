@@ -155,14 +155,19 @@ export default function NetworkConnector({ className }: NetworkConnectorProps) {
       }
       ctx.fill();
 
-      for (let i = 0; i < numNodes; i++) {
-        const nodeA = nodes[i];
-        for (let j = i + 1; j < numNodes; j++) {
-          const nodeB = nodes[j];
-          const dx = nodeA.x - nodeB.x;
+      // BOLT: 1D sweep and prune spatial partitioning to optimize O(N²) distance checks.
+      // We sort a shallow copy of the nodes to avoid mutating the original array in-place,
+      // preventing dangerous side-effects if the array required a stable order.
+      const sortedNodes = [...nodes].sort((a, b) => a.x - b.x);
 
-          // Early exit for horizontal distance
-          if (dx > MAX_DISTANCE || dx < -MAX_DISTANCE) continue;
+      for (let i = 0; i < numNodes; i++) {
+        const nodeA = sortedNodes[i];
+        for (let j = i + 1; j < numNodes; j++) {
+          const nodeB = sortedNodes[j];
+          const dx = nodeB.x - nodeA.x;
+
+          // BOLT: Short-circuit the inner loop with a break statement when the 1D distance exceeds the maximum interaction threshold.
+          if (dx > MAX_DISTANCE) break;
 
           const dy = nodeA.y - nodeB.y;
 
